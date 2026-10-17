@@ -1,5 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
+import "@fontsource-variable/geist";
+import "@fontsource-variable/geist-mono";
 import "antd/dist/reset.css";
 import "streamdown/styles.css";
 import "./styles/globals.css";
@@ -11,8 +13,6 @@ import { initAnalytics } from "@/lib/analytics";
 import { router } from "@/router";
 
 initAnalytics();
-
-document.body.style.fontFamily = '"SF Pro Display","SF Pro Text","PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif';
 
 createRoot(document.getElementById("root")!).render(
     <React.StrictMode>

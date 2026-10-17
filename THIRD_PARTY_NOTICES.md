@@ -48,3 +48,13 @@ SOFTWARE.
 - `.claude/skills/design-taste-frontend/`：复制自 [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill)（提交 `f624f37`）的 `skills/taste-skill`，MIT License，Copyright (c) 2026 Leonxlnx。
 - `.claude/skills/redesign-existing-projects/`：复制自同一仓库的 `skills/redesign-skill`，MIT License，Copyright (c) 2026 Leonxlnx。
 
+
+---
+
+## Geist 字体
+
+`apps/web` 通过 npm 依赖 [`@fontsource-variable/geist`](https://www.npmjs.com/package/@fontsource-variable/geist) 和 [`@fontsource-variable/geist-mono`](https://www.npmjs.com/package/@fontsource-variable/geist-mono) 自托管 [Geist](https://github.com/vercel/geist-font) 字体，SIL Open Font License 1.1，Copyright 2024 The Geist Project Authors。
+
+## cmdk
+
+`apps/web` 的命令面板依赖 [`cmdk`](https://github.com/pacocoursey/cmdk)，MIT License，Copyright (c) 2022 Paco Coursey。
