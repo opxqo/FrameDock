@@ -5,8 +5,9 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* FrameDock design tokens: "control room" charcoal (cool, hue 255) + one signal-amber accent.
-   Tally colours carry node state only. See apps/web/DESIGN.md. */
+/* FrameDock design tokens (updream language): near-black neutrals, white as the only accent, glass chrome.
+   `signal` is the accent token (white in dark, near-black in light); tally colours carry node state only.
+   See apps/web/DESIGN.md. */
 @theme inline {
     --color-background: var(--background);
     --color-foreground: var(--foreground);
@@ -54,6 +55,8 @@
     --color-tally-ok: var(--tally-ok);
     --color-tally-fail: var(--tally-fail);
     --color-tally-stale: var(--tally-stale);
+    --color-glass: var(--glass);
+    --color-glass-border: var(--glass-border);
     --shadow-panel: var(--shadow-panel);
     --shadow-float: var(--shadow-float);
     --radius-2xl: calc(var(--radius) * 1.5);
@@ -62,19 +65,19 @@
 }
 
 /* The inherited components use stone-* utilities everywhere; remapping the ramp moves them all onto
-   the control-room neutrals in one place, keeping their light/dark pairings. */
+   pure neutrals (no hue) in one place, keeping their light/dark pairings. */
 @theme {
-    --color-stone-50: oklch(0.985 0.003 255);
-    --color-stone-100: oklch(0.965 0.004 255);
-    --color-stone-200: oklch(0.925 0.006 255);
-    --color-stone-300: oklch(0.87 0.008 255);
-    --color-stone-400: oklch(0.72 0.012 255);
-    --color-stone-500: oklch(0.6 0.014 255);
-    --color-stone-600: oklch(0.47 0.014 255);
-    --color-stone-700: oklch(0.38 0.013 255);
-    --color-stone-800: oklch(0.3 0.012 255);
-    --color-stone-900: oklch(0.225 0.01 255);
-    --color-stone-950: oklch(0.195 0.009 255);
+    --color-stone-50: #fafafa;
+    --color-stone-100: #f5f5f5;
+    --color-stone-200: #e5e5e5;
+    --color-stone-300: #d4d4d4;
+    --color-stone-400: #a3a3a3;
+    --color-stone-500: #737373;
+    --color-stone-600: #525252;
+    --color-stone-700: #404040;
+    --color-stone-800: #262626;
+    --color-stone-900: #171717;
+    --color-stone-950: #0a0a0a;
     --z-canvas: 0;
     --z-chrome: 30;
     --z-panel: 40;
@@ -84,91 +87,99 @@
 
 :root {
     --radius: 0.5rem;
-    --background: oklch(0.975 0.003 255);
-    --surface: oklch(0.955 0.004 255);
-    --foreground: oklch(0.2 0.01 255);
-    --card: oklch(0.995 0.002 255);
-    --card-foreground: oklch(0.2 0.01 255);
-    --popover: oklch(0.995 0.002 255);
-    --popover-foreground: oklch(0.2 0.01 255);
-    --primary: oklch(0.7 0.15 62);
-    --primary-foreground: oklch(0.22 0.03 60);
-    --secondary: oklch(0.94 0.005 255);
-    --secondary-foreground: oklch(0.22 0.012 255);
-    --muted: oklch(0.94 0.005 255);
-    --muted-foreground: oklch(0.48 0.012 255);
-    --accent: oklch(0.94 0.005 255);
-    --accent-foreground: oklch(0.22 0.012 255);
-    --destructive: oklch(0.58 0.2 25);
-    --border: oklch(0.2 0.01 255 / 11%);
-    --input: oklch(0.2 0.01 255 / 16%);
-    --ring: oklch(0.7 0.15 62 / 70%);
-    --signal: oklch(0.7 0.15 62);
-    --signal-foreground: oklch(0.22 0.03 60);
-    --tally-idle: oklch(0.65 0.012 255);
-    --tally-live: oklch(0.7 0.15 62);
-    --tally-ok: oklch(0.62 0.15 155);
-    --tally-fail: oklch(0.58 0.2 25);
-    --tally-stale: oklch(0.62 0.03 255);
-    --shadow-panel: 0 1px 2px oklch(0.2 0.02 255 / 6%), 0 4px 12px -4px oklch(0.2 0.02 255 / 10%);
-    --shadow-float: 0 2px 4px oklch(0.2 0.02 255 / 6%), 0 12px 32px -8px oklch(0.2 0.02 255 / 18%);
-    --chart-1: oklch(0.7 0.15 62);
-    --chart-2: oklch(0.62 0.15 155);
-    --chart-3: oklch(0.6 0.12 255);
-    --chart-4: oklch(0.58 0.2 25);
-    --chart-5: oklch(0.48 0.012 255);
-    --sidebar: oklch(0.955 0.004 255);
-    --sidebar-foreground: oklch(0.2 0.01 255);
-    --sidebar-primary: oklch(0.22 0.012 255);
-    --sidebar-primary-foreground: oklch(0.98 0.003 255);
-    --sidebar-accent: oklch(0.94 0.005 255);
-    --sidebar-accent-foreground: oklch(0.22 0.012 255);
-    --sidebar-border: oklch(0.2 0.01 255 / 11%);
-    --sidebar-ring: oklch(0.7 0.15 62 / 70%);
+    --background: #fafafa;
+    --surface: #f5f5f5;
+    --foreground: #0a0a0a;
+    --card: #ffffff;
+    --card-foreground: #0a0a0a;
+    --popover: #ffffff;
+    --popover-foreground: #0a0a0a;
+    --primary: #0a0a0a;
+    --primary-foreground: #fafafa;
+    --secondary: #f0f0f0;
+    --secondary-foreground: #171717;
+    --muted: #f0f0f0;
+    --muted-foreground: #737373;
+    --accent: #ebebeb;
+    --accent-foreground: #171717;
+    --destructive: #dc2626;
+    --border: rgb(0 0 0 / 8%);
+    --input: rgb(0 0 0 / 12%);
+    --ring: rgb(0 0 0 / 45%);
+    --signal: #0a0a0a;
+    --signal-foreground: #fafafa;
+    --glass: rgb(255 255 255 / 78%);
+    --glass-border: rgb(0 0 0 / 8%);
+    --edge: #a3a3a3;
+    --edge-selected: #404040;
+    --tally-idle: #a3a3a3;
+    --tally-live: #0a0a0a;
+    --tally-ok: #16a34a;
+    --tally-fail: #dc2626;
+    --tally-stale: #d97706;
+    --shadow-panel: 0 1px 2px rgb(0 0 0 / 5%), 0 4px 12px -4px rgb(0 0 0 / 8%);
+    --shadow-float: 0 2px 4px rgb(0 0 0 / 5%), 0 16px 40px -12px rgb(0 0 0 / 18%);
+    --chart-1: #0a0a0a;
+    --chart-2: #16a34a;
+    --chart-3: #737373;
+    --chart-4: #dc2626;
+    --chart-5: #a3a3a3;
+    --sidebar: #f5f5f5;
+    --sidebar-foreground: #0a0a0a;
+    --sidebar-primary: #0a0a0a;
+    --sidebar-primary-foreground: #fafafa;
+    --sidebar-accent: #ebebeb;
+    --sidebar-accent-foreground: #171717;
+    --sidebar-border: rgb(0 0 0 / 8%);
+    --sidebar-ring: rgb(0 0 0 / 45%);
 }
 
 .dark {
-    --background: oklch(0.195 0.009 255);
-    --surface: oklch(0.215 0.01 255);
-    --foreground: oklch(0.96 0.004 255);
-    --card: oklch(0.225 0.01 255);
-    --card-foreground: oklch(0.96 0.004 255);
-    --popover: oklch(0.255 0.011 255);
-    --popover-foreground: oklch(0.96 0.004 255);
-    --primary: oklch(0.8 0.145 72);
-    --primary-foreground: oklch(0.22 0.03 60);
-    --secondary: oklch(0.29 0.012 255);
-    --secondary-foreground: oklch(0.96 0.004 255);
-    --muted: oklch(0.27 0.011 255);
-    --muted-foreground: oklch(0.72 0.012 255);
-    --accent: oklch(0.29 0.012 255);
-    --accent-foreground: oklch(0.96 0.004 255);
-    --destructive: oklch(0.68 0.19 25);
-    --border: oklch(0.96 0.01 255 / 9%);
-    --input: oklch(0.96 0.01 255 / 14%);
-    --ring: oklch(0.8 0.145 72 / 65%);
-    --signal: oklch(0.8 0.145 72);
-    --signal-foreground: oklch(0.22 0.03 60);
-    --tally-idle: oklch(0.5 0.012 255);
-    --tally-live: oklch(0.8 0.145 72);
-    --tally-ok: oklch(0.76 0.15 155);
-    --tally-fail: oklch(0.68 0.19 25);
-    --tally-stale: oklch(0.6 0.03 255);
-    --shadow-panel: 0 1px 2px oklch(0.08 0.02 255 / 40%), 0 6px 16px -6px oklch(0.08 0.02 255 / 50%);
-    --shadow-float: 0 2px 6px oklch(0.08 0.02 255 / 40%), 0 16px 40px -10px oklch(0.08 0.02 255 / 65%);
-    --chart-1: oklch(0.8 0.145 72);
-    --chart-2: oklch(0.76 0.15 155);
-    --chart-3: oklch(0.7 0.1 255);
-    --chart-4: oklch(0.68 0.19 25);
-    --chart-5: oklch(0.6 0.014 255);
-    --sidebar: oklch(0.215 0.01 255);
-    --sidebar-foreground: oklch(0.96 0.004 255);
-    --sidebar-primary: oklch(0.8 0.145 72);
-    --sidebar-primary-foreground: oklch(0.22 0.03 60);
-    --sidebar-accent: oklch(0.29 0.012 255);
-    --sidebar-accent-foreground: oklch(0.96 0.004 255);
-    --sidebar-border: oklch(0.96 0.01 255 / 9%);
-    --sidebar-ring: oklch(0.8 0.145 72 / 65%);
+    --background: #0a0a0a;
+    --surface: #121212;
+    --foreground: #fafafa;
+    --card: #171717;
+    --card-foreground: #fafafa;
+    --popover: #1a1a1a;
+    --popover-foreground: #fafafa;
+    --primary: #fafafa;
+    --primary-foreground: #0a0a0a;
+    --secondary: #262626;
+    --secondary-foreground: #fafafa;
+    --muted: #1f1f1f;
+    --muted-foreground: #a3a3a3;
+    --accent: #262626;
+    --accent-foreground: #fafafa;
+    --destructive: #f87171;
+    --border: rgb(255 255 255 / 8%);
+    --input: rgb(255 255 255 / 12%);
+    --ring: rgb(255 255 255 / 50%);
+    --signal: #fafafa;
+    --signal-foreground: #0a0a0a;
+    --glass: rgb(23 23 23 / 75%);
+    --glass-border: rgb(255 255 255 / 8%);
+    --edge: #525252;
+    --edge-selected: #a3a3a3;
+    --tally-idle: #525252;
+    --tally-live: #fafafa;
+    --tally-ok: #4ade80;
+    --tally-fail: #f87171;
+    --tally-stale: #fbbf24;
+    --shadow-panel: 0 1px 2px rgb(0 0 0 / 40%), 0 8px 24px -8px rgb(0 0 0 / 50%);
+    --shadow-float: 0 2px 6px rgb(0 0 0 / 40%), 0 20px 48px -12px rgb(0 0 0 / 70%);
+    --chart-1: #fafafa;
+    --chart-2: #4ade80;
+    --chart-3: #a3a3a3;
+    --chart-4: #f87171;
+    --chart-5: #525252;
+    --sidebar: #0f0f0f;
+    --sidebar-foreground: #fafafa;
+    --sidebar-primary: #fafafa;
+    --sidebar-primary-foreground: #0a0a0a;
+    --sidebar-accent: #262626;
+    --sidebar-accent-foreground: #fafafa;
+    --sidebar-border: rgb(255 255 255 / 8%);
+    --sidebar-ring: rgb(255 255 255 / 50%);
 }
 
 @layer base {
@@ -195,7 +206,7 @@
         -webkit-font-smoothing: antialiased;
     }
     ::selection {
-        background: color-mix(in oklch, var(--signal) 32%, transparent);
+        background: color-mix(in oklch, var(--signal) 22%, transparent);
     }
     input,
     textarea,
@@ -216,6 +227,14 @@
     /* Numbers that change (durations, prices, sizes, counts) keep their width. */
     .tnum {
         font-variant-numeric: tabular-nums;
+    }
+    /* Floating chrome (capsules, menus, in-place panels): translucent and blurred over the canvas. */
+    .glass {
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        backdrop-filter: blur(20px) saturate(150%);
+        -webkit-backdrop-filter: blur(20px) saturate(150%);
+        box-shadow: var(--shadow-float);
     }
 
     .hide-scrollbar {
