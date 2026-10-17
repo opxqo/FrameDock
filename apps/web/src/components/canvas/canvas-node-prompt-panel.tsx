@@ -75,11 +75,13 @@ export function CanvasNodePromptPanel({ node, nodes, isRunning, onPromptChange, 
     return (
         <div
             data-canvas-no-zoom
-            className="rounded-xl border border-border bg-popover p-3 text-popover-foreground shadow-float"
+            className="relative rounded-xl border border-border bg-popover p-3 text-popover-foreground shadow-float"
             onMouseDown={(event) => event.stopPropagation()}
             onPointerDown={(event) => event.stopPropagation()}
             onWheel={(event) => event.stopPropagation()}
         >
+            {/* FrameDock: estimated cost sits in the top-right corner, level with the references heading. */}
+            <CostEstimate model={config.model} params={generationCostParams(config, mode === "video" && connectedNodes.some((item) => item.type === CanvasNodeType.Image), connectedNodes.some((item) => item.type === CanvasNodeType.Video))} className="absolute right-3 top-2.5" />
             <CanvasNodeReferenceBar nodeId={node.id} nodes={nodes} connectedNodes={connectedNodes} onDisconnect={onDisconnectReference} onStartSelection={onStartReferenceSelection} />
             <CanvasPromptChipInput
                 value={prompt}
@@ -126,11 +128,6 @@ export function CanvasNodePromptPanel({ node, nodes, isRunning, onPromptChange, 
                         </>
                     )}
                 </div>
-                <CostEstimate
-                    model={config.model}
-                    params={generationCostParams(config, mode === "video" && connectedNodes.some((item) => item.type === CanvasNodeType.Image), connectedNodes.some((item) => item.type === CanvasNodeType.Video))}
-                    className="text-xs opacity-70"
-                />
                 <Button
                     type="primary"
                     className="!h-10 !min-w-16 shrink-0 !rounded-full !px-3"
