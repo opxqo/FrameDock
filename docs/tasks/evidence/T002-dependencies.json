@@ -1,0 +1,166 @@
+{
+  "dependencies": {
+    "@ant-design/icons": {
+      "declared": "^6.1.1",
+      "installed": "6.3.4"
+    },
+    "@ant-design/pro-components": {
+      "declared": "3.0.0-beta.3",
+      "installed": "3.0.0-beta.3"
+    },
+    "@codemirror/lang-javascript": {
+      "declared": "^6.2.5",
+      "installed": "6.2.5"
+    },
+    "@codemirror/lang-json": {
+      "declared": "^6.0.2",
+      "installed": "6.0.2"
+    },
+    "@tanstack/react-query": {
+      "declared": "^5.100.9",
+      "installed": "5.104.3"
+    },
+    "@uiw/react-codemirror": {
+      "declared": "^4.25.9",
+      "installed": "4.25.12"
+    },
+    "antd": {
+      "declared": "^6.4.2",
+      "installed": "6.6.6"
+    },
+    "axios": {
+      "declared": "^1.16.0",
+      "installed": "1.20.0"
+    },
+    "class-variance-authority": {
+      "declared": "^0.7.1",
+      "installed": "0.7.1"
+    },
+    "clsx": {
+      "declared": "^2.1.1",
+      "installed": "2.1.1"
+    },
+    "copy-to-clipboard": {
+      "declared": "^4.0.2",
+      "installed": "4.0.2"
+    },
+    "dayjs": {
+      "declared": "^1.11.20",
+      "installed": "1.11.23"
+    },
+    "fflate": {
+      "declared": "^0.8.3",
+      "installed": "0.8.3"
+    },
+    "file-saver": {
+      "declared": "^2.0.5",
+      "installed": "2.0.5"
+    },
+    "i18next": {
+      "declared": "^26.3.6",
+      "installed": "26.4.7"
+    },
+    "localforage": {
+      "declared": "^1.10.0",
+      "installed": "1.10.0"
+    },
+    "lucide-react": {
+      "declared": "^1.16.0",
+      "installed": "1.59.0"
+    },
+    "motion": {
+      "declared": "^12.38.0",
+      "installed": "12.43.0"
+    },
+    "nanoid": {
+      "declared": "^5.1.11",
+      "installed": "5.1.16"
+    },
+    "radix-ui": {
+      "declared": "^1.4.3",
+      "installed": "1.8.1"
+    },
+    "react": {
+      "declared": "19.2.5",
+      "installed": "19.2.5"
+    },
+    "react-dom": {
+      "declared": "19.2.5",
+      "installed": "19.2.5"
+    },
+    "react-i18next": {
+      "declared": "^17.0.11",
+      "installed": "17.0.20"
+    },
+    "react-router": {
+      "declared": "^7.12.0",
+      "installed": "7.18.4"
+    },
+    "react-router-dom": {
+      "declared": "^7.12.0",
+      "installed": "7.18.4"
+    },
+    "shadcn": {
+      "declared": "^4.7.0",
+      "installed": "4.22.0"
+    },
+    "streamdown": {
+      "declared": "^2.5.0",
+      "installed": "2.7.0"
+    },
+    "tailwind-merge": {
+      "declared": "^3.6.0",
+      "installed": "3.7.0"
+    },
+    "tailwindcss": {
+      "declared": "^4",
+      "installed": "4.3.3"
+    },
+    "tw-animate-css": {
+      "declared": "^1.4.0",
+      "installed": "1.4.0"
+    },
+    "zustand": {
+      "declared": "^5.0.12",
+      "installed": "5.0.15"
+    }
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": {
+      "declared": "^4",
+      "installed": "4.3.3"
+    },
+    "@types/file-saver": {
+      "declared": "^2.0.7",
+      "installed": "2.0.7"
+    },
+    "@types/node": {
+      "declared": "^20",
+      "installed": "20.19.43"
+    },
+    "@types/react": {
+      "declared": "19.1.12",
+      "installed": "19.1.12"
+    },
+    "@types/react-dom": {
+      "declared": "19.1.9",
+      "installed": "19.1.9"
+    },
+    "@vitejs/plugin-react": {
+      "declared": "^5.2.0",
+      "installed": "5.2.0"
+    },
+    "prettier": {
+      "declared": "^3.8.3",
+      "installed": "3.9.10"
+    },
+    "typescript": {
+      "declared": "^5",
+      "installed": "5.9.3"
+    },
+    "vite": {
+      "declared": "^7.3.0",
+      "installed": "7.3.7"
+    }
+  }
+}

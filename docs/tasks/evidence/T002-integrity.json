@@ -1,0 +1,33 @@
+{
+  "sourceCommit": "3a6b64b602ad062b29fac66902ed18a7ef5fd9dc",
+  "referenceFiles": 4233,
+  "referenceManifestBeforeSha256": "8a90fd38b2e40f25b5e1f7b5e97ca5945e88c4839a018629823716fea4283304",
+  "referenceManifestAfterSha256": "8a90fd38b2e40f25b5e1f7b5e97ca5945e88c4839a018629823716fea4283304",
+  "referencesUnchanged": true,
+  "protectedTrackedFilesChanged": [],
+  "upstreamFilesCopiedVerbatim": 185,
+  "filesAdaptedFromUpstream": [
+    "index.html",
+    "package.json",
+    "vite.config.ts",
+    "src/constant/env.ts",
+    "src/hooks/use-version-check.ts",
+    "src/services/api/prompt-source-presets.ts",
+    "src/i18n/locales/zh-CN.ts",
+    "src/i18n/locales/en-US.ts",
+    "src/lib/canvas/plugin-registry.ts",
+    "src/components/layout/app-config-modal.tsx",
+    "src/components/layout/model-script-editor.tsx",
+    "src/components/canvas/canvas-plugin-manager-modal.tsx"
+  ],
+  "missingUpstreamFiles": [],
+  "workspaceLockfiles": ["pnpm-lock.yaml"],
+  "developmentPortsAfterCleanup": {
+    "5173": "closed",
+    "8787": "closed"
+  },
+  "dependenciesAndDevDependenciesIdenticalToUpstream": true,
+  "upstreamTsconfigPreserved": true,
+  "deploymentFilesPreserved": true,
+  "completeLicenseInNotices": true
+}

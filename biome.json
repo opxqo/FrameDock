@@ -8,6 +8,7 @@
       "!**/.pnpm-store",
       "!data",
       "!参考项目",
+      "!apps/web",
       "!apps/server/drizzle/meta"
     ]
   },

@@ -1,0 +1,33 @@
+{
+  "checkedAt": "2026-10-17T15:04:21.013Z",
+  "method": "Chrome via unified-computer-use: visible UI interactions, accessibility snapshots, screenshots and console logs",
+  "origin": "http://127.0.0.1:5173",
+  "projectUrl": "http://127.0.0.1:5173/canvas/bEsf5-7nVX2LITQL-l_iK",
+  "checks": {
+    "home": true,
+    "createProject": true,
+    "addTextNode": true,
+    "addImageNode": true,
+    "dragNode": true,
+    "connectTextToImage": true,
+    "undoConnection": true,
+    "redoConnection": true,
+    "panCanvas": true,
+    "zoomSliderFrom100To101": true,
+    "minimapDisplay": true,
+    "minimapClickNavigation": true,
+    "refreshRestoresNodesAndConnection": true,
+    "chineseBrandTitle": "FrameDock 帧坞",
+    "englishBrandTitle": "FrameDock",
+    "settingsAttribution": true,
+    "emptyDefaultPromptSources": true,
+    "emptyDefaultPluginMarket": true,
+    "localReleasePanel": true
+  },
+  "consoleErrorsAndWarnings": [],
+  "networkInspection": {
+    "verified": false,
+    "reason": "Raw CDP access to the local origin was rejected by the browser approval gate. No alternate network-inspection workaround was attempted. Static default-request audit is documented in the task card."
+  },
+  "testData": "One local test canvas named 帧坞 1 with two nodes and one connection remains in this Chrome profile. No model API key was entered and no generation was run."
+}
