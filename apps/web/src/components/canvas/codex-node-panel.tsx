@@ -64,13 +64,13 @@ export function CodexNodePanel({ node, nodes, connectedNodes = [], mentionRefere
     return (
         <div
             data-canvas-no-zoom
-            className="relative rounded-xl border border-border bg-popover p-3 text-popover-foreground shadow-float"
+            className="glass relative rounded-[20px] p-4 text-popover-foreground"
             onMouseDown={(event) => event.stopPropagation()}
             onPointerDown={(event) => event.stopPropagation()}
             onWheel={(event) => event.stopPropagation()}
         >
             <Tooltip title={status?.version ? `${status.version} · 使用本机 Codex 登录的 ChatGPT 账号` : undefined}>
-                <span className="absolute right-3 top-2.5 inline-flex items-center gap-1 rounded-full border border-border bg-muted/60 px-2 py-0.5 text-xs text-muted-foreground">
+                <span className="absolute right-4 top-3.5 inline-flex items-center gap-1 rounded-full border border-border bg-muted/60 px-2 py-0.5 text-xs text-muted-foreground">
                     <Sparkles className="size-3.5" aria-hidden="true" />
                     {t("canvas.codexNode.quota")}
                 </span>
@@ -84,7 +84,7 @@ export function CodexNodePanel({ node, nodes, connectedNodes = [], mentionRefere
                 references={mentionReferences}
                 onChange={updatePrompt}
                 onSubmit={submit}
-                className="thin-scrollbar h-40 w-full cursor-text resize-none rounded-xl px-3 py-2 text-sm leading-5 outline-none"
+                className="thin-scrollbar h-28 w-full cursor-text resize-none rounded-xl px-1 py-2 text-sm leading-6 outline-none"
                 style={{ background: "transparent", color: theme.node.text }}
                 placeholder={placeholder}
             />
@@ -131,7 +131,7 @@ export function CodexNodePanel({ node, nodes, connectedNodes = [], mentionRefere
                 </div>
                 <Button
                     type="primary"
-                    className="!h-10 !min-w-16 shrink-0 !rounded-full !px-3"
+                    className="!h-8 !min-w-8 shrink-0 !rounded-full !px-2.5"
                     danger={isRunning}
                     disabled={!isRunning && (!prompt.trim() || !ready)}
                     onClick={() => (isRunning ? onStop(node.id) : submit())}

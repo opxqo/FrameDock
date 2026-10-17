@@ -117,7 +117,7 @@ export function CanvasConfigComposer({ nodeId, nodes, value, inputs, connectedNo
     return (
         <div
             data-canvas-no-zoom
-            className="rounded-xl border border-border bg-popover p-3 text-popover-foreground shadow-float"
+            className="glass rounded-[20px] p-4 text-popover-foreground"
             onMouseDown={stopCanvasInteraction}
             onPointerDown={stopCanvasInteraction}
             onWheel={(event) => event.stopPropagation()}
@@ -204,7 +204,7 @@ function MentionMenu({ inputs, allInputs, activeIndex, theme, onSelect }: { inpu
     };
 
     return (
-        <div className="absolute left-2 top-[calc(100%+6px)] z-[90] max-h-56 w-64 overflow-y-auto rounded-lg border border-border bg-popover p-1 shadow-float">
+        <div className="glass absolute left-2 top-[calc(100%+6px)] z-[90] max-h-56 w-64 overflow-y-auto rounded-2xl p-1.5">
             {inputs.map((input, index) => (
                 <button
                     key={input.nodeId}

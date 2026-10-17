@@ -110,7 +110,8 @@ export function CanvasNodeHoverToolbar({
 
     const activeNode = node;
     const left = viewport.x + (node.position.x + node.width / 2) * viewport.k;
-    const top = viewport.y + node.position.y * viewport.k - 14;
+    // Sits above the node title (which floats 28 world px over the node), like updream's edit bar.
+    const top = viewport.y + (node.position.y - 28) * viewport.k - 10;
     const isImage = node.type === CanvasNodeType.Image;
     const isVideo = node.type === CanvasNodeType.Video;
     const isAudio = node.type === CanvasNodeType.Audio;
@@ -187,7 +188,7 @@ export function CanvasNodeHoverToolbar({
     return (
         <>
             <div
-                className="absolute z-[70] flex h-10 -translate-x-1/2 -translate-y-full items-center overflow-visible rounded-lg border border-border bg-popover px-0.5 text-[13px] text-popover-foreground shadow-float"
+                className="glass absolute z-[70] flex h-11 -translate-x-1/2 -translate-y-full items-center overflow-visible rounded-full px-1 text-[13px] text-popover-foreground"
                 data-node-toolbar={node.id}
                 style={{ left, top }}
                 onMouseEnter={() => onKeep(node.id)}
@@ -296,7 +297,7 @@ function ToolbarAction({ title, label, icon, onClick, showLabel, active = false,
     return (
         <Tooltip title={title} placement="top" mouseEnterDelay={0.2}>
             <button type="button" className={`group relative flex h-10 items-center whitespace-nowrap px-0.5 ${danger ? "text-destructive" : ""}`} onClick={onClick} aria-label={title}>
-                <span className={`flex h-8 items-center ${hasText ? "gap-1.5 px-2" : "justify-center px-1.5"} rounded-md transition-colors duration-150 group-hover:bg-accent ${active ? "bg-secondary" : ""}`}>
+                <span className={`flex h-8 items-center ${hasText ? "gap-1.5 px-2" : "justify-center px-1.5"} rounded-full transition-colors duration-150 group-hover:bg-accent ${active ? "bg-accent" : ""}`}>
                     {icon}
                     {hasText ? <span>{label}</span> : null}
                 </span>

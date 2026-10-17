@@ -6,8 +6,7 @@ import { useThemeStore } from "@/stores/use-theme-store";
 
 type WireRunState = "none" | "path" | "flow" | "ok" | "fail";
 
-// FrameDock signature: during a chain run the wires in scope light up, and the wire feeding the running
-// node carries a moving signal.
+// During a chain run the wires in scope light up, and the wire feeding the running node carries a comet.
 function useWireRunState(fromId: string, toId: string): WireRunState {
     return useWorkflowRunStore((state) => {
         const run = state.run;
@@ -20,7 +19,12 @@ function useWireRunState(fromId: string, toId: string): WireRunState {
     });
 }
 
-const WIRE_STROKE: Record<Exclude<WireRunState, "none">, string> = { path: "var(--tally-live)", flow: "var(--tally-live)", ok: "var(--tally-ok)", fail: "var(--tally-fail)" };
+/** updream bezier: horizontal handles of half the gap, and a minimum 80 when the target sits left of the source. */
+export function wirePath(startX: number, startY: number, endX: number, endY: number) {
+    const dx = endX - startX;
+    const handle = dx >= 0 ? dx / 2 : Math.max(-dx / 2, 80);
+    return `M ${startX} ${startY} C ${startX + handle} ${startY}, ${endX - handle} ${endY}, ${endX} ${endY}`;
+}
 import type { CanvasConnection, CanvasNodeData, ConnectionHandle, Position } from "@/types/canvas";
 
 export function ConnectionPath({
@@ -43,9 +47,7 @@ export function ConnectionPath({
     const startY = from.position.y + from.height / 2;
     const endX = to.position.x;
     const endY = to.position.y + to.height / 2;
-    const dx = Math.abs(endX - startX);
-    const curvature = Math.max(dx * 0.5, 50);
-    const pathD = `M ${startX} ${startY} C ${startX + curvature} ${startY}, ${endX - curvature} ${endY}, ${endX} ${endY}`;
+    const pathD = wirePath(startX, startY, endX, endY);
     const runState = useWireRunState(from.id, to.id);
 
     return (
@@ -54,7 +56,7 @@ export function ConnectionPath({
                 data-connection-id={connection.id}
                 d={pathD}
                 stroke="transparent"
-                strokeWidth="16"
+                strokeWidth="12"
                 fill="none"
                 style={{ cursor: "pointer", pointerEvents: "stroke" }}
                 onClick={(event) => {
@@ -67,15 +69,30 @@ export function ConnectionPath({
                     onContextMenu?.(event);
                 }}
             />
+            {/* Widths are in world units, so they scale with zoom like updream's 2.5×zoom / 3×zoom. */}
             <path
                 d={pathD}
-                stroke={runState !== "none" ? WIRE_STROKE[runState] : active ? theme.node.activeStroke : theme.node.muted}
-                strokeWidth={active || runState === "flow" ? 2.5 : 1.75}
-                strokeOpacity={active || runState === "flow" ? 1 : runState === "path" ? 0.45 : runState === "none" ? 0.6 : 0.8}
+                stroke={runState === "fail" ? "var(--tally-fail)" : active || runState === "flow" || runState === "path" ? theme.edge.selected : theme.edge.stroke}
+                strokeWidth={active || runState === "flow" ? 3 : 2.5}
+                strokeOpacity={runState === "fail" ? 0.7 : 1}
+                strokeLinecap="round"
                 fill="none"
-                style={{ pointerEvents: "none" }}
+                style={{ pointerEvents: "none", transition: "stroke 150ms ease-out" }}
             />
-            {runState === "flow" ? <path d={pathD} stroke="var(--tally-live)" strokeWidth={2.5} strokeLinecap="round" strokeDasharray="2 14" fill="none" className="canvas-wire-flow" style={{ pointerEvents: "none" }} /> : null}
+            {/* The comet: a bright 30% segment travelling source → target (2.5s when selected, 4s while generating). */}
+            {active || runState === "flow" ? (
+                <path
+                    d={pathD}
+                    pathLength={100}
+                    stroke={theme.node.text}
+                    strokeWidth={3}
+                    strokeLinecap="round"
+                    strokeDasharray="30 70"
+                    fill="none"
+                    className="canvas-wire-flow"
+                    style={{ pointerEvents: "none", animationDuration: runState === "flow" ? "4s" : "2.5s" }}
+                />
+            ) : null}
         </g>
     );
 }
@@ -92,8 +109,7 @@ export function ActiveConnectionPath({ node, handle, mouseWorld, target }: { nod
     const snappedStartY = handle.handleType === "target" && target ? target.position.y + target.height / 2 : startY;
     const snappedEndX = handle.handleType === "source" && target ? target.position.x : endX;
     const snappedEndY = handle.handleType === "source" && target ? target.position.y + target.height / 2 : endY;
-    const distance = Math.abs(snappedEndX - snappedStartX);
-    const pathD = `M ${snappedStartX} ${snappedStartY} C ${snappedStartX + distance * 0.5} ${snappedStartY}, ${snappedEndX - distance * 0.5} ${snappedEndY}, ${snappedEndX} ${snappedEndY}`;
+    const pathD = wirePath(snappedStartX, snappedStartY, snappedEndX, snappedEndY);
 
-    return <path d={pathD} stroke={theme.node.activeStroke} strokeWidth="2" fill="none" strokeDasharray="5,5" />;
+    return <path d={pathD} stroke={theme.edge.selected} strokeWidth="2.5" strokeLinecap="round" fill="none" strokeDasharray="6 6" />;
 }

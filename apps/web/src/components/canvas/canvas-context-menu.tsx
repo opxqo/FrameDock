@@ -37,7 +37,7 @@ export function CanvasNodeContextMenu({ menu, canCaptureVideoFrame, canGroup, ca
         <div
             ref={ref}
             role="menu"
-            className="fixed z-[80] min-w-52 overflow-hidden rounded-lg border border-border bg-popover p-1 text-popover-foreground shadow-float"
+            className="glass fixed z-[80] min-w-56 overflow-hidden rounded-2xl p-1.5 text-popover-foreground"
             style={position}
             onPointerDown={(event) => event.stopPropagation()}
         >
@@ -69,7 +69,7 @@ function MenuButton({ icon, label, shortcut, onClick, danger = false }: { icon: 
         <button
             type="button"
             role="menuitem"
-            className={cn("flex h-8 w-full items-center gap-2 rounded-md px-2 text-left text-sm transition-colors duration-100 [&_svg]:shrink-0", danger ? "text-destructive hover:bg-destructive/12" : "hover:bg-accent")}
+            className={cn("flex h-9 w-full items-center gap-2.5 rounded-[10px] px-2.5 text-left text-sm transition-colors duration-100 [&_svg]:shrink-0", danger ? "text-destructive hover:bg-destructive/12" : "hover:bg-accent")}
             onClick={onClick}
         >
             {icon}

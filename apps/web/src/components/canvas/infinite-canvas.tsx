@@ -236,17 +236,22 @@ function CanvasGrid({ viewport, mode }: { viewport: ViewportTransform; mode: Can
     const theme = canvasThemes[useThemeStore((state) => state.theme)];
     if (mode === "blank") return null;
 
-    const gridSize = 48 * viewport.k;
-    const x = viewport.x % gridSize;
-    const y = viewport.y % gridSize;
-    const dotSize = viewport.k < 0.12 ? 0.8 : 1.15;
-    const backgroundImage =
-        mode === "dots" ? `radial-gradient(circle, ${theme.canvas.dot} ${dotSize}px, transparent ${dotSize + 0.2}px)` : `linear-gradient(${theme.canvas.line} 1px, transparent 1px), linear-gradient(90deg, ${theme.canvas.line} 1px, transparent 1px)`;
+    // updream: 48px world spacing, kept inside 20–64 screen px by doubling / halving, and the grid fades out
+    // as you zoom away (gone below 30%) so an overview reads as content, not texture.
+    let gridSize = 48 * viewport.k;
+    while (gridSize > 64) gridSize /= 2;
+    while (gridSize < 20) gridSize *= 2;
+    const opacity = Math.min(1, Math.max(0, (viewport.k - 0.3) / 0.9));
+    if (opacity <= 0) return null;
+    const x = ((viewport.x % gridSize) + gridSize) % gridSize;
+    const y = ((viewport.y % gridSize) + gridSize) % gridSize;
+    const backgroundImage = mode === "dots" ? `radial-gradient(circle, ${theme.canvas.dot} 1px, transparent 1.4px)` : `linear-gradient(${theme.canvas.line} 1px, transparent 1px), linear-gradient(90deg, ${theme.canvas.line} 1px, transparent 1px)`;
 
     return (
         <div
-            className="pointer-events-none absolute inset-0 opacity-40"
+            className="pointer-events-none absolute inset-0"
             style={{
+                opacity,
                 backgroundImage,
                 backgroundSize: `${gridSize}px ${gridSize}px`,
                 backgroundPosition: `${x}px ${y}px`,

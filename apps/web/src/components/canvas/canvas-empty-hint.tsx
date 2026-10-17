@@ -11,7 +11,7 @@ export function CanvasEmptyHint({ onAddText, onAddImage, onAddVideo, onUpload }:
     return (
         <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center pt-12">
             <div className="flex w-[min(440px,calc(100%-96px))] flex-col items-center text-center">
-                <h2 className="text-base font-medium">{t("canvas.emptyHint.title")}</h2>
+                <h2 className="text-lg font-semibold">{t("canvas.emptyHint.title")}</h2>
                 <p className="mt-1.5 text-sm text-muted-foreground">{t("canvas.emptyHint.description")}</p>
                 <div className="pointer-events-auto mt-5 grid w-full grid-cols-4 gap-2">
                     <HintAction icon={<Type />} label={t("canvas.nodeTypes.text")} onClick={onAddText} />
@@ -29,7 +29,7 @@ export function CanvasEmptyHint({ onAddText, onAddImage, onAddVideo, onUpload }:
 
 function HintAction({ icon, label, onClick }: { icon: ReactNode; label: string; onClick: () => void }) {
     return (
-        <button type="button" onClick={onClick} className="flex h-16 flex-col items-center justify-center gap-1.5 rounded-lg border border-border bg-card text-sm text-muted-foreground transition-colors duration-150 hover:border-foreground/20 hover:text-foreground [&_svg]:size-4">
+        <button type="button" onClick={onClick} className="flex h-20 flex-col items-center justify-center gap-2 rounded-2xl border border-border bg-card text-sm text-muted-foreground transition-colors duration-150 hover:border-foreground/20 hover:bg-accent hover:text-foreground [&_svg]:size-6">
             {icon}
             {label}
         </button>

@@ -77,19 +77,19 @@ export function CanvasTopBar({
 
     return (
         <>
-            <header className="absolute inset-x-0 top-0 z-50 grid h-12 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 border-b border-border bg-background px-2">
-                <div className="flex min-w-0 items-center gap-0.5">
+            {/* Floating chrome over the canvas: project capsule (left), programme (centre), actions capsule (right). */}
+            <header className="pointer-events-none absolute inset-x-0 top-0 z-50 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-start gap-3 p-4">
+                <div className="glass pointer-events-auto flex h-12 min-w-0 items-center gap-0.5 justify-self-start rounded-full pl-1.5 pr-2">
                     <Tooltip title={sidePanelOpen ? t("canvas.collapsePanel") : t("canvas.expandPanel")} mouseEnterDelay={0.3}>
                         <button type="button" onClick={toggleSidePanel} aria-label={sidePanelOpen ? t("canvas.collapsePanel") : t("canvas.expandPanel")} aria-expanded={sidePanelOpen} className={iconButtonClass}>
                             {sidePanelOpen ? <PanelLeftClose /> : <PanelLeftOpen />}
                         </button>
                     </Tooltip>
                     <Tooltip title={t("canvas.projects")} mouseEnterDelay={0.3}>
-                        <button type="button" onClick={onProjects} aria-label={t("canvas.projects")} className={iconButtonClass}>
-                            <span className="size-4 bg-signal" style={{ mask: "url(/logo.svg) center / contain no-repeat", WebkitMask: "url(/logo.svg) center / contain no-repeat" }} />
+                        <button type="button" onClick={onProjects} aria-label={t("canvas.projects")} className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-signal transition-opacity hover:opacity-85">
+                            <span className="size-4 bg-signal-foreground" style={{ mask: "url(/logo.svg) center / contain no-repeat", WebkitMask: "url(/logo.svg) center / contain no-repeat" }} />
                         </button>
                     </Tooltip>
-                    <span className="mx-1 text-muted-foreground/50">/</span>
                     <div ref={titleRef} className="flex min-w-0 items-center">
                         {isTitleEditing ? (
                             <input
@@ -101,10 +101,10 @@ export function CanvasTopBar({
                                     if (event.key === "Enter") onFinishTitleEditing();
                                     if (event.key === "Escape") onCancelTitleEditing();
                                 }}
-                                className="h-7 w-56 rounded-md border border-ring bg-card px-2 text-sm font-medium outline-none"
+                                className="ml-1 h-8 w-56 rounded-full border border-ring bg-transparent px-3 text-[15px] font-semibold outline-none"
                             />
                         ) : (
-                            <button type="button" className="h-7 min-w-0 max-w-[280px] truncate rounded-md px-1.5 text-left text-sm font-medium transition-colors hover:bg-accent" onDoubleClick={onStartTitleEditing} title={t("canvas.renameHint")}>
+                            <button type="button" className="ml-1 h-8 min-w-0 max-w-[280px] truncate rounded-full px-3 text-left text-[15px] font-semibold transition-colors hover:bg-accent" onDoubleClick={onStartTitleEditing} title={t("canvas.renameHint")}>
                                 {title}
                             </button>
                         )}
@@ -125,21 +125,21 @@ export function CanvasTopBar({
                                 ],
                             }}
                         >
-                            <button type="button" className={cn(iconButtonClass, "size-7")} aria-label={t("canvas.openMenu")}>
+                            <button type="button" className={iconButtonClass} aria-label={t("canvas.openMenu")}>
                                 <ChevronDown />
                             </button>
                         </Dropdown>
                     </div>
                 </div>
 
-                <div className="flex min-w-0 justify-center">{programme}</div>
+                <div className="flex min-w-0 justify-center pt-1.5">{programme}</div>
 
-                <div className="flex min-w-0 items-center justify-end gap-1">
+                <div className="glass pointer-events-auto flex h-12 min-w-0 items-center gap-1 justify-self-end rounded-full px-2">
                     <UserStatusActions variant="canvas" onOpenShortcuts={() => setShortcutsOpen(true)} onOpenPlugins={onOpenPlugins} />
                     <Tooltip title={agentLabel} mouseEnterDelay={0.3}>
-                        <button type="button" onClick={onToggleAgent} aria-pressed={agentOpen} aria-label={t("canvas.openAgent")} className={cn(iconButtonClass, "relative", agentOpen && "bg-secondary text-foreground")}>
+                        <button type="button" onClick={onToggleAgent} aria-pressed={agentOpen} aria-label={t("canvas.openAgent")} className={cn(iconButtonClass, "relative", agentOpen && "bg-accent text-foreground")}>
                             <Bot />
-                            <span className={cn("absolute right-1 top-1 size-1.5 rounded-full", compactAgentStatus.connected ? "bg-tally-ok" : compactAgentStatus.enabled ? "bg-tally-live" : "hidden")} />
+                            <span className={cn("absolute right-1.5 top-1.5 size-1.5 rounded-full", compactAgentStatus.connected ? "bg-tally-ok" : compactAgentStatus.enabled ? "bg-tally-live" : "hidden")} />
                         </button>
                     </Tooltip>
                 </div>

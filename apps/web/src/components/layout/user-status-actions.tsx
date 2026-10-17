@@ -22,7 +22,7 @@ type UserStatusActionsProps = {
 };
 
 export const iconButtonClass =
-    "inline-flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors duration-150 hover:bg-accent hover:text-foreground active:bg-secondary [&_svg]:size-4";
+    "inline-flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-full text-muted-foreground transition-colors duration-150 hover:bg-accent hover:text-foreground active:bg-secondary [&_svg]:size-[18px]";
 
 // FrameDock: the header keeps three things — search/commands, settings, and a "more" menu that holds
 // everything secondary (theme, language, agent, docs, version, upstream links).
@@ -59,14 +59,14 @@ export function UserStatusActions({ showConfig = true, variant = "default", onOp
                 type="button"
                 onClick={() => setPaletteOpen(true)}
                 className={cn(
-                    "hidden h-8 items-center gap-2 rounded-md border border-border bg-surface pl-2.5 pr-1.5 text-sm text-muted-foreground transition-colors duration-150 hover:text-foreground sm:inline-flex",
-                    variant === "canvas" ? "w-52" : "w-56",
+                    "hidden h-9 items-center gap-2 rounded-full pl-3 pr-2 text-sm text-muted-foreground transition-colors duration-150 hover:bg-accent hover:text-foreground sm:inline-flex",
+                    variant === "canvas" ? "w-44" : "w-56 border border-border bg-surface",
                 )}
                 aria-label={t("palette.title")}
             >
-                <Search className="size-3.5 shrink-0" />
+                <Search className="size-4 shrink-0" />
                 <span className="min-w-0 flex-1 truncate text-left">{t("palette.trigger")}</span>
-                <kbd className="rounded border border-border px-1 font-mono text-[11px] leading-4">{MOD_KEY}K</kbd>
+                <kbd className="rounded-full px-1.5 font-mono text-[11px] leading-4 text-muted-foreground/80">{MOD_KEY}K</kbd>
             </button>
             <button type="button" className={cn(iconButtonClass, "sm:hidden")} onClick={() => setPaletteOpen(true)} aria-label={t("palette.title")}>
                 <Search />

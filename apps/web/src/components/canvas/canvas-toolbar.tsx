@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
 import { Segmented, Switch, Tooltip } from "antd";
-import { CircleDot, Eraser, Grid2x2, Group, Hand, Image as ImageIcon, Info, LocateFixed, Moon, MousePointer2, Music2, Palette, Puzzle, Settings2, Square, Sun, Trash2, Type, Upload, Video } from "@/components/icons";
+import { CircleDot, Eraser, Grid2x2, Group, Image as ImageIcon, Info, LocateFixed, Moon, Music2, Palette, Puzzle, Settings2, Square, Sun, Trash2, Type, Upload, Video } from "@/components/icons";
 import { CodexLogo } from "@/components/codex-logo";
 
 import { type CanvasBackgroundMode } from "@/lib/canvas-theme";
@@ -78,15 +78,9 @@ export function CanvasToolbar({
     }, [panel]);
 
     return (
-        <div ref={rootRef} className="pointer-events-none absolute left-3 top-1/2 z-50 -translate-y-1/2" onMouseDown={(event) => event.stopPropagation()}>
-            <div role="toolbar" aria-orientation="vertical" aria-label={t("canvas.toolbar.rail")} className="pointer-events-auto flex w-10 flex-col items-center gap-0.5 rounded-lg border border-border bg-card p-1 shadow-panel">
-                <RailButton label={t("canvas.toolbar.select")} shortcut="V" active={canvasTool === "select"} onClick={() => onCanvasToolChange("select")}>
-                    <MousePointer2 />
-                </RailButton>
-                <RailButton label={t("canvas.toolbar.pan")} shortcut="H" active={canvasTool === "pan"} onClick={() => onCanvasToolChange("pan")}>
-                    <Hand />
-                </RailButton>
-                <RailDivider />
+        <div ref={rootRef} className="pointer-events-none absolute left-4 top-1/2 z-50 -translate-y-1/2" onMouseDown={(event) => event.stopPropagation()}>
+            {/* Select / pan live in the bottom dock with the view controls; the rail is for adding things. */}
+            <div role="toolbar" aria-orientation="vertical" aria-label={t("canvas.toolbar.rail")} className="glass pointer-events-auto flex w-[52px] flex-col items-center gap-1 rounded-full py-2">
                 <RailButton label={t("canvas.toolbar.text")} onClick={onAddText}>
                     <Type />
                 </RailButton>
@@ -103,7 +97,7 @@ export function CanvasToolbar({
                     <Settings2 />
                 </RailButton>
                 <RailButton label={t("canvas.toolbar.codex")} onClick={onAddCodex}>
-                    <CodexLogo className="size-4" />
+                    <CodexLogo className="size-5" />
                 </RailButton>
                 <RailButton label={t("canvas.toolbar.group")} shortcut="⌘G" onClick={onAddGroup}>
                     <Group />
@@ -210,8 +204,8 @@ function RailButton({ label, shortcut, active = false, disabled = false, danger 
                 disabled={disabled}
                 onClick={onClick}
                 className={cn(
-                    "grid size-8 place-items-center rounded-md transition-colors duration-150 disabled:pointer-events-none disabled:opacity-35 [&_svg]:size-4",
-                    active ? "bg-signal/15 text-signal" : danger ? "text-muted-foreground hover:bg-destructive/12 hover:text-destructive" : "text-muted-foreground hover:bg-accent hover:text-foreground",
+                    "grid size-9 place-items-center rounded-full transition-colors duration-150 disabled:pointer-events-none disabled:opacity-35 [&_svg]:size-5",
+                    active ? "bg-signal text-signal-foreground" : danger ? "text-muted-foreground hover:bg-destructive/12 hover:text-destructive" : "text-muted-foreground hover:bg-accent hover:text-foreground",
                 )}
             >
                 {children}
@@ -221,12 +215,12 @@ function RailButton({ label, shortcut, active = false, disabled = false, danger 
 }
 
 function RailDivider() {
-    return <div className="my-0.5 h-px w-5 bg-border" />;
+    return <div className="my-1 h-px w-6 bg-border" />;
 }
 
 function RailPanel({ title, children }: { title: string; children: ReactNode }) {
     return (
-        <div className="pointer-events-auto absolute left-[calc(100%+8px)] top-1/2 w-64 -translate-y-1/2 rounded-lg border border-border bg-popover p-3 text-popover-foreground shadow-float">
+        <div className="glass pointer-events-auto absolute left-[calc(100%+12px)] top-1/2 w-64 -translate-y-1/2 rounded-2xl p-4 text-popover-foreground">
             <div className="pb-2 text-sm font-medium">{title}</div>
             {children}
         </div>

@@ -58,7 +58,7 @@ export function CanvasSelectionToolbar({
             </svg>
             {showActions ? (
                 <div
-                    className="absolute z-[70] flex h-10 -translate-x-1/2 -translate-y-full items-center overflow-visible rounded-lg border border-border bg-popover px-0.5 text-[13px] text-popover-foreground shadow-float"
+                    className="glass absolute z-[70] flex h-11 -translate-x-1/2 -translate-y-full items-center overflow-visible rounded-full px-1 text-[13px] text-popover-foreground"
                     style={{ left: left + width / 2, top: top - 8 }}
                     onMouseDown={(event) => event.stopPropagation()}
                     onPointerDown={(event) => event.stopPropagation()}
@@ -75,7 +75,7 @@ function SelectionAction({ title, label, icon, onClick }: { title: string; label
     return (
         <Tooltip title={title} placement="top" mouseEnterDelay={0.2}>
             <button type="button" className="group relative flex h-10 items-center whitespace-nowrap px-0.5" onClick={onClick} aria-label={title}>
-                <span className="flex h-8 items-center gap-1.5 rounded-md px-2 transition-colors duration-150 group-hover:bg-accent">
+                <span className="flex h-8 items-center gap-1.5 rounded-full px-2.5 transition-colors duration-150 group-hover:bg-accent">
                     {icon}
                     <span>{label}</span>
                 </span>

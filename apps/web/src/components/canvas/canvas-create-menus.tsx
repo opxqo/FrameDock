@@ -29,9 +29,9 @@ export function ConnectionCreateMenu({
     const { t } = useTranslation();
     return (
         <div
-            className="absolute z-[120] w-[240px] rounded-2xl border p-2 shadow-2xl backdrop-blur"
+            className="glass absolute z-[120] w-[240px] rounded-2xl p-2"
             data-connection-create-menu
-            style={{ left: pending.position.x, top: pending.position.y, transform: `scale(${1 / scale})`, transformOrigin: "top left", background: theme.node.panel, borderColor: theme.node.stroke, color: theme.node.text }}
+            style={{ left: pending.position.x, top: pending.position.y, transform: `scale(${1 / scale})`, transformOrigin: "top left", color: theme.node.text }}
             onMouseDown={(event) => event.stopPropagation()}
             onPointerDown={(event) => event.stopPropagation()}
         >
@@ -97,9 +97,9 @@ export function NodeCreateMenu({ position, scale = 1, onCreate, onClose }: { pos
     return (
         <div
             ref={menuRef}
-            className="absolute z-[120] max-h-[70vh] w-[240px] overflow-y-auto rounded-2xl border p-2 shadow-2xl backdrop-blur thin-scrollbar"
+            className="glass absolute z-[120] max-h-[70vh] w-[240px] overflow-y-auto rounded-2xl p-2 thin-scrollbar"
             data-canvas-no-zoom
-            style={{ left: position.x, top: position.y, transform: `scale(${1 / scale})`, transformOrigin: "top left", background: theme.node.panel, borderColor: theme.node.stroke, color: theme.node.text }}
+            style={{ left: position.x, top: position.y, transform: `scale(${1 / scale})`, transformOrigin: "top left", color: theme.node.text }}
             onPointerDown={(event) => event.stopPropagation()}
         >
             <div className="mb-1.5 flex items-center justify-between px-1">

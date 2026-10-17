@@ -260,7 +260,7 @@ function InfiniteCanvasPage() {
     const [nodeCreatePosition, setNodeCreatePosition] = useState<Position | null>(null);
     const [runningNodeId, setRunningNodeId] = useState<string | null>(null);
     const [isMiniMapOpen, setIsMiniMapOpen] = useState(false);
-    const [backgroundMode, setBackgroundMode] = useState<CanvasBackgroundMode>("lines");
+    const [backgroundMode, setBackgroundMode] = useState<CanvasBackgroundMode>("dots");
     const [showImageInfo, setShowImageInfo] = useState(false);
     const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
     const [assetPickerOpen, setAssetPickerOpen] = useState(false);
@@ -3699,7 +3699,7 @@ function InfiniteCanvasPage() {
                     />
                 ) : null}
 
-                {nodes.length === 0 ? <CanvasEmptyHint onAddText={() => createNode(CanvasNodeType.Text)} onAddImage={() => createNode(CanvasNodeType.Image)} onAddVideo={() => createNode(CanvasNodeType.Video)} onUpload={() => handleUploadRequest()} /> : null}
+                {nodes.length === 0 && !nodeCreatePosition ? <CanvasEmptyHint onAddText={() => createNode(CanvasNodeType.Text)} onAddImage={() => createNode(CanvasNodeType.Image)} onAddVideo={() => createNode(CanvasNodeType.Video)} onUpload={() => handleUploadRequest()} /> : null}
 
                 <CanvasToolbar
                     selectedCount={selectedNodeIds.size}
@@ -3729,7 +3729,7 @@ function InfiniteCanvasPage() {
 
                 {isMiniMapOpen ? <Minimap nodes={nodes} viewport={viewport} viewportSize={size} onViewportChange={setViewport} /> : null}
 
-                <CanvasZoomControls scale={viewport.k} onScaleChange={setZoomScale} onReset={resetViewport} onFit={fitAllNodes} isMiniMapOpen={isMiniMapOpen} onToggleMiniMap={() => setIsMiniMapOpen((value) => !value)} canUndo={historyState.canUndo} canRedo={historyState.canRedo} onUndo={undoCanvas} onRedo={redoCanvas} />
+                <CanvasZoomControls scale={viewport.k} onScaleChange={setZoomScale} onReset={resetViewport} onFit={fitAllNodes} isMiniMapOpen={isMiniMapOpen} onToggleMiniMap={() => setIsMiniMapOpen((value) => !value)} canUndo={historyState.canUndo} canRedo={historyState.canRedo} onUndo={undoCanvas} onRedo={redoCanvas} canvasTool={canvasTool} onCanvasToolChange={setCanvasTool} />
 
                 {contextMenu ? (
                     <CanvasNodeContextMenu

@@ -18,8 +18,9 @@ import type { CanvasResourceReference } from "@/lib/canvas/canvas-resource-refer
 import { useTranslation } from "react-i18next";
 
 type ResizeCorner = "top-left" | "top-right" | "bottom-left" | "bottom-right";
-// FrameDock: selection uses the signal amber (the same value as theme.node.activeStroke).
-const selectionBlue = "var(--signal)";
+// updream selection: a 1px half-strength accent outline plus a soft 2px ring outside it.
+const selectionBlue = "color-mix(in srgb, var(--signal) 50%, transparent)";
+const selectionRing = "0 0 0 2px color-mix(in srgb, var(--signal) 10%, transparent)";
 
 const TALLY_CLASS: Record<TallyState, string> = {
     idle: "bg-tally-idle",
@@ -341,17 +342,17 @@ export const CanvasNode = React.memo(function CanvasNode({
         >
             {!referenceSelectionState && (isGroup ? isSelected || hovered || isEditingTitle : true) && (
                 <div
-                    className={`absolute left-1 top-[-26px] z-[65] flex max-w-[calc(100%-8px)] items-center gap-1.5 transition-opacity duration-150 ${isSelected || hovered || isEditingTitle || tally !== "idle" ? "opacity-100" : "opacity-60"}`}
+                    className={`absolute left-0.5 top-[-28px] z-[65] flex max-w-[calc(100%-4px)] items-center gap-1.5 transition-opacity duration-150 ${isSelected || hovered || isEditingTitle || tally !== "idle" ? "opacity-100" : "opacity-75"}`}
                     onMouseDown={(event) => event.stopPropagation()}
                     onPointerDown={(event) => event.stopPropagation()}
                 >
-                    {isGroup ? null : <span role="img" aria-label={tallyLabel} title={tallyLabel} className={`size-2 shrink-0 rounded-full ${TALLY_CLASS[tally]}`} />}
+                    {isGroup || tally === "idle" ? null : <span role="img" aria-label={tallyLabel} title={tallyLabel} className={`size-1.5 shrink-0 rounded-full ${TALLY_CLASS[tally]}`} />}
                     {isEditingTitle ? (
                         <input
                             ref={titleInputRef}
                             value={titleDraft}
                             maxLength={64}
-                            className="h-6 max-w-full border-0 border-b border-dashed bg-transparent px-0 text-left text-xs font-medium outline-none"
+                            className="h-6 max-w-full border-0 border-b border-dashed bg-transparent px-0 text-left text-[13px] font-semibold outline-none"
                             style={{ borderColor: theme.node.muted, color: theme.node.text }}
                             onChange={(event) => setTitleDraft(event.target.value)}
                             onBlur={finishTitleEditing}
@@ -366,7 +367,7 @@ export const CanvasNode = React.memo(function CanvasNode({
                     ) : (
                         <button
                             type="button"
-                            className="block min-w-0 max-w-full truncate border-b border-dashed border-transparent px-0 py-0.5 text-left text-xs font-medium transition hover:border-current"
+                            className="block min-w-0 max-w-full truncate border-b border-dashed border-transparent px-0 py-0.5 text-left text-[13px] font-semibold transition hover:border-current"
                             style={{ color: theme.node.text }}
                             title={t("canvas.node.renameHint")}
                             onDoubleClick={(event) => {
@@ -381,12 +382,12 @@ export const CanvasNode = React.memo(function CanvasNode({
             )}
 
             <div
-                className="relative h-full w-full overflow-visible rounded-xl border"
+                className="relative h-full w-full overflow-visible rounded-lg border"
                 style={{
                     background: isGroup ? "transparent" : hasImageContent || hasVideoContent || transparentBg ? "transparent" : theme.node.fill,
                     borderColor: isGroup ? (isGroupDropTarget || isActive ? selectionBlue : theme.node.stroke) : hasImageContent ? imageBorderColor : isActive ? selectionBlue : isRelated ? theme.node.muted : transparentBg ? "transparent" : theme.node.stroke,
                     borderStyle: isGroup ? "dashed" : "solid",
-                    boxShadow: isGroupDropTarget ? "0 0 0 2px color-mix(in oklch, var(--signal) 40%, transparent), inset 0 0 0 999px color-mix(in oklch, var(--signal) 6%, transparent)" : isActive ? "0 0 0 1px var(--signal)" : isRelated ? `0 0 0 1px ${theme.node.muted}55` : undefined,
+                    boxShadow: isGroupDropTarget ? "0 0 0 2px color-mix(in srgb, var(--signal) 30%, transparent), inset 0 0 0 999px color-mix(in srgb, var(--signal) 4%, transparent)" : isActive ? selectionRing : undefined,
                 }}
                 onMouseDown={(event) => {
                     if (!referenceSelectionState) onMouseDown(event, data.id);
@@ -470,7 +471,7 @@ export const CanvasNode = React.memo(function CanvasNode({
 
             {/* Counter-scale the panel so its on-screen size stays constant while the canvas zooms. */}
             {showPanel && !isGroup && renderPanel ? (
-                <div className="absolute left-1/2 top-full z-[70] w-[600px] pt-4" style={{ transform: `translateX(-50%) scale(${1 / scale})`, transformOrigin: "top center" }} data-node-panel={data.id}>
+                <div className="absolute left-1/2 top-full z-[70] pt-4" style={{ width: data.type === CanvasNodeType.Video ? 630 : 520, transform: `translateX(-50%) scale(${1 / scale})`, transformOrigin: "top center" }} data-node-panel={data.id}>
                     {renderPanel(data)}
                 </div>
             ) : null}
@@ -560,10 +561,13 @@ function GroupNodeContent({ node, theme, groupChildCount }: NodeContentRendererP
 
 function LoadingContent({ theme }: Pick<NodeContentRendererProps, "theme">) {
     const { t } = useTranslation();
+    // updream: a light sweep across the node plus a small status pill, instead of a spinner.
     return (
-        <div className="flex h-full w-full flex-col items-center justify-center gap-3" style={{ color: theme.node.activeStroke }}>
-            <div className="size-10 animate-spin rounded-full border-2" style={{ borderColor: theme.node.stroke, borderTopColor: theme.node.activeStroke }} />
-            <span className="text-[10px] tracking-[0.2em]">{t("canvas.node.generating")}</span>
+        <div className="canvas-node-sweep relative flex h-full w-full items-center justify-center" style={{ background: theme.node.fill }}>
+            <span className="glass inline-flex h-7 items-center gap-1.5 rounded-full px-3 text-xs" style={{ color: theme.node.text }}>
+                <span className="size-3 animate-spin rounded-full border-[1.5px] border-current border-t-transparent opacity-80" />
+                {t("canvas.node.generating")}
+            </span>
         </div>
     );
 }
@@ -571,12 +575,11 @@ function LoadingContent({ theme }: Pick<NodeContentRendererProps, "theme">) {
 function ErrorContent({ node, theme, onRetry }: Pick<NodeContentRendererProps, "node" | "theme" | "onRetry">) {
     const { t } = useTranslation();
     return (
-        <div className="flex max-w-[260px] flex-col items-center gap-3 px-5 text-center">
-            <div className="text-xs leading-5 text-red-300">{node.metadata?.errorDetails || t("canvas.node.failed")}</div>
+        <div className="flex h-full w-full flex-col items-center justify-center gap-3 px-5 text-center" style={{ background: "color-mix(in srgb, var(--tally-fail) 10%, transparent)" }}>
+            <div className="line-clamp-4 max-w-[280px] text-xs leading-5" style={{ color: "var(--tally-fail)" }}>{node.metadata?.errorDetails || t("canvas.node.failed")}</div>
             <button
                 type="button"
-                className="inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-xs font-medium transition hover:scale-[1.02]"
-                style={{ background: theme.toolbar.panel, borderColor: theme.toolbar.border, color: theme.node.text }}
+                className="inline-flex h-8 items-center gap-1.5 rounded-full bg-signal px-3.5 text-xs font-medium text-signal-foreground transition-opacity hover:opacity-85"
                 onClick={(event) => {
                     event.stopPropagation();
                     onRetry?.(node);
@@ -1042,15 +1045,26 @@ function ResizeHandle({ corner, onMouseDown }: { corner: ResizeCorner; onMouseDo
 
 function ConnectionHandleDot({ side, visible, onMouseDown }: { side: "left" | "right"; visible: boolean; onMouseDown: (event: React.MouseEvent) => void }) {
     const theme = canvasThemes[useThemeStore((state) => state.theme)];
+    const offset = side === "left" ? 18 : -18;
 
+    // updream port: a 20px circle that springs out 18px from the edge on hover; the 48px box is the hit area.
     return (
         <div
-            className={`absolute top-1/2 z-30 flex size-12 -translate-y-1/2 cursor-crosshair items-center justify-center transition-opacity duration-150 ${
-                side === "left" ? "-left-6" : "-right-6"
-            } ${visible ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`}
+            className={`absolute top-1/2 z-30 flex size-12 -translate-y-1/2 cursor-crosshair items-center justify-center ${side === "left" ? "-left-[42px]" : "-right-[42px]"} ${visible ? "pointer-events-auto" : "pointer-events-none"}`}
             onMouseDown={onMouseDown}
         >
-            <div className="size-3 rounded-full border-2 transition-all hover:scale-125" style={{ background: theme.node.panel, borderColor: theme.node.muted }} />
+            <div
+                className="grid size-5 place-items-center rounded-full border-[1.5px] hover:!scale-110 motion-reduce:transition-none"
+                style={{
+                    background: theme.node.panel,
+                    borderColor: theme.edge.selected,
+                    opacity: visible ? 1 : 0,
+                    transform: visible ? "translateX(0) scale(1)" : `translateX(${offset}px) scale(0.5)`,
+                    transition: "opacity 160ms ease-out, transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1)",
+                }}
+            >
+                <span className="size-1.5 rounded-full" style={{ background: theme.edge.selected }} />
+            </div>
         </div>
     );
 }

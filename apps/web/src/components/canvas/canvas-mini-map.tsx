@@ -1,7 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 
 import { canvasThemes } from "@/lib/canvas-theme";
-import { getNodeDefinition } from "@/lib/canvas/node-registry";
 import { useThemeStore } from "@/stores/use-theme-store";
 import { type CanvasNodeData, type ViewportTransform } from "@/types/canvas";
 
@@ -96,7 +95,7 @@ export function Minimap({ nodes, viewport, viewportSize, onViewportChange }: { n
     };
 
     return (
-        <div className="absolute bottom-14 left-3 z-50 overflow-hidden rounded-lg border shadow-float" style={{ width, height, background: theme.toolbar.panel, borderColor: theme.toolbar.border }}>
+        <div className="glass absolute bottom-5 left-4 z-50 overflow-hidden rounded-2xl" style={{ width, height }}>
             <div
                 ref={containerRef}
                 className="relative h-full w-full cursor-crosshair"
@@ -114,11 +113,12 @@ export function Minimap({ nodes, viewport, viewportSize, onViewportChange }: { n
             >
                 {nodes.map((node) => {
                     const pos = toMinimap(node.position.x, node.position.y);
-                    const color = getNodeDefinition(node.type)?.minimapColor || theme.node.muted;
+                    // updream: nodes are plain grey blocks; the minimap is for position, not type.
+                    const color = theme.edge.stroke;
                     return (
                         <div
                             key={node.id}
-                            className="absolute rounded-[1px]"
+                            className="absolute rounded-[2px]"
                             style={{
                                 left: pos.x,
                                 top: pos.y,
@@ -130,7 +130,7 @@ export function Minimap({ nodes, viewport, viewportSize, onViewportChange }: { n
                         />
                     );
                 })}
-                <div className="pointer-events-none absolute border" style={{ left: viewportRect.x, top: viewportRect.y, width: viewportRect.w, height: viewportRect.h, borderColor: theme.node.activeStroke, background: `${theme.node.activeStroke}18` }} />
+                <div className="pointer-events-none absolute rounded-[3px] border" style={{ left: viewportRect.x, top: viewportRect.y, width: viewportRect.w, height: viewportRect.h, borderColor: theme.node.activeStroke, background: theme.canvas.selectionFill }} />
             </div>
         </div>
     );

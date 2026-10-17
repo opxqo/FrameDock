@@ -32,8 +32,8 @@ export const canvasThemes = {
             border: "rgba(0,0,0,.08)",
             item: "#404040",
             itemHover: "rgba(0,0,0,.05)",
-            activeBg: "#0a0a0a",
-            activeText: "#fafafa",
+            activeBg: "rgba(0,0,0,.06)",
+            activeText: "#0a0a0a",
         },
     },
     dark: {
@@ -64,8 +64,8 @@ export const canvasThemes = {
             border: "rgba(255,255,255,.08)",
             item: "#d4d4d4",
             itemHover: "rgba(255,255,255,.08)",
-            activeBg: "#fafafa",
-            activeText: "#0a0a0a",
+            activeBg: "rgba(255,255,255,.1)",
+            activeText: "#fafafa",
         },
     },
 } as const;

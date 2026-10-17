@@ -1,3 +1,6 @@
+/* antd's reset is unlayered when imported from JS, which made it beat every Tailwind text colour on <button>;
+   loading it into the base layer keeps it underneath the utilities. */
+@import "antd/dist/reset.css" layer(base);
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -475,20 +478,50 @@
         top: 21px;
     }
 
-    /* FrameDock: the moving signal on the wire feeding a running node. */
+    /* The comet on a selected or generating wire (path normalised with pathLength=100). */
     .canvas-wire-flow {
-        animation: canvas-wire-flow 0.9s linear infinite;
-        filter: brightness(1.35);
+        animation: canvas-wire-flow 2.5s linear infinite;
+        opacity: 0.9;
     }
 
     @keyframes canvas-wire-flow {
+        from {
+            stroke-dashoffset: 100;
+        }
         to {
-            stroke-dashoffset: -16;
+            stroke-dashoffset: 0;
         }
     }
 
     @media (prefers-reduced-motion: reduce) {
         .canvas-wire-flow {
+            animation: none;
+            stroke-dasharray: none;
+            opacity: 0.5;
+        }
+    }
+
+    /* Generating node: a soft light band sweeping across. */
+    .canvas-node-sweep::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(100deg, transparent 30%, rgb(255 255 255 / 6%) 50%, transparent 70%);
+        background-size: 250% 100%;
+        animation: canvas-node-sweep 1.8s ease-in-out infinite;
+    }
+
+    @keyframes canvas-node-sweep {
+        from {
+            background-position: 120% 0;
+        }
+        to {
+            background-position: -120% 0;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .canvas-node-sweep::before {
             animation: none;
         }
     }
