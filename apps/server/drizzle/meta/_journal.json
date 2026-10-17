@@ -8,6 +8,13 @@
       "when": 1792247203790,
       "tag": "0000_tiny_sebastian_shaw",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1792253865321,
+      "tag": "0001_groovy_zombie",
+      "breakpoints": true
     }
   ]
 }

@@ -80,6 +80,10 @@ export const LOCAL_PROXY_PACKAGE = "@basketikun/canvas-proxy";
 export const DEFAULT_LOCAL_PROXY_URL = "http://127.0.0.1:23210";
 // FrameDock: the self-hosted server forwards provider calls and result downloads (apps/server/src/proxy.ts).
 export const FRAMEDOCK_PROXY_URL = `${window.location.origin}/proxy`;
+// Empty, the upstream canvas-proxy default, or any origin's built-in "/proxy" all map to this page's built-in proxy.
+function isBuiltinProxyUrl(url: string | undefined) {
+    return !url || url === DEFAULT_LOCAL_PROXY_URL || /^https?:\/\/[^/]+\/proxy\/?$/i.test(url);
+}
 
 const mockChannel: ModelChannel | undefined = import.meta.env.DEV ? {
     id: "mock",
@@ -300,6 +304,8 @@ export const useConfigStore = create<ConfigStore>()(
                 if (persistedState.config && !Array.isArray(persistedConfig.channels)) config.channels = [];
                 const channels = normalizeChannels(config);
                 if (mockChannel && !channels.some((channel) => channel.id === "mock")) channels.unshift(mockChannel);
+                // Config is shared by every browser (server storage), so origin-bound addresses follow the current page.
+                if (mockChannel) channels.forEach((channel, index) => { if (channel.id === "mock") channels[index] = { ...channel, baseUrl: mockChannel.baseUrl }; });
                 autodlChannels.forEach((preset) => {
                     if (!channels.some((channel) => channel.id === preset.id)) channels.push(preset);
                 });
@@ -329,8 +335,8 @@ export const useConfigStore = create<ConfigStore>()(
                         videoMode: config.videoMode === "reference" ? "reference" : "frames",
                         canvasImageCount: config.canvasImageCount || "3",
                         // Configs still pointing at the upstream canvas-proxy default move to the built-in FrameDock proxy.
-                        proxyEnabled: !config.proxyUrl || config.proxyUrl === DEFAULT_LOCAL_PROXY_URL ? true : Boolean(config.proxyEnabled),
-                        proxyUrl: !config.proxyUrl || config.proxyUrl === DEFAULT_LOCAL_PROXY_URL ? FRAMEDOCK_PROXY_URL : config.proxyUrl,
+                        proxyEnabled: isBuiltinProxyUrl(config.proxyUrl) ? true : Boolean(config.proxyEnabled),
+                        proxyUrl: isBuiltinProxyUrl(config.proxyUrl) ? FRAMEDOCK_PROXY_URL : config.proxyUrl,
                         nodeRegenerateBehavior: config.nodeRegenerateBehavior === "overwrite" ? "overwrite" : "new-node",
                         autoFocusOnSelect: Boolean(config.autoFocusOnSelect),
                     },

@@ -2,10 +2,25 @@ import type { NodeStatus, NodeType, RunStatus } from "@framedock/shared";
 import {
   type AnySQLiteColumn,
   integer,
+  primaryKey,
   real,
   sqliteTable,
   text,
 } from "drizzle-orm/sqlite-core";
+
+export const kv = sqliteTable(
+  "kv",
+  {
+    store: text("store").notNull(),
+    key: text("key").notNull(),
+    kind: text("kind", { enum: ["json", "blob"] }).notNull(),
+    value: text("value"),
+    mime: text("mime"),
+    size: integer("size"),
+    updated_at: integer("updated_at").notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.store, table.key] })],
+);
 
 export const projects = sqliteTable("projects", {
   id: text("id").primaryKey(),

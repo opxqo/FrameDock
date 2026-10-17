@@ -2,11 +2,14 @@ import Fastify from "fastify";
 import packageJson from "../package.json" with { type: "json" };
 import { config } from "./config";
 import { openDatabase } from "./db";
+import kvApi from "./kv";
 import mockApi from "./mock";
 import proxy from "./proxy";
 
 const app = Fastify({ logger: true });
-const { sqlite } = openDatabase();
+const { db, sqlite } = openDatabase();
+
+await app.register(kvApi, { prefix: "/api/kv", db });
 
 await app.register(proxy, { prefix: "/proxy" });
 
