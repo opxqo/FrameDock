@@ -1,3 +1,5 @@
+import type { CanvasSkill } from "@/lib/skills/skills";
+
 export type Position = {
     x: number;
     y: number;
@@ -47,6 +49,8 @@ export type CanvasNodeText = {
 };
 
 export type CanvasNodeMetadata = {
+    /** FrameDock: skill snapshot used as the system prompt when this node generates text. */
+    skill?: CanvasSkill;
     content?: string;
     composerContent?: string;
     prompt?: string;

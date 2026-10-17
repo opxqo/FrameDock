@@ -11,6 +11,7 @@ import { canvasThemes } from "@/lib/canvas-theme";
 import { useThemeStore } from "@/stores/use-theme-store";
 import { CanvasImageSettingsPopover } from "./canvas-image-settings-popover";
 import { CanvasPromptRecipes } from "./canvas-prompt-recipes";
+import { CanvasSkillPicker } from "./canvas-skill-picker";
 import { CanvasPromptLibrary } from "./canvas-prompt-library";
 import { CanvasAudioSettingsPopover, type CanvasAudioSettingKey } from "./canvas-audio-settings-popover";
 import { CanvasPromptChipInput } from "./canvas-prompt-chip-input";
@@ -48,6 +49,7 @@ export function CanvasNodePromptPanel({ node, nodes, isRunning, onPromptChange, 
     const hasTextContent = node.type === CanvasNodeType.Text && Boolean(node.metadata?.content?.trim());
     const hasImageContent = node.type === CanvasNodeType.Image && Boolean(node.metadata?.content);
     const isEditingExistingContent = hasTextContent || hasImageContent;
+    const skill = node.metadata?.skill;
     const [prompt, setPrompt] = useState(node.metadata?.composerContent ?? node.metadata?.prompt ?? "");
     const [expanded, setExpanded] = useState(false);
 
@@ -91,7 +93,7 @@ export function CanvasNodePromptPanel({ node, nodes, isRunning, onPromptChange, 
                 onSubmit={submit}
                 className="thin-scrollbar h-28 w-full cursor-text resize-none rounded-xl px-1 py-2 text-sm leading-6 outline-none"
                 style={{ background: "transparent", color: theme.node.text }}
-                placeholder={t(`canvas.promptPanel.${mode === "image" && hasImageContent ? "editImage" : mode === "text" && hasTextContent ? "editText" : mode}`)}
+                placeholder={mode === "text" && skill ? t("skills.promptPlaceholder", { name: skill.title }) : t(`canvas.promptPanel.${mode === "image" && hasImageContent ? "editImage" : mode === "text" && hasTextContent ? "editText" : mode}`)}
             />
 
             <div className="mt-2 flex min-w-0 items-center justify-between gap-2">
@@ -125,8 +127,9 @@ export function CanvasNodePromptPanel({ node, nodes, isRunning, onPromptChange, 
                         </>
                     ) : (
                         <>
-                            <ModelPicker config={config} value={config.model} onChange={(model) => onConfigChange(node.id, { model })} capability="text" onMissingConfig={() => openConfigDialog(true)} className="max-w-[190px]" />
-                            <CanvasTextSettingsPopover config={config} count={node.metadata?.textCount || 1} onConfigChange={(_, value) => onConfigChange(node.id, { reasoningEffort: value })} onCountChange={(textCount) => onConfigChange(node.id, { textCount })} />
+                            <CanvasSkillPicker skill={skill} onChange={(next) => onConfigChange(node.id, { skill: next })} />
+                            <ModelPicker config={config} value={config.model} onChange={(model) => onConfigChange(node.id, { model })} capability="text" onMissingConfig={() => openConfigDialog(true)} className="max-w-[140px]" />
+                            <CanvasTextSettingsPopover config={config} buttonClassName="!h-8 !max-w-[124px] !justify-start !rounded-full !px-2.5" count={node.metadata?.textCount || 1} onConfigChange={(_, value) => onConfigChange(node.id, { reasoningEffort: value })} onCountChange={(textCount) => onConfigChange(node.id, { textCount })} />
                         </>
                     )}
                 </div>
@@ -160,7 +163,7 @@ export function CanvasNodePromptPanel({ node, nodes, isRunning, onPromptChange, 
                         onChange={updatePrompt}
                         className="thin-scrollbar h-[52dvh] min-h-80 w-full cursor-text overflow-y-auto rounded-xl border p-4 text-[15px] leading-6 outline-none"
                         style={{ background: "transparent", borderColor: theme.toolbar.border, color: theme.node.text }}
-                        placeholder={t(`canvas.promptPanel.${mode === "image" && hasImageContent ? "editImage" : mode === "text" && hasTextContent ? "editText" : mode}`)}
+                        placeholder={mode === "text" && skill ? t("skills.promptPlaceholder", { name: skill.title }) : t(`canvas.promptPanel.${mode === "image" && hasImageContent ? "editImage" : mode === "text" && hasTextContent ? "editText" : mode}`)}
                     />
                 </div>
             </Modal>

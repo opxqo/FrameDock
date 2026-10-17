@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { ReactNode } from "react";
-import { ChevronRight, Copy, Download, Group, Image as ImageIcon, Music2, Puzzle, RefreshCw, Star, Trash2, Video } from "@/components/icons";
+import { ChevronRight, Copy, Download, Group, Image as ImageIcon, Music2, Puzzle, RefreshCw, SkillBook, Star, Trash2, Video } from "@/components/icons";
 import { CodexLogo } from "@/components/codex-logo";
 
 import { canvasThemes } from "@/lib/canvas-theme";
@@ -363,6 +363,11 @@ export const CanvasNode = React.memo(function CanvasNode({
                     onPointerDown={(event) => event.stopPropagation()}
                 >
                     {isGroup || tally === "idle" ? null : <span role="img" aria-label={tallyLabel} title={tallyLabel} className={`size-1.5 shrink-0 rounded-full ${TALLY_CLASS[tally]}`} />}
+                    {data.metadata?.skill ? (
+                        <span role="img" aria-label={t("skills.nodeBadge", { name: data.metadata.skill.title })} title={t("skills.nodeBadge", { name: data.metadata.skill.title })} className="inline-flex shrink-0" style={{ color: theme.node.muted }}>
+                            <SkillBook className="size-3.5" />
+                        </span>
+                    ) : null}
                     {isEditingTitle ? (
                         <input
                             ref={titleInputRef}
@@ -490,7 +495,7 @@ export const CanvasNode = React.memo(function CanvasNode({
                 <div
                     ref={panelRef}
                     className={`absolute left-1/2 z-[70] ${panelAbove ? "bottom-full" : "top-full pt-4"}`}
-                    style={{ width: data.type === CanvasNodeType.Video ? 630 : 520, paddingBottom: panelAbove ? 28 * scale + 64 : undefined, transform: `translateX(-50%) scale(${1 / scale})`, transformOrigin: panelAbove ? "bottom center" : "top center" }}
+                    style={{ width: data.type === CanvasNodeType.Video ? 630 : data.type === CanvasNodeType.Text ? 600 : 520, paddingBottom: panelAbove ? 28 * scale + 64 : undefined, transform: `translateX(-50%) scale(${1 / scale})`, transformOrigin: panelAbove ? "bottom center" : "top center" }}
                     data-node-panel={data.id}
                 >
                     {renderPanel(data)}

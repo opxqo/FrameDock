@@ -1,5 +1,6 @@
 import { defaultConfig, resolveModelForCapability, type AiConfig } from "@/stores/use-config-store";
 import i18n from "@/i18n";
+import { skillSystemPrompt } from "@/lib/skills/skills";
 import { ensureImagePreview, resolveImageUrl, uploadImage } from "@/services/image-storage";
 import { resolveMediaUrl } from "@/services/file-storage";
 import { imageMetadata, referenceUrl } from "@/lib/canvas/canvas-node-factory";
@@ -120,6 +121,8 @@ export function buildGenerationConfig(config: AiConfig, node: CanvasNodeData | u
         audioSpeed: node?.metadata?.audioSpeed || config.audioSpeed || defaultConfig.audioSpeed,
         audioInstructions: node?.metadata?.audioInstructions || config.audioInstructions || defaultConfig.audioInstructions,
         count: String(node?.metadata?.count || (mode === "image" ? config.canvasImageCount || config.count : config.count) || defaultConfig.count),
+        // A skill only steers text generation (it writes prompts for the nodes downstream).
+        systemPrompt: mode === "text" ? skillSystemPrompt(node?.metadata?.skill, config.systemPrompt) : config.systemPrompt,
     };
 }
 

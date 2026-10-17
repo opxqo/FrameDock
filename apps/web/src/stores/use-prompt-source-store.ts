@@ -20,6 +20,9 @@ export const PROMPT_SOURCE_INTERVALS = [0, 30, 60, 360, 1440];
 type PromptSourceStore = {
     sources: PromptSource[];
     schedule: PromptSourceSchedule;
+    /** FrameDock: search MOKE AIGC skills online (anonymous, read-only). */
+    mokeEnabled: boolean;
+    setMokeEnabled: (enabled: boolean) => void;
     addSource: () => PromptSource;
     saveSource: (source: PromptSource) => void;
     removeSource: (id: string) => void;
@@ -32,6 +35,8 @@ export const usePromptSourceStore = create<PromptSourceStore>()(
         (set) => ({
             sources: DEFAULT_PROMPT_SOURCES,
             schedule: defaultSchedule,
+            mokeEnabled: true,
+            setMokeEnabled: (mokeEnabled) => set({ mokeEnabled }),
             addSource: () => createPromptSource(),
             saveSource: (source) =>
                 set((state) => ({
@@ -45,14 +50,14 @@ export const usePromptSourceStore = create<PromptSourceStore>()(
         }),
         {
             name: PROMPT_SOURCE_STORE_KEY,
-            partialize: (state) => ({ sources: state.sources, schedule: state.schedule }),
+            partialize: (state) => ({ sources: state.sources, schedule: state.schedule, mokeEnabled: state.mokeEnabled }),
             merge: (persisted, current) => {
                 const persistedState = (persisted || {}) as Partial<PromptSourceStore>;
                 const savedSources = Array.isArray(persistedState.sources) ? persistedState.sources : [];
                 const enabledById = new Map(savedSources.map((source) => [source.id, source.enabled]));
                 const builtIn = DEFAULT_PROMPT_SOURCES.map((source) => ({ ...source, enabled: enabledById.get(source.id) ?? source.enabled }));
                 const custom = savedSources.filter((source) => !source.builtIn).map((source) => createPromptSource(source));
-                return { ...current, sources: [...builtIn, ...custom], schedule: { ...defaultSchedule, ...(persistedState.schedule || {}) } };
+                return { ...current, sources: [...builtIn, ...custom], schedule: { ...defaultSchedule, ...(persistedState.schedule || {}) }, mokeEnabled: persistedState.mokeEnabled ?? true };
             },
         },
     ),
