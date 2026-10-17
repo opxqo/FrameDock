@@ -48,6 +48,7 @@ import { useAgentBridge } from "@/pages/canvas/hooks/use-agent-bridge";
 import { usePluginHost } from "@/pages/canvas/hooks/use-plugin-host";
 import { buildNodeMentionReferences, getGroupResourceNodes, isCanvasReferenceNode, type CanvasResourceReference } from "@/lib/canvas/canvas-resource-references";
 import { exportCanvasProjects } from "@/lib/canvas/canvas-export";
+import { SNAP_GUIDE_COLOR, computeResizeSnap, computeSnap, getNodesBounds, type SnapGuide } from "@/lib/canvas/canvas-snap";
 import { applyNodeConfigPatch, audioMetadata, buildAudioGenerationMetadata, buildImageGenerationMetadata, createCanvasNode, imageMetadata, videoMetadata } from "@/lib/canvas/canvas-node-factory";
 import { applyGroupSelection, applyUngroupSelection, canGroupSelectedNodes, canUngroupSelectedNodes, collectGroupMemberNodes, findContainingGroupId, findGroupDropTarget, focusViewportForNode, getConnectionTargetAnchor, getGroupWrapRect, normalizeConnection, snapNodesIntoGroup } from "@/lib/canvas/canvas-node-geometry";
 import {
@@ -205,6 +206,9 @@ function InfiniteCanvasPage() {
         // Keyed by node id so drag frames look positions up in O(1) instead of scanning the array per node.
         initialSelectedNodes: Map<string, { x: number; y: number }>;
         movedIds: Set<string>;
+        // Offset after alignment snapping; the drop uses it so the node lands where the last frame showed it.
+        dx: number;
+        dy: number;
     }>({
         isDraggingNode: false,
         hasMoved: false,
@@ -212,6 +216,8 @@ function InfiniteCanvasPage() {
         startY: 0,
         initialSelectedNodes: new Map(),
         movedIds: new Set(),
+        dx: 0,
+        dy: 0,
     });
 
     const config = useConfigStore((state) => state.config);
@@ -272,6 +278,9 @@ function InfiniteCanvasPage() {
     const [expandedBatchNodeIds, setExpandedBatchNodeIds] = useState<Set<string>>(new Set());
     const [isNodeDragging, setIsNodeDragging] = useState(false);
     const [isNodeResizing, setIsNodeResizing] = useState(false);
+    const [snapGuides, setSnapGuides] = useState<SnapGuide[]>([]);
+    // Alt/Option state from the last mouse move; resize callbacks from CanvasNode do not carry the event.
+    const altKeyRef = useRef(false);
     const [dropTargetGroupId, setDropTargetGroupId] = useState<string | null>(null);
     const [referencePickerNodeId, setReferencePickerNodeId] = useState<string | null>(null);
 
@@ -706,6 +715,9 @@ function InfiniteCanvasPage() {
         () => nodes.filter((node) => node.position.x + node.width > viewBounds.left && node.position.x < viewBounds.right && node.position.y + node.height > viewBounds.top && node.position.y < viewBounds.bottom),
         [nodes, viewBounds],
     );
+
+    const visibleNodesRef = useRef(visibleNodes);
+    visibleNodesRef.current = visibleNodes;
 
     const nodeById = useMemo(() => new Map(nodes.map((node) => [node.id, node])), [nodes]);
 
@@ -1300,6 +1312,8 @@ function InfiniteCanvasPage() {
             startY: event.clientY,
             initialSelectedNodes,
             movedIds: new Set(initialSelectedNodes.keys()),
+            dx: 0,
+            dy: 0,
         };
         historyPausedRef.current = true;
         nodeDraggingRef.current = true;
@@ -1315,9 +1329,8 @@ function InfiniteCanvasPage() {
 
         const wasClick = !dragRef.current.hasMoved && dragRef.current.initialSelectedNodes.size === 1;
         const clickedNodeId = dragRef.current.initialSelectedNodes.keys().next().value;
-        const currentViewport = viewportRef.current;
-        const dx = clientX == null ? 0 : (clientX - dragRef.current.startX) / currentViewport.k;
-        const dy = clientY == null ? 0 : (clientY - dragRef.current.startY) / currentViewport.k;
+        const dx = clientX == null ? 0 : dragRef.current.dx;
+        const dy = clientY == null ? 0 : dragRef.current.dy;
         const initialPositions = dragRef.current.initialSelectedNodes;
         const movedIds = dragRef.current.movedIds;
 
@@ -1325,6 +1338,7 @@ function InfiniteCanvasPage() {
         nodeDraggingRef.current = false;
         setIsNodeDragging(false);
         setDropTargetGroupId(null);
+        setSnapGuides([]);
         if (dragRef.current.hasMoved && clientX != null && clientY != null) {
             setNodes((prev) => {
                 const moved = prev.map((node) => {
@@ -1365,15 +1379,30 @@ function InfiniteCanvasPage() {
     const handleGlobalMouseMove = useCallback(
         (event: MouseEvent) => {
             const currentViewport = viewportRef.current;
+            altKeyRef.current = event.altKey;
 
             if (dragRef.current.isDraggingNode) {
-                const dx = (event.clientX - dragRef.current.startX) / currentViewport.k;
-                const dy = (event.clientY - dragRef.current.startY) / currentViewport.k;
+                let dx = (event.clientX - dragRef.current.startX) / currentViewport.k;
+                let dy = (event.clientY - dragRef.current.startY) / currentViewport.k;
                 const initialPositions = dragRef.current.initialSelectedNodes;
                 const movedIds = dragRef.current.movedIds;
                 if (Math.abs(event.clientX - dragRef.current.startX) > 3 || Math.abs(event.clientY - dragRef.current.startY) > 3) {
                     dragRef.current.hasMoved = true;
                 }
+                // Snap the whole dragged selection to other visible nodes; holding Alt/Option drags freely.
+                let guides: SnapGuide[] = [];
+                const bounds = event.altKey || !dragRef.current.hasMoved ? null : getNodesBounds(nodesRef.current.flatMap((node) => {
+                    const initial = initialPositions.get(node.id);
+                    return initial ? [{ ...node, position: initial }] : [];
+                }));
+                if (bounds) {
+                    const snap = computeSnap({ bounds, dx, dy, targets: visibleNodesRef.current.filter((node) => !movedIds.has(node.id)), scale: currentViewport.k });
+                    dx = snap.dx;
+                    dy = snap.dy;
+                    guides = snap.guides;
+                }
+                dragRef.current.dx = dx;
+                dragRef.current.dy = dy;
 
                 // Drop-target detection and node updates both run once per frame; mousemove can fire far more often than the display refreshes.
                 if (rafRef.current) cancelAnimationFrame(rafRef.current);
@@ -1383,6 +1412,7 @@ function InfiniteCanvasPage() {
                         return initial ? { ...node, position: { x: initial.x + dx, y: initial.y + dy } } : node;
                     });
                     setDropTargetGroupId(findGroupDropTarget(movedIds, previewNodes)?.id || null);
+                    setSnapGuides((current) => (current.length || guides.length ? guides : current));
                     setNodes((prev) =>
                         prev.map((node) => {
                             const initial = initialPositions.get(node.id);
@@ -1683,13 +1713,43 @@ function InfiniteCanvasPage() {
     );
 
     const handleNodeResize = useCallback((nodeId: string, width: number, height: number, position?: Position) => {
-        setNodes((prev) => prev.map((node) => (node.id === nodeId ? { ...node, width, height, position: position || node.position } : node)));
+        const current = nodesRef.current.find((node) => node.id === nodeId);
+        let next = { width, height, position: position || current?.position || { x: 0, y: 0 } };
+        let guides: SnapGuide[] = [];
+        if (current && !altKeyRef.current) {
+            // CanvasNode keeps the edge opposite the handle fixed, so a moved left/top edge means that handle is being dragged.
+            const right = next.position.x + width;
+            const bottom = next.position.y + height;
+            const moveLeft = Math.abs(right - (current.position.x + current.width)) < 0.01 && Math.abs(next.position.x - current.position.x) >= 0.01;
+            const moveTop = Math.abs(bottom - (current.position.y + current.height)) < 0.01 && Math.abs(next.position.y - current.position.y) >= 0.01;
+            // Same aspect-ratio rule as CanvasNode's resize handler.
+            const keepRatio = (current.type === CanvasNodeType.Image && !current.metadata?.freeResize) || current.type === CanvasNodeType.Video || Boolean(getNodeDefinition(current.type)?.keepAspectRatio?.(current));
+            const snap = computeResizeSnap({
+                rect: { left: next.position.x, top: next.position.y, right, bottom },
+                moveLeft,
+                moveTop,
+                snapX: Math.abs(width - current.width) >= 0.01 || moveLeft,
+                snapY: Math.abs(height - current.height) >= 0.01 || moveTop,
+                ratio: keepRatio ? width / height : undefined,
+                minWidth: 220,
+                minHeight: 160,
+                targets: visibleNodesRef.current.filter((node) => node.id !== nodeId && node.metadata?.groupId !== nodeId),
+                scale: viewportRef.current.k,
+            });
+            next = { width: snap.rect.right - snap.rect.left, height: snap.rect.bottom - snap.rect.top, position: { x: snap.rect.left, y: snap.rect.top } };
+            guides = snap.guides;
+        }
+        setSnapGuides((prev) => (prev.length || guides.length ? guides : prev));
+        setNodes((prev) => prev.map((node) => (node.id === nodeId ? { ...node, ...next } : node)));
     }, []);
 
     const handleNodeResizeStart = useCallback(() => {
         setIsNodeResizing(true);
     }, []);
-    const handleNodeResizeEnd = useCallback(() => setIsNodeResizing(false), []);
+    const handleNodeResizeEnd = useCallback(() => {
+        setIsNodeResizing(false);
+        setSnapGuides([]);
+    }, []);
 
     const toggleNodeFreeResize = useCallback((nodeId: string) => {
         setNodes((prev) =>
@@ -3362,6 +3422,17 @@ function InfiniteCanvasPage() {
                             }}
                         >
                             <rect width="100%" height="100%" fill={theme.canvas.selectionFill} stroke={theme.canvas.selectionStroke} strokeOpacity={0.55} strokeWidth={1 / viewport.k} strokeDasharray={`${6 / viewport.k} ${4 / viewport.k}`} />
+                        </svg>
+                    ) : null}
+                    {snapGuides.length ? (
+                        <svg className="pointer-events-none absolute left-0 top-0 z-[100] overflow-visible" width={1} height={1}>
+                            {snapGuides.map((guide) =>
+                                guide.axis === "x" ? (
+                                    <line key={`x-${guide.at}`} x1={guide.at} y1={guide.from} x2={guide.at} y2={guide.to} stroke={SNAP_GUIDE_COLOR} strokeWidth={1 / viewport.k} strokeDasharray={`${4 / viewport.k} ${3 / viewport.k}`} />
+                                ) : (
+                                    <line key={`y-${guide.at}`} x1={guide.from} y1={guide.at} x2={guide.to} y2={guide.at} stroke={SNAP_GUIDE_COLOR} strokeWidth={1 / viewport.k} strokeDasharray={`${4 / viewport.k} ${3 / viewport.k}`} />
+                                ),
+                            )}
                         </svg>
                     ) : null}
                     {pendingConnectionCreate ? <ConnectionCreateMenu pending={pendingConnectionCreate} scale={viewport.k} onCreate={(type) => createConnectedNode(type, pendingConnectionCreate)} onClose={cancelPendingConnectionCreate} /> : null}
