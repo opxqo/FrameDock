@@ -11,6 +11,7 @@
 - **执行**：先在前端编排。在 infinite-canvas 的单节点生成之上增加“运行到此处 / 运行下游”（拓扑排序、失败阻断下游）。第 6 节的服务端执行引擎、输入哈希缓存放到后续阶段。
 - **存储**：暂时沿用 infinite-canvas 的浏览器本地存储（localforage）。迁移到服务端 SQLite + 本地文件放到工作流跑通之后，第 4 节的数据模型届时再按实际情况调整。
 - **后端**：`apps/server` 保留，先提供 OpenAI 兼容的模拟生成接口，用于不花钱的端到端测试。
+- **界面**（2026-10-17 更新）：UI 设计以 [`apps/web/DESIGN.md`](../apps/web/DESIGN.md) 为准（“导播台 Tally”体系），产品事实见 [`apps/web/PRODUCT.md`](../apps/web/PRODUCT.md)，改版审查见 [`docs/design/ui-audit.md`](design/ui-audit.md)。
 - **里程碑**（取代第 10 节）：T002 复制前端 → T003 模拟接口 → T004 整条链运行 → 接入真实接口 → 存储迁移到服务端。
 
 ## 1. 定位

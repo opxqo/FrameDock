@@ -20,6 +20,8 @@ function initialWidth() {
 
 function initialOpen() {
     if (typeof window === "undefined") return true;
+    // FrameDock: on phone-sized screens the canvas gets the room first.
+    if (window.matchMedia?.("(max-width: 767px)").matches) return false;
     return localStorage.getItem(OPEN_KEY) !== "0";
 }
 

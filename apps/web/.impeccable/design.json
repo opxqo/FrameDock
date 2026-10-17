@@ -1,0 +1,217 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-17T18:40:00Z",
+  "title": "Design System: FrameDock 帧坞",
+  "extensions": {
+    "colorMeta": {
+      "signal": {
+        "role": "primary",
+        "displayName": "Signal Amber 信号琥珀",
+        "canonical": "oklch(0.8 0.145 72)",
+        "tonalRamp": [
+          "oklch(0.15 0.145 72)",
+          "oklch(0.25 0.145 72)",
+          "oklch(0.35 0.145 72)",
+          "oklch(0.45 0.145 72)",
+          "oklch(0.6 0.145 72)",
+          "oklch(0.72 0.145 72)",
+          "oklch(0.85 0.145 72)",
+          "oklch(0.95 0.145 72)"
+        ]
+      },
+      "ground": {
+        "role": "neutral",
+        "displayName": "Control Room Charcoal 控制室炭灰",
+        "canonical": "oklch(0.195 0.009 255)",
+        "tonalRamp": [
+          "oklch(0.15 0.01 255)",
+          "oklch(0.25 0.01 255)",
+          "oklch(0.35 0.01 255)",
+          "oklch(0.45 0.01 255)",
+          "oklch(0.6 0.01 255)",
+          "oklch(0.72 0.01 255)",
+          "oklch(0.85 0.01 255)",
+          "oklch(0.95 0.01 255)"
+        ]
+      },
+      "tally-ok": {
+        "role": "tertiary",
+        "displayName": "Tally Green",
+        "canonical": "oklch(0.76 0.15 155)",
+        "tonalRamp": [
+          "oklch(0.15 0.15 155)",
+          "oklch(0.25 0.15 155)",
+          "oklch(0.35 0.15 155)",
+          "oklch(0.45 0.15 155)",
+          "oklch(0.6 0.15 155)",
+          "oklch(0.72 0.15 155)",
+          "oklch(0.85 0.15 155)",
+          "oklch(0.95 0.15 155)"
+        ]
+      },
+      "tally-fail": {
+        "role": "error",
+        "displayName": "Tally Red",
+        "canonical": "oklch(0.68 0.19 25)",
+        "tonalRamp": [
+          "oklch(0.15 0.19 25)",
+          "oklch(0.25 0.19 25)",
+          "oklch(0.35 0.19 25)",
+          "oklch(0.45 0.19 25)",
+          "oklch(0.6 0.19 25)",
+          "oklch(0.72 0.19 25)",
+          "oklch(0.85 0.19 25)",
+          "oklch(0.95 0.19 25)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "page-title": {
+        "displayName": "Page title",
+        "purpose": "每页一个，20px/600，左对齐在工具栏行里。"
+      },
+      "numeric": {
+        "displayName": "Numeric",
+        "purpose": "时长、价格、百分比、快捷键；Geist Mono + tabular-nums。"
+      }
+    },
+    "shadows": [
+      {
+        "name": "shadow-panel",
+        "value": "0 1px 2px oklch(0.08 0.02 255 / 40%), 0 6px 16px -6px oklch(0.08 0.02 255 / 50%)",
+        "purpose": "工具栏、卡片浮起一级。"
+      },
+      {
+        "name": "shadow-float",
+        "value": "0 2px 6px oklch(0.08 0.02 255 / 40%), 0 16px 40px -10px oklch(0.08 0.02 255 / 65%)",
+        "purpose": "菜单、popover、命令面板。"
+      }
+    ],
+    "motion": [
+      {
+        "name": "duration-fast",
+        "value": "120ms",
+        "purpose": "悬停底色。"
+      },
+      {
+        "name": "duration-mid",
+        "value": "180ms",
+        "purpose": "大多数状态切换。"
+      },
+      {
+        "name": "wire-flow",
+        "value": "stroke-dashoffset 0.9s linear infinite",
+        "purpose": "通往运行中节点的连线信号；reduced-motion 时停止。"
+      },
+      {
+        "name": "tally-pulse",
+        "value": "animate-pulse",
+        "purpose": "运行中的 tally 灯呼吸。"
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      },
+      {
+        "name": "2xl",
+        "value": "1536px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "每个区域最多一个主操作。",
+      "html": "<button class=\"ds-btn-primary\">新建画布</button>",
+      "css": ".ds-btn-primary{background:oklch(0.8 0.145 72);color:oklch(0.22 0.03 60);height:32px;padding:0 15px;border:0;border-radius:8px;font:500 14px 'Geist Variable',system-ui,sans-serif;transition:background .15s}.ds-btn-primary:hover{background:oklch(0.84 0.13 75)}.ds-btn-primary:focus-visible{outline:2px solid oklch(0.8 0.145 72 / 65%);outline-offset:2px}.ds-btn-primary:active{background:oklch(0.76 0.15 70)}"
+    },
+    {
+      "name": "Icon Button",
+      "kind": "button",
+      "refersTo": "icon-button",
+      "description": "顶栏、工具栏里的图标操作，tooltip 写快捷键。",
+      "html": "<button class=\"ds-icon-btn\" aria-label=\"设置\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><circle cx=\"12\" cy=\"12\" r=\"3\"/></svg></button>",
+      "css": ".ds-icon-btn{display:inline-grid;place-items:center;width:32px;height:32px;border:0;border-radius:6px;background:transparent;color:oklch(0.72 0.012 255);transition:background .15s,color .15s}.ds-icon-btn:hover{background:oklch(0.29 0.012 255);color:oklch(0.96 0.004 255)}.ds-icon-btn:focus-visible{outline:2px solid oklch(0.8 0.145 72 / 65%);outline-offset:2px}"
+    },
+    {
+      "name": "Tally Lamp",
+      "kind": "custom",
+      "refersTo": "canvas-node",
+      "description": "节点标题行前的状态灯：idle / queued / live / ok / fail / skipped。",
+      "html": "<div class=\"ds-tally-row\"><span class=\"ds-tally ds-live\"></span>分镜配置</div>",
+      "css": ".ds-tally-row{display:flex;align-items:center;gap:6px;font:500 12px 'Geist Variable',system-ui;color:oklch(0.96 0.004 255)}.ds-tally{width:8px;height:8px;border-radius:999px;background:oklch(0.5 0.012 255)}.ds-live{background:oklch(0.8 0.145 72);animation:ds-pulse 2s ease-in-out infinite}@keyframes ds-pulse{50%{opacity:.5}}"
+    },
+    {
+      "name": "Programme Bar",
+      "kind": "custom",
+      "description": "整条链运行时的顶栏中间状态条。",
+      "html": "<div class=\"ds-prog\"><span class=\"ds-tally ds-live\"></span><b>运行中 2/3</b><span class=\"ds-seg\"><i class=\"ok\"></i><i class=\"live\"></i><i></i></span><span class=\"ds-mono\">00:42</span><button>停止</button></div>",
+      "css": ".ds-prog{display:inline-flex;align-items:center;gap:12px;height:32px;padding:0 4px 0 10px;border:1px solid oklch(0.96 0.01 255 / 9%);border-radius:8px;background:oklch(0.225 0.01 255);color:oklch(0.96 0.004 255);font:12px 'Geist Variable',system-ui}.ds-prog b{font-weight:500}.ds-seg{display:flex;gap:2px;width:112px;height:6px}.ds-seg i{flex:1;border-radius:999px;background:oklch(0.29 0.012 255)}.ds-seg i.ok{background:oklch(0.76 0.15 155)}.ds-seg i.live{background:oklch(0.8 0.145 72)}.ds-mono{font-family:'Geist Mono Variable',monospace;color:oklch(0.72 0.012 255);font-variant-numeric:tabular-nums}.ds-prog button{height:24px;border:0;border-radius:4px;background:transparent;color:inherit;padding:0 8px}.ds-prog button:hover{background:oklch(0.29 0.012 255)}"
+    },
+    {
+      "name": "Menu Item",
+      "kind": "custom",
+      "refersTo": "popover",
+      "description": "菜单 / 右键菜单行，右侧 mono 快捷键。",
+      "html": "<div class=\"ds-menu\"><button class=\"ds-item\">运行到此处<kbd>⌘↵</kbd></button><button class=\"ds-item ds-danger\">删除<kbd>Del</kbd></button></div>",
+      "css": ".ds-menu{display:grid;min-width:208px;padding:4px;border:1px solid oklch(0.96 0.01 255 / 9%);border-radius:8px;background:oklch(0.255 0.011 255);box-shadow:0 2px 6px oklch(0.08 0.02 255 / 40%),0 16px 40px -10px oklch(0.08 0.02 255 / 65%)}.ds-item{display:flex;justify-content:space-between;align-items:center;height:32px;padding:0 8px;border:0;border-radius:6px;background:transparent;color:oklch(0.96 0.004 255);font:14px 'Geist Variable',system-ui}.ds-item:hover{background:oklch(0.29 0.012 255)}.ds-item kbd{font:11px 'Geist Mono Variable',monospace;color:oklch(0.72 0.012 255)}.ds-danger{color:oklch(0.68 0.19 25)}"
+    },
+    {
+      "name": "Option Item",
+      "kind": "chip",
+      "description": "参数面板里的单选项，选中为琥珀描边加浅底。",
+      "html": "<div class=\"ds-opts\"><button class=\"ds-opt is-on\">720p</button><button class=\"ds-opt\">1080p</button></div>",
+      "css": ".ds-opts{display:flex;gap:8px}.ds-opt{height:32px;padding:0 12px;border:1px solid oklch(0.3 0.012 255);border-radius:8px;background:transparent;color:oklch(0.96 0.004 255);font:14px 'Geist Variable',system-ui;transition:background .15s}.ds-opt:hover{background:oklch(0.29 0.012 255)}.ds-opt.is-on{border-color:oklch(0.8 0.145 72);background:color-mix(in oklch,oklch(0.8 0.145 72) 12%,transparent)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "导播台 Tally",
+    "overview": "画布是一台生成内容的切换台：每个节点戴一盏 tally 灯，整条链运行时信号沿连线一路点亮。Operate 模式：安静、可扫读，素材是全屏最亮的东西。",
+    "keyCharacteristics": [
+      "冷调控制室炭灰三层中性色",
+      "唯一强调色：信号琥珀",
+      "tally 状态色只表达状态",
+      "1px 发丝线、8–12px 圆角",
+      "Geist + Geist Mono 等宽数字"
+    ],
+    "rules": [
+      {
+        "name": "One Signal",
+        "body": "琥珀色只用于主操作、选中和焦点，不再引入第二个强调色。",
+        "section": "colors"
+      },
+      {
+        "name": "Tally Means State",
+        "body": "绿 / 红 / 琥珀灯只表达节点状态，不做装饰。",
+        "section": "colors"
+      },
+      {
+        "name": "Media Is Brightest",
+        "body": "界面色值贴近底色，图片和视频是屏幕上最亮的内容。",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "状态用 tally 词汇",
+      "数字用 mono 并就地显示价格",
+      "高频操作给快捷键并在 tooltip 中写出"
+    ],
+    "donts": [
+      "渐变文字、毛玻璃装饰、点阵背景",
+      "嵌套卡片和胶囊按钮堆",
+      "组件里写死颜色"
+    ]
+  }
+}
