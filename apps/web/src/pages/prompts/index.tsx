@@ -1,9 +1,12 @@
-import { FolderPlus, Search } from "@/components/icons";
+import { Copy, FolderPlus, Search } from "@/components/icons";
 import { type ReactNode, type UIEvent, useEffect, useState } from "react";
-import { App, Button, Empty, Input, Spin, Tag } from "antd";
+import { App, Button, Empty, Input, Segmented, Spin, Tag } from "antd";
 import { useTranslation } from "react-i18next";
 
 import { PromptCard } from "@/components/prompts/prompt-card";
+import { PromptRecipesBrowser } from "@/components/prompts/prompt-recipes-browser";
+import { SkillBrowser } from "@/components/skills/skill-browser";
+import type { CanvasSkill } from "@/lib/skills/skills";
 import { usePromptList } from "@/components/prompts/use-prompt-list";
 import { PromptDetailDialog } from "./components/prompt-detail-dialog";
 import { useCopyText } from "@/hooks/use-copy-text";
@@ -18,6 +21,7 @@ export default function PromptsPage() {
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
     const [selectedCategory, setSelectedCategory] = useState(ALL_PROMPTS_OPTION);
     const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
+    const [tab, setTab] = useState<"prompts" | "recipes" | "skills">("prompts");
     const addAsset = useAssetStore((state) => state.addAsset);
     const copyText = useCopyText();
     const { query, items: promptItems, tags: promptTags, categories: promptCategoryOptions, total: totalPrompts } = usePromptList({ keyword: titleKeyword, tags: selectedTags, category: selectedCategory });
@@ -36,7 +40,13 @@ export default function PromptsPage() {
         message.success(t("common.addedToAssets"));
     };
 
+    const saveSkillAsset = (skill: CanvasSkill) => {
+        addAsset({ kind: "text", title: skill.title, coverUrl: "", tags: ["Skill"], source: skill.source === "moke" ? "MOKE AIGC" : "FrameDock", data: { content: skill.instructions }, metadata: { source: "skill", skillId: skill.id, version: skill.version, sourceUrl: skill.sourceUrl } });
+        message.success(t("skills.saved"));
+    };
+
     const handleListScroll = (event: UIEvent<HTMLDivElement>) => {
+        if (tab !== "prompts") return;
         const target = event.currentTarget;
         if (query.hasNextPage && !query.isFetchingNextPage && target.scrollTop + target.clientHeight >= target.scrollHeight - 160) void query.fetchNextPage();
     };
@@ -45,10 +55,30 @@ export default function PromptsPage() {
         <div className="flex h-full flex-col overflow-hidden bg-background text-stone-800 dark:text-stone-100">
             <main className="min-h-0 flex-1 overflow-y-auto bg-background px-4 py-5" onScroll={handleListScroll}>
                 <div>
-                    <div className="flex items-baseline gap-3">
+                    <div className="flex flex-wrap items-center gap-3">
                         <h1 className="text-xl font-semibold">{t("prompts.title")}</h1>
-                        <p className="tnum text-sm text-muted-foreground">{t("prompts.total", { count: totalPrompts })}</p>
+                        <Segmented value={tab} onChange={(value) => setTab(value as typeof tab)} options={(["prompts", "recipes", "skills"] as const).map((value) => ({ value, label: t(`prompts.tabs.${value}`) }))} />
+                        {tab === "prompts" ? <p className="tnum text-sm text-muted-foreground">{t("prompts.total", { count: totalPrompts })}</p> : null}
                     </div>
+                    {tab === "recipes" ? (
+                        <div className="mt-5">
+                            <PromptRecipesBrowser />
+                        </div>
+                    ) : tab === "skills" ? (
+                        <SkillBrowser
+                            className="mt-5 h-[calc(100dvh-10rem)]"
+                            renderAction={(resolve, ready) => (
+                                <>
+                                    <Button className="!rounded-full" disabled={!ready} icon={<Copy className="size-4" />} onClick={async () => copyText((await resolve()).instructions, t("skills.copied"))}>
+                                        {t("skills.copy")}
+                                    </Button>
+                                    <Button type="primary" className="!rounded-full" disabled={!ready} icon={<FolderPlus className="size-4" />} onClick={async () => saveSkillAsset(await resolve())}>
+                                        {t("skills.saveAsset")}
+                                    </Button>
+                                </>
+                            )}
+                        />
+                    ) : (
                     <div className="mt-5 grid items-start gap-5 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-6">
                         <aside className="thin-scrollbar max-h-72 overflow-y-auto border-b border-stone-200 pb-5 lg:sticky lg:top-0 lg:max-h-[calc(100dvh-6rem)] lg:border-b-0 lg:border-r lg:pb-8 lg:pr-5 dark:border-stone-800">
                             <PromptFilter label={t("prompts.category")} options={promptCategoryOptions} selected={selectedCategory} onChange={setSelectedCategory} />
@@ -69,6 +99,7 @@ export default function PromptsPage() {
                             <div className="mt-6 text-center text-xs text-stone-500 dark:text-stone-400">{query.isFetchingNextPage ? t("prompts.loading") : query.hasNextPage ? t("prompts.loadMore") : promptItems.length > 0 ? t("prompts.end") : null}</div>
                         </section>
                     </div>
+                    )}
                 </div>
             </main>
 

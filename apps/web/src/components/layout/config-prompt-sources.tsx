@@ -1,6 +1,6 @@
 import { App, Button, Select, Switch, Tag } from "antd";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Eye, Pencil, Plus, RefreshCw, Trash2 } from "@/components/icons";
+import { Eye, Pencil, Plus, RefreshCw, SkillBook, Trash2 } from "@/components/icons";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -23,6 +23,8 @@ export function ConfigPromptSources() {
     const removeSource = usePromptSourceStore((state) => state.removeSource);
     const toggleSource = usePromptSourceStore((state) => state.toggleSource);
     const updateSchedule = usePromptSourceStore((state) => state.updateSchedule);
+    const mokeEnabled = usePromptSourceStore((state) => state.mokeEnabled);
+    const setMokeEnabled = usePromptSourceStore((state) => state.setMokeEnabled);
     const statusQuery = useQuery({ queryKey: STATUS_QUERY_KEY, queryFn: fetchPromptSourceStatuses });
 
     const [editingSource, setEditingSource] = useState<PromptSource | null>(null);
@@ -90,6 +92,15 @@ export function ConfigPromptSources() {
 
     return (
         <div>
+            {/* FrameDock: MOKE AIGC online skills (see apps/server/src/moke.ts). */}
+            <div className="mb-5 flex items-start gap-3 rounded-2xl border border-stone-200 px-4 py-3.5 dark:border-stone-800">
+                <SkillBook className="mt-0.5 size-5 shrink-0 text-muted-foreground" />
+                <div className="min-w-0 flex-1">
+                    <div className="text-sm font-semibold">{t("skills.settings.title")}</div>
+                    <p className="mt-1 text-xs leading-5 text-muted-foreground">{t("skills.settings.description")}</p>
+                </div>
+                <Switch size="small" checked={mokeEnabled} onChange={setMokeEnabled} aria-label={t("skills.settings.title")} />
+            </div>
             <div className="mb-4 flex flex-wrap items-center justify-end gap-3">
                 <Button type="primary" icon={<Plus className="size-4" />} onClick={() => setEditingSource(addSource())}>
                     {t("config.promptSources.add")}
