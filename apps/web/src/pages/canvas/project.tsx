@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { estimateAutodlCost, generationCostParams } from "@/lib/autodl-pricing";
 import type { ChangeEvent as ReactChangeEvent, DragEvent as ReactDragEvent, MouseEvent as ReactMouseEvent, PointerEvent as ReactPointerEvent } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Group, Video } from "lucide-react";
@@ -2932,6 +2933,26 @@ function InfiniteCanvasPage() {
                 message.info(t("canvas.workflow.nothingToRun"));
                 return;
             }
+            // FrameDock: estimate the whole run (AutoDL prices) before spending; confirm when it is above ¥5.
+            const total = plan.steps.reduce(
+                (sum, step) => {
+                    const node = nodesRef.current.find((item) => item.id === step.nodeId);
+                    const generationConfig = buildGenerationConfig(effectiveConfig, node, step.mode);
+                    const upstream = connectionsRef.current.filter((connection) => connection.toNodeId === step.nodeId).map((connection) => nodesRef.current.find((item) => item.id === connection.fromNodeId)?.type);
+                    const quote = estimateAutodlCost(generationConfig.model, generationCostParams(generationConfig, step.mode === "video" && upstream.includes(CanvasNodeType.Image), upstream.includes(CanvasNodeType.Video)));
+                    return quote ? { member: sum.member + quote.member, original: sum.original + quote.original, priced: sum.priced + 1, approximate: sum.approximate || quote.approximate } : sum;
+                },
+                { member: 0, original: 0, priced: 0, approximate: false },
+            );
+            if (total.priced) {
+                const summary = `预计${total.approximate ? "约" : ""} ¥${total.member.toFixed(2)}（原价 ¥${total.original.toFixed(2)}），${plan.steps.length} 个节点${total.priced < plan.steps.length ? `，其中 ${plan.steps.length - total.priced} 个无价格` : ""}`;
+                if (total.member > 5) {
+                    const confirmed = await modal.confirm({ title: "确认运行工作流？", content: summary, okText: "运行", cancelText: "取消" });
+                    if (!confirmed) return;
+                } else {
+                    message.info(summary);
+                }
+            }
             const run = { canceled: false };
             workflowRunRef.current = run;
             setWorkflowRunning(true);
@@ -2967,7 +2988,7 @@ function InfiniteCanvasPage() {
                 runStore.finish();
             }
         },
-        [handleGenerateNode, message, t],
+        [effectiveConfig, handleGenerateNode, message, modal, t],
     );
     useEffect(() => {
         runWorkflowRef.current = (nodeId, scope) => void runWorkflow(nodeId, scope);

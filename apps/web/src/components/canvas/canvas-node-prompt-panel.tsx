@@ -4,6 +4,8 @@ import { Button, Modal, Tooltip } from "antd";
 import { useTranslation } from "react-i18next";
 
 import { ModelPicker } from "@/components/model-picker";
+import { CostEstimate } from "@/components/autodl-price";
+import { generationCostParams } from "@/lib/autodl-pricing";
 import { defaultConfig, resolveModelForCapability, useConfigStore, useEffectiveConfig, type AiConfig } from "@/stores/use-config-store";
 import { canvasThemes } from "@/lib/canvas-theme";
 import { useThemeStore } from "@/stores/use-theme-store";
@@ -124,6 +126,11 @@ export function CanvasNodePromptPanel({ node, nodes, isRunning, onPromptChange, 
                         </>
                     )}
                 </div>
+                <CostEstimate
+                    model={config.model}
+                    params={generationCostParams(config, mode === "video" && connectedNodes.some((item) => item.type === CanvasNodeType.Image), connectedNodes.some((item) => item.type === CanvasNodeType.Video))}
+                    className="text-xs opacity-70"
+                />
                 <Button
                     type="primary"
                     className="!h-10 !min-w-16 shrink-0 !rounded-full !px-3"

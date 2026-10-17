@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { setLiveAutodlPrices, type AutodlPriceEntry } from "@/lib/autodl-pricing";
 import { create } from "zustand";
 import { allAutodlModels, AUTODL_BASE_URL, AUTODL_CHANNEL_IDS, AUTODL_CURATED_NAMES, AUTODL_GEMINI_BASE_URL, type AutodlSyncedModel } from "@/lib/autodl-catalog";
 import { persist } from "zustand/middleware";
@@ -62,6 +63,9 @@ export type AiConfig = {
     /** FrameDock: models listed by the AutoDL account at the last sync. */
     autodlSyncedModels: AutodlSyncedModel[];
     autodlSyncedAt: string;
+    /** Live AutoDL price list from the last sync (overrides the bundled snapshot). */
+    autodlPrices: AutodlPriceEntry[];
+    autodlPricesAt: string;
 };
 
 export type WebdavSyncConfig = {
@@ -185,6 +189,8 @@ export const defaultConfig: AiConfig = {
     autodlEnabledModels: AUTODL_CURATED_NAMES,
     autodlSyncedModels: [],
     autodlSyncedAt: "",
+    autodlPrices: [],
+    autodlPricesAt: "",
 };
 
 export const defaultWebdavSyncConfig: WebdavSyncConfig = {
@@ -362,6 +368,8 @@ export const useConfigStore = create<ConfigStore>()(
                         autodlEnabledModels,
                         autodlSyncedModels,
                         autodlSyncedAt: config.autodlSyncedAt || "",
+                        autodlPrices: Array.isArray(config.autodlPrices) ? config.autodlPrices : [],
+                        autodlPricesAt: config.autodlPricesAt || "",
                     },
                 };
             },
@@ -583,3 +591,9 @@ export function withLocalProxy(url: string) {
     if (!base || url.startsWith(`${base}/`)) return url;
     return `${base}/${url}`;
 }
+
+// FrameDock: keep the pricing engine on the latest synced AutoDL prices.
+setLiveAutodlPrices(useConfigStore.getState().config.autodlPrices);
+useConfigStore.subscribe((state, previous) => {
+    if (state.config.autodlPrices !== previous.config.autodlPrices) setLiveAutodlPrices(state.config.autodlPrices);
+});

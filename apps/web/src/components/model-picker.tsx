@@ -1,6 +1,6 @@
 import { useEffect, useId, useMemo, useState } from "react";
+import { ModelPrice } from "@/components/autodl-price";
 import { Cpu } from "lucide-react";
-import { findAutodlModel } from "@/lib/autodl-catalog";
 import { useTranslation } from "react-i18next";
 
 import i18n from "@/i18n";
@@ -109,7 +109,7 @@ function ModelLabel({ config, model }: { config: AiConfig; model: string }) {
         <span className="flex min-w-0 items-center gap-2">
             <ModelIcon model={model} />
             <span className="truncate">{modelOptionLabel(config, model)}</span>
-            {findAutodlModel(model) ? <span className="shrink-0 text-xs opacity-50">{findAutodlModel(model)?.price}</span> : null}
+            <ModelPrice model={model} className="text-xs opacity-60" />
         </span>
     );
 }

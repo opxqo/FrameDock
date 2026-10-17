@@ -1,4 +1,6 @@
 import { ArrowLeft, ArrowRight, BookOpen, CheckSquare, ClipboardPaste, Download, FolderPlus, History, ImagePlus, LoaderCircle, PenLine, Plus, SlidersHorizontal, Sparkles, Trash2, Upload } from "lucide-react";
+import { CostEstimate } from "@/components/autodl-price";
+import { generationCostParams } from "@/lib/autodl-pricing";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { App, Button, Checkbox, Drawer, Image, Input, Modal, Tag, Tooltip, Typography } from "antd";
 import { createSharedStore } from "@/lib/server-storage";
@@ -484,6 +486,9 @@ export default function ImagePage() {
                         </div>
 
                         <div className="mt-auto pt-6">
+                            <div className="mb-2 flex min-h-5 justify-end">
+                                <CostEstimate model={model} params={generationCostParams(effectiveConfig, references.length > 0)} className="text-sm text-stone-500" />
+                            </div>
                             <Button type="primary" size="large" block icon={<Sparkles className="size-4" />} loading={running} disabled={!canGenerate || running} onClick={() => void generate()}>
                                 {t("workbench.generate")}
                             </Button>

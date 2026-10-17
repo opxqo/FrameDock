@@ -1,10 +1,11 @@
 import type { ReactNode } from "react";
+import { CostEstimate } from "@/components/autodl-price";
+import { generationCostParams } from "@/lib/autodl-pricing";
 import { Image as ImageIcon, LoaderCircle, MessageSquare, Music2, Play, Settings2, Square, Video } from "lucide-react";
 import { Button, Segmented } from "antd";
 import { useTranslation } from "react-i18next";
 
 import { ModelPicker } from "@/components/model-picker";
-import { findAutodlModel } from "@/lib/autodl-catalog";
 import { defaultConfig, resolveModelForCapability, useConfigStore, useEffectiveConfig, type AiConfig } from "@/stores/use-config-store";
 import { canvasThemes } from "@/lib/canvas-theme";
 import { useThemeStore } from "@/stores/use-theme-store";
@@ -35,7 +36,6 @@ export function CanvasConfigNodePanel({ node, isRunning, inputSummary, onConfigC
     const hasComposerContent = Boolean((node.metadata?.composerContent ?? node.metadata?.prompt ?? "").trim());
     const canGenerate = hasComposerContent || (mode === "audio" ? inputSummary.textCount > 0 : hasAnyInput);
 
-    const price = findAutodlModel(config.model)?.price;
     const inputs = [
         { label: t("canvas.configNode.prompt"), count: inputSummary.textCount },
         { label: t("canvas.configNode.references"), count: inputSummary.imageCount },
@@ -89,7 +89,7 @@ export function CanvasConfigNodePanel({ node, isRunning, inputSummary, onConfigC
                 )}
             </div>
 
-            {price ? <div className="tnum -mt-0.5 text-xs" style={{ color: theme.node.muted }}>{t("canvas.configNode.price", { price })}</div> : null}
+            <CostEstimate model={config.model} params={generationCostParams(config, mode === "video" ? inputSummary.imageCount > 0 : false, inputSummary.videoCount > 0)} className="-mt-0.5 text-xs" />
 
             <Button
                 type="primary"

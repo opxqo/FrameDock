@@ -1,4 +1,6 @@
 import { App, Button, Input, Segmented, Switch, Tag } from "antd";
+import { ModelPrice } from "@/components/autodl-price";
+import { AUTODL_PRICES_FETCHED_AT, fetchAutodlPrices, type AutodlPriceEntry } from "@/lib/autodl-pricing";
 import { ChevronDown, ChevronRight, ExternalLink, RefreshCw, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -62,9 +64,11 @@ export function ConfigAutodl({ config, onConfigChange }: { config: AiConfig; onC
         setSyncing(true);
         try {
             const list = await fetchAutodlModelList(apiKey);
+            // Public price list (no login needed); failures keep the bundled snapshot.
+            const prices = await fetchAutodlPrices((url, init) => fetch(withLocalProxy(url), init)).catch(() => [] as AutodlPriceEntry[]);
             const known = new Set([...AUTODL_CURATED_NAMES, ...config.autodlSyncedModels.map((model) => model.name)].map((name) => name.toLowerCase()));
             const added = list.filter((model) => !known.has(model.name.toLowerCase())).length;
-            onConfigChange(withAutodlConfig(config, { synced: list, syncedAt: new Date().toISOString() }));
+            onConfigChange({ ...withAutodlConfig(config, { synced: list, syncedAt: new Date().toISOString() }), ...(prices.length ? { autodlPrices: prices, autodlPricesAt: new Date().toISOString() } : {}) });
             const count = (capability: AutodlCapability) => list.filter((model) => model.capability === capability).length;
             message.success(`连接成功：对话 ${count("text")} · 图片 ${count("image")} · 视频 ${count("video")}${added ? `，新发现 ${added} 个，可在下方启用` : ""}`);
         } catch (error) {
@@ -83,7 +87,7 @@ export function ConfigAutodl({ config, onConfigChange }: { config: AiConfig; onC
                             AutoDL.Art
                             {!apiKey ? <Tag className="!m-0">未填写 Key</Tag> : config.autodlSyncedAt ? <Tag color="green" className="!m-0">已同步 {config.autodlSyncedModels.length} 个模型 · {formatTime(config.autodlSyncedAt)}</Tag> : <Tag color="gold" className="!m-0">未同步</Tag>}
                         </div>
-                        <div className="mt-1 text-xs text-stone-500">接口地址已内置，只需填写 API Key（AutoDL 控制台左侧“令牌管理”中创建），再同步账户可用的全部模型。</div>
+                        <div className="mt-1 text-xs text-stone-500">接口地址已内置，只需填写 API Key（AutoDL 控制台左侧“令牌管理”中创建），再同步账户可用的全部模型。价格为会员价（划线为原价），{config.autodlPricesAt ? `更新于 ${formatTime(config.autodlPricesAt)}` : `内置价格表 ${AUTODL_PRICES_FETCHED_AT}`}，同步时自动刷新。</div>
                     </div>
                     <a href={AUTODL_TOKEN_URL} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs">
                         打开 AutoDL <ExternalLink className="size-3" />
@@ -138,7 +142,7 @@ export function ConfigAutodl({ config, onConfigChange }: { config: AiConfig; onC
                                                     <span className={`min-w-0 flex-1 truncate text-sm ${on ? "" : "opacity-50"}`} title={model.name}>
                                                         {model.name}
                                                     </span>
-                                                    {model.price ? <span className="shrink-0 text-xs text-stone-500">{model.price}</span> : null}
+                                                    <ModelPrice model={model.name} className="text-xs text-stone-500" />
                                                     {missing ? (
                                                         <Tag color="orange" className="!m-0 shrink-0" title="同步的模型列表中没有它：可能未开通，也可能是该原生接口不在列表中">
                                                             不在模型列表
