@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { ReactNode } from "react";
 import { ChevronRight, Copy, Download, Group, Image as ImageIcon, Music2, Puzzle, RefreshCw, Star, Trash2, Video } from "@/components/icons";
 import { CodexLogo } from "@/components/codex-logo";
@@ -139,6 +139,9 @@ export const CanvasNode = React.memo(function CanvasNode({
     const theme = canvasThemes[useThemeStore((state) => state.theme)];
     const { t } = useTranslation();
     const [hovered, setHovered] = useState(false);
+    const nodeRef = useRef<HTMLDivElement>(null);
+    const panelRef = useRef<HTMLDivElement>(null);
+    const [panelAbove, setPanelAbove] = useState(false);
     const definition = getNodeDefinition(data.type);
     const pluginContext = useMemo<CanvasNodeContext | null>(() => (pluginHost ? buildNodeContext(pluginHost, data, theme, scale, isSelected) : null), [pluginHost, data, theme, scale, isSelected]);
     const [isEditingContent, setIsEditingContent] = useState(false);
@@ -313,8 +316,21 @@ export const CanvasNode = React.memo(function CanvasNode({
         };
     }, [handleResizeMove, handleResizeUp]);
 
+    // updream: the parameter panel opens below the node, or flips above it when the viewport has no room below
+    // (keeping clear of the bottom dock). Decided from the node's own rect so it doesn't oscillate.
+    useLayoutEffect(() => {
+        if (!showPanel) return;
+        const nodeRect = nodeRef.current?.getBoundingClientRect();
+        const panelHeight = panelRef.current?.firstElementChild?.getBoundingClientRect().height || 0;
+        if (!nodeRect || !panelHeight) return;
+        const spaceBelow = window.innerHeight - 96 - nodeRect.bottom;
+        const spaceAbove = nodeRect.top - 80 - (28 * scale + 64);
+        setPanelAbove(panelHeight + 16 > spaceBelow && spaceAbove > spaceBelow);
+    }, [showPanel, scale]);
+
     return (
         <div
+            ref={nodeRef}
             data-node-id={data.id}
             className={`node-element group/node absolute flex select-none flex-col transition-shadow duration-200 ${isGroup ? "z-[5]" : isSelected ? "z-50" : "z-10"} ${referenceSelectionState === "available" ? "cursor-pointer" : referenceSelectionState ? "cursor-not-allowed" : ""}`}
             style={{
@@ -471,7 +487,12 @@ export const CanvasNode = React.memo(function CanvasNode({
 
             {/* Counter-scale the panel so its on-screen size stays constant while the canvas zooms. */}
             {showPanel && !isGroup && renderPanel ? (
-                <div className="absolute left-1/2 top-full z-[70] pt-4" style={{ width: data.type === CanvasNodeType.Video ? 630 : 520, transform: `translateX(-50%) scale(${1 / scale})`, transformOrigin: "top center" }} data-node-panel={data.id}>
+                <div
+                    ref={panelRef}
+                    className={`absolute left-1/2 z-[70] ${panelAbove ? "bottom-full" : "top-full pt-4"}`}
+                    style={{ width: data.type === CanvasNodeType.Video ? 630 : 520, paddingBottom: panelAbove ? 28 * scale + 64 : undefined, transform: `translateX(-50%) scale(${1 / scale})`, transformOrigin: panelAbove ? "bottom center" : "top center" }}
+                    data-node-panel={data.id}
+                >
                     {renderPanel(data)}
                 </div>
             ) : null}
