@@ -78,6 +78,8 @@ const OPENAI_BASE_URL = "https://api.openai.com";
 const GEMINI_BASE_URL = "https://generativelanguage.googleapis.com";
 export const LOCAL_PROXY_PACKAGE = "@basketikun/canvas-proxy";
 export const DEFAULT_LOCAL_PROXY_URL = "http://127.0.0.1:23210";
+// FrameDock: the self-hosted server forwards provider calls and result downloads (apps/server/src/proxy.ts).
+export const FRAMEDOCK_PROXY_URL = `${window.location.origin}/proxy`;
 
 const mockChannel: ModelChannel | undefined = import.meta.env.DEV ? {
     id: "mock",
@@ -163,8 +165,8 @@ export const defaultConfig: AiConfig = {
     background: "",
     count: "1",
     canvasImageCount: "3",
-    proxyEnabled: false,
-    proxyUrl: DEFAULT_LOCAL_PROXY_URL,
+    proxyEnabled: true,
+    proxyUrl: FRAMEDOCK_PROXY_URL,
     nodeRegenerateBehavior: "new-node",
     autoFocusOnSelect: false,
 };
@@ -326,8 +328,9 @@ export const useConfigStore = create<ConfigStore>()(
                         videoWatermark: config.videoWatermark || "false",
                         videoMode: config.videoMode === "reference" ? "reference" : "frames",
                         canvasImageCount: config.canvasImageCount || "3",
-                        proxyEnabled: Boolean(config.proxyEnabled),
-                        proxyUrl: config.proxyUrl || DEFAULT_LOCAL_PROXY_URL,
+                        // Configs still pointing at the upstream canvas-proxy default move to the built-in FrameDock proxy.
+                        proxyEnabled: !config.proxyUrl || config.proxyUrl === DEFAULT_LOCAL_PROXY_URL ? true : Boolean(config.proxyEnabled),
+                        proxyUrl: !config.proxyUrl || config.proxyUrl === DEFAULT_LOCAL_PROXY_URL ? FRAMEDOCK_PROXY_URL : config.proxyUrl,
                         nodeRegenerateBehavior: config.nodeRegenerateBehavior === "overwrite" ? "overwrite" : "new-node",
                         autoFocusOnSelect: Boolean(config.autoFocusOnSelect),
                     },

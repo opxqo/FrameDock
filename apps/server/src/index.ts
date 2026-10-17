@@ -3,9 +3,12 @@ import packageJson from "../package.json" with { type: "json" };
 import { config } from "./config";
 import { openDatabase } from "./db";
 import mockApi from "./mock";
+import proxy from "./proxy";
 
 const app = Fastify({ logger: true });
 const { sqlite } = openDatabase();
+
+await app.register(proxy, { prefix: "/proxy" });
 
 if (config.mockApi) {
   await app.register(mockApi, { prefix: "/v1" });

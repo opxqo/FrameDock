@@ -46,6 +46,7 @@ export default defineConfig({
         proxy: {
             "/api": "http://127.0.0.1:8787",
             "/v1": "http://127.0.0.1:8787",
+            "/proxy": "http://127.0.0.1:8787",
         },
     },
     plugins: [react(), localPluginsManifest()],

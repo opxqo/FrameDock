@@ -4,6 +4,8 @@
 
 `apps/web` is derived from [basketikun/infinite-canvas](https://github.com/basketikun/infinite-canvas), commit `3a6b64b602ad062b29fac66902ed18a7ef5fd9dc` (`3a6b64b`, v0.20.0).
 
+`apps/server/src/proxy.ts` is adapted from `canvas-proxy/index.js` in the same repository and commit.
+
 The original MIT license is reproduced in full below and preserved in `apps/web/LICENSE`.
 
 ```text
