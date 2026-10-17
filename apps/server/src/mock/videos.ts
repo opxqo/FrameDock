@@ -1,5 +1,6 @@
 import { execFile } from "node:child_process";
 import { randomUUID } from "node:crypto";
+import { existsSync } from "node:fs";
 import { mkdir, mkdtemp, readFile, rename, rm } from "node:fs/promises";
 import { join } from "node:path";
 import { promisify } from "node:util";
@@ -9,6 +10,12 @@ import { config } from "../config";
 import { countFiles, fieldValue, type MultipartInput } from "./multipart";
 
 const run = promisify(execFile);
+
+// FFMPEG_PATH wins; otherwise Homebrew's build on macOS, then whatever "ffmpeg" is on PATH (Linux, Windows).
+const HOMEBREW_FFMPEG = "/opt/homebrew/bin/ffmpeg";
+const FFMPEG =
+  process.env.FFMPEG_PATH ||
+  (existsSync(HOMEBREW_FFMPEG) ? HOMEBREW_FFMPEG : "ffmpeg");
 
 async function generateVideo() {
   const directory = join(config.dataDir, "mock");
@@ -37,7 +44,7 @@ async function generateVideo() {
         .toFile(join(temporaryDir, `frame-${second}.png`));
     }
     await run(
-      "/opt/homebrew/bin/ffmpeg",
+      FFMPEG,
       [
         "-hide_banner",
         "-loglevel",
@@ -69,7 +76,7 @@ async function generateVideo() {
     return await readFile(target);
   } catch (error) {
     throw new Error(
-      `Mock video generation failed: ensure /opt/homebrew/bin/ffmpeg is installed with overlay and libx264 support. ${error instanceof Error ? error.message : String(error)}`,
+      `Mock video generation failed: ensure ${FFMPEG} is installed with overlay and libx264 support (or set FFMPEG_PATH). ${error instanceof Error ? error.message : String(error)}`,
     );
   } finally {
     await rm(temporaryDir, { recursive: true, force: true });
