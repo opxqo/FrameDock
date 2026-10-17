@@ -36,7 +36,7 @@ SOFTWARE.
 
 ## LobeHub Icons
 
-`apps/web/public/icons/lobehub/*.svg` are copied from [`@lobehub/icons-static-svg`](https://www.npmjs.com/package/@lobehub/icons-static-svg) v1.95.1 ([lobehub/lobe-icons](https://github.com/lobehub/lobe-icons)), MIT License, Copyright (c) LobeHub. The logos themselves are trademarks of their respective owners and are used only to identify the corresponding models.
+`apps/web/public/icons/lobehub/*.svg` are copied from [`@lobehub/icons-static-svg`](https://www.npmjs.com/package/@lobehub/icons-static-svg) v1.95.1 ([lobehub/lobe-icons](https://github.com/lobehub/lobe-icons)), MIT License, Copyright (c) LobeHub. `apps/web/src/components/codex-logo.tsx` is a line-icon version of `codex.svg` from the same package. The logos themselves are trademarks of their respective owners and are used only to identify the corresponding models.
 
 ---
 
