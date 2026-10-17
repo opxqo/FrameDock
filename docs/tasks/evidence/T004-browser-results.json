@@ -1,0 +1,150 @@
+{
+  "task": "T004",
+  "projectUrl": "http://localhost:5173/canvas/mkDq6UOTJQVyi1ETml6Yw",
+  "channel": "本地模拟",
+  "scenarios": [
+    {
+      "step": 1,
+      "passed": true,
+      "evidence": "T004-01-single-node.png"
+    },
+    {
+      "step": 2,
+      "passed": true,
+      "evidence": "T004-02-video-chain.png"
+    },
+    {
+      "step": 3,
+      "passed": true,
+      "nodeIdsUnchanged": true,
+      "imageUrlChanged": true,
+      "videoUrlChanged": true,
+      "evidence": "T004-03-downstream.png"
+    },
+    {
+      "step": 4,
+      "passed": true,
+      "videoUrlChanged": true,
+      "evidence": "T004-04-upstream.png"
+    },
+    {
+      "step": 5,
+      "passed": true,
+      "failed": 1,
+      "skipped": 1,
+      "videoUnchanged": true,
+      "evidence": "T004-05-failure-blocking.png"
+    },
+    {
+      "step": 6,
+      "passed": true,
+      "stopDuring": "C1; progress 1 / 2",
+      "videoUnchanged": true,
+      "note": "Temporarily used ten 2880x2880 mock outputs for an observable stop window, then restored one output and width/height input fields to 1024.",
+      "evidence": "T004-06-stop.png"
+    },
+    {
+      "step": 7,
+      "passed": true,
+      "nodeIdsUnchanged": true,
+      "ownPrompt": "测试原地",
+      "upstream": "绿色小舟",
+      "evidence": "T004-07-in-place.png"
+    },
+    {
+      "step": 8,
+      "passed": true,
+      "evidence": "T004-08-refresh.png"
+    }
+  ],
+  "ui": {
+    "contextMenuVerified": true,
+    "hoverButtonExecuted": true,
+    "hoverRunCount": 1,
+    "groupHoverButtonCount": 0,
+    "stopButtonHiddenWhenIdle": true
+  },
+  "finalDom": {
+    "connectionIds": [
+      "apQlVY6h1vdkW_0Sdvecp",
+      "Tpo8F_IMDNGhh3GvdspXF",
+      "I-_gFkMl8i_EYQPAcmH1s",
+      "uhcDKpGqlqk6xlBbaykoL",
+      "M8Ic5_K8NPSTBfPD70cAh"
+    ],
+    "nodes": [
+      {
+        "id": "text-1792250821613-o8ctf",
+        "images": [],
+        "text": "绿色小舟",
+        "videos": []
+      },
+      {
+        "id": "config-1792250832403-y8zfm",
+        "images": [],
+        "text": "生成配置生图文本视频音频提示词1 个参考图0 张参考视频0 个参考音频0 个组装提示词mock-image（本地模拟）自动 · 1k · 1:1 · 1 张开始生成",
+        "videos": []
+      },
+      {
+        "id": "GQON9N4ZIVJrPPXPPO2kF",
+        "images": [
+          {
+            "alt": "【文本1】\n绿色小舟",
+            "height": 768,
+            "loaded": true,
+            "width": 768
+          }
+        ],
+        "text": "下载",
+        "videos": []
+      },
+      {
+        "id": "config-1792250914268-n929m",
+        "images": [],
+        "text": "生成配置生图文本视频音频提示词0 个参考图1 张参考视频0 个参考音频0 个组装提示词mock-video（本地模拟）720p · 1:1 · 6s · 首尾帧模式开始生成",
+        "videos": []
+      },
+      {
+        "id": "mEGYNKvbflxvZKCA6MAuI",
+        "images": [],
+        "text": "",
+        "videos": [
+          {
+            "duration": 3,
+            "height": 360,
+            "readyState": 4,
+            "width": 640
+          }
+        ]
+      },
+      {
+        "id": "image-1792251275969-h67sg",
+        "images": [
+          {
+            "alt": "测试原地\n\n【文本1】\n绿色小舟",
+            "height": 768,
+            "loaded": true,
+            "width": 768
+          }
+        ],
+        "text": "下载",
+        "videos": []
+      }
+    ]
+  },
+  "servicesStopped": {
+    "5173": true,
+    "8787": true
+  },
+  "commands": {
+    "pnpm typecheck": "passed",
+    "pnpm lint": "passed (configured scope excludes apps/web)",
+    "pnpm build": "passed with existing Vite bundle/import warnings"
+  },
+  "protectedBaselineUnchanged": [
+    "workflow-runner.ts",
+    "handleGenerateNode",
+    "zh-CN.ts",
+    "en-US.ts"
+  ]
+}

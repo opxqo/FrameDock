@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { BookOpen, Bot, Download, Home, Images, Menu, PanelLeftClose, PanelLeftOpen, Plus, Redo2, Trash2, Undo2, Upload } from "lucide-react";
+import { BookOpen, Bot, Download, Home, Images, Menu, PanelLeftClose, PanelLeftOpen, Plus, Redo2, Square, Trash2, Undo2, Upload } from "lucide-react";
 import { Button, Dropdown, Modal, Tooltip } from "antd";
 import { useTranslation } from "react-i18next";
 
@@ -28,6 +28,8 @@ export function CanvasTopBar({
     onOpenPlugins,
     onUndo,
     onRedo,
+    workflowRunning,
+    onStopWorkflow,
     agentOpen,
     compactAgentStatus,
     onToggleAgent,
@@ -50,6 +52,8 @@ export function CanvasTopBar({
     onOpenPlugins: () => void;
     onUndo: () => void;
     onRedo: () => void;
+    workflowRunning: boolean;
+    onStopWorkflow: () => void;
     agentOpen: boolean;
     compactAgentStatus: { connected: boolean; enabled: boolean; activity: string };
     onToggleAgent: () => void;
@@ -139,6 +143,17 @@ export function CanvasTopBar({
                 </div>
 
                 <div className="pointer-events-auto flex items-center gap-1.5">
+                    {workflowRunning ? (
+                        <Button
+                            type="text"
+                            className="!h-10 !rounded-xl !px-3 !font-medium"
+                            style={{ background: theme.toolbar.panel, color: theme.node.text, boxShadow: "0 10px 30px rgba(28,25,23,.10)" }}
+                            icon={<Square className="size-4" />}
+                            onClick={onStopWorkflow}
+                        >
+                            {t("canvas.workflow.stop")}
+                        </Button>
+                    ) : null}
                     <UserStatusActions variant="canvas" onOpenShortcuts={() => setShortcutsOpen(true)} onOpenPlugins={onOpenPlugins} />
                     <span className="h-6 w-px" style={{ background: theme.toolbar.border }} />
                     <Button

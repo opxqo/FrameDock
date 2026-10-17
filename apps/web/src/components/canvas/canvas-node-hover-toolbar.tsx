@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { App, Modal, Segmented, Tooltip } from "antd";
-import { Download, Ellipsis, FolderPlus, Image as ImageIcon, Info, MessageSquare, Minus, Music2, Plus, RefreshCw, Settings2, Trash2, Ungroup, Upload, Video } from "lucide-react";
+import { Download, Ellipsis, FolderPlus, Image as ImageIcon, Info, MessageSquare, Minus, Music2, Play, Plus, RefreshCw, Settings2, Trash2, Ungroup, Upload, Video } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { canvasThemes } from "@/lib/canvas-theme";
@@ -23,6 +23,7 @@ type CanvasNodeHoverToolbarProps = {
     onIncreaseFont: (node: CanvasNodeData) => void;
     onToggleDialog: (node: CanvasNodeData) => void;
     onGenerateImage: (node: CanvasNodeData) => void;
+    onRunDownstream: (node: CanvasNodeData) => void;
     onUpload: (node: CanvasNodeData) => void;
     onDownload: (node: CanvasNodeData) => void;
     onSaveAsset: (node: CanvasNodeData) => void;
@@ -61,6 +62,7 @@ export function CanvasNodeHoverToolbar({
     onIncreaseFont,
     onToggleDialog,
     onGenerateImage,
+    onRunDownstream,
     onUpload,
     onDownload,
     onSaveAsset,
@@ -198,6 +200,7 @@ export function CanvasNodeHoverToolbar({
                 {toolbarTools.map((tool) => (
                     <ToolbarAction key={tool.id} {...tool} showLabel={isImage ? showImageToolLabels : true} />
                 ))}
+                {isText || isConfig || isImage || isVideo || isAudio ? <ToolbarAction id="runDownstream" title={t("canvas.workflow.runDownstream")} label={t("canvas.workflow.runDownstream")} icon={<Play className="size-4" />} onClick={() => onRunDownstream(node)} showLabel={isImage ? showImageToolLabels : true} /> : null}
                 {hasImage ? <ToolbarAction id="more" title={t("canvas.imageTools.configure")} label={t("canvas.imageTools.more")} icon={<Ellipsis className="size-4" />} active={imageToolSettingsOpen} onClick={openImageToolSettings} showLabel={showImageToolLabels} /> : null}
             </div>
             {hasImage ? (
