@@ -79,12 +79,26 @@ const GEMINI_BASE_URL = "https://generativelanguage.googleapis.com";
 export const LOCAL_PROXY_PACKAGE = "@basketikun/canvas-proxy";
 export const DEFAULT_LOCAL_PROXY_URL = "http://127.0.0.1:23210";
 
+const mockChannel: ModelChannel | undefined = import.meta.env.DEV ? {
+    id: "mock",
+    name: "本地模拟",
+    baseUrl: window.location.origin,
+    apiKey: "mock",
+    apiFormat: "openai",
+    models: [
+        { name: "mock-image", capability: "image" },
+        { name: "mock-video", capability: "video" },
+        { name: "mock-text", capability: "text" },
+    ],
+} : undefined;
+
 export const defaultConfig: AiConfig = {
     channelMode: "local",
     baseUrl: OPENAI_BASE_URL,
     apiKey: "",
     apiFormat: "openai",
     channels: [
+        ...(mockChannel ? [mockChannel] : []),
         {
             id: "default",
             name: i18n.t("config.channels.defaultName"),
@@ -99,10 +113,10 @@ export const defaultConfig: AiConfig = {
             ],
         },
     ],
-    model: "default::gpt-image-2",
-    imageModel: "default::gpt-image-2",
-    videoModel: "default::grok-imagine-video",
-    textModel: "default::gpt-5.5",
+    model: import.meta.env.DEV ? "mock::mock-image" : "default::gpt-image-2",
+    imageModel: import.meta.env.DEV ? "mock::mock-image" : "default::gpt-image-2",
+    videoModel: import.meta.env.DEV ? "mock::mock-video" : "default::grok-imagine-video",
+    textModel: import.meta.env.DEV ? "mock::mock-text" : "default::gpt-5.5",
     audioModel: "default::gpt-4o-mini-tts",
     audioVoice: "alloy",
     audioFormat: "mp3",
@@ -115,7 +129,7 @@ export const defaultConfig: AiConfig = {
     videoMode: "frames",
     systemPrompt: "",
     reasoningEffort: "auto",
-    models: ["default::gpt-image-2", "default::grok-imagine-video", "default::gpt-5.5", "default::gpt-4o-mini-tts"],
+    models: [...(mockChannel ? ["mock::mock-image", "mock::mock-video", "mock::mock-text"] : []), "default::gpt-image-2", "default::grok-imagine-video", "default::gpt-5.5", "default::gpt-4o-mini-tts"],
     quality: "auto",
     size: "1:1",
     background: "",
@@ -253,8 +267,9 @@ export const useConfigStore = create<ConfigStore>()(
                 const persistedConfig = (persistedState.config || {}) as Partial<AiConfig>;
                 const persistedWebdav = (persistedState.webdav || {}) as Partial<WebdavSyncConfig>;
                 const config = { ...defaultConfig, ...persistedConfig };
-                if (!Array.isArray(persistedConfig.channels)) config.channels = [];
+                if (persistedState.config && !Array.isArray(persistedConfig.channels)) config.channels = [];
                 const channels = normalizeChannels(config);
+                if (mockChannel && !channels.some((channel) => channel.id === "mock")) channels.unshift(mockChannel);
                 const models = modelOptionsFromChannels(channels);
                 return {
                     ...current,

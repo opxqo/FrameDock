@@ -2,9 +2,14 @@ import Fastify from "fastify";
 import packageJson from "../package.json" with { type: "json" };
 import { config } from "./config";
 import { openDatabase } from "./db";
+import mockApi from "./mock";
 
 const app = Fastify({ logger: true });
 const { sqlite } = openDatabase();
+
+if (config.mockApi) {
+  await app.register(mockApi, { prefix: "/v1" });
+}
 
 app.addHook("onClose", async () => {
   sqlite.close();
