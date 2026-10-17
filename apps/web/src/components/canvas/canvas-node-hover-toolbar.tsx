@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { App, Modal, Segmented, Tooltip } from "antd";
 import { Download, Ellipsis, FolderPlus, Image as ImageIcon, Info, MessageSquare, Minus, Music2, Play, Plus, RefreshCw, Settings2, Trash2, Ungroup, Upload, Video } from "@/components/icons";
 import { useTranslation } from "react-i18next";
@@ -106,10 +106,22 @@ export function CanvasNodeHoverToolbar({
         setImageToolSettingsOpen(false);
     }, [node?.id]);
 
+    // Keep the edit bar inside the canvas, clear of the left rail (16px inset + 52px rail + gap).
+    const toolbarRef = useRef<HTMLDivElement>(null);
+    const [toolbarBounds, setToolbarBounds] = useState({ width: 0, container: 0 });
+    useLayoutEffect(() => {
+        const el = toolbarRef.current;
+        if (!el) return;
+        const next = { width: el.offsetWidth, container: el.parentElement?.clientWidth || 0 };
+        setToolbarBounds((current) => (current.width === next.width && current.container === next.container ? current : next));
+    });
+
     if (!node) return null;
 
     const activeNode = node;
-    const left = viewport.x + (node.position.x + node.width / 2) * viewport.k;
+    const centerX = viewport.x + (node.position.x + node.width / 2) * viewport.k;
+    const half = toolbarBounds.width / 2;
+    const left = toolbarBounds.container > 0 ? Math.min(Math.max(centerX, 84 + half), Math.max(84 + half, toolbarBounds.container - 16 - half)) : centerX;
     // Sits above the node title (which floats 28 world px over the node), like updream's edit bar.
     const top = viewport.y + (node.position.y - 28) * viewport.k - 10;
     const isImage = node.type === CanvasNodeType.Image;
@@ -189,6 +201,7 @@ export function CanvasNodeHoverToolbar({
         <>
             <div
                 className="glass absolute z-[70] flex h-11 -translate-x-1/2 -translate-y-full items-center overflow-visible rounded-full px-1 text-[13px] text-popover-foreground"
+                ref={toolbarRef}
                 data-node-toolbar={node.id}
                 style={{ left, top }}
                 onMouseEnter={() => onKeep(node.id)}
