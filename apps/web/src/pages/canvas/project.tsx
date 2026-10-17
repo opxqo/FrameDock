@@ -73,7 +73,7 @@ import {
     resolveMetadataReferences,
     sourceNodeReferenceImages,
 } from "@/lib/canvas/canvas-generation-helpers";
-import { planWorkflow, runWorkflowPlan, type WorkflowScope } from "@/lib/canvas/workflow-runner";
+import { configResultTarget, planWorkflow, runWorkflowPlan, type WorkflowScope } from "@/lib/canvas/workflow-runner";
 import { useWorkflowRunStore } from "@/stores/canvas/use-workflow-run-store";
 import { CanvasProgrammeBar } from "@/components/canvas/canvas-programme-bar";
 import { CanvasEmptyHint } from "@/components/canvas/canvas-empty-hint";
@@ -2516,8 +2516,10 @@ function InfiniteCanvasPage() {
                 }
                 return;
             }
-            // FrameDock workflow runs write a config node's result back into its existing result node.
-            const retargetNode = options.targetNodeId ? nodesRef.current.find((node) => node.id === options.targetNodeId) : undefined;
+            // FrameDock: a config node writes into its connected result node (chain runs pass it in; single
+            // "generate" clicks look it up the same way), so results keep flowing downstream.
+            const targetNodeId = options.targetNodeId ?? (sourceNode?.type === CanvasNodeType.Config ? configResultTarget(sourceNode, mode, nodesRef.current, connectionsRef.current)?.id : undefined);
+            const retargetNode = targetNodeId ? nodesRef.current.find((node) => node.id === targetNodeId) : undefined;
             const generationConfig = buildGenerationConfig(effectiveConfig, sourceNode, mode);
             if (!isAiConfigReady(generationConfig, generationConfig.model)) {
                 openConfigDialog(true);
@@ -2604,7 +2606,7 @@ function InfiniteCanvasPage() {
                     const rootNode: CanvasNodeData = {
                         id: rootId,
                         type: CanvasNodeType.Image,
-                        title: effectivePrompt.slice(0, 32) || "Generated Image",
+                        title: retargetImage?.title || effectivePrompt.slice(0, 32) || "Generated Image",
                         position: retargetImage
                             ? retargetImage.position
                             : {
@@ -2749,7 +2751,7 @@ function InfiniteCanvasPage() {
                     const videoNode: CanvasNodeData = {
                         id: videoId,
                         type: CanvasNodeType.Video,
-                        title: effectivePrompt.slice(0, 32) || "Generated Video",
+                        title: retargetVideo?.title || effectivePrompt.slice(0, 32) || "Generated Video",
                         position: retargetVideo ? retargetVideo.position : reuseVideoNode ? sourceNode.position : { x: parent.x + (sourceNode?.width || spec.width) + 96, y: parent.y },
                         width: retargetVideo ? retargetVideo.width : reuseVideoNode ? sourceNode.width : spec.width,
                         height: retargetVideo ? retargetVideo.height : reuseVideoNode ? sourceNode.height : spec.height,
@@ -2803,7 +2805,7 @@ function InfiniteCanvasPage() {
                     const audioNode: CanvasNodeData = {
                         id: audioId,
                         type: CanvasNodeType.Audio,
-                        title: effectivePrompt.slice(0, 32) || "Generated Audio",
+                        title: retargetAudio?.title || effectivePrompt.slice(0, 32) || "Generated Audio",
                         position: retargetAudio ? retargetAudio.position : reuseAudioNode ? sourceNode.position : { x: parent.x + (sourceNode?.width || spec.width) + 96, y: parent.y + ((sourceNode?.height || spec.height) - spec.height) / 2 },
                         width: retargetAudio ? retargetAudio.width : reuseAudioNode ? sourceNode.width : spec.width,
                         height: retargetAudio ? retargetAudio.height : reuseAudioNode ? sourceNode.height : spec.height,
@@ -2841,7 +2843,7 @@ function InfiniteCanvasPage() {
                 const rootNode: CanvasNodeData = {
                     id: rootId,
                     type: CanvasNodeType.Text,
-                    title: effectivePrompt.slice(0, 32) || "Generated Text",
+                    title: retargetText?.title || effectivePrompt.slice(0, 32) || "Generated Text",
                     position: retargetText ? retargetText.position : reuseTextNode ? sourceNode.position : { x: parentPosition.x + parentConfig.width + 96, y: parentPosition.y + parentConfig.height / 2 - textConfig.height / 2 },
                     width: retargetText ? retargetText.width : reuseTextNode ? sourceNode.width : textConfig.width,
                     height: retargetText ? retargetText.height : reuseTextNode ? sourceNode.height : textConfig.height,

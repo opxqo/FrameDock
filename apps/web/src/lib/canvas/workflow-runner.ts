@@ -71,17 +71,24 @@ function topologicalOrder(ids: Set<string>, connections: CanvasConnection[]) {
     return order.length === ids.size ? order : null;
 }
 
+/**
+ * The result node a config node writes into: the most recent downstream node of the mode's output type.
+ * Shared by chain runs and single "generate" clicks so results always flow into the connected node.
+ */
+export function configResultTarget(config: CanvasNodeData, mode: CanvasGenerationMode, nodes: CanvasNodeData[], connections: CanvasConnection[]) {
+    const outputType = MODE_OUTPUT_TYPE[mode];
+    return connections
+        .filter((connection) => connection.fromNodeId === config.id)
+        .map((connection) => nodes.find((item) => item.id === connection.toNodeId))
+        .filter((item): item is CanvasNodeData => item?.type === outputType)
+        .at(-1);
+}
+
 // Decides whether a node generates something when the workflow runs, and how.
 export function workflowStepForNode(node: CanvasNodeData, nodes: CanvasNodeData[], connections: CanvasConnection[]): WorkflowStep | null {
     if (node.type === CanvasNodeType.Config) {
         const mode = node.metadata?.generationMode || "image";
-        const outputType = MODE_OUTPUT_TYPE[mode];
-        // Config nodes only have outgoing connections to results they created; reuse the most recent one.
-        const target = connections
-            .filter((connection) => connection.fromNodeId === node.id)
-            .map((connection) => nodes.find((item) => item.id === connection.toNodeId))
-            .filter((item): item is CanvasNodeData => item?.type === outputType)
-            .at(-1);
+        const target = configResultTarget(node, mode, nodes, connections);
         return { nodeId: node.id, mode, prompt: rawNodePrompt(node), targetNodeId: target?.id };
     }
     // FrameDock: Codex nodes always regenerate in place from their own prompt.
