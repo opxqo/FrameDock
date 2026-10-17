@@ -130,7 +130,10 @@ export function Minimap({ nodes, viewport, viewportSize, onViewportChange }: { n
                         />
                     );
                 })}
-                <div className="pointer-events-none absolute rounded-[3px] border" style={{ left: viewportRect.x, top: viewportRect.y, width: viewportRect.w, height: viewportRect.h, borderColor: theme.node.activeStroke, background: theme.canvas.selectionFill }} />
+                <div
+                    className="pointer-events-none absolute rounded-[3px] border"
+                    style={{ left: viewportRect.x, top: viewportRect.y, width: viewportRect.w, height: viewportRect.h, borderColor: theme.node.activeStroke, background: theme.canvas.selectionFill }}
+                />
             </div>
         </div>
     );

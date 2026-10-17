@@ -104,7 +104,12 @@ export function CanvasTopBar({
                                 className="ml-1 h-8 w-56 rounded-full border border-ring bg-transparent px-3 text-[15px] font-semibold outline-none"
                             />
                         ) : (
-                            <button type="button" className="ml-1 h-8 min-w-0 max-w-[280px] truncate rounded-full px-3 text-left text-[15px] font-semibold transition-colors hover:bg-accent" onDoubleClick={onStartTitleEditing} title={t("canvas.renameHint")}>
+                            <button
+                                type="button"
+                                className="ml-1 h-8 min-w-0 max-w-[280px] truncate rounded-full px-3 text-left text-[15px] font-semibold transition-colors hover:bg-accent"
+                                onDoubleClick={onStartTitleEditing}
+                                title={t("canvas.renameHint")}
+                            >
                                 {title}
                             </button>
                         )}

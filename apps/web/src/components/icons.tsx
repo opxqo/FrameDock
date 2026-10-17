@@ -131,9 +131,7 @@ export type IconProps = Omit<SVGProps<SVGSVGElement>, "ref"> & {
 export type IconComponent = ComponentType<IconProps>;
 
 function solar(Svg: ComponentType<SVGProps<SVGSVGElement>>, name: string): IconComponent {
-    const Icon = ({ size = 24, strokeWidth: _strokeWidth, absoluteStrokeWidth: _absolute, className, ...props }: IconProps) => (
-        <Svg aria-hidden="true" width={size} height={size} className={cn("shrink-0", className)} {...props} />
-    );
+    const Icon = ({ size = 24, strokeWidth: _strokeWidth, absoluteStrokeWidth: _absolute, className, ...props }: IconProps) => <Svg aria-hidden="true" width={size} height={size} className={cn("shrink-0", className)} {...props} />;
     Icon.displayName = name;
     return Icon;
 }
