@@ -7,6 +7,7 @@
       "!**/node_modules",
       "!**/.pnpm-store",
       "!data",
+      "!参考项目",
       "!apps/server/drizzle/meta"
     ]
   },
