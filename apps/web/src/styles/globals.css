@@ -502,24 +502,14 @@
         top: 21px;
     }
 
-    /* The comet on a selected or generating wire (path normalised with pathLength=100). */
+    /* Geometry and the soft trail are updated together without re-rendering the canvas. */
     .canvas-wire-flow {
-        animation: canvas-wire-flow 2.5s linear infinite;
         opacity: 0.9;
-    }
-
-    @keyframes canvas-wire-flow {
-        from {
-            stroke-dashoffset: 100;
-        }
-        to {
-            stroke-dashoffset: 0;
-        }
     }
 
     @media (prefers-reduced-motion: reduce) {
         .canvas-wire-flow {
-            animation: none;
+            stroke: var(--foreground);
             stroke-dasharray: none;
             opacity: 0.5;
         }
