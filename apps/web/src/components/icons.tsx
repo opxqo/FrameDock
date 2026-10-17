@@ -65,6 +65,8 @@ import SolarLock from "~icons/solar/lock-linear";
 import SolarLockKeyhole from "~icons/solar/lock-keyhole-linear";
 import SolarLockKeyholeUnlocked from "~icons/solar/lock-keyhole-unlocked-linear";
 import SolarMagicStick3 from "~icons/solar/magic-stick-3-linear";
+import SolarNotebookBookmark from "~icons/solar/notebook-bookmark-linear";
+import SolarRoutingLinear from "~icons/solar/routing-3-linear";
 import SolarMagnifer from "~icons/solar/magnifer-linear";
 import SolarMagniferZoomIn from "~icons/solar/magnifer-zoom-in-linear";
 import SolarMagniferZoomOut from "~icons/solar/magnifer-zoom-out-linear";
@@ -147,6 +149,11 @@ function HandGlyph(props: SVGProps<SVGSVGElement>) {
 }
 
 export const Hand = solar(HandGlyph, "Hand");
+
+// FrameDock-specific names (no lucide equivalent): recipes, skills, workflow templates.
+export const MagicStick = solar(SolarMagicStick3, "MagicStick");
+export const SkillBook = solar(SolarNotebookBookmark, "SkillBook");
+export const TemplateFlow = solar(SolarRoutingLinear, "TemplateFlow");
 export const AlertTriangle = solar(SolarDangerTriangle, "AlertTriangle");
 export const ArrowLeft = solar(SolarArrowLeft, "ArrowLeft");
 export const ArrowRight = solar(SolarArrowRight, "ArrowRight");
