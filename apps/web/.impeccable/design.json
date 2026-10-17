@@ -1,68 +1,56 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-17T18:40:00Z",
+  "generatedAt": "2026-10-17T21:30:00Z",
   "title": "Design System: FrameDock 帧坞",
   "extensions": {
     "colorMeta": {
       "signal": {
         "role": "primary",
-        "displayName": "Signal Amber 信号琥珀",
-        "canonical": "oklch(0.8 0.145 72)",
+        "displayName": "Accent 白（浅色主题为近黑）",
+        "canonical": "#fafafa",
         "tonalRamp": [
-          "oklch(0.15 0.145 72)",
-          "oklch(0.25 0.145 72)",
-          "oklch(0.35 0.145 72)",
-          "oklch(0.45 0.145 72)",
-          "oklch(0.6 0.145 72)",
-          "oklch(0.72 0.145 72)",
-          "oklch(0.85 0.145 72)",
-          "oklch(0.95 0.145 72)"
+          "#0a0a0a",
+          "#171717",
+          "#262626",
+          "#404040",
+          "#737373",
+          "#a3a3a3",
+          "#e5e5e5",
+          "#fafafa"
         ]
       },
       "ground": {
         "role": "neutral",
-        "displayName": "Control Room Charcoal 控制室炭灰",
-        "canonical": "oklch(0.195 0.009 255)",
+        "displayName": "Ground 近黑中性灰",
+        "canonical": "#0a0a0a",
         "tonalRamp": [
-          "oklch(0.15 0.01 255)",
-          "oklch(0.25 0.01 255)",
-          "oklch(0.35 0.01 255)",
-          "oklch(0.45 0.01 255)",
-          "oklch(0.6 0.01 255)",
-          "oklch(0.72 0.01 255)",
-          "oklch(0.85 0.01 255)",
-          "oklch(0.95 0.01 255)"
+          "#0a0a0a",
+          "#121212",
+          "#171717",
+          "#262626",
+          "#404040",
+          "#525252",
+          "#a3a3a3",
+          "#e5e5e5"
         ]
       },
-      "tally-ok": {
+      "state-ok": {
         "role": "tertiary",
-        "displayName": "Tally Green",
-        "canonical": "oklch(0.76 0.15 155)",
-        "tonalRamp": [
-          "oklch(0.15 0.15 155)",
-          "oklch(0.25 0.15 155)",
-          "oklch(0.35 0.15 155)",
-          "oklch(0.45 0.15 155)",
-          "oklch(0.6 0.15 155)",
-          "oklch(0.72 0.15 155)",
-          "oklch(0.85 0.15 155)",
-          "oklch(0.95 0.15 155)"
-        ]
+        "displayName": "State Green",
+        "canonical": "#4ade80",
+        "tonalRamp": []
       },
-      "tally-fail": {
-        "role": "error",
-        "displayName": "Tally Red",
-        "canonical": "oklch(0.68 0.19 25)",
-        "tonalRamp": [
-          "oklch(0.15 0.19 25)",
-          "oklch(0.25 0.19 25)",
-          "oklch(0.35 0.19 25)",
-          "oklch(0.45 0.19 25)",
-          "oklch(0.6 0.19 25)",
-          "oklch(0.72 0.19 25)",
-          "oklch(0.85 0.19 25)",
-          "oklch(0.95 0.19 25)"
-        ]
+      "state-fail": {
+        "role": "tertiary",
+        "displayName": "State Red",
+        "canonical": "#f87171",
+        "tonalRamp": []
+      },
+      "state-stale": {
+        "role": "tertiary",
+        "displayName": "State Amber（过期）",
+        "canonical": "#fbbf24",
+        "tonalRamp": []
       }
     },
     "typographyMeta": {
@@ -78,13 +66,13 @@
     "shadows": [
       {
         "name": "shadow-panel",
-        "value": "0 1px 2px oklch(0.08 0.02 255 / 40%), 0 6px 16px -6px oklch(0.08 0.02 255 / 50%)",
-        "purpose": "工具栏、卡片浮起一级。"
+        "value": "0 1px 2px rgb(0 0 0 / 40%), 0 8px 24px -8px rgb(0 0 0 / 50%)",
+        "purpose": "卡片浮起一级。"
       },
       {
         "name": "shadow-float",
-        "value": "0 2px 6px oklch(0.08 0.02 255 / 40%), 0 16px 40px -10px oklch(0.08 0.02 255 / 65%)",
-        "purpose": "菜单、popover、命令面板。"
+        "value": "0 2px 6px rgb(0 0 0 / 40%), 0 20px 48px -12px rgb(0 0 0 / 70%)",
+        "purpose": "玻璃浮层自带。"
       }
     ],
     "motion": [
@@ -94,19 +82,19 @@
         "purpose": "悬停底色。"
       },
       {
-        "name": "duration-mid",
-        "value": "180ms",
-        "purpose": "大多数状态切换。"
+        "name": "port-spring",
+        "value": "transform 320ms cubic-bezier(0.34,1.56,0.64,1)",
+        "purpose": "节点端口弹出。"
       },
       {
-        "name": "wire-flow",
-        "value": "stroke-dashoffset 0.9s linear infinite",
-        "purpose": "通往运行中节点的连线信号；reduced-motion 时停止。"
+        "name": "wire-comet",
+        "value": "stroke-dashoffset 2.5s / 4s linear infinite",
+        "purpose": "选中 / 生成中的连线亮段；reduced-motion 时停止。"
       },
       {
-        "name": "tally-pulse",
-        "value": "animate-pulse",
-        "purpose": "运行中的 tally 灯呼吸。"
+        "name": "node-sweep",
+        "value": "background-position 1.8s ease-in-out infinite",
+        "purpose": "生成中节点的扫光。"
       }
     ],
     "breakpoints": [
@@ -135,7 +123,7 @@
       "refersTo": "button-primary",
       "description": "每个区域最多一个主操作。",
       "html": "<button class=\"ds-btn-primary\">新建画布</button>",
-      "css": ".ds-btn-primary{background:oklch(0.8 0.145 72);color:oklch(0.22 0.03 60);height:32px;padding:0 15px;border:0;border-radius:8px;font:500 14px 'Geist Variable',system-ui,sans-serif;transition:background .15s}.ds-btn-primary:hover{background:oklch(0.84 0.13 75)}.ds-btn-primary:focus-visible{outline:2px solid oklch(0.8 0.145 72 / 65%);outline-offset:2px}.ds-btn-primary:active{background:oklch(0.76 0.15 70)}"
+      "css": ".ds-btn-primary{background:#fafafa;color:#0a0a0a;height:32px;padding:0 15px;border:0;border-radius:8px;font-weight:500}"
     },
     {
       "name": "Icon Button",
@@ -177,41 +165,32 @@
     }
   ],
   "narrative": {
-    "northStar": "导播台 Tally",
-    "overview": "画布是一台生成内容的切换台：每个节点戴一盏 tally 灯，整条链运行时信号沿连线一路点亮。Operate 模式：安静、可扫读，素材是全屏最亮的东西。",
+    "northStar": "内容优先的画布（updream 设计语言）",
+    "overview": "素材是全屏最亮的东西：节点即内容，标题在节点外，工具与参数以玻璃浮层就地出现。只用中性灰和白色，状态色只表达状态。",
     "keyCharacteristics": [
-      "冷调控制室炭灰三层中性色",
-      "唯一强调色：信号琥珀",
-      "tally 状态色只表达状态",
-      "1px 发丝线、8–12px 圆角",
-      "Geist + Geist Mono 等宽数字"
+      "近黑底、纯中性灰阶",
+      "白色是唯一强调色",
+      "浮层统一玻璃材质（75% + 20px 模糊）",
+      "圆角分档：8 / 16 / 20 / 胶囊",
+      "Solar 线性图标；Geist + Geist Mono 等宽数字"
     ],
     "rules": [
       {
-        "name": "One Signal",
-        "body": "琥珀色只用于主操作、选中和焦点，不再引入第二个强调色。",
-        "section": "colors"
+        "name": "One Accent",
+        "body": "只用白色（浅色主题为近黑）做强调：主按钮、选中、当前工具、生成键；不引入任何彩色强调色。"
       },
       {
-        "name": "Tally Means State",
-        "body": "绿 / 红 / 琥珀灯只表达节点状态，不做装饰。",
-        "section": "colors"
+        "name": "Glass Chrome",
+        "body": "浮在画布或页面上的东西一律用 .glass。"
       },
       {
-        "name": "Media Is Brightest",
-        "body": "界面色值贴近底色，图片和视频是屏幕上最亮的内容。",
-        "section": "elevation"
+        "name": "State Only",
+        "body": "绿 / 红 / 琥珀只表达完成 / 失败 / 过期。"
+      },
+      {
+        "name": "One Icon Set",
+        "body": "图标只从 @/components/icons 引入（Solar）。"
       }
-    ],
-    "dos": [
-      "状态用 tally 词汇",
-      "数字用 mono 并就地显示价格",
-      "高频操作给快捷键并在 tooltip 中写出"
-    ],
-    "donts": [
-      "渐变文字、毛玻璃装饰、点阵背景",
-      "嵌套卡片和胶囊按钮堆",
-      "组件里写死颜色"
     ]
   }
 }

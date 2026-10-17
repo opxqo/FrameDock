@@ -7,6 +7,8 @@ related_targets: ["src/pages/home/index.tsx","src/pages/config/index.tsx"]
 
 # Surface brief: FrameDock app (canvas editor + shell)
 
+> 2026-10-17 更新：视觉方向已由“导播台 Tally”改为 updream 设计语言（用户确认的画布 demo）。下面的 Direction contract 仅作历史记录，现行规范以 `apps/web/DESIGN.md` 为准。
+
 Scope: whole web app — canvas editor (primary), home/project list, settings, image/video workbenches, assets. Mode: Operate.
 Task: build and run node workflows (text → image → video), watch long-running generations, compare results, control cost. High frequency, long sessions, desktop.
 Constraints: antd 6 + Tailwind v4 kept; all features preserved; secondary features moved under "高级"; zh-CN primary, en-US must work. User pinned: dark, charcoal ground, one accent.
