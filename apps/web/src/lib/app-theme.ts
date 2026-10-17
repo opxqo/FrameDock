@@ -155,6 +155,9 @@ export function getAntThemeConfig(dark: boolean): ThemeConfig {
             },
             Tooltip: {
                 colorBgSpotlight: dark ? "#2a2e34" : "#13161b",
+                // The global colorTextLightSolid is the dark "on signal" color for primary buttons;
+                // tooltips sit on a dark spotlight background and need light text instead.
+                colorTextLightSolid: "#f4f5f7",
             },
         },
     };
