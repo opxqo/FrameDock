@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Button, Modal, Segmented } from "antd";
-import { ImagePlus } from "lucide-react";
+import { ImagePlus } from "@/components/icons";
 import { useTranslation } from "react-i18next";
 
 import { readImageMeta } from "@/lib/image-utils";

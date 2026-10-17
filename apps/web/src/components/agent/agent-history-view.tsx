@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button, Checkbox } from "antd";
-import { FolderOpen, Plus, RefreshCw, Trash2 } from "lucide-react";
+import { FolderOpen, Plus, RefreshCw, Trash2 } from "@/components/icons";
 import { useTranslation } from "react-i18next";
 
 import { canvasThemes } from "@/lib/canvas-theme";

@@ -1,6 +1,6 @@
 import { useEffect, useId, useMemo, useState } from "react";
 import { ModelPrice } from "@/components/autodl-price";
-import { Cpu } from "lucide-react";
+import { Cpu } from "@/components/icons";
 import { useTranslation } from "react-i18next";
 
 import i18n from "@/i18n";

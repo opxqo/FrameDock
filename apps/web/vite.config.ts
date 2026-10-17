@@ -2,6 +2,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import react from "@vitejs/plugin-react";
+import Icons from "unplugin-icons/vite";
 import { defineConfig, type Plugin } from "vite";
 
 import { parseChangelog } from "./src/lib/release";
@@ -49,7 +50,8 @@ export default defineConfig({
             "/proxy": "http://127.0.0.1:8787",
         },
     },
-    plugins: [react(), localPluginsManifest()],
+    // FrameDock: Solar icons compiled to React components at build time (offline, tree-shaken).
+    plugins: [react(), Icons({ compiler: "jsx", jsx: "react" }), localPluginsManifest()],
     resolve: {
         alias: {
             "@": resolve(webDir, "src"),

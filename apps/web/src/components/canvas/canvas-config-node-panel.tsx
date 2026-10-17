@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { CostEstimate } from "@/components/autodl-price";
 import { generationCostParams } from "@/lib/autodl-pricing";
-import { Image as ImageIcon, LoaderCircle, MessageSquare, Music2, Play, Settings2, Square, Video } from "lucide-react";
+import { Image as ImageIcon, LoaderCircle, MessageSquare, Music2, Play, Settings2, Square, Video } from "@/components/icons";
 import { Button, Segmented } from "antd";
 import { useTranslation } from "react-i18next";
 

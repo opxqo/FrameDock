@@ -1,4 +1,4 @@
-import { Copy, FileText, FolderPlus } from "lucide-react";
+import { Copy, FileText, FolderPlus } from "@/components/icons";
 import { Button, Modal, Space, Tag } from "antd";
 import { useTranslation } from "react-i18next";
 

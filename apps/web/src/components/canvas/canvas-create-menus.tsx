@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { ImageIcon, List, Music2, Settings2, Video, X } from "lucide-react";
+import { ImageIcon, List, Music2, Settings2, Video, X } from "@/components/icons";
 import { CodexLogo } from "@/components/codex-logo";
 import { useTranslation } from "react-i18next";
 

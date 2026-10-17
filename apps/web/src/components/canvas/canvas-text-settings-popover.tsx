@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { createPortal } from "react-dom";
-import { Settings2 } from "lucide-react";
+import { Settings2 } from "@/components/icons";
 import { Button, InputNumber } from "antd";
 import { useTranslation } from "react-i18next";
 

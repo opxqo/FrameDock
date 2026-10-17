@@ -1,4 +1,4 @@
-import { Menu } from "lucide-react";
+import { Menu } from "@/components/icons";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 

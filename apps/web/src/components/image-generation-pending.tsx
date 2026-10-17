@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { LoaderCircle } from "lucide-react";
+import { LoaderCircle } from "@/components/icons";
 import { useTranslation } from "react-i18next";
 
 import { formatDuration } from "@/lib/image-utils";

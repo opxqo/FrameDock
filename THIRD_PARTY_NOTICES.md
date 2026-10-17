@@ -58,3 +58,7 @@ SOFTWARE.
 ## cmdk
 
 `apps/web` 的命令面板依赖 [`cmdk`](https://github.com/pacocoursey/cmdk)，MIT License，Copyright (c) 2022 Paco Coursey。
+
+## Solar Icon Set
+
+`apps/web` 的界面图标来自 [Solar Icon Set](https://www.figma.com/community/file/1166831539721848736)（作者 480 Design / R4IN80W），按 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) 许可使用。图标数据来自 npm 包 [`@iconify-json/solar`](https://www.npmjs.com/package/@iconify-json/solar)（[Iconify](https://iconify.design/) 整理），未做修改；构建时由 [`unplugin-icons`](https://github.com/unplugin/unplugin-icons)（MIT License，Copyright (c) 2020 Anthony Fu）编译为 React 组件。统一入口是 `apps/web/src/components/icons.tsx`，其中“抓手”图标是 FrameDock 自绘的。

@@ -1,6 +1,6 @@
 import { App, Button, Form, Input, Modal, Progress, Radio, Segmented, Select, Switch } from "antd";
 import type { TFunction } from "i18next";
-import { Cloud, Download, Pencil, Plus, RefreshCw, Trash2, Upload, Wifi } from "lucide-react";
+import { Cloud, Download, Pencil, Plus, RefreshCw, Trash2, Upload, Wifi } from "@/components/icons";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 

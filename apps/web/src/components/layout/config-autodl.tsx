@@ -1,7 +1,7 @@
 import { App, Button, Input, Segmented, Switch, Tag } from "antd";
 import { ModelPrice } from "@/components/autodl-price";
 import { AUTODL_PRICES_FETCHED_AT, fetchAutodlPrices, type AutodlPriceEntry } from "@/lib/autodl-pricing";
-import { ChevronDown, ChevronRight, ExternalLink, RefreshCw, Search } from "lucide-react";
+import { ChevronDown, ChevronRight, ExternalLink, RefreshCw, Search } from "@/components/icons";
 import { useMemo, useState } from "react";
 
 import { ModelIcon, resolveModelVendor } from "@/components/model-picker";

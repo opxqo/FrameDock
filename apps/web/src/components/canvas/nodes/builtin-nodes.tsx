@@ -1,4 +1,4 @@
-import { FileText, Group, Image as ImageIcon, Music2, Settings2, Video } from "lucide-react";
+import { FileText, Group, Image as ImageIcon, Music2, Settings2, Video } from "@/components/icons";
 import { CodexLogo } from "@/components/codex-logo";
 
 import i18n from "@/i18n";

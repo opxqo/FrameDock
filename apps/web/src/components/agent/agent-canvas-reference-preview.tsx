@@ -1,4 +1,4 @@
-import { FileText, Image as ImageIcon, Music2, Video } from "lucide-react";
+import { FileText, Image as ImageIcon, Music2, Video } from "@/components/icons";
 import { useTranslation } from "react-i18next";
 
 import i18n from "@/i18n";

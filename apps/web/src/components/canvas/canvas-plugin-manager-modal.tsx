@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import { App, Button, Input, Modal, Popconfirm, Switch, Tabs } from "antd";
-import { AlertTriangle, Download, Puzzle, RefreshCw, Trash2 } from "lucide-react";
+import { AlertTriangle, Download, Puzzle, RefreshCw, Trash2 } from "@/components/icons";
 import { useTranslation } from "react-i18next";
 
 import { PLUGIN_REGISTRY_URL } from "@/constant/env";

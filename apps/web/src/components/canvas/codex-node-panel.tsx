@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowUp, LoaderCircle, Maximize2, Sparkles, Square } from "lucide-react";
+import { ArrowUp, LoaderCircle, Maximize2, Sparkles, Square } from "@/components/icons";
 import { Button, Modal, Segmented, Select, Tooltip } from "antd";
 import { useTranslation } from "react-i18next";
 

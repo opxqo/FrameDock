@@ -1,5 +1,5 @@
 import { App, Button, Empty, Modal, Space, Table, Tag } from "antd";
-import { Copy, FolderPlus, RefreshCw } from "lucide-react";
+import { Copy, FolderPlus, RefreshCw } from "@/components/icons";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 

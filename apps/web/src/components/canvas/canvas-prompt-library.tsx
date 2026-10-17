@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button, Tooltip } from "antd";
-import { BookOpen } from "lucide-react";
+import { BookOpen } from "@/components/icons";
 import { useTranslation } from "react-i18next";
 
 import { PromptSelectDialog } from "@/components/prompts/prompt-select-dialog";

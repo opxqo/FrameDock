@@ -4,7 +4,7 @@ import { runCodex } from "@/services/api/codex";
 import { estimateAutodlCost, generationCostParams } from "@/lib/autodl-pricing";
 import type { ChangeEvent as ReactChangeEvent, DragEvent as ReactDragEvent, MouseEvent as ReactMouseEvent, PointerEvent as ReactPointerEvent } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { Group, Video } from "lucide-react";
+import { Group, Video } from "@/components/icons";
 import { saveAs } from "file-saver";
 import { useTranslation } from "react-i18next";
 

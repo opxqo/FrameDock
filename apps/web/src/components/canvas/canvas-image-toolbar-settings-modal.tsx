@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { Button, Card, Checkbox, Form, Modal, Space, Switch, Tag, Tooltip, Typography, theme as antdTheme } from "antd";
-import { Ellipsis, Image as ImageIcon, Settings2 } from "lucide-react";
+import { Ellipsis, Image as ImageIcon, Settings2 } from "@/components/icons";
 import { useTranslation } from "react-i18next";
 
 import type { ImageQuickToolId } from "./canvas-image-toolbar-tools";

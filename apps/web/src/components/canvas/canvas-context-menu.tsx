@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { BetweenHorizontalStart, GalleryHorizontalEnd, GalleryHorizontal, Group, ListEnd, Play, Plus, Trash2, Ungroup } from "lucide-react";
+import { BetweenHorizontalStart, GalleryHorizontalEnd, GalleryHorizontal, Group, ListEnd, Play, Plus, Trash2, Ungroup } from "@/components/icons";
 import { useTranslation } from "react-i18next";
 
 import { cn } from "@/lib/utils";

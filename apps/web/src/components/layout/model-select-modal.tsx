@@ -1,5 +1,5 @@
 import { App, Button, Checkbox, Input, Modal, Tabs } from "antd";
-import { RefreshCw, Search } from "lucide-react";
+import { RefreshCw, Search } from "@/components/icons";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 

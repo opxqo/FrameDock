@@ -1,6 +1,6 @@
 import { GithubOutlined } from "@ant-design/icons";
 import { Dropdown, Tooltip, type MenuProps } from "antd";
-import { BookOpen, Bot, FileText, History, Keyboard, Languages, Moon, MoreHorizontal, Puzzle, Search, Settings2, Sun } from "lucide-react";
+import { BookOpen, Bot, FileText, History, Keyboard, Languages, Moon, MoreHorizontal, Puzzle, Search, Settings2, Sun } from "@/components/icons";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { App, Button, Input } from "antd";
-import { Download, FileUp, Plus, Search } from "lucide-react";
+import { Download, FileUp, Plus, Search } from "@/components/icons";
 import { useTranslation } from "react-i18next";
 
 import { readZip } from "@/lib/zip";

@@ -1,7 +1,7 @@
 import { javascript } from "@codemirror/lang-javascript";
 import CodeMirror from "@uiw/react-codemirror";
 import { Button, Modal } from "antd";
-import { Copy } from "lucide-react";
+import { Copy } from "@/components/icons";
 import { useEffect, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 

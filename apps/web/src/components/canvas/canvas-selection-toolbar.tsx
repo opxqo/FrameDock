@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Group, Ungroup } from "lucide-react";
+import { Group, Ungroup } from "@/components/icons";
 import { Tooltip } from "antd";
 import { useTranslation } from "react-i18next";
 

@@ -1,4 +1,4 @@
-import { ImagePlus, Images, LayoutGrid, Video } from "lucide-react";
+import { ImagePlus, Images, LayoutGrid, Video } from "@/components/icons";
 
 // FrameDock: four primary destinations. Prompts, settings and the rest live in the "more" menu and ⌘K.
 export const navigationTools = [

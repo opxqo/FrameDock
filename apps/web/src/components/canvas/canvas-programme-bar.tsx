@@ -1,4 +1,4 @@
-import { Square } from "lucide-react";
+import { Square } from "@/components/icons";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 

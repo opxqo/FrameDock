@@ -1,4 +1,4 @@
-import { Check, Download, Pencil, Trash2, X } from "lucide-react";
+import { Check, Download, Pencil, Trash2, X } from "@/components/icons";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button, Checkbox, Input, Tooltip } from "antd";
 import { useTranslation } from "react-i18next";

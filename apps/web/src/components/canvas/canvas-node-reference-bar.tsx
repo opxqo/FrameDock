@@ -1,4 +1,4 @@
-import { FileText, Image as ImageIcon, Music2, Plus, Puzzle, Video, X } from "lucide-react";
+import { FileText, Image as ImageIcon, Music2, Plus, Puzzle, Video, X } from "@/components/icons";
 import { Popover } from "antd";
 import { useSyncExternalStore } from "react";
 import { useTranslation } from "react-i18next";

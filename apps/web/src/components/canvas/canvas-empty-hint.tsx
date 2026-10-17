@@ -1,4 +1,4 @@
-import { Image as ImageIcon, Type, Upload, Video } from "lucide-react";
+import { Image as ImageIcon, Type, Upload, Video } from "@/components/icons";
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 

@@ -1,5 +1,5 @@
 import { Button, Tooltip } from "antd";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown } from "@/components/icons";
 
 import { canvasThemes } from "@/lib/canvas-theme";
 

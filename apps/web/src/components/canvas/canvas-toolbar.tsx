@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
 import { Segmented, Switch, Tooltip } from "antd";
-import { CircleDot, Eraser, Grid2x2, Group, Hand, Image as ImageIcon, Info, LocateFixed, Moon, MousePointer2, Music2, Palette, Puzzle, Settings2, Square, Sun, Trash2, Type, Upload, Video } from "lucide-react";
+import { CircleDot, Eraser, Grid2x2, Group, Hand, Image as ImageIcon, Info, LocateFixed, Moon, MousePointer2, Music2, Palette, Puzzle, Settings2, Square, Sun, Trash2, Type, Upload, Video } from "@/components/icons";
 import { CodexLogo } from "@/components/codex-logo";
 
 import { type CanvasBackgroundMode } from "@/lib/canvas-theme";

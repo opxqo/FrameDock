@@ -1,6 +1,6 @@
 import { App, Button, Select, Switch, Tag } from "antd";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Eye, Pencil, Plus, RefreshCw, Trash2 } from "lucide-react";
+import { Eye, Pencil, Plus, RefreshCw, Trash2 } from "@/components/icons";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 

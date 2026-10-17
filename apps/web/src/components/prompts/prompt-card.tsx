@@ -1,4 +1,4 @@
-import { Copy, FileText } from "lucide-react";
+import { Copy, FileText } from "@/components/icons";
 import type { ReactNode } from "react";
 import { Button, Card, Tag } from "antd";
 import { useTranslation } from "react-i18next";

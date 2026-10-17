@@ -1,5 +1,5 @@
 import { Button } from "antd";
-import { KeyRound } from "lucide-react";
+import { KeyRound } from "@/components/icons";
 import { useTranslation } from "react-i18next";
 
 import { cn } from "@/lib/utils";

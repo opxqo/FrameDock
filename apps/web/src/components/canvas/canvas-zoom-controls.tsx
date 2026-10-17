@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Map as MapIcon, Maximize, Minus, Plus, Redo2, Undo2 } from "lucide-react";
+import { Map as MapIcon, Maximize, Minus, Plus, Redo2, Undo2 } from "@/components/icons";
 import { Tooltip } from "antd";
 import { useTranslation } from "react-i18next";
 

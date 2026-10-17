@@ -1,5 +1,5 @@
 import { App, Button, Form, Input, Switch } from "antd";
-import { Copy, Network, Wifi } from "lucide-react";
+import { Copy, Network, Wifi } from "@/components/icons";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 

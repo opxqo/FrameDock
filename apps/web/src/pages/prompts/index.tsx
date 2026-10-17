@@ -1,4 +1,4 @@
-import { FolderPlus, Search } from "lucide-react";
+import { FolderPlus, Search } from "@/components/icons";
 import { type ReactNode, type UIEvent, useEffect, useState } from "react";
 import { App, Button, Empty, Input, Spin, Tag } from "antd";
 import { useTranslation } from "react-i18next";

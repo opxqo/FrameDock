@@ -1,5 +1,5 @@
 import { Tooltip } from "antd";
-import { Coins } from "lucide-react";
+import { Coins } from "@/components/icons";
 
 import { cn } from "@/lib/utils";
 import { describeAutodlPrice, estimateAutodlCost, formatQuote, type CostParams, type PriceLabel } from "@/lib/autodl-pricing";
