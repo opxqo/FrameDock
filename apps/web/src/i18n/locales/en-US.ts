@@ -72,8 +72,8 @@ export default {
         loadMore: "Scroll down to load more",
         end: "You've reached the end",
     },
-    assets: {
-        title: "My Assets",
+    assets: { emptyHint: "Save results as assets from the canvas or a workbench, or use “Add asset” at the top right.", 
+        title: "Assets",
         description: "Save frequently used text and images, then find them quickly by type, title, or tag.",
         search: "Search titles, content, tags, or sources",
         type: "Type",
@@ -131,7 +131,7 @@ export default {
         description: "There is no page at this address. It may have moved or been merged into another section.",
         home: "Back to home",
     },
-    workbench: {
+    workbench: { emptyHint: "Write a prompt, pick a model and generate. Results appear here and are kept in the history on the left.", 
         logs: "Generation history",
         settings: "Settings",
         prompt: "Prompt",

@@ -59,7 +59,7 @@ export function AudioSettingsPanel({ config, onConfigChange, theme, showTitle = 
                         min={0.25}
                         max={4}
                         step={0.05}
-                        className="h-9 w-full rounded-full border bg-transparent px-3 text-center text-sm outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                        className="h-8 w-full rounded-md border bg-transparent px-3 text-center text-sm outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                         style={{ borderColor: theme.node.stroke, color: theme.node.text, WebkitTextFillColor: theme.node.text }}
                         value={config.audioSpeed || "1"}
                         onChange={(event) => onConfigChange("audioSpeed", event.target.value)}
@@ -71,7 +71,7 @@ export function AudioSettingsPanel({ config, onConfigChange, theme, showTitle = 
                     <textarea
                         value={config.audioInstructions || ""}
                         placeholder={t("settingsPanels.audio.instructionsPlaceholder")}
-                        className="thin-scrollbar h-20 w-full resize-none rounded-xl border bg-transparent px-3 py-2 text-sm leading-5 outline-none"
+                        className="thin-scrollbar h-20 w-full resize-none rounded-md border bg-transparent px-3 py-2 text-sm leading-5 outline-none"
                         style={{ borderColor: theme.node.stroke, color: theme.node.text }}
                         onChange={(event) => onConfigChange("audioInstructions", event.target.value)}
                         onMouseDown={(event) => event.stopPropagation()}
@@ -84,7 +84,7 @@ export function AudioSettingsPanel({ config, onConfigChange, theme, showTitle = 
 
 function OptionPill({ selected, theme, onClick, children }: { selected: boolean; theme: CanvasTheme; onClick: () => void; children: ReactNode }) {
     return (
-        <button type="button" className="h-9 cursor-pointer rounded-full border px-2 text-sm transition hover:opacity-80" style={{ background: "transparent", borderColor: selected ? theme.node.text : theme.node.stroke, color: theme.node.text }} onMouseDown={(event) => event.stopPropagation()} onClick={onClick}>
+        <button type="button" className="h-8 cursor-pointer rounded-md border px-2 text-sm transition-colors duration-150 hover:bg-accent" style={{ background: selected ? "color-mix(in oklch, var(--signal) 12%, transparent)" : "transparent", borderColor: selected ? theme.node.activeStroke : theme.node.stroke, color: theme.node.text }} onMouseDown={(event) => event.stopPropagation()} onClick={onClick}>
             {children}
         </button>
     );

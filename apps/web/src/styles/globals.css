@@ -247,8 +247,9 @@
 
     .prompt-filter-tag.ant-tag-checkable.is-active,
     .prompt-filter-tag.ant-tag-checkable-checked {
-        background: var(--secondary);
-        border-color: var(--border);
+        /* antd injects its checked colours at higher precedence than this layer. */
+        background: var(--secondary) !important;
+        border-color: var(--border) !important;
         color: var(--foreground) !important;
         font-weight: 600;
     }

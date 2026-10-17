@@ -79,8 +79,8 @@ export function VideoSettingsPanel({ config, onConfigChange, theme, showTitle = 
                             <button
                                 key={item.value}
                                 type="button"
-                                className="flex h-[72px] cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border bg-transparent text-sm transition hover:opacity-80"
-                                style={{ borderColor: selectedRatio === item.value ? theme.node.text : theme.node.stroke, color: theme.node.text }}
+                                className="flex h-14 cursor-pointer flex-col items-center justify-center gap-1 rounded-md border bg-transparent text-xs transition-colors duration-150 hover:bg-accent"
+                                style={{ borderColor: selectedRatio === item.value ? theme.node.activeStroke : theme.node.stroke, background: selectedRatio === item.value ? "color-mix(in oklch, var(--signal) 12%, transparent)" : "transparent", color: theme.node.text }}
                                 onMouseDown={(event) => event.stopPropagation()}
                                 onClick={() => applySize(resolution, item.value)}
                             >
@@ -163,7 +163,7 @@ function updateDimension(key: "width" | "height", value: number | null, dimensio
 
 function OptionPill({ selected, disabled = false, theme, onClick, children }: { selected: boolean; disabled?: boolean; theme: CanvasTheme; onClick: () => void; children: ReactNode }) {
     return (
-        <button type="button" disabled={disabled} className="h-9 cursor-pointer rounded-full border px-2 text-sm transition hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-35" style={{ background: "transparent", borderColor: selected ? theme.node.text : theme.node.stroke, color: theme.node.text }} onMouseDown={(event) => event.stopPropagation()} onClick={onClick}>
+        <button type="button" disabled={disabled} className="h-8 cursor-pointer rounded-md border px-2 text-sm transition-colors duration-150 hover:bg-accent disabled:cursor-not-allowed disabled:opacity-35" style={{ background: selected ? "color-mix(in oklch, var(--signal) 12%, transparent)" : "transparent", borderColor: selected ? theme.node.activeStroke : theme.node.stroke, color: theme.node.text }} onMouseDown={(event) => event.stopPropagation()} onClick={onClick}>
             {children}
         </button>
     );
@@ -182,7 +182,7 @@ function SettingGroup({ title, color, children }: { title: string; color: string
 
 function ResolutionInput({ value, theme, onChange }: { value: string; theme: CanvasTheme; onChange: (value: string) => void }) {
     return (
-        <label className="flex h-9 overflow-hidden rounded-full border text-sm" style={{ borderColor: theme.node.stroke, color: theme.node.text }}>
+        <label className="flex h-8 overflow-hidden rounded-md border text-sm" style={{ borderColor: theme.node.stroke, color: theme.node.text }}>
             <input type="number" min={1} className="min-w-0 flex-1 bg-transparent px-3 text-center outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" value={value} onChange={(event) => onChange(event.target.value)} onMouseDown={(event) => event.stopPropagation()} />
             <span className="grid w-7 place-items-center pr-1" style={{ color: theme.node.muted }}>
                 p
@@ -199,7 +199,7 @@ function SecondsInput({ value, theme, onCommit }: { value: number; theme: Canvas
     };
 
     return (
-        <label className="flex h-9 w-[68px] shrink-0 overflow-hidden rounded-xl text-sm" style={{ background: theme.node.fill, color: theme.node.text }}>
+        <label className="flex h-8 w-[68px] shrink-0 overflow-hidden rounded-md text-sm" style={{ background: theme.node.fill, color: theme.node.text }}>
             <input
                 type="number"
                 min={VIDEO_SECONDS_MIN}
@@ -219,7 +219,7 @@ function SecondsInput({ value, theme, onCommit }: { value: number; theme: Canvas
 
 function DimensionInput({ prefix, value, disabled, theme, onChange }: { prefix: string; value: number; disabled: boolean; theme: CanvasTheme; onChange: (value: number | null) => void }) {
     return (
-        <label className="flex h-9 overflow-hidden rounded-xl text-sm" style={{ background: theme.node.fill, color: theme.node.text, opacity: disabled ? 0.55 : 1 }}>
+        <label className="flex h-8 overflow-hidden rounded-md text-sm" style={{ background: theme.node.fill, color: theme.node.text, opacity: disabled ? 0.55 : 1 }}>
             <span className="grid w-9 place-items-center" style={{ color: theme.node.muted }}>
                 {prefix}
             </span>

@@ -108,8 +108,8 @@ export function ImageSettingsPanel({ config, onConfigChange, theme, showTitle = 
                             <button
                                 key={item.value}
                                 type="button"
-                                className="flex h-[72px] cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border bg-transparent text-sm transition hover:opacity-80"
-                                style={{ borderColor: selectedRatio === item.value ? theme.node.text : theme.node.stroke, background: "transparent", color: theme.node.text }}
+                                className="flex h-14 cursor-pointer flex-col items-center justify-center gap-1 rounded-md border bg-transparent text-xs transition-colors duration-150 hover:bg-accent"
+                                style={{ borderColor: selectedRatio === item.value ? theme.node.activeStroke : theme.node.stroke, background: selectedRatio === item.value ? "color-mix(in oklch, var(--signal) 12%, transparent)" : "transparent", color: theme.node.text }}
                                 onMouseDown={(event) => event.stopPropagation()}
                                 onClick={() => selectRatio(item.value)}
                             >
@@ -178,8 +178,8 @@ function OptionPill({ selected, theme, onClick, children }: { selected: boolean;
     return (
         <button
             type="button"
-            className="h-9 cursor-pointer rounded-full border px-2 text-sm transition hover:opacity-80"
-            style={{ background: "transparent", borderColor: selected ? theme.node.text : theme.node.stroke, color: theme.node.text }}
+            className="h-8 cursor-pointer rounded-md border px-2 text-sm transition-colors duration-150 hover:bg-accent"
+            style={{ background: selected ? "color-mix(in oklch, var(--signal) 12%, transparent)" : "transparent", borderColor: selected ? theme.node.activeStroke : theme.node.stroke, color: theme.node.text }}
             onMouseDown={(event) => event.stopPropagation()}
             onClick={onClick}
         >
@@ -196,7 +196,7 @@ function DimensionInput({ prefix, value, disabled, theme, alignToStep, onChange 
     };
 
     return (
-        <label className="flex h-9 overflow-hidden rounded-xl text-sm" style={{ background: theme.node.fill, color: theme.node.text, opacity: disabled ? 0.55 : 1 }}>
+        <label className="flex h-8 overflow-hidden rounded-md text-sm" style={{ background: theme.node.fill, color: theme.node.text, opacity: disabled ? 0.55 : 1 }}>
             <span className="grid w-9 place-items-center" style={{ color: theme.node.muted }}>
                 {prefix}
             </span>
@@ -219,7 +219,7 @@ function DimensionInput({ prefix, value, disabled, theme, alignToStep, onChange 
 
 function CountInput({ value, max, theme, onChange }: { value: number; max: number; theme: CanvasTheme; onChange: (value: number | null) => void }) {
     return (
-        <label className="col-span-2 flex h-9 overflow-hidden rounded-full border text-sm" style={{ borderColor: theme.node.stroke, color: theme.node.text }}>
+        <label className="col-span-2 flex h-8 overflow-hidden rounded-md border text-sm" style={{ borderColor: theme.node.stroke, color: theme.node.text }}>
             <input
                 type="number"
                 min={1}
