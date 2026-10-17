@@ -19,7 +19,10 @@ type VideoMediaOptions = RequestOptions & { videos?: ReferenceVideo[]; audios?: 
 const apiText = (key: string, options?: Record<string, unknown>) => i18n.t(`apiErrors.${key}`, options);
 
 export type VideoGenerationResult = { blob?: Blob; url?: string; mimeType?: string };
-export type VideoGenerationTask = { id: string; provider: "openai" | "gemini" | "plugin"; model: string };
+export type VideoGenerationTask = { id: string; provider: "openai" | "gemini" | "minimax" | "plugin"; model: string };
+type MiniMaxBaseResp = { status_code?: number; status_msg?: string };
+type MiniMaxCreateResponse = { task_id?: string; base_resp?: MiniMaxBaseResp };
+type MiniMaxQueryResponse = { status?: string; download_url?: string; error_message?: string; base_resp?: MiniMaxBaseResp };
 type GeminiInlineData = { bytesBase64Encoded: string; mimeType: string };
 type GeminiVideoOperation = {
     name?: string;
@@ -48,13 +51,15 @@ export async function requestVideoGeneration(config: AiConfig, prompt: string, r
 }
 
 export async function waitForVideoGenerationTask(config: AiConfig, task: VideoGenerationTask, options?: RequestOptions): Promise<VideoGenerationResult> {
-    for (let attempt = 0; attempt < 120; attempt += 1) {
+    // MiniMax tasks often queue for 15+ minutes on relays such as AutoDL, so poll slower and longer (45 min).
+    const [attempts, intervalMs] = task.provider === "minimax" ? [270, 10000] : [120, 2500];
+    for (let attempt = 0; attempt < attempts; attempt += 1) {
         if (options?.signal?.aborted) throw new DOMException("Aborted", "AbortError");
         const state = await pollVideoGenerationTask(config, task, options);
         if (state.status === "completed") return state.result;
         if (state.status === "failed") throw videoTaskFailed(state.error);
-        if (attempt === 119) throw new Error(apiText("videoTimeout", { provider: "" }));
-        await delay(2500, options?.signal);
+        if (attempt === attempts - 1) throw new Error(apiText("videoTimeout", { provider: "" }));
+        await delay(intervalMs, options?.signal);
     }
     throw new Error(apiText("videoTimeout", { provider: "" }));
 }
@@ -76,6 +81,7 @@ export async function createVideoGenerationTask(config: AiConfig, prompt: string
     if (script) return createPluginVideoTask(requestConfig, selectedModel, script, prompt, references, options);
     assertVideoConfig(requestConfig, requestConfig.model);
     if (requestConfig.apiFormat === "gemini") return createGeminiVideoTask(requestConfig, selectedModel, prompt, references, options);
+    if (isMiniMaxVideoModel(requestConfig.model)) return createMiniMaxVideoTask(requestConfig, selectedModel, prompt, references, options);
     return createOpenAIVideoTask(requestConfig, selectedModel, prompt, references, options);
 }
 
@@ -87,7 +93,62 @@ export async function pollVideoGenerationTask(config: AiConfig, task: VideoGener
     const requestConfig = resolveModelRequestConfig(config, task.model);
     assertVideoConfig(requestConfig, requestConfig.model);
     if (task.provider === "gemini") return pollGeminiVideoTask(requestConfig, task, options);
+    if (task.provider === "minimax") return pollMiniMaxVideoTask(requestConfig, task, options);
     return pollOpenAIVideoTask(requestConfig, task, options);
+}
+
+// FrameDock: MiniMax Hailuo video. Request/response shapes verified against AutoDL's relay (2026-10-17):
+// POST .../video_generation → { task_id }, GET .../query/video_generation/{task_id} → { status, download_url }.
+export function isMiniMaxVideoModel(model: string) {
+    return /^minimax-hailuo/i.test(modelOptionName(model));
+}
+
+function miniMaxUrl(config: AiConfig, path: string) {
+    const base = config.baseUrl.trim().replace(/\/+$/, "");
+    // AutoDL exposes MiniMax under /api/v1/minimax/v1; the official API lives at <host>/v1.
+    return withLocalProxy(/autodl\.art/i.test(base) ? `${base}/minimax/v1${path}` : `${base.replace(/\/v1$/i, "")}/v1${path}`);
+}
+
+function miniMaxResolution(vquality: string, hasFirstFrame: boolean) {
+    const height = Number.parseInt(vquality, 10) || 720;
+    if (height >= 1000) return "1080P";
+    // 512P is only offered for image-to-video and is the cheapest tier.
+    return height <= 540 && hasFirstFrame ? "512P" : "768P";
+}
+
+async function createMiniMaxVideoTask(config: AiConfig, model: string, prompt: string, references: ReferenceImage[], options?: VideoMediaOptions): Promise<VideoGenerationTask> {
+    const frames = await Promise.all(references.slice(0, 2).map((image) => imageToDataUrl(image)));
+    const resolution = miniMaxResolution(config.vquality, frames.length > 0);
+    const duration = resolution !== "1080P" && Number(normalizeVideoSeconds(config.videoSeconds)) >= 8 ? 10 : 6;
+    const body = {
+        model: modelOptionName(model),
+        prompt: prompt.slice(0, 2000),
+        duration,
+        resolution,
+        ...(frames[0] ? { first_frame_image: frames[0] } : {}),
+        ...(frames[1] ? { last_frame_image: frames[1] } : {}),
+    };
+    try {
+        const data = (await axios.post<MiniMaxCreateResponse>(miniMaxUrl(config, "/video_generation"), body, { headers: aiHeaders(config, "application/json"), signal: options?.signal })).data;
+        if (!data.task_id || (data.base_resp?.status_code ?? 0) !== 0) throw new Error(data.base_resp?.status_msg || apiText("noVideoTaskId"));
+        return { id: data.task_id, provider: "minimax", model };
+    } catch (error) {
+        throw new Error(readAxiosError(error, apiText("videoTaskCreateFailed")));
+    }
+}
+
+async function pollMiniMaxVideoTask(config: AiConfig, task: VideoGenerationTask, options?: RequestOptions): Promise<VideoGenerationTaskState> {
+    try {
+        const data = (await axios.get<MiniMaxQueryResponse>(miniMaxUrl(config, `/query/video_generation/${encodeURIComponent(task.id)}`), { headers: aiHeaders(config), signal: options?.signal })).data;
+        if (data.status === "Success") {
+            if (!data.download_url) return { status: "failed", error: apiText("noPlayableVideo") };
+            return { status: "completed", result: await videoResultFromUrl(data.download_url, options) };
+        }
+        if (data.status === "Fail") return { status: "failed", error: data.error_message || data.base_resp?.status_msg || apiText("videoGenerationFailed") };
+        return { status: "pending" };
+    } catch (error) {
+        throw new Error(readAxiosError(error, apiText("videoTaskQueryFailed")));
+    }
 }
 
 async function createPluginVideoTask(config: AiConfig, model: string, script: string, prompt: string, references: ReferenceImage[], options?: VideoMediaOptions): Promise<VideoGenerationTask> {

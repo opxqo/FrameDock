@@ -110,6 +110,10 @@ const autodlChannels: ModelChannel[] = [
             { name: "gpt-image-2", capability: "image" },
             { name: "Qwen-Image", capability: "image" },
             { name: "Z-Image-Turbo", capability: "image" },
+            // MiniMax Hailuo uses the native adapter in services/api/video.ts (AutoDL path /minimax/v1).
+            { name: "MiniMax-Hailuo-02", capability: "video" },
+            { name: "MiniMax-Hailuo-2.3-Fast", capability: "video" },
+            { name: "MiniMax-Hailuo-2.3", capability: "video" },
         ],
     },
     {
@@ -307,7 +311,10 @@ export const useConfigStore = create<ConfigStore>()(
                 // Config is shared by every browser (server storage), so origin-bound addresses follow the current page.
                 if (mockChannel) channels.forEach((channel, index) => { if (channel.id === "mock") channels[index] = { ...channel, baseUrl: mockChannel.baseUrl }; });
                 autodlChannels.forEach((preset) => {
-                    if (!channels.some((channel) => channel.id === preset.id)) channels.push(preset);
+                    const index = channels.findIndex((channel) => channel.id === preset.id);
+                    if (index < 0) channels.push(preset);
+                    // Keep the user's key and edits, but add preset models introduced in later versions.
+                    else channels[index] = { ...channels[index], models: [...channels[index].models, ...preset.models.filter((model) => !channels[index].models.some((item) => item.name === model.name))] };
                 });
                 const models = modelOptionsFromChannels(channels);
                 return {
