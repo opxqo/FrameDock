@@ -102,16 +102,36 @@ function ModelLabel({ config, model }: { config: AiConfig; model: string }) {
 
 function ModelIcon({ model }: { model: string }) {
     const icon = resolveModelIcon(modelOptionName(model));
-    return icon ? <img src={icon} alt="" className="size-4 shrink-0 dark:invert" /> : <Cpu className="size-4 shrink-0 opacity-70" />;
+    if (!icon) return <Cpu className="size-4 shrink-0 opacity-70" />;
+    // Only monochrome logos are inverted in dark mode; brand-colored ones keep their colors.
+    return <img src={`/icons/lobehub/${icon}.svg`} alt="" className={`size-4 shrink-0 ${icon.endsWith("-color") ? "" : "dark:invert"}`} />;
 }
+
+// FrameDock: logos from LobeHub Icons (@lobehub/icons-static-svg, MIT), see THIRD_PARTY_NOTICES.md.
+// Order matters: more specific names (hailuo, sora, gpt-image) come before their vendors.
+const MODEL_ICON_RULES: Array<[RegExp, string]> = [
+    [/claude|anthropic/, "claude-color"],
+    [/gemini|nano-banana|imagen|veo/, "gemini-color"],
+    [/sora/, "sora-color"],
+    [/gpt|openai|dall-e|o\d-/, "openai"],
+    [/grok/, "grok"],
+    [/deepseek/, "deepseek-color"],
+    [/glm|zhipu|cogview|cogvideo/, "zhipu-color"],
+    [/hailuo/, "hailuo-color"],
+    [/minimax|abab/, "minimax-color"],
+    [/qwen|z-image|tongyi/, "qwen-color"],
+    [/^wan|wanx|wan\d/, "alibabacloud-color"],
+    [/kling|kolors/, "kling-color"],
+    [/seedance|seedream|doubao|jimeng/, "doubao-color"],
+    [/vidu/, "vidu-color"],
+    [/hunyuan|^hy\d/, "hunyuan-color"],
+    [/kimi|moonshot/, "kimi-color"],
+    [/midjourney|^mj/, "midjourney"],
+    [/flux/, "flux"],
+    [/stable|sdxl|^sd\d|stability/, "stability-color"],
+];
 
 function resolveModelIcon(model: string) {
     const name = model.toLowerCase();
-    if (name.includes("claude") || name.includes("anthropic")) return "/icons/claude.svg";
-    if (name.includes("gemini") || name.includes("google")) return "/icons/gemini.svg";
-    if (name.includes("gpt") || name.includes("openai")) return "/icons/openai.svg";
-    if (name.includes("grok") || name.includes("grok")) return "/icons/grok.svg";
-    if (name.includes("deepseek") || name.includes("deepseek")) return "/icons/deepseek.svg";
-    if (name.includes("glm") || name.includes("glm")) return "/icons/glm.svg";
-    return "";
+    return MODEL_ICON_RULES.find(([pattern]) => pattern.test(name))?.[1] || "";
 }
