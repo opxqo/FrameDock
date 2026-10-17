@@ -1,5 +1,7 @@
 import { Command } from "cmdk";
-import { Bot, FileText, Images, ImagePlus, Languages, LayoutGrid, Moon, Plus, Search, Settings2, Sun, Video } from "@/components/icons";
+import { Bot, FileText, Images, ImagePlus, Languages, LayoutGrid, Moon, Plus, Search, Settings2, Sun, Video, TemplateFlow } from "@/components/icons";
+import { CANVAS_TEMPLATES } from "@/lib/canvas/canvas-templates";
+import { createProjectFromTemplate } from "@/lib/canvas/create-from-template";
 import { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -47,6 +49,7 @@ export function CommandPalette() {
         const prefs = t("palette.groups.preferences");
         return [
             { id: "new-canvas", group: create, label: t("palette.newCanvas"), icon: <Plus className={ICON} />, keywords: ["new", "create", "canvas", "xinjian"], run: () => navigate(`/canvas/${createProject(t("canvas.defaultTitle", { count: projects.length + 1 }))}`) },
+            ...CANVAS_TEMPLATES.map((template) => ({ id: `template-${template.id}`, group: create, label: `${t("templates.menu")} · ${t(template.titleKey)}`, icon: <TemplateFlow className={ICON} />, keywords: ["template", "workflow", "moban"], run: () => navigate(`/canvas/${createProjectFromTemplate(template.id)}`) })),
             ...projects.slice(0, 6).map((project) => ({ id: `project-${project.id}`, group: recent, label: project.title || t("canvas.project.untitled"), icon: <LayoutGrid className={ICON} />, keywords: ["open", "project"], run: () => navigate(`/canvas/${project.id}`) })),
             { id: "go-projects", group: go, label: t("navigation.canvas"), icon: <LayoutGrid className={ICON} />, keywords: ["projects", "canvas", "home"], run: () => navigate("/") },
             { id: "go-image", group: go, label: t("navigation.image"), icon: <ImagePlus className={ICON} />, keywords: ["image", "workbench"], run: () => navigate("/image") },

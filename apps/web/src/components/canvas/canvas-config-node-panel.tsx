@@ -6,6 +6,7 @@ import { Button, Segmented } from "antd";
 import { useTranslation } from "react-i18next";
 
 import { ModelPicker } from "@/components/model-picker";
+import { CanvasSkillPicker } from "./canvas-skill-picker";
 import { defaultConfig, resolveModelForCapability, useConfigStore, useEffectiveConfig, type AiConfig } from "@/stores/use-config-store";
 import { canvasThemes } from "@/lib/canvas-theme";
 import { useThemeStore } from "@/stores/use-theme-store";
@@ -70,6 +71,11 @@ export function CanvasConfigNodePanel({ node, isRunning, inputSummary, onConfigC
                         </span>
                     ))}
                 </div>
+                {mode === "text" ? (
+                    <div className="shrink-0" onMouseDown={(event) => event.stopPropagation()}>
+                        <CanvasSkillPicker compact skill={node.metadata?.skill} onChange={(skill) => onConfigChange(node.id, { skill })} />
+                    </div>
+                ) : null}
                 <button type="button" className="inline-flex h-6 shrink-0 cursor-pointer items-center gap-1 rounded-md px-1.5 text-xs transition-colors hover:bg-accent" style={{ color: theme.node.muted }} onMouseDown={(event) => event.stopPropagation()} onClick={onComposerToggle}>
                     <Settings2 className="size-3.5" />
                     {t("canvas.configNode.compose")}

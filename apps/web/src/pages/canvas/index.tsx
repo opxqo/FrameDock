@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { App, Button, Input } from "antd";
-import { Download, FileUp, Plus, Search } from "@/components/icons";
+import { App, Button, Dropdown, Input, Space } from "antd";
+import { ChevronDown, Download, FileUp, Plus, Search, TemplateFlow } from "@/components/icons";
+import { CANVAS_TEMPLATES, type CanvasTemplateId } from "@/lib/canvas/canvas-templates";
+import { createProjectFromTemplate } from "@/lib/canvas/create-from-template";
 import { useTranslation } from "react-i18next";
 
 import { readZip } from "@/lib/zip";
@@ -42,6 +44,24 @@ export default function CanvasPage() {
         navigate(`/canvas/${id}${agentQuery}${agentHash}`, { replace: Boolean(agentHash) });
     };
     const createAndEnter = () => enterProject(createProject(t("canvas.defaultTitle", { count: projects.length + 1 })));
+    const createFromTemplate = (id: CanvasTemplateId) => {
+        const templateTitle = t(CANVAS_TEMPLATES.find((item) => item.id === id)!.titleKey);
+        enterProject(createProjectFromTemplate(id));
+        message.success(t("templates.created", { name: templateTitle }));
+    };
+    const templateMenu = {
+        items: CANVAS_TEMPLATES.map((template) => ({
+            key: template.id,
+            icon: <TemplateFlow className="size-4" />,
+            label: (
+                <span className="block py-0.5">
+                    <span className="block text-sm">{t(template.titleKey)}</span>
+                    <span className="block text-xs text-muted-foreground">{t(template.descriptionKey)}</span>
+                </span>
+            ),
+            onClick: () => createFromTemplate(template.id),
+        })),
+    };
     const importCanvas = async (file?: File) => {
         if (!file) return;
         try {
@@ -99,9 +119,14 @@ export default function CanvasPage() {
                         <Button disabled={!hydrated} icon={<FileUp className="size-4" />} onClick={() => inputRef.current?.click()}>
                             {t("canvas.import")}
                         </Button>
-                        <Button disabled={!hydrated} type="primary" icon={<Plus className="size-4" />} onClick={createAndEnter}>
-                            {t("canvas.create")}
-                        </Button>
+                        <Space.Compact>
+                            <Button disabled={!hydrated} type="primary" icon={<Plus className="size-4" />} onClick={createAndEnter}>
+                                {t("canvas.create")}
+                            </Button>
+                            <Dropdown disabled={!hydrated} menu={templateMenu} placement="bottomRight" trigger={["click"]}>
+                                <Button type="primary" icon={<ChevronDown className="size-4" />} aria-label={t("templates.menu")} title={t("templates.menu")} className="!border-l-signal-foreground/15" />
+                            </Dropdown>
+                        </Space.Compact>
                     </div>
                 </header>
 
@@ -146,6 +171,20 @@ export default function CanvasPage() {
                                 <Button icon={<FileUp className="size-4" />} onClick={() => inputRef.current?.click()}>
                                     {t("canvas.import")}
                                 </Button>
+                            </div>
+                            <div className="mt-6">
+                                <div className="mb-2 text-xs font-medium text-muted-foreground">{t("templates.menu")}</div>
+                                <div className="grid gap-2 sm:grid-cols-2">
+                                    {CANVAS_TEMPLATES.map((template) => (
+                                        <button key={template.id} type="button" onClick={() => createFromTemplate(template.id)} className="flex items-start gap-2.5 rounded-2xl border border-border px-3 py-2.5 text-left transition-colors hover:bg-accent">
+                                            <TemplateFlow className="mt-0.5 size-4 text-muted-foreground" />
+                                            <span className="min-w-0">
+                                                <span className="block text-sm font-medium">{t(template.titleKey)}</span>
+                                                <span className="mt-0.5 block text-xs leading-5 text-muted-foreground">{t(template.descriptionKey)}</span>
+                                            </span>
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                         <EmptyChainDiagram />
