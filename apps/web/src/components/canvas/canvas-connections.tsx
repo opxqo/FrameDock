@@ -1,7 +1,26 @@
 import type { MouseEvent as ReactMouseEvent } from "react";
 
 import { canvasThemes } from "@/lib/canvas-theme";
+import { runTallyFor, useWorkflowRunStore } from "@/stores/canvas/use-workflow-run-store";
 import { useThemeStore } from "@/stores/use-theme-store";
+
+type WireRunState = "none" | "path" | "flow" | "ok" | "fail";
+
+// FrameDock signature: during a chain run the wires in scope light up, and the wire feeding the running
+// node carries a moving signal.
+function useWireRunState(fromId: string, toId: string): WireRunState {
+    return useWorkflowRunStore((state) => {
+        const run = state.run;
+        if (!run || !run.scopeNodeIds.includes(fromId) || !run.scopeNodeIds.includes(toId)) return "none";
+        const tally = runTallyFor(run, toId);
+        if (tally === "live") return "flow";
+        if (tally === "ok") return "ok";
+        if (tally === "fail" || tally === "skipped") return "fail";
+        return "path";
+    });
+}
+
+const WIRE_STROKE: Record<Exclude<WireRunState, "none">, string> = { path: "var(--tally-live)", flow: "var(--tally-live)", ok: "var(--tally-ok)", fail: "var(--tally-fail)" };
 import type { CanvasConnection, CanvasNodeData, ConnectionHandle, Position } from "@/types/canvas";
 
 export function ConnectionPath({
@@ -27,6 +46,7 @@ export function ConnectionPath({
     const dx = Math.abs(endX - startX);
     const curvature = Math.max(dx * 0.5, 50);
     const pathD = `M ${startX} ${startY} C ${startX + curvature} ${startY}, ${endX - curvature} ${endY}, ${endX} ${endY}`;
+    const runState = useWireRunState(from.id, to.id);
 
     return (
         <g>
@@ -49,12 +69,13 @@ export function ConnectionPath({
             />
             <path
                 d={pathD}
-                stroke={active ? theme.node.activeStroke : theme.node.muted}
-                strokeWidth={active ? 3 : 2}
-                strokeOpacity={active ? 1 : 0.82}
+                stroke={runState !== "none" ? WIRE_STROKE[runState] : active ? theme.node.activeStroke : theme.node.muted}
+                strokeWidth={active || runState === "flow" ? 2.5 : 1.75}
+                strokeOpacity={active || runState === "flow" ? 1 : runState === "path" ? 0.45 : runState === "none" ? 0.6 : 0.8}
                 fill="none"
-                style={{ filter: active ? `drop-shadow(0 0 8px ${theme.node.activeStroke}66)` : undefined, pointerEvents: "none" }}
+                style={{ pointerEvents: "none" }}
             />
+            {runState === "flow" ? <path d={pathD} stroke="var(--tally-live)" strokeWidth={2.5} strokeLinecap="round" strokeDasharray="2 14" fill="none" className="canvas-wire-flow" style={{ pointerEvents: "none" }} /> : null}
         </g>
     );
 }

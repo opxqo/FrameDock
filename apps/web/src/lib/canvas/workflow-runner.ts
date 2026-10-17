@@ -111,6 +111,7 @@ export type WorkflowRunHooks = {
     readStatus: (nodeId: string) => Promise<string | undefined>;
     isCanceled: () => boolean;
     onStep?: (step: WorkflowStep, index: number, total: number) => void;
+    onOutcome?: (step: WorkflowStep, outcome: WorkflowStepOutcome) => void;
 };
 
 export async function runWorkflowPlan(steps: WorkflowStep[], connections: CanvasConnection[], hooks: WorkflowRunHooks): Promise<WorkflowRunResult> {
@@ -125,6 +126,7 @@ export async function runWorkflowPlan(steps: WorkflowStep[], connections: Canvas
         ancestors.delete(step.nodeId);
         if ([...ancestors].some((id) => failed.has(id))) {
             outcomes.set(step.nodeId, "skipped");
+            hooks.onOutcome?.(step, "skipped");
             failed.add(step.nodeId);
             continue;
         }
@@ -137,9 +139,12 @@ export async function runWorkflowPlan(steps: WorkflowStep[], connections: Canvas
         const status = await hooks.readStatus(step.targetNodeId || step.nodeId);
         if (status === "success") {
             outcomes.set(step.nodeId, "success");
+            hooks.onOutcome?.(step, "success");
             continue;
         }
-        outcomes.set(step.nodeId, hooks.isCanceled() ? "canceled" : "failed");
+        const outcome = hooks.isCanceled() ? "canceled" : "failed";
+        outcomes.set(step.nodeId, outcome);
+        hooks.onOutcome?.(step, outcome);
         failed.add(step.nodeId);
         if (step.targetNodeId) failed.add(step.targetNodeId);
     }

@@ -60,7 +60,7 @@ export function UserStatusActions({ showConfig = true, variant = "default", onOp
                 onClick={() => setPaletteOpen(true)}
                 className={cn(
                     "hidden h-8 items-center gap-2 rounded-md border border-border bg-surface pl-2.5 pr-1.5 text-sm text-muted-foreground transition-colors duration-150 hover:text-foreground sm:inline-flex",
-                    variant === "canvas" ? "w-44" : "w-56",
+                    variant === "canvas" ? "w-52" : "w-56",
                 )}
                 aria-label={t("palette.title")}
             >

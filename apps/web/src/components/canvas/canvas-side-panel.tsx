@@ -44,10 +44,11 @@ const NODE_TYPE_ICON: Record<string, typeof Square> = {
     [CanvasNodeType.Group]: Square,
 };
 
+// FrameDock: same tally vocabulary as the lamps on canvas nodes.
 const STATUS_COLOR: Record<string, string> = {
-    success: "#22c55e",
-    loading: "#f59e0b",
-    error: "#ef4444",
+    success: "var(--tally-ok)",
+    loading: "var(--tally-live)",
+    error: "var(--tally-fail)",
     idle: "transparent",
 };
 

@@ -71,11 +71,15 @@ import {
     sourceNodeReferenceImages,
 } from "@/lib/canvas/canvas-generation-helpers";
 import { planWorkflow, runWorkflowPlan, type WorkflowScope } from "@/lib/canvas/workflow-runner";
+import { useWorkflowRunStore } from "@/stores/canvas/use-workflow-run-store";
+import { CanvasProgrammeBar } from "@/components/canvas/canvas-programme-bar";
+import { CanvasEmptyHint } from "@/components/canvas/canvas-empty-hint";
+import { MOD_KEY, useCommandStore } from "@/stores/use-command-store";
 import { getNodeDefinition, isBuiltinNodeType as isBuiltinType, useNodeRegistryVersion } from "@/lib/canvas/node-registry";
 import { registerBuiltinNodes } from "@/components/canvas/nodes/builtin-nodes";
 import { CanvasPluginManagerModal } from "@/components/canvas/canvas-plugin-manager-modal";
 import { CanvasRefreshShell } from "@/components/canvas/canvas-refresh-shell";
-import { CanvasTopBar } from "@/components/canvas/canvas-top-bar";
+import { CanvasTopBar, useShortcutSheetStore } from "@/components/canvas/canvas-top-bar";
 import { ConnectionCreateMenu, NodeCreateMenu, type PendingConnectionCreate } from "@/components/canvas/canvas-create-menus";
 import {
     CanvasNodeType,
@@ -1147,6 +1151,26 @@ function InfiniteCanvasPage() {
         if (nodeId) focusNode(nodeId);
     }, [focusNode]);
 
+    // FrameDock: fit every node into view (Shift+1). The top bar (48px) is kept clear.
+    const fitAllNodes = useCallback(() => {
+        const items = nodesRef.current;
+        if (!items.length) {
+            resetViewport();
+            return;
+        }
+        const minX = Math.min(...items.map((node) => node.position.x));
+        const minY = Math.min(...items.map((node) => node.position.y));
+        const maxX = Math.max(...items.map((node) => node.position.x + node.width));
+        const maxY = Math.max(...items.map((node) => node.position.y + node.height));
+        const padding = 80;
+        const top = 48;
+        const k = Math.min(Math.max(Math.min((size.width - padding * 2) / Math.max(maxX - minX, 1), (size.height - top - padding * 2) / Math.max(maxY - minY, 1)), 0.05), 1.5);
+        setViewport({ x: size.width / 2 - ((minX + maxX) / 2) * k, y: top + (size.height - top) / 2 - ((minY + maxY) / 2) * k, k });
+        setContextMenu(null);
+    }, [resetViewport, size.height, size.width]);
+    // runWorkflow is declared further down; keyboard shortcuts reach it through this ref.
+    const runWorkflowRef = useRef<(nodeId: string, scope: WorkflowScope) => void>(() => undefined);
+
     useEffect(() => () => void (focusAnimRef.current && cancelAnimationFrame(focusAnimRef.current)), []);
 
     const setZoomScale = useCallback(
@@ -1622,6 +1646,45 @@ function InfiniteCanvasPage() {
 
             if (isModifierShortcut && key === "c" && window.getSelection()?.toString()) return;
 
+            // FrameDock shortcuts: run the selected node's chain, switch tools, fit and reset the view, shortcut sheet.
+            if (isModifierShortcut && !event.altKey && event.key === "Enter") {
+                const [nodeId] = selectedNodeIdsRef.current;
+                if (nodeId && selectedNodeIdsRef.current.size === 1) {
+                    event.preventDefault();
+                    runWorkflowRef.current(nodeId, event.shiftKey ? "downstream" : "upstream");
+                }
+                return;
+            }
+            if (isModifierShortcut && !event.altKey && event.key === "0") {
+                event.preventDefault();
+                resetViewport();
+                return;
+            }
+            if (!isModifierShortcut && !event.altKey) {
+                if (event.key === "?") {
+                    event.preventDefault();
+                    useShortcutSheetStore.getState().setOpen(true);
+                    return;
+                }
+                if (event.shiftKey && event.code === "Digit1") {
+                    event.preventDefault();
+                    fitAllNodes();
+                    return;
+                }
+                if (!event.shiftKey && key === "v") {
+                    setCanvasTool("select");
+                    return;
+                }
+                if (!event.shiftKey && key === "h") {
+                    setCanvasTool("pan");
+                    return;
+                }
+                if (!event.shiftKey && key === "f") {
+                    focusSelectedNode();
+                    return;
+                }
+            }
+
             if (isModifierShortcut && !event.altKey && key === "z") {
                 event.preventDefault();
                 if (event.shiftKey) redoCanvas();
@@ -1698,7 +1761,7 @@ function InfiniteCanvasPage() {
 
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [copySelectedNodes, deleteConnection, deleteNodes, groupSelection, pasteCopiedNodes, pasteSystemClipboard, redoCanvas, selectedConnectionId, setConnecting, undoCanvas, ungroupSelection]);
+    }, [copySelectedNodes, deleteConnection, deleteNodes, fitAllNodes, focusSelectedNode, groupSelection, pasteCopiedNodes, pasteSystemClipboard, redoCanvas, resetViewport, selectedConnectionId, setConnecting, undoCanvas, ungroupSelection]);
 
     const handleConnectStart = useCallback(
         (event: ReactMouseEvent, nodeId: string, handleType: "source" | "target") => {
@@ -2872,6 +2935,8 @@ function InfiniteCanvasPage() {
             const run = { canceled: false };
             workflowRunRef.current = run;
             setWorkflowRunning(true);
+            const runStore = useWorkflowRunStore.getState();
+            runStore.start(plan.steps, plan.nodeIds);
             const messageKey = `workflow-${startNodeId}`;
             try {
                 const result = await runWorkflowPlan(plan.steps, connectionsRef.current, {
@@ -2886,7 +2951,9 @@ function InfiniteCanvasPage() {
                         return nodesRef.current.find((node) => node.id === nodeId)?.metadata?.status;
                     },
                     isCanceled: () => run.canceled,
-                    onStep: (_step, index, total) => message.open({ key: messageKey, type: "loading", content: t("canvas.workflow.progress", { current: index + 1, total }), duration: 0 }),
+                    // Progress lives in the programme bar (top bar) and on the nodes' tally lamps.
+                    onStep: (_step, index) => runStore.setCurrent(index),
+                    onOutcome: (step, outcome) => runStore.setOutcome(step.nodeId, outcome),
                 });
                 const outcomes = [...result.outcomes.values()];
                 const failed = outcomes.filter((outcome) => outcome === "failed").length;
@@ -2897,10 +2964,33 @@ function InfiniteCanvasPage() {
             } finally {
                 workflowRunRef.current = null;
                 setWorkflowRunning(false);
+                runStore.finish();
             }
         },
         [handleGenerateNode, message, t],
     );
+    useEffect(() => {
+        runWorkflowRef.current = (nodeId, scope) => void runWorkflow(nodeId, scope);
+    }, [runWorkflow]);
+
+    // FrameDock: canvas commands in the ⌘K palette.
+    const registerCommands = useCommandStore((state) => state.register);
+    const unregisterCommands = useCommandStore((state) => state.unregister);
+    useEffect(() => {
+        const group = t("palette.groups.canvas");
+        const add = (type: CanvasNodeType, label: string) => ({ id: `canvas-add-${type}`, group, label: `${t("canvas.toolbar.add")}${label}`, keywords: ["add", "node", type], run: () => createNode(type) });
+        registerCommands("canvas", [
+            add(CanvasNodeType.Text, t("canvas.nodeTypes.text")),
+            add(CanvasNodeType.Image, t("canvas.nodeTypes.image")),
+            add(CanvasNodeType.Video, t("canvas.nodeTypes.video")),
+            add(CanvasNodeType.Config, t("canvas.nodeTypes.config")),
+            { id: "canvas-fit", group, label: t("canvas.shortcutGroups.fit"), shortcut: "⇧1", keywords: ["fit", "zoom"], run: fitAllNodes },
+            { id: "canvas-reset", group, label: t("canvas.resetView"), shortcut: `${MOD_KEY}0`, keywords: ["reset", "100%"], run: resetViewport },
+            { id: "canvas-upload", group, label: t("canvas.toolbar.upload"), keywords: ["upload", "import"], run: () => handleUploadRequest() },
+            { id: "canvas-shortcuts", group, label: t("canvas.shortcuts"), shortcut: "?", keywords: ["shortcuts", "keyboard"], run: () => useShortcutSheetStore.getState().setOpen(true) },
+        ]);
+        return () => unregisterCommands("canvas");
+    }, [createNode, fitAllNodes, handleUploadRequest, registerCommands, resetViewport, t, unregisterCommands]);
     const stopWorkflow = useCallback(() => {
         if (workflowRunRef.current) workflowRunRef.current.canceled = true;
     }, []);
@@ -3307,8 +3397,7 @@ function InfiniteCanvasPage() {
                     onCancelTitleEditing={() => setTitleEditing(false)}
                     canUndo={historyState.canUndo}
                     canRedo={historyState.canRedo}
-                    onHome={() => navigate("/")}
-                    onProjects={() => navigate("/canvas")}
+                    onProjects={() => navigate("/")}
                     onCreateProject={createAndOpenProject}
                     onDeleteProject={deleteCurrentProject}
                     onExportProject={exportCurrentProject}
@@ -3316,8 +3405,7 @@ function InfiniteCanvasPage() {
                     onOpenPlugins={() => setPluginManagerOpen(true)}
                     onUndo={undoCanvas}
                     onRedo={redoCanvas}
-                    workflowRunning={workflowRunning}
-                    onStopWorkflow={stopWorkflow}
+                    programme={<CanvasProgrammeBar nodes={nodes} onStop={stopWorkflow} onFocusNode={focusNode} />}
                     agentOpen={agentPanelOpen}
                     compactAgentStatus={{ connected: localAgentConnected, enabled: localAgentEnabled, activity: localAgentActivity }}
                     onToggleAgent={toggleAgentPanel}
@@ -3513,6 +3601,8 @@ function InfiniteCanvasPage() {
                     />
                 ) : null}
 
+                {nodes.length === 0 ? <CanvasEmptyHint onAddText={() => createNode(CanvasNodeType.Text)} onAddImage={() => createNode(CanvasNodeType.Image)} onAddVideo={() => createNode(CanvasNodeType.Video)} onUpload={() => handleUploadRequest()} /> : null}
+
                 <CanvasToolbar
                     selectedCount={selectedNodeIds.size}
                     canvasTool={canvasTool}
@@ -3540,7 +3630,7 @@ function InfiniteCanvasPage() {
 
                 {isMiniMapOpen ? <Minimap nodes={nodes} viewport={viewport} viewportSize={size} onViewportChange={setViewport} /> : null}
 
-                <CanvasZoomControls scale={viewport.k} onScaleChange={setZoomScale} onReset={resetViewport} isMiniMapOpen={isMiniMapOpen} onToggleMiniMap={() => setIsMiniMapOpen((value) => !value)} />
+                <CanvasZoomControls scale={viewport.k} onScaleChange={setZoomScale} onReset={resetViewport} onFit={fitAllNodes} isMiniMapOpen={isMiniMapOpen} onToggleMiniMap={() => setIsMiniMapOpen((value) => !value)} canUndo={historyState.canUndo} canRedo={historyState.canRedo} onUndo={undoCanvas} onRedo={redoCanvas} />
 
                 {contextMenu ? (
                     <CanvasNodeContextMenu

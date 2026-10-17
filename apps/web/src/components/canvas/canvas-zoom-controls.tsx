@@ -1,11 +1,10 @@
 import type { ReactNode } from "react";
-import { Compass, Focus, HelpCircle } from "lucide-react";
-import { useState } from "react";
-import { Button, Modal, Tooltip } from "antd";
+import { Map as MapIcon, Maximize, Minus, Plus, Redo2, Undo2 } from "lucide-react";
+import { Tooltip } from "antd";
 import { useTranslation } from "react-i18next";
 
-import { canvasThemes } from "@/lib/canvas-theme";
-import { useThemeStore } from "@/stores/use-theme-store";
+import { cn } from "@/lib/utils";
+import { MOD_KEY } from "@/stores/use-command-store";
 
 type CanvasZoomControlsProps = {
     scale: number;
@@ -13,73 +12,71 @@ type CanvasZoomControlsProps = {
     onReset: () => void;
     isMiniMapOpen: boolean;
     onToggleMiniMap: () => void;
+    onFit?: () => void;
+    canUndo?: boolean;
+    canRedo?: boolean;
+    onUndo?: () => void;
+    onRedo?: () => void;
 };
 
-export function CanvasZoomControls({ scale, onScaleChange, onReset, isMiniMapOpen, onToggleMiniMap }: CanvasZoomControlsProps) {
-    const [shortcutsOpen, setShortcutsOpen] = useState(false);
+const ZOOM_STEPS = [0.05, 0.1, 0.25, 0.33, 0.5, 0.67, 0.8, 1, 1.25, 1.5, 2, 3, 4, 5];
+
+// FrameDock: bottom-left view controls — history, zoom steps (click the percentage for 100%), fit, minimap.
+export function CanvasZoomControls({ scale, onScaleChange, onReset, isMiniMapOpen, onToggleMiniMap, onFit, canUndo, canRedo, onUndo, onRedo }: CanvasZoomControlsProps) {
     const { t } = useTranslation();
-    const colorTheme = useThemeStore((state) => state.theme);
-    const theme = canvasThemes[colorTheme];
-    const dockStyle = { background: theme.toolbar.panel, borderColor: theme.toolbar.border, color: theme.toolbar.item, boxShadow: colorTheme === "dark" ? "0 18px 45px rgba(0,0,0,.32)" : "0 16px 40px rgba(28,25,23,.12)" };
-    const activeStyle = { background: theme.toolbar.activeBg, color: theme.toolbar.activeText };
+    const zoomOut = () => onScaleChange([...ZOOM_STEPS].reverse().find((step) => step < scale - 0.001) ?? ZOOM_STEPS[0]);
+    const zoomIn = () => onScaleChange(ZOOM_STEPS.find((step) => step > scale + 0.001) ?? ZOOM_STEPS[ZOOM_STEPS.length - 1]);
 
     return (
-        <div className="absolute bottom-5 left-5 z-50" onMouseDown={(event) => event.stopPropagation()} onPointerDown={(event) => event.stopPropagation()}>
-            <div className="flex h-14 items-center gap-1 rounded-xl border px-2 shadow-lg backdrop-blur" style={dockStyle}>
-                <Tooltip title={isMiniMapOpen ? t("canvas.miniMapClose") : t("canvas.miniMapOpen")}>
-                    <Button
-                        type="text"
-                        className="!h-8 !w-8 !min-w-8 !p-0"
-                        style={isMiniMapOpen ? activeStyle : { color: theme.toolbar.item }}
-                        icon={<Compass className="size-4" />}
-                        onClick={onToggleMiniMap}
-                        aria-label={isMiniMapOpen ? t("canvas.miniMapClose") : t("canvas.miniMapOpen")}
-                    />
-                </Tooltip>
-                <Tooltip title={t("canvas.resetView")}>
-                    <Button type="text" className="!h-8 !w-8 !min-w-8 !p-0" style={{ color: theme.toolbar.item }} icon={<Focus className="size-4" />} onClick={onReset} aria-label={t("canvas.resetView")} />
-                </Tooltip>
-                <Tooltip title={t("canvas.zoom")}>
-                    <input
-                        type="range"
-                        min="5"
-                        max="500"
-                        step="1"
-                        value={Math.round(scale * 100)}
-                        className="w-24"
-                        style={{ accentColor: theme.node.activeStroke }}
-                        onChange={(event) => onScaleChange(Number(event.target.value) / 100)}
-                        aria-label={t("canvas.zoom")}
-                    />
-                </Tooltip>
-                <span className="w-10 text-right text-xs tabular-nums" style={{ color: theme.node.muted }}>
-                    {Math.round(scale * 100)}%
-                </span>
-                <Tooltip title={t("canvas.shortcuts")}>
-                    <Button type="text" className="!h-8 !w-8 !min-w-8 !p-0" style={shortcutsOpen ? activeStyle : { color: theme.toolbar.item }} icon={<HelpCircle className="size-4" />} onClick={() => setShortcutsOpen(true)} aria-label={t("canvas.shortcuts")} />
-                </Tooltip>
-            </div>
-            <Modal title={t("canvas.shortcuts")} open={shortcutsOpen} onCancel={() => setShortcutsOpen(false)} footer={null} centered>
-                <div className="space-y-3 border-t pt-4 text-sm" style={{ borderColor: theme.node.stroke }}>
-                    <Shortcut label={`Ctrl / Space + ${t("canvas.shortcut.drag")}`} value={t("canvas.shortcut.toggleTool")} />
-                    <Shortcut label={t("canvas.shortcut.wheel")} value={t("canvas.shortcut.zoom")} />
-                    <Shortcut label={t("canvas.shortcut.drag")} value={t("canvas.shortcut.boxSelect")} />
-                    <Shortcut label={`Shift / Cmd + ${t("canvas.shortcut.click")}`} value={t("canvas.shortcut.addSelection")} />
-                    <Shortcut label="Ctrl / Cmd + C / V" value={t("canvas.shortcut.copyPasteNodes")} />
-                    <Shortcut label="Ctrl / Cmd + G" value={t("canvas.shortcut.group")} />
-                    <Shortcut label="Ctrl / Cmd + Shift + G" value={t("canvas.shortcut.ungroup")} />
-                    <Shortcut label="Delete / Backspace" value={t("canvas.shortcut.delete")} />
+        <div data-canvas-bottom-toolbar className="absolute bottom-3 left-3 z-50 flex items-center gap-1.5" onMouseDown={(event) => event.stopPropagation()} onPointerDown={(event) => event.stopPropagation()}>
+            {onUndo ? (
+                <div className="flex h-9 items-center rounded-lg border border-border bg-card p-0.5 shadow-panel">
+                    <ControlButton label={t("canvas.undo")} shortcut={`${MOD_KEY}Z`} disabled={!canUndo} onClick={onUndo}>
+                        <Undo2 />
+                    </ControlButton>
+                    <ControlButton label={t("canvas.redo")} shortcut={`${MOD_KEY}⇧Z`} disabled={!canRedo} onClick={onRedo}>
+                        <Redo2 />
+                    </ControlButton>
                 </div>
-            </Modal>
+            ) : null}
+            <div className="flex h-9 items-center rounded-lg border border-border bg-card p-0.5 shadow-panel">
+                <ControlButton label={t("canvas.zoomOut")} onClick={zoomOut}>
+                    <Minus />
+                </ControlButton>
+                <Tooltip title={<span className="inline-flex items-center gap-2">{t("canvas.resetView")}<kbd className="font-mono text-[11px] opacity-60">{MOD_KEY}0</kbd></span>} mouseEnterDelay={0.3}>
+                    <button type="button" onClick={onReset} className="tnum h-8 w-12 rounded-md font-mono text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground" aria-label={t("canvas.resetView")}>
+                        {Math.round(scale * 100)}%
+                    </button>
+                </Tooltip>
+                <ControlButton label={t("canvas.zoomIn")} onClick={zoomIn}>
+                    <Plus />
+                </ControlButton>
+                {onFit ? (
+                    <ControlButton label={t("canvas.shortcutGroups.fit")} shortcut="⇧1" onClick={onFit}>
+                        <Maximize />
+                    </ControlButton>
+                ) : null}
+                <ControlButton label={isMiniMapOpen ? t("canvas.miniMapClose") : t("canvas.miniMapOpen")} active={isMiniMapOpen} onClick={onToggleMiniMap}>
+                    <MapIcon />
+                </ControlButton>
+            </div>
         </div>
     );
 }
 
-function Shortcut({ label, value }: { label: ReactNode; value: string }) {
+function ControlButton({ label, shortcut, active = false, disabled = false, onClick, children }: { label: string; shortcut?: string; active?: boolean; disabled?: boolean; onClick?: () => void; children: ReactNode }) {
     return (
-        <div className="flex items-center justify-between gap-4">
-            <span className="text-base font-medium">{label}</span>
-            <span className="opacity-60">{value}</span>
-        </div>
+        <Tooltip title={<span className="inline-flex items-center gap-2">{label}{shortcut ? <kbd className="font-mono text-[11px] opacity-60">{shortcut}</kbd> : null}</span>} mouseEnterDelay={0.3}>
+            <button
+                type="button"
+                aria-label={label}
+                aria-pressed={active || undefined}
+                disabled={disabled}
+                onClick={onClick}
+                className={cn("grid size-8 place-items-center rounded-md transition-colors duration-150 disabled:pointer-events-none disabled:opacity-35 [&_svg]:size-4", active ? "bg-signal/15 text-signal" : "text-muted-foreground hover:bg-accent hover:text-foreground")}
+            >
+                {children}
+            </button>
+        </Tooltip>
     );
 }
