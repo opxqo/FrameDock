@@ -8,6 +8,7 @@ import { getMediaBlob, resolveMediaUrl, uploadMediaFile, type UploadedFile } fro
 import { imageToDataUrl } from "@/services/image-storage";
 import { boolConfig, buildApiUrl, modelOptionName, resolveModelRequestConfig, resolveModelScript, withLocalProxy, type AiConfig } from "@/stores/use-config-store";
 import { runModelPlugin } from "./model-plugin";
+import { findAutodlModel, nearestOption } from "@/lib/autodl-catalog";
 import type { ReferenceImage } from "@/types/image";
 import type { ReferenceAudio, ReferenceVideo } from "@/types/media";
 
@@ -19,7 +20,11 @@ type VideoMediaOptions = RequestOptions & { videos?: ReferenceVideo[]; audios?: 
 const apiText = (key: string, options?: Record<string, unknown>) => i18n.t(`apiErrors.${key}`, options);
 
 export type VideoGenerationResult = { blob?: Blob; url?: string; mimeType?: string };
-export type VideoGenerationTask = { id: string; provider: "openai" | "gemini" | "minimax" | "plugin"; model: string };
+export type VideoGenerationTask = { id: string; provider: "openai" | "gemini" | "minimax" | "kling" | "ark" | "wan" | "plugin"; model: string };
+type AutodlVideoProvider = "minimax" | "kling" | "ark" | "wan";
+type KlingResponse = { code?: number; message?: string; data?: { task_id?: string; task_status?: string; task_status_msg?: string; task_result?: { videos?: Array<{ url?: string }> | null } } };
+type ArkTaskResponse = { id?: string; status?: string; content?: { video_url?: string }; error?: { message?: string } };
+type WanTaskResponse = { output?: { task_id?: string; task_status?: string; video_url?: string; message?: string; code?: string }; message?: string };
 type MiniMaxBaseResp = { status_code?: number; status_msg?: string };
 type MiniMaxCreateResponse = { task_id?: string; base_resp?: MiniMaxBaseResp };
 type MiniMaxQueryResponse = { status?: string; download_url?: string; error_message?: string; base_resp?: MiniMaxBaseResp };
@@ -52,7 +57,7 @@ export async function requestVideoGeneration(config: AiConfig, prompt: string, r
 
 export async function waitForVideoGenerationTask(config: AiConfig, task: VideoGenerationTask, options?: RequestOptions): Promise<VideoGenerationResult> {
     // MiniMax tasks often queue for 15+ minutes on relays such as AutoDL, so poll slower and longer (45 min).
-    const [attempts, intervalMs] = task.provider === "minimax" ? [270, 10000] : [120, 2500];
+    const [attempts, intervalMs] = isAutodlVideoProvider(task.provider) ? [270, 10000] : [120, 2500];
     for (let attempt = 0; attempt < attempts; attempt += 1) {
         if (options?.signal?.aborted) throw new DOMException("Aborted", "AbortError");
         const state = await pollVideoGenerationTask(config, task, options);
@@ -81,7 +86,11 @@ export async function createVideoGenerationTask(config: AiConfig, prompt: string
     if (script) return createPluginVideoTask(requestConfig, selectedModel, script, prompt, references, options);
     assertVideoConfig(requestConfig, requestConfig.model);
     if (requestConfig.apiFormat === "gemini") return createGeminiVideoTask(requestConfig, selectedModel, prompt, references, options);
-    if (isMiniMaxVideoModel(requestConfig.model)) return createMiniMaxVideoTask(requestConfig, selectedModel, prompt, references, options);
+    const autodlProvider = autodlVideoProvider(requestConfig.model);
+    if (autodlProvider === "minimax") return createMiniMaxVideoTask(requestConfig, selectedModel, prompt, references, options);
+    if (autodlProvider === "kling") return createKlingVideoTask(requestConfig, selectedModel, prompt, references, options);
+    if (autodlProvider === "ark") return createArkVideoTask(requestConfig, selectedModel, prompt, references, options);
+    if (autodlProvider === "wan") return createWanVideoTask(requestConfig, selectedModel, prompt, references, options);
     return createOpenAIVideoTask(requestConfig, selectedModel, prompt, references, options);
 }
 
@@ -94,13 +103,144 @@ export async function pollVideoGenerationTask(config: AiConfig, task: VideoGener
     assertVideoConfig(requestConfig, requestConfig.model);
     if (task.provider === "gemini") return pollGeminiVideoTask(requestConfig, task, options);
     if (task.provider === "minimax") return pollMiniMaxVideoTask(requestConfig, task, options);
+    if (task.provider === "kling") return pollKlingVideoTask(requestConfig, task, options);
+    if (task.provider === "ark") return pollArkVideoTask(requestConfig, task, options);
+    if (task.provider === "wan") return pollWanVideoTask(requestConfig, task, options);
     return pollOpenAIVideoTask(requestConfig, task, options);
 }
 
 // FrameDock: MiniMax Hailuo video. Request/response shapes verified against AutoDL's relay (2026-10-17):
 // POST .../video_generation → { task_id }, GET .../query/video_generation/{task_id} → { status, download_url }.
-export function isMiniMaxVideoModel(model: string) {
-    return /^minimax-hailuo/i.test(modelOptionName(model));
+function isAutodlVideoProvider(provider: VideoGenerationTask["provider"]): provider is AutodlVideoProvider {
+    return provider === "minimax" || provider === "kling" || provider === "ark" || provider === "wan";
+}
+
+/** Native adapters for AutoDL video families; MiniMax Hailuo names also work on the official MiniMax API. */
+function autodlVideoProvider(model: string): AutodlVideoProvider | undefined {
+    const family = findAutodlModel(modelOptionName(model))?.family;
+    if (family === "minimax" || family === "kling" || family === "ark" || family === "wan") return family;
+    return /^minimax-hailuo/i.test(modelOptionName(model)) ? "minimax" : undefined;
+}
+
+/** Duration snapped to what the catalog allows for this model. */
+function autodlDuration(config: AiConfig, model: string, fallback: number[]) {
+    return nearestOption(Number(normalizeVideoSeconds(config.videoSeconds)) || fallback[0], findAutodlModel(modelOptionName(model))?.durations || fallback);
+}
+
+function autodlResolution(config: AiConfig, model: string) {
+    const options = (findAutodlModel(modelOptionName(model))?.resolutions || ["480", "720", "1080"]).map(Number);
+    return nearestOption(Number.parseInt(config.vquality, 10) || 720, options);
+}
+
+function autodlUrl(config: AiConfig, path: string) {
+    return withLocalProxy(`${config.baseUrl.trim().replace(/\/+$/, "")}${path}`);
+}
+
+function stripDataUrl(dataUrl: string) {
+    return dataUrl.replace(/^data:[^;]+;base64,/, "");
+}
+
+// Kling: POST /kling/v1/videos/{text2video|image2video}; the endpoint kind is kept in the task id for polling.
+async function createKlingVideoTask(config: AiConfig, model: string, prompt: string, references: ReferenceImage[], options?: VideoMediaOptions): Promise<VideoGenerationTask> {
+    const frames = await Promise.all(references.slice(0, 2).map((image) => imageToDataUrl(image)));
+    const kind = frames.length ? "image2video" : "text2video";
+    const body = {
+        model_name: modelOptionName(model),
+        prompt: prompt.slice(0, 2500),
+        duration: String(autodlDuration(config, model, [5, 10])),
+        mode: autodlResolution(config, model) >= 1000 ? "pro" : "std",
+        ...(frames[0] ? { image: stripDataUrl(frames[0]) } : { aspect_ratio: videoAspectRatio(config.size) }),
+        ...(frames[1] ? { image_tail: stripDataUrl(frames[1]) } : {}),
+    };
+    try {
+        const data = (await axios.post<KlingResponse>(autodlUrl(config, `/kling/v1/videos/${kind}`), body, { headers: aiHeaders(config, "application/json"), signal: options?.signal })).data;
+        if (data.code !== 0 || !data.data?.task_id) throw new Error(data.message || apiText("noVideoTaskId"));
+        return { id: `${kind}/${data.data.task_id}`, provider: "kling", model };
+    } catch (error) {
+        throw new Error(readAxiosError(error, apiText("videoTaskCreateFailed")));
+    }
+}
+
+async function pollKlingVideoTask(config: AiConfig, task: VideoGenerationTask, options?: RequestOptions): Promise<VideoGenerationTaskState> {
+    try {
+        const data = (await axios.get<KlingResponse>(autodlUrl(config, `/kling/v1/videos/${task.id}`), { headers: aiHeaders(config), signal: options?.signal })).data.data;
+        if (data?.task_status === "succeed") {
+            const url = data.task_result?.videos?.[0]?.url;
+            return url ? { status: "completed", result: await videoResultFromUrl(url, options) } : { status: "failed", error: apiText("noPlayableVideo") };
+        }
+        if (data?.task_status === "failed") return { status: "failed", error: data.task_status_msg || apiText("videoGenerationFailed") };
+        return { status: "pending" };
+    } catch (error) {
+        throw new Error(readAxiosError(error, apiText("videoTaskQueryFailed")));
+    }
+}
+
+// Volcengine Ark (Seedance): POST /ark/v3/contents/generations/tasks, GET .../tasks/{id}.
+async function createArkVideoTask(config: AiConfig, model: string, prompt: string, references: ReferenceImage[], options?: VideoMediaOptions): Promise<VideoGenerationTask> {
+    const frames = await Promise.all(references.slice(0, 2).map((image) => imageToDataUrl(image)));
+    const body = {
+        model: modelOptionName(model),
+        content: [
+            { type: "text", text: prompt },
+            ...frames.map((url, index) => ({ type: "image_url", image_url: { url }, role: index === 0 ? "first_frame" : "last_frame" })),
+        ],
+        resolution: `${autodlResolution(config, model)}p`,
+        ratio: frames.length ? "adaptive" : videoAspectRatio(config.size),
+        duration: autodlDuration(config, model, [5]),
+        generate_audio: boolConfig(config.videoGenerateAudio, true),
+        watermark: boolConfig(config.videoWatermark, false),
+    };
+    try {
+        const data = (await axios.post<ArkTaskResponse>(autodlUrl(config, "/ark/v3/contents/generations/tasks"), body, { headers: aiHeaders(config, "application/json"), signal: options?.signal })).data;
+        if (!data.id) throw new Error(data.error?.message || apiText("noVideoTaskId"));
+        return { id: data.id, provider: "ark", model };
+    } catch (error) {
+        throw new Error(readAxiosError(error, apiText("videoTaskCreateFailed")));
+    }
+}
+
+async function pollArkVideoTask(config: AiConfig, task: VideoGenerationTask, options?: RequestOptions): Promise<VideoGenerationTaskState> {
+    try {
+        const data = (await axios.get<ArkTaskResponse>(autodlUrl(config, `/ark/v3/contents/generations/tasks/${encodeURIComponent(task.id)}`), { headers: aiHeaders(config), signal: options?.signal })).data;
+        if (data.status === "succeeded") {
+            const url = data.content?.video_url;
+            return url ? { status: "completed", result: await videoResultFromUrl(url, options) } : { status: "failed", error: apiText("noPlayableVideo") };
+        }
+        if (data.status === "failed" || data.status === "cancelled" || data.status === "expired") return { status: "failed", error: data.error?.message || apiText("videoGenerationFailed") };
+        return { status: "pending" };
+    } catch (error) {
+        throw new Error(readAxiosError(error, apiText("videoTaskQueryFailed")));
+    }
+}
+
+// Alibaba DashScope (Wan): async POST .../video-synthesis with X-DashScope-Async, GET /ali/api/v1/tasks/{id}.
+async function createWanVideoTask(config: AiConfig, model: string, prompt: string, references: ReferenceImage[], options?: VideoMediaOptions): Promise<VideoGenerationTask> {
+    const frame = references[0] ? await imageToDataUrl(references[0]) : "";
+    const body = {
+        model: modelOptionName(model),
+        input: { prompt, ...(frame ? { img_url: frame } : {}) },
+        parameters: { resolution: `${autodlResolution(config, model)}P`, duration: autodlDuration(config, model, [5]) },
+    };
+    try {
+        const data = (await axios.post<WanTaskResponse>(autodlUrl(config, "/ali/api/v1/services/aigc/video-generation/video-synthesis"), body, { headers: { ...aiHeaders(config, "application/json"), "X-DashScope-Async": "enable" }, signal: options?.signal })).data;
+        if (!data.output?.task_id) throw new Error(data.message || apiText("noVideoTaskId"));
+        return { id: data.output.task_id, provider: "wan", model };
+    } catch (error) {
+        throw new Error(readAxiosError(error, apiText("videoTaskCreateFailed")));
+    }
+}
+
+async function pollWanVideoTask(config: AiConfig, task: VideoGenerationTask, options?: RequestOptions): Promise<VideoGenerationTaskState> {
+    try {
+        const output = (await axios.get<WanTaskResponse>(autodlUrl(config, `/ali/api/v1/tasks/${encodeURIComponent(task.id)}`), { headers: aiHeaders(config), signal: options?.signal })).data.output;
+        if (output?.task_status === "SUCCEEDED") {
+            return output.video_url ? { status: "completed", result: await videoResultFromUrl(output.video_url, options) } : { status: "failed", error: apiText("noPlayableVideo") };
+        }
+        if (output?.task_status === "FAILED" || output?.task_status === "CANCELED" || output?.task_status === "UNKNOWN") return { status: "failed", error: output.message || apiText("videoGenerationFailed") };
+        return { status: "pending" };
+    } catch (error) {
+        throw new Error(readAxiosError(error, apiText("videoTaskQueryFailed")));
+    }
 }
 
 function miniMaxUrl(config: AiConfig, path: string) {
@@ -118,8 +258,8 @@ function miniMaxResolution(vquality: string, hasFirstFrame: boolean) {
 
 async function createMiniMaxVideoTask(config: AiConfig, model: string, prompt: string, references: ReferenceImage[], options?: VideoMediaOptions): Promise<VideoGenerationTask> {
     const frames = await Promise.all(references.slice(0, 2).map((image) => imageToDataUrl(image)));
-    const resolution = miniMaxResolution(config.vquality, frames.length > 0);
-    const duration = resolution !== "1080P" && Number(normalizeVideoSeconds(config.videoSeconds)) >= 8 ? 10 : 6;
+    const resolution = miniMaxResolution(String(autodlResolution(config, model)), frames.length > 0);
+    const duration = resolution === "1080P" ? 6 : autodlDuration(config, model, [6, 10]);
     const body = {
         model: modelOptionName(model),
         prompt: prompt.slice(0, 2000),

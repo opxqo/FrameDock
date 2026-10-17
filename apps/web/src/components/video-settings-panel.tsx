@@ -6,6 +6,7 @@ import i18n from "@/i18n";
 import { ImageSettingsTheme } from "@/components/image-settings-panel";
 import { type CanvasTheme } from "@/lib/canvas-theme";
 import { clampVideoSeconds, computeVideoSize, inferVideoRatio, parseVideoResolution, readVideoDimensions, VIDEO_SECONDS_MAX, VIDEO_SECONDS_MIN, videoRatioOptions } from "@/lib/media-size";
+import { findAutodlModel, nearestOption } from "@/lib/autodl-catalog";
 import { type AiConfig } from "@/stores/use-config-store";
 
 const resolutionOptions = [
@@ -32,9 +33,14 @@ type VideoSettingsPanelProps = {
 
 export function VideoSettingsPanel({ config, onConfigChange, theme, showTitle = true, className = "w-[320px] space-y-4 rounded-2xl px-1 py-0.5" }: VideoSettingsPanelProps) {
     const { t } = useTranslation();
-    const seconds = Number(clampVideoSeconds(config.videoSeconds || "6"));
+    // FrameDock: AutoDL models only offer the resolutions/durations from the catalog; requests snap to the nearest one too.
+    const catalog = [config.model, config.videoModel].map((model) => findAutodlModel(model || "")).find((model) => model?.capability === "video");
+    const modelResolutions = catalog?.resolutions ? resolutionOptions.filter((item) => catalog.resolutions?.includes(item.value)) : resolutionOptions;
+    const rawSeconds = Number(clampVideoSeconds(config.videoSeconds || "6"));
+    const seconds = catalog?.durations ? nearestOption(rawSeconds, catalog.durations) : rawSeconds;
     const videoMode = normalizeVideoModeValue(config.videoMode);
-    const resolution = parseVideoResolution(config.vquality);
+    const rawResolution = parseVideoResolution(config.vquality);
+    const resolution = catalog?.resolutions ? String(nearestOption(Number(rawResolution) || 720, catalog.resolutions.map(Number))) : rawResolution;
     const selectedRatio = inferVideoRatio(config.size || "auto");
     const dimensions = readVideoDimensions(config.size || "auto", resolution, selectedRatio);
     const applySize = (nextResolution: string, ratio: string) => {
@@ -52,12 +58,12 @@ export function VideoSettingsPanel({ config, onConfigChange, theme, showTitle = 
                 {showTitle ? <div className="text-lg font-semibold">{t("settingsPanels.video.title")}</div> : null}
                 <SettingGroup title={t("settingsPanels.video.quality")} color={theme.node.muted}>
                     <div className="grid grid-cols-4 gap-2.5">
-                        {resolutionOptions.map((item) => (
+                        {modelResolutions.map((item) => (
                             <OptionPill key={item.value} selected={resolution === item.value} theme={theme} onClick={() => selectResolution(item.value)}>
-                                {item.label}
+                                {catalog?.family === "minimax" && item.value === "480" ? "512p" : item.label}
                             </OptionPill>
                         ))}
-                        <ResolutionInput value={resolution} theme={theme} onChange={selectResolution} />
+                        {catalog ? null : <ResolutionInput value={resolution} theme={theme} onChange={selectResolution} />}
                     </div>
                 </SettingGroup>
                 <SettingGroup title={t("settingsPanels.video.size")} color={theme.node.muted}>
@@ -85,11 +91,23 @@ export function VideoSettingsPanel({ config, onConfigChange, theme, showTitle = 
                     </div>
                 </SettingGroup>
                 <SettingGroup title={t("settingsPanels.video.seconds")} color={theme.node.muted}>
+                    {catalog?.durations ? (
+                        <div className="grid grid-cols-4 gap-2.5">
+                            {catalog.durations.map((value) => (
+                                <OptionPill key={value} selected={seconds === value} theme={theme} onClick={() => onConfigChange("videoSeconds", String(value))}>
+                                    {value}s
+                                </OptionPill>
+                            ))}
+                        </div>
+                    ) : (
                     <div className="flex items-center gap-3" onMouseDown={(event) => event.stopPropagation()}>
                         <Slider className="min-w-0 flex-1" min={VIDEO_SECONDS_MIN} max={VIDEO_SECONDS_MAX} step={1} value={seconds} onChange={(value) => onConfigChange("videoSeconds", String(Array.isArray(value) ? value[0] : value))} />
                         <SecondsInput value={seconds} theme={theme} onCommit={(value) => onConfigChange("videoSeconds", String(value))} />
                         <span className="shrink-0 text-sm" style={{ color: theme.node.muted }}>s</span>
                     </div>
+                    )}
+                    {catalog?.family === "minimax" && resolution === "480" ? <div className="text-xs" style={{ color: theme.node.muted }}>512p 仅图生视频可用，没有首帧时自动改用 768p</div> : null}
+                    {catalog?.textToVideo === false ? <div className="text-xs" style={{ color: theme.node.muted }}>该模型需要连接一张首帧图片</div> : null}
                 </SettingGroup>
                 <SettingGroup title={t("settingsPanels.video.mode")} color={theme.node.muted}>
                     <div className="grid grid-cols-2 gap-2.5">

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { closestAutodlImageSize } from "@/lib/autodl-catalog";
 
 import i18n from "@/i18n";
 import { buildApiUrl, resolveModelRequestConfig, resolveModelScript, withLocalProxy, type AiConfig, type ModelChannel } from "@/stores/use-config-store";
@@ -724,7 +725,7 @@ export async function requestGeneration(config: AiConfig, prompt: string, option
         }
     }
     const quality = normalizeQuality(config.quality);
-    const requestSize = resolveRequestSize(config.size);
+    const requestSize = closestAutodlImageSize(requestConfig.model, resolveRequestSize(config.size));
     const background = normalizeBackground(config.background);
     try {
         const response = await axios.post<ImageApiResponse>(
@@ -787,7 +788,7 @@ export async function requestEdit(config: AiConfig, prompt: string, references: 
     }
 
     const quality = normalizeQuality(config.quality);
-    const requestSize = resolveRequestSize(config.size);
+    const requestSize = closestAutodlImageSize(requestConfig.model, resolveRequestSize(config.size));
     const background = normalizeBackground(config.background);
     const formData = new FormData();
     formData.set("model", requestConfig.model);
