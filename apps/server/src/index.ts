@@ -5,6 +5,7 @@ import { config } from "./config";
 import { openDatabase } from "./db";
 import kvApi from "./kv";
 import mockApi from "./mock";
+import mokeApi from "./moke";
 import proxy from "./proxy";
 
 const app = Fastify({ logger: true });
@@ -15,6 +16,10 @@ await app.register(kvApi, { prefix: "/api/kv", db });
 await app.register(proxy, { prefix: "/proxy" });
 
 await app.register(codexApi, { prefix: "/api/codex" });
+
+if (config.moke) {
+  await app.register(mokeApi, { prefix: "/api/moke", db });
+}
 
 if (config.mockApi) {
   await app.register(mockApi, { prefix: "/v1" });

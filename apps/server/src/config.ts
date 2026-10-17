@@ -7,6 +7,7 @@ const env = z
     PORT: z.coerce.number().int().min(1).max(65535).default(8787),
     FRAMEDOCK_DATA_DIR: z.string().min(1).optional(),
     FRAMEDOCK_MOCK_API: z.string().default("1"),
+    FRAMEDOCK_MOKE: z.string().default("1"),
   })
   .parse(process.env);
 
@@ -16,6 +17,7 @@ const repositoryRoot = fileURLToPath(new URL("../../../", import.meta.url));
 export const config = {
   port: env.PORT,
   mockApi: env.FRAMEDOCK_MOCK_API !== "0",
+  moke: env.FRAMEDOCK_MOKE !== "0",
   dataDir: resolve(repositoryRoot, env.FRAMEDOCK_DATA_DIR ?? "data"),
   migrationsDir: fileURLToPath(new URL("../drizzle/", import.meta.url)),
 };
