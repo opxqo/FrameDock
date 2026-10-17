@@ -1,7 +1,7 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useSyncExternalStore } from "react";
 import { useTranslation } from "react-i18next";
 
-import { previewUrlFor } from "@/services/image-storage";
+import { ensureImagePreview, getImagePreviewRevision, previewUrlFor, subscribeImagePreviews } from "@/services/image-storage";
 import type { CanvasProject } from "@/stores/canvas/use-canvas-store";
 import { CanvasNodeType } from "@/types/canvas";
 
@@ -10,6 +10,14 @@ const PADDING = 6; // percent of the preview box kept free around the layout
 // FrameDock: a scaled schematic of the project's real layout — wires, node boxes, and image thumbnails.
 export function CanvasProjectPreview({ project }: { project: CanvasProject }) {
     const { t } = useTranslation();
+    // Thumbnails are generated lazily from storage; re-render when one becomes available.
+    useSyncExternalStore(subscribeImagePreviews, getImagePreviewRevision);
+    useEffect(() => {
+        project.nodes
+            .filter((node) => node.type === CanvasNodeType.Image && node.metadata?.storageKey)
+            .slice(0, 12)
+            .forEach((node) => void ensureImagePreview(node.metadata?.storageKey));
+    }, [project.nodes]);
     const layout = useMemo(() => {
         const nodes = project.nodes.filter((node) => node.type !== CanvasNodeType.Group && node.width > 0 && node.height > 0);
         if (!nodes.length) return null;
@@ -54,14 +62,16 @@ export function CanvasProjectPreview({ project }: { project: CanvasProject }) {
                 ))}
             </svg>
             {layout.nodes.map(({ node, left, top, width, height }) => {
-                const image = node.type === CanvasNodeType.Image ? previewUrlFor(node.metadata?.storageKey) || node.metadata?.content : undefined;
+                // Saved blob: URLs die with the page that created them; only stored previews and real URLs render.
+                const content = node.metadata?.content || "";
+                const image = node.type === CanvasNodeType.Image ? previewUrlFor(node.metadata?.storageKey) || (/^(data:|https?:)/.test(content) ? content : undefined) : undefined;
                 return (
                     <div
                         key={node.id}
                         className="absolute overflow-hidden rounded-[3px] border border-border bg-secondary"
                         style={{ left: `${left}%`, top: `${top}%`, width: `${width}%`, height: `${height}%` }}
                     >
-                        {image && /^(blob:|data:|https?:|\/)/.test(image) ? <img src={image} alt="" loading="lazy" className="size-full object-cover" /> : null}
+                        {image ? <img src={image} alt="" loading="lazy" className="size-full object-cover" /> : null}
                     </div>
                 );
             })}

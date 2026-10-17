@@ -1,7 +1,7 @@
-import { App, Button, Form, Input, Modal, Progress, Radio, Select, Switch, Tabs } from "antd";
+import { App, Button, Form, Input, Modal, Progress, Radio, Segmented, Select, Switch } from "antd";
 import type { TFunction } from "i18next";
 import { Cloud, Download, Pencil, Plus, RefreshCw, Trash2, Upload, Wifi } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 
 import { ModelPicker } from "@/components/model-picker";
@@ -11,7 +11,9 @@ import { ConfigAutodl } from "@/components/layout/config-autodl";
 import { ConfigLocalProxy } from "@/components/layout/config-local-proxy";
 import { ConfigPromptSources } from "@/components/layout/config-prompt-sources";
 import { ConfigLocalStorage } from "@/components/layout/config-local-storage";
-import type { AppLocale } from "@/i18n";
+import { changeAppLocale, type AppLocale } from "@/i18n";
+import { cn } from "@/lib/utils";
+import { useThemeStore, type ThemeName } from "@/stores/use-theme-store";
 import { exportAppConfig, importAppConfig } from "@/services/config-file";
 import { syncAppDataToWebdav, type AppSyncDomainKey, type AppSyncProgressEvent } from "@/services/app-sync";
 import { testWebdavConnection, WEBDAV_MANIFEST_FILE_NAME } from "@/services/webdav-sync";
@@ -70,6 +72,8 @@ export function AppConfigPanel({ showDoneButton = false, initialTab = "channels"
     const webdavReady = Boolean(webdav.url.trim());
     const editingChannel = config.channels.find((channel) => channel.id === editingChannelId) || null;
     const locale = i18n.resolvedLanguage as AppLocale;
+    const theme = useThemeStore((state) => state.theme);
+    const setTheme = useThemeStore((state) => state.setTheme);
     const imageResolutionOptions = mediaScaleOptions.map((value) => ({ value, label: value === "auto" ? t("settingsPanels.common.auto") : value.toUpperCase() }));
     useEffect(() => setActiveTab(initialTab), [initialTab]);
 
@@ -168,21 +172,23 @@ export function AppConfigPanel({ showDoneButton = false, initialTab = "channels"
 
     return (
         <>
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-stone-200 pb-3 dark:border-stone-800">
-                <div className="text-xs text-stone-500">{t("config.fileSecurity")}</div>
-                <div className="flex gap-2">
-                    <Button icon={<Upload className="size-4" />} onClick={() => configInputRef.current?.click()}>
-                        {t("config.import")}
-                    </Button>
-                    <Button icon={<Download className="size-4" />} onClick={exportAppConfig}>
-                        {t("config.export")}
-                    </Button>
-                    <input ref={configInputRef} type="file" accept="application/json,.json" className="hidden" onChange={(event) => event.target.files?.[0] && void loadConfigFile(event.target.files[0])} />
-                </div>
-            </div>
-            <Tabs
+            <input ref={configInputRef} type="file" accept="application/json,.json" className="hidden" onChange={(event) => event.target.files?.[0] && void loadConfigFile(event.target.files[0])} />
+            <ConfigSections
                 activeKey={activeTab}
-                onChange={(key) => setActiveTab(key as ConfigTabKey)}
+                onChange={setActiveTab}
+                footer={
+                    <div className="space-y-1.5">
+                        <div className="px-2 text-xs text-muted-foreground">{t("config.fileSecurity")}</div>
+                        <div className="flex gap-1">
+                            <Button size="small" type="text" icon={<Upload className="size-3.5" />} onClick={() => configInputRef.current?.click()}>
+                                {t("config.import")}
+                            </Button>
+                            <Button size="small" type="text" icon={<Download className="size-3.5" />} onClick={exportAppConfig}>
+                                {t("config.export")}
+                            </Button>
+                        </div>
+                    </div>
+                }
                 items={[
                     {
                         key: "channels",
@@ -219,6 +225,7 @@ export function AppConfigPanel({ showDoneButton = false, initialTab = "channels"
                     },
                     {
                         key: "local-proxy",
+                        advanced: true,
                         label: t("config.tabs.localProxy"),
                         children: <ConfigLocalProxy />,
                     },
@@ -271,6 +278,26 @@ export function AppConfigPanel({ showDoneButton = false, initialTab = "channels"
                                         />
                                     </Form.Item>
                                 </div>
+                                <Form.Item label={t("config.preferences.audioInstructions")} className="mb-4">
+                                    <Input.TextArea rows={2} value={config.audioInstructions} placeholder={t("config.preferences.audioInstructionsPlaceholder")} onChange={(event) => updateConfig("audioInstructions", event.target.value)} />
+                                </Form.Item>
+                                <Form.Item label={t("config.preferences.systemPrompt")} className="mb-0">
+                                    <Input.TextArea rows={4} value={config.systemPrompt} placeholder={t("config.preferences.systemPromptPlaceholder")} onChange={(event) => updateConfig("systemPrompt", event.target.value)} />
+                                </Form.Item>
+                            </Form>
+                        ),
+                    },
+                    {
+                        key: "appearance",
+                        label: t("config.tabs.appearance"),
+                        children: (
+                            <Form layout="vertical" requiredMark={false}>
+                                <Form.Item label={t("config.appearance.theme")} className="mb-4">
+                                    <Segmented value={theme} onChange={(value) => setTheme(value as ThemeName)} options={[{ value: "dark", label: t("canvas.toolbar.dark") }, { value: "light", label: t("canvas.toolbar.light") }]} />
+                                </Form.Item>
+                                <Form.Item label={t("config.appearance.language")} className="mb-4">
+                                    <Segmented value={locale} onChange={(value) => void changeAppLocale(value as AppLocale)} options={[{ value: "zh-CN", label: t("locale.zhCN") }, { value: "en-US", label: t("locale.enUS") }]} />
+                                </Form.Item>
                                 <Form.Item label={t("config.preferences.regenerateBehavior")} className="mb-4">
                                     <Radio.Group value={config.nodeRegenerateBehavior} onChange={(event) => updateConfig("nodeRegenerateBehavior", event.target.value)} className="flex flex-col gap-2">
                                         <Radio value="overwrite">
@@ -289,22 +316,18 @@ export function AppConfigPanel({ showDoneButton = false, initialTab = "channels"
                                         <Switch checked={config.autoFocusOnSelect} onChange={(checked) => updateConfig("autoFocusOnSelect", checked)} />
                                     </div>
                                 </Form.Item>
-                                <Form.Item label={t("config.preferences.audioInstructions")} className="mb-4">
-                                    <Input.TextArea rows={2} value={config.audioInstructions} placeholder={t("config.preferences.audioInstructionsPlaceholder")} onChange={(event) => updateConfig("audioInstructions", event.target.value)} />
-                                </Form.Item>
-                                <Form.Item label={t("config.preferences.systemPrompt")} className="mb-0">
-                                    <Input.TextArea rows={4} value={config.systemPrompt} placeholder={t("config.preferences.systemPromptPlaceholder")} onChange={(event) => updateConfig("systemPrompt", event.target.value)} />
-                                </Form.Item>
                             </Form>
                         ),
                     },
                     {
                         key: "prompt-sources",
+                        advanced: true,
                         label: t("config.tabs.promptSources"),
                         children: <ConfigPromptSources />,
                     },
                     {
                         key: "webdav",
+                        advanced: true,
                         label: "WebDAV",
                         children: (
                             <Form layout="vertical" requiredMark={false}>
@@ -349,6 +372,7 @@ export function AppConfigPanel({ showDoneButton = false, initialTab = "channels"
                     },
                     {
                         key: "local-storage",
+                        advanced: true,
                         label: t("config.tabs.localStorage"),
                         children: <ConfigLocalStorage active={activeTab === "local-storage"} />,
                     },
@@ -373,17 +397,12 @@ export function AppConfigModal() {
     const setConfigDialogOpen = useConfigStore((state) => state.setConfigDialogOpen);
     return (
         <Modal
-            title={
-                <div>
-                    <div className="text-lg font-semibold">{t("config.title")}</div>
-                    <div className="mt-1 text-xs font-normal text-stone-500">{t("config.modalDescription")}</div>
-                </div>
-            }
+            title={t("config.title")}
             open={isConfigOpen}
             width={980}
             centered
             onCancel={() => setConfigDialogOpen(false)}
-            styles={{ body: { maxHeight: "72vh", overflowY: "auto", paddingRight: 12 } }}
+            styles={{ body: { height: "min(72vh, 680px)", overflowY: "auto", paddingRight: 12 } }}
             footer={
                 <div className="text-center text-xs text-stone-500 dark:text-stone-400">
                     <a href="https://github.com/basketikun/infinite-canvas" target="_blank" rel="noopener noreferrer">基于 infinite-canvas（MIT）开发</a>
@@ -392,6 +411,44 @@ export function AppConfigModal() {
         >
             <AppConfigPanel showDoneButton initialTab={configTab} />
         </Modal>
+    );
+}
+
+type ConfigSection = { key: string; label: string; advanced?: boolean; children: ReactNode };
+
+// FrameDock: settings as a left-hand section list (not tabs). Everyday sections first, everything rarely touched
+// grouped under "高级"; import/export sits at the bottom of the list.
+function ConfigSections({ activeKey, onChange, items, footer }: { activeKey: ConfigTabKey; onChange: (key: ConfigTabKey) => void; items: ConfigSection[]; footer?: ReactNode }) {
+    const { t } = useTranslation();
+    const active = items.find((item) => item.key === activeKey) || items[0];
+    const navItem = (item: ConfigSection) => (
+        <button
+            key={item.key}
+            type="button"
+            aria-current={item.key === active.key ? "page" : undefined}
+            onClick={() => onChange(item.key as ConfigTabKey)}
+            className={cn(
+                "flex h-8 shrink-0 items-center rounded-md px-2 text-left text-sm transition-colors duration-150 md:w-full",
+                item.key === active.key ? "bg-secondary font-medium text-foreground" : "text-muted-foreground hover:bg-accent hover:text-foreground",
+            )}
+        >
+            {item.label}
+        </button>
+    );
+    return (
+        <div className="flex min-h-0 flex-col gap-4 md:flex-row md:gap-6">
+            <nav aria-label={t("config.title")} className="hide-scrollbar -mx-1 flex gap-1 overflow-x-auto px-1 md:sticky md:top-0 md:mx-0 md:w-44 md:shrink-0 md:flex-col md:self-start md:overflow-visible md:px-0">
+                {items.filter((item) => !item.advanced).map(navItem)}
+                <div className="hidden px-2 pb-1 pt-4 text-xs text-muted-foreground md:block">{t("config.sectionGroups.advanced")}</div>
+                {items.filter((item) => item.advanced).map(navItem)}
+                {footer ? <div className="hidden border-t border-border pt-3 md:mt-4 md:block">{footer}</div> : null}
+            </nav>
+            <section className="min-w-0 flex-1">
+                <h2 className="mb-4 text-base font-semibold">{active.label}</h2>
+                {active.children}
+                {footer ? <div className="mt-6 border-t border-border pt-3 md:hidden">{footer}</div> : null}
+            </section>
+        </div>
     );
 }
 
