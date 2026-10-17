@@ -37,3 +37,14 @@ SOFTWARE.
 ## LobeHub Icons
 
 `apps/web/public/icons/lobehub/*.svg` are copied from [`@lobehub/icons-static-svg`](https://www.npmjs.com/package/@lobehub/icons-static-svg) v1.95.1 ([lobehub/lobe-icons](https://github.com/lobehub/lobe-icons)), MIT License, Copyright (c) LobeHub. The logos themselves are trademarks of their respective owners and are used only to identify the corresponding models.
+
+---
+
+## Agent skills（`.claude/skills/`）
+
+供 Claude Code 等编码 Agent 使用的设计 skill，原样复制，未修改，各目录内附原许可证。
+
+- `.claude/skills/impeccable/`：复制自 [pbakaus/impeccable](https://github.com/pbakaus/impeccable)（提交 `08d5b47`）的 `.claude/skills/impeccable`，Apache License 2.0，作者 Paul Bakaus。见该目录下的 `LICENSE` 与 `NOTICE.md`。
+- `.claude/skills/design-taste-frontend/`：复制自 [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill)（提交 `f624f37`）的 `skills/taste-skill`，MIT License，Copyright (c) 2026 Leonxlnx。
+- `.claude/skills/redesign-existing-projects/`：复制自同一仓库的 `skills/redesign-skill`，MIT License，Copyright (c) 2026 Leonxlnx。
+
