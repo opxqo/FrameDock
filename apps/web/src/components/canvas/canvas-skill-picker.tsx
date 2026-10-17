@@ -23,7 +23,12 @@ export function CanvasSkillPicker({ skill, onChange, compact = false }: { skill?
                         {skill.title}
                     </button>
                     <Tooltip title={t("skills.detach")}>
-                        <button type="button" className="grid size-5 shrink-0 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground" onClick={() => onChange(undefined)} aria-label={t("skills.detach")}>
+                        <button
+                            type="button"
+                            className="grid size-5 shrink-0 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                            onClick={() => onChange(undefined)}
+                            aria-label={t("skills.detach")}
+                        >
                             <X className="size-3.5" />
                         </button>
                     </Tooltip>

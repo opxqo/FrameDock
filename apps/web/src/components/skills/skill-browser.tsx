@@ -53,7 +53,11 @@ export function SkillBrowser({ renderAction, className }: { renderAction: (resol
         const needle = query.toLowerCase();
         const builtin =
             category === "all" || category === "builtin" || BUILTIN_SKILLS.some((skill) => skill.category === category)
-                ? BUILTIN_SKILLS.filter((skill) => (category === "all" || category === "builtin" || skill.category === category) && (!needle || `${skill.title}${skill.summary}`.toLowerCase().includes(needle))).map((skill) => ({ key: skill.id, source: "builtin" as const, skill }))
+                ? BUILTIN_SKILLS.filter((skill) => (category === "all" || category === "builtin" || skill.category === category) && (!needle || `${skill.title}${skill.summary}`.toLowerCase().includes(needle))).map((skill) => ({
+                      key: skill.id,
+                      source: "builtin" as const,
+                      skill,
+                  }))
                 : [];
         const online = showMoke ? (moke.data?.pages.flatMap((page) => page.items) || []).map((summary) => ({ key: summary.id, source: "moke" as const, summary })) : [];
         return [...builtin, ...online];
@@ -67,19 +71,34 @@ export function SkillBrowser({ renderAction, className }: { renderAction: (resol
                 <Input className="!rounded-full" prefix={<Search className="size-4 text-muted-foreground" />} placeholder={t("skills.searchPlaceholder")} value={keyword} onChange={(event) => setKeyword(event.target.value)} allowClear />
                 <div className="mt-3 flex flex-wrap gap-1.5">
                     {CATEGORIES.map((item) => (
-                        <button key={item} type="button" aria-pressed={category === item} onClick={() => setCategory(item)} className={cn("h-7 rounded-full border px-3 text-xs transition-colors", category === item ? "border-foreground/40 bg-signal/10 text-foreground" : "border-border text-muted-foreground hover:bg-accent hover:text-foreground")}>
+                        <button
+                            key={item}
+                            type="button"
+                            aria-pressed={category === item}
+                            onClick={() => setCategory(item)}
+                            className={cn("h-7 rounded-full border px-3 text-xs transition-colors", category === item ? "border-foreground/40 bg-signal/10 text-foreground" : "border-border text-muted-foreground hover:bg-accent hover:text-foreground")}
+                        >
                             {t(`skills.categories.${item}`)}
                         </button>
                     ))}
                 </div>
-                {!mokeEnabled ? <p className="mt-3 text-xs text-muted-foreground">{t("skills.disabled")}</p> : moke.isError ? <p className="mt-3 text-xs text-destructive">{t("skills.offline", { error: moke.error instanceof Error ? moke.error.message : "" })}</p> : null}
+                {!mokeEnabled ? (
+                    <p className="mt-3 text-xs text-muted-foreground">{t("skills.disabled")}</p>
+                ) : moke.isError ? (
+                    <p className="mt-3 text-xs text-destructive">{t("skills.offline", { error: moke.error instanceof Error ? moke.error.message : "" })}</p>
+                ) : null}
                 <div className="thin-scrollbar mt-3 min-h-0 flex-1 space-y-1 overflow-y-auto pr-1">
                     {items.map((item) => {
                         const title = item.source === "builtin" ? item.skill.title : item.summary.title;
                         const summary = item.source === "builtin" ? item.skill.summary : item.summary.summary;
                         const active = selected?.key === item.key;
                         return (
-                            <button key={item.key} type="button" onClick={() => setSelectedKey(item.key)} className={cn("w-full rounded-xl border px-3 py-2.5 text-left transition-colors", active ? "border-foreground/40 bg-signal/10" : "border-transparent hover:bg-accent")}>
+                            <button
+                                key={item.key}
+                                type="button"
+                                onClick={() => setSelectedKey(item.key)}
+                                className={cn("w-full rounded-xl border px-3 py-2.5 text-left transition-colors", active ? "border-foreground/40 bg-signal/10" : "border-transparent hover:bg-accent")}
+                            >
                                 <span className="flex items-center gap-2">
                                     <span className="min-w-0 flex-1 truncate text-sm font-medium">{title}</span>
                                     <span className="shrink-0 rounded-full border border-border px-1.5 text-[11px] leading-4 text-muted-foreground">{item.source === "builtin" ? t("skills.sourceBuiltin") : t("skills.sourceMoke")}</span>
@@ -102,7 +121,17 @@ export function SkillBrowser({ renderAction, className }: { renderAction: (resol
                     ) : null}
                 </div>
             </section>
-            <section className="flex min-h-0 flex-col rounded-[20px] border border-border p-4">{selected ? selected.source === "builtin" ? <BuiltinDetail skill={selected.skill} renderAction={renderAction} /> : <MokeDetail summary={selected.summary} renderAction={renderAction} /> : <p className="m-auto text-sm text-muted-foreground">{t("skills.selectHint")}</p>}</section>
+            <section className="flex min-h-0 flex-col rounded-[20px] border border-border p-4">
+                {selected ? (
+                    selected.source === "builtin" ? (
+                        <BuiltinDetail skill={selected.skill} renderAction={renderAction} />
+                    ) : (
+                        <MokeDetail summary={selected.summary} renderAction={renderAction} />
+                    )
+                ) : (
+                    <p className="m-auto text-sm text-muted-foreground">{t("skills.selectHint")}</p>
+                )}
+            </section>
         </div>
     );
 }

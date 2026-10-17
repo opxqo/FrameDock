@@ -21,7 +21,10 @@ const ROW = 340;
 const SHOT_SUBJECT = "镜头中的人物";
 
 function recipe(ids: string[], subject = SHOT_SUBJECT) {
-    return composePresetPrompt(PROMPT_PRESETS.filter((preset) => ids.includes(preset.id)), subject);
+    return composePresetPrompt(
+        PROMPT_PRESETS.filter((preset) => ids.includes(preset.id)),
+        subject,
+    );
 }
 
 function skill(id: string): CanvasSkill {
@@ -51,7 +54,11 @@ export function buildCanvasTemplate(id: CanvasTemplateId, t: Translate, create: 
         link(script, breakdownConfig);
         link(breakdownConfig, breakdown);
 
-        const shotRecipes = [["comp-ultrawide-depth", "light-golden-hour"], ["comp-split-focus", "light-motivated"], ["comp-profile", "comp-halation"]];
+        const shotRecipes = [
+            ["comp-ultrawide-depth", "light-golden-hour"],
+            ["comp-split-focus", "light-motivated"],
+            ["comp-profile", "comp-halation"],
+        ];
         const shots = shotRecipes.map((ids, index) => {
             const n = index + 1;
             const config = add("config", 5, index - 1, t("templates.nodes.shotConfig", { n }), { generationMode: "image", size: "16:9", count: 1, prompt: `只画上游逐镜提示词里“镜头 ${n}”那一条。\n${recipe(ids)}` });
@@ -86,7 +93,12 @@ export function buildCanvasTemplate(id: CanvasTemplateId, t: Translate, create: 
     ];
     scenes.forEach((scene, index) => {
         const n = index + 1;
-        const config = add("config", 5, index - 1, t("templates.nodes.sceneConfig", { n }), { generationMode: "image", size: "16:9", count: 1, prompt: `场景 ${n}：${scene.text}。人物外貌与定妆图、角色设定中的固定特征完全一致。\n${recipe(scene.ids, "他")}` });
+        const config = add("config", 5, index - 1, t("templates.nodes.sceneConfig", { n }), {
+            generationMode: "image",
+            size: "16:9",
+            count: 1,
+            prompt: `场景 ${n}：${scene.text}。人物外貌与定妆图、角色设定中的固定特征完全一致。\n${recipe(scene.ids, "他")}`,
+        });
         const image = add("image", 6, index - 1, t("templates.nodes.scene", { n }));
         link(bible, config);
         link(portrait, config);
