@@ -337,9 +337,11 @@ function geminiApiUrl(config: Pick<AiConfig, "baseUrl" | "model">, action?: "gen
     return withLocalProxy(`${baseUrl}/models/${encodeURIComponent(geminiModelName(config.model))}:${action}`);
 }
 
-function geminiHeaders(config: Pick<AiConfig, "apiKey">) {
+function geminiHeaders(config: Pick<AiConfig, "apiKey"> & Partial<Pick<AiConfig, "baseUrl">>) {
+    // FrameDock: relays such as AutoDL only allow the Authorization header in CORS, so x-goog-api-key is kept for Google's own host.
+    const googleHost = !config.baseUrl || /(^|\.)googleapis\.com/i.test(new URL(config.baseUrl, "https://x").hostname);
     return {
-        "x-goog-api-key": config.apiKey,
+        ...(googleHost ? { "x-goog-api-key": config.apiKey } : { Authorization: `Bearer ${config.apiKey}` }),
         "Content-Type": "application/json",
     };
 }

@@ -92,6 +92,33 @@ const mockChannel: ModelChannel | undefined = import.meta.env.DEV ? {
     ],
 } : undefined;
 
+// FrameDock: AutoDL.Art presets (https://www.autodl.art/docs/cherry_studio/). Users only fill in the API key.
+const autodlChannels: ModelChannel[] = [
+    {
+        id: "autodl",
+        name: "AutoDL",
+        baseUrl: "https://www.autodl.art/api/v1",
+        apiKey: "",
+        apiFormat: "openai",
+        models: [
+            { name: "gpt-image-2", capability: "image" },
+            { name: "Qwen-Image", capability: "image" },
+            { name: "Z-Image-Turbo", capability: "image" },
+        ],
+    },
+    {
+        id: "autodl-gemini",
+        name: "AutoDL Gemini",
+        baseUrl: "https://www.autodl.art/api/v1/gemini/v1beta",
+        apiKey: "",
+        apiFormat: "gemini",
+        models: [
+            { name: "gemini-2.5-flash-image", capability: "image" },
+            { name: "gemini-3.1-flash-image-preview", capability: "image" },
+        ],
+    },
+];
+
 export const defaultConfig: AiConfig = {
     channelMode: "local",
     baseUrl: OPENAI_BASE_URL,
@@ -99,6 +126,7 @@ export const defaultConfig: AiConfig = {
     apiFormat: "openai",
     channels: [
         ...(mockChannel ? [mockChannel] : []),
+        ...autodlChannels,
         {
             id: "default",
             name: i18n.t("config.channels.defaultName"),
@@ -129,7 +157,7 @@ export const defaultConfig: AiConfig = {
     videoMode: "frames",
     systemPrompt: "",
     reasoningEffort: "auto",
-    models: [...(mockChannel ? ["mock::mock-image", "mock::mock-video", "mock::mock-text"] : []), "default::gpt-image-2", "default::grok-imagine-video", "default::gpt-5.5", "default::gpt-4o-mini-tts"],
+    models: [...(mockChannel ? ["mock::mock-image", "mock::mock-video", "mock::mock-text"] : []), ...autodlChannels.flatMap((channel) => channel.models.map((model) => `${channel.id}::${model.name}`)), "default::gpt-image-2", "default::grok-imagine-video", "default::gpt-5.5", "default::gpt-4o-mini-tts"],
     quality: "auto",
     size: "1:1",
     background: "",
@@ -270,6 +298,9 @@ export const useConfigStore = create<ConfigStore>()(
                 if (persistedState.config && !Array.isArray(persistedConfig.channels)) config.channels = [];
                 const channels = normalizeChannels(config);
                 if (mockChannel && !channels.some((channel) => channel.id === "mock")) channels.unshift(mockChannel);
+                autodlChannels.forEach((preset) => {
+                    if (!channels.some((channel) => channel.id === preset.id)) channels.push(preset);
+                });
                 const models = modelOptionsFromChannels(channels);
                 return {
                     ...current,
