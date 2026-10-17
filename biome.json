@@ -1,0 +1,20 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.15/schema.json",
+  "files": {
+    "includes": [
+      "**",
+      "!**/dist",
+      "!**/node_modules",
+      "!**/.pnpm-store",
+      "!data",
+      "!apps/server/drizzle/meta"
+    ]
+  },
+  "formatter": {
+    "indentStyle": "space",
+    "indentWidth": 2
+  },
+  "css": { "parser": { "tailwindDirectives": true } },
+  "linter": { "enabled": true, "rules": { "preset": "recommended" } },
+  "assist": { "actions": { "source": { "organizeImports": "on" } } }
+}

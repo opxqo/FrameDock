@@ -1,0 +1,23 @@
+{
+  "name": "framedock",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.25.0",
+  "engines": {
+    "node": ">=22.18.0 <23",
+    "pnpm": "11.25.0"
+  },
+  "scripts": {
+    "dev": "concurrently --kill-others --names server,web \"pnpm --filter @framedock/server dev\" \"pnpm --filter @framedock/web dev\"",
+    "build": "pnpm -r --if-present build",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "biome check .",
+    "format": "biome format --write ."
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.15",
+    "concurrently": "10.0.6",
+    "typescript": "~5.9.3"
+  }
+}

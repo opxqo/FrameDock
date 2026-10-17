@@ -1,0 +1,27 @@
+{
+  "name": "@framedock/server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --env-file-if-exists=../../.env src/index.ts",
+    "build": "tsup",
+    "start": "node --env-file-if-exists=../../.env dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate"
+  },
+  "dependencies": {
+    "@framedock/shared": "workspace:*",
+    "better-sqlite3": "13.0.3",
+    "drizzle-orm": "0.45.4",
+    "fastify": "5.12.7",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "9.6.0",
+    "@types/node": "^22.0.0",
+    "drizzle-kit": "0.31.11",
+    "tsup": "9.0.0",
+    "tsx": "4.23.15"
+  }
+}
