@@ -110,7 +110,7 @@ export default function CanvasPage() {
                 {!hydrated ? (
                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 min-[1900px]:grid-cols-5" aria-busy>
                         {Array.from({ length: 4 }, (_, index) => (
-                            <div key={index} className="overflow-hidden rounded-lg border border-border bg-card">
+                            <div key={index} className="overflow-hidden rounded-[20px] border border-border bg-card">
                                 <div className="aspect-[16/10] animate-pulse bg-secondary/60" />
                                 <div className="space-y-2 px-3 py-3">
                                     <div className="h-3.5 w-1/2 animate-pulse rounded bg-secondary" />
@@ -128,7 +128,7 @@ export default function CanvasPage() {
                 ) : projects.length ? (
                     <p className="py-16 text-center text-sm text-muted-foreground">{t("projects.noMatch", { keyword: keyword.trim() })}</p>
                 ) : (
-                    <section className="grid gap-8 rounded-lg border border-border bg-card p-6 sm:p-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] md:items-center">
+                    <section className="grid gap-8 rounded-[20px] border border-border bg-card p-6 sm:p-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] md:items-center">
                         <div>
                             <h2 className="text-lg font-semibold">{t("projects.emptyTitle")}</h2>
                             <ol className="mt-4 space-y-3">

@@ -75,7 +75,7 @@ export function CommandPalette() {
             label={t("palette.title")}
             loop
             overlayClassName="fixed inset-0 z-[1250] bg-black/40"
-            contentClassName="fixed left-1/2 top-[14vh] z-[1251] w-[min(560px,calc(100vw-32px))] -translate-x-1/2 overflow-hidden rounded-xl border border-border bg-popover text-popover-foreground shadow-float"
+            contentClassName="fixed left-1/2 top-[14vh] z-[1251] w-[min(560px,calc(100vw-32px))] -translate-x-1/2 overflow-hidden rounded-[20px] glass text-popover-foreground"
         >
             <div className="flex items-center gap-2 border-b border-border px-3">
                 <Search className="size-4 shrink-0 text-muted-foreground" />
@@ -93,7 +93,7 @@ export function CommandPalette() {
                                     value={`${command.id} ${command.label}`}
                                     keywords={command.keywords}
                                     onSelect={() => run(command)}
-                                    className="flex h-9 cursor-pointer items-center gap-2.5 rounded-md px-2 text-sm data-[selected=true]:bg-accent"
+                                    className="flex h-10 cursor-pointer items-center gap-2.5 rounded-xl px-2.5 text-sm data-[selected=true]:bg-accent"
                                 >
                                     {command.icon}
                                     <span className="min-w-0 flex-1 truncate">{command.label}</span>

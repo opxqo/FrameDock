@@ -43,8 +43,8 @@ export function CanvasProjectCard({ project }: { project: CanvasProject }) {
     return (
         <article
             className={cn(
-                "group relative flex cursor-pointer flex-col overflow-hidden rounded-lg border bg-card transition-[border-color,box-shadow] duration-150",
-                selected ? "border-signal ring-1 ring-signal" : "border-border hover:border-foreground/20",
+                "group relative flex cursor-pointer flex-col overflow-hidden rounded-2xl border bg-card transition-[border-color,box-shadow] duration-150",
+                selected ? "border-foreground/50 ring-2 ring-foreground/10" : "border-border hover:border-foreground/20",
             )}
             onClick={activate}
         >

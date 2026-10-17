@@ -366,7 +366,7 @@ export default function ImagePage() {
     return (
         <div className="flex h-full flex-col overflow-hidden bg-background text-foreground">
             <main className="grid min-h-0 flex-1 grid-cols-1 gap-3 overflow-y-auto p-3 lg:grid-cols-[300px_minmax(0,1fr)] lg:overflow-hidden xl:grid-cols-[320px_minmax(0,1fr)]">
-                <aside className="thin-scrollbar hidden min-h-0 overflow-y-auto rounded-lg border border-border bg-card p-4 lg:block">
+                <aside className="thin-scrollbar hidden min-h-0 overflow-y-auto rounded-[20px] border border-border bg-card p-4 lg:block">
                     <LogPanel
                         logs={logs}
                         selectedLogIds={selectedLogIds}
@@ -379,7 +379,7 @@ export default function ImagePage() {
                 </aside>
 
                 <section className="grid gap-3 lg:min-h-0 lg:overflow-hidden xl:grid-cols-[420px_minmax(0,1fr)]">
-                    <div className="thin-scrollbar flex flex-col rounded-lg border border-border bg-card p-4 lg:min-h-0 lg:overflow-y-auto">
+                    <div className="thin-scrollbar flex flex-col rounded-[20px] border border-border bg-card p-4 lg:min-h-0 lg:overflow-y-auto">
                         <div>
                             <div className="flex items-start justify-between gap-3">
                                 <div className="min-w-0">
@@ -495,7 +495,7 @@ export default function ImagePage() {
                         </div>
                     </div>
 
-                    <div className="thin-scrollbar rounded-lg border border-border bg-card p-4 lg:min-h-0 lg:overflow-y-auto lg:p-5">
+                    <div className="thin-scrollbar rounded-[20px] border border-border bg-card p-4 lg:min-h-0 lg:overflow-y-auto lg:p-5">
                         <div className="mb-4 flex items-center justify-between gap-3">
                             <div>
                                 <h2 className="text-base font-semibold">{t("workbench.results")}</h2>

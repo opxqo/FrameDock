@@ -41,11 +41,13 @@ export function AppTopNav() {
                                 <Menu />
                             </button>
                             <Link to="/" className="flex h-full shrink-0 items-center gap-2 pr-4 text-sm font-semibold text-foreground">
-                                <span className="size-[18px] shrink-0 bg-signal" style={{ mask: "url(/logo.svg) center / contain no-repeat", WebkitMask: "url(/logo.svg) center / contain no-repeat" }} />
+                                <span className="grid size-8 shrink-0 place-items-center rounded-full bg-signal">
+                                    <span className="size-4 bg-signal-foreground" style={{ mask: "url(/logo.svg) center / contain no-repeat", WebkitMask: "url(/logo.svg) center / contain no-repeat" }} />
+                                </span>
                                 <span>FrameDock</span>
                             </Link>
 
-                            <nav aria-label={t("topNav.navigation")} className="hide-scrollbar hidden h-12 min-w-0 items-stretch gap-1 overflow-x-auto md:flex">
+                            <nav aria-label={t("topNav.navigation")} className="hide-scrollbar hidden h-12 min-w-0 items-center gap-1 overflow-x-auto md:flex">
                                 {navigationTools.map((tool) => {
                                     const Icon = tool.icon;
                                     const active = tool.slug === activeToolSlug;
@@ -55,8 +57,9 @@ export function AppTopNav() {
                                             to={tool.slug === "canvas" ? "/" : `/${tool.slug}`}
                                             aria-current={active ? "page" : undefined}
                                             className={cn(
-                                                "relative flex shrink-0 items-center gap-1.5 px-2.5 text-sm transition-colors duration-150 after:absolute after:inset-x-2.5 after:bottom-0 after:h-0.5 after:rounded-full",
-                                                active ? "font-medium text-foreground after:bg-signal" : "text-muted-foreground after:bg-transparent hover:text-foreground",
+                                                "flex h-8 shrink-0 items-center gap-1.5 rounded-full px-3 text-sm transition-colors duration-150",
+                                                // antd's global link style sets a transparent background, hence the important modifiers.
+                                                active ? "!bg-accent font-medium !text-foreground" : "!text-muted-foreground hover:!bg-accent/60 hover:!text-foreground",
                                             )}
                                         >
                                             <Icon className="size-4" />

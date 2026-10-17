@@ -98,6 +98,11 @@ export function getAntThemeConfig(dark: boolean): ThemeConfig {
         },
         components: {
             Button: {
+                // Keep the primary fill exactly the accent (the dark algorithm would otherwise dim white to grey).
+                colorPrimary: color.signal,
+                colorPrimaryHover: color.signalHover,
+                colorPrimaryActive: color.signalHover,
+                primaryColor: color.onSignal,
                 primaryShadow: "none",
                 defaultShadow: "none",
                 dangerShadow: "none",

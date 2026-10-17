@@ -231,6 +231,30 @@
     .tnum {
         font-variant-numeric: tabular-nums;
     }
+    /* antd overlays (menus, popovers, select lists) share the glass material. */
+    .ant-dropdown .ant-dropdown-menu,
+    .ant-popover .ant-popover-inner,
+    .ant-select-dropdown,
+    .ant-picker-dropdown .ant-picker-panel-container {
+        background: var(--glass) !important;
+        border: 1px solid var(--glass-border);
+        backdrop-filter: blur(20px) saturate(150%);
+        -webkit-backdrop-filter: blur(20px) saturate(150%);
+    }
+    .ant-dropdown .ant-dropdown-menu {
+        border-radius: 16px !important;
+        padding: 6px !important;
+    }
+    .ant-dropdown .ant-dropdown-menu .ant-dropdown-menu-item {
+        border-radius: 10px !important;
+    }
+    .ant-popover .ant-popover-inner {
+        border-radius: 16px !important;
+    }
+    .ant-popover .ant-popover-arrow {
+        display: none;
+    }
+
     /* Floating chrome (capsules, menus, in-place panels): translucent and blurred over the canvas. */
     .glass {
         background: var(--glass);
