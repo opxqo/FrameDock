@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { create } from "zustand";
-import { AUTODL_BASE_URL, AUTODL_CHANNEL_IDS, AUTODL_GEMINI_BASE_URL, AUTODL_MODELS } from "@/lib/autodl-catalog";
+import { allAutodlModels, AUTODL_BASE_URL, AUTODL_CHANNEL_IDS, AUTODL_CURATED_NAMES, AUTODL_GEMINI_BASE_URL, type AutodlSyncedModel } from "@/lib/autodl-catalog";
 import { persist } from "zustand/middleware";
 import { nanoid } from "nanoid";
 
@@ -57,6 +57,11 @@ export type AiConfig = {
     proxyUrl: string;
     nodeRegenerateBehavior: "new-node" | "overwrite";
     autoFocusOnSelect: boolean;
+    /** FrameDock: AutoDL models shown in model pickers (curated + synced). */
+    autodlEnabledModels: string[];
+    /** FrameDock: models listed by the AutoDL account at the last sync. */
+    autodlSyncedModels: AutodlSyncedModel[];
+    autodlSyncedAt: string;
 };
 
 export type WebdavSyncConfig = {
@@ -99,25 +104,31 @@ const mockChannel: ModelChannel | undefined = import.meta.env.DEV ? {
     ],
 } : undefined;
 
-// FrameDock: AutoDL.Art channels are generated from lib/autodl-catalog.ts; users only fill in the API key.
-const autodlChannels: ModelChannel[] = [
-    {
-        id: "autodl",
-        name: "AutoDL",
-        baseUrl: AUTODL_BASE_URL,
-        apiKey: "",
-        apiFormat: "openai",
-        models: AUTODL_MODELS.filter((model) => model.family !== "gemini-image").map((model) => ({ name: model.name, capability: model.capability })),
-    },
-    {
-        id: "autodl-gemini",
-        name: "AutoDL Gemini",
-        baseUrl: AUTODL_GEMINI_BASE_URL,
-        apiKey: "",
-        apiFormat: "gemini",
-        models: AUTODL_MODELS.filter((model) => model.family === "gemini-image").map((model) => ({ name: model.name, capability: model.capability })),
-    },
-];
+// FrameDock: AutoDL.Art channels are generated from lib/autodl-catalog.ts plus the synced model list;
+// users only fill in the API key and pick which models are enabled.
+export function buildAutodlChannels(apiKey: string, enabled: string[], synced: AutodlSyncedModel[]): ModelChannel[] {
+    const enabledNames = new Set(enabled.map((name) => name.toLowerCase()));
+    const models = allAutodlModels(synced).filter((model) => enabledNames.has(model.name.toLowerCase()));
+    const pick = (gemini: boolean) => models.filter((model) => (model.family === "gemini-image") === gemini).map((model) => ({ name: model.name, capability: model.capability }));
+    return [
+        { id: "autodl", name: "AutoDL", baseUrl: AUTODL_BASE_URL, apiKey, apiFormat: "openai", models: pick(false) },
+        { id: "autodl-gemini", name: "AutoDL Gemini", baseUrl: AUTODL_GEMINI_BASE_URL, apiKey, apiFormat: "gemini", models: pick(true) },
+    ];
+}
+
+const autodlChannels = buildAutodlChannels("", AUTODL_CURATED_NAMES, []);
+
+/** Replaces the AutoDL channels after a key, enable or sync change; other channels are kept in place. */
+export function withAutodlConfig(config: AiConfig, patch: { apiKey?: string; enabled?: string[]; synced?: AutodlSyncedModel[]; syncedAt?: string }): AiConfig {
+    const apiKey = patch.apiKey ?? config.channels.find((channel) => isAutodlChannel(channel.id))?.apiKey ?? "";
+    const enabled = patch.enabled ?? config.autodlEnabledModels;
+    const synced = patch.synced ?? config.autodlSyncedModels;
+    const fresh = buildAutodlChannels(apiKey, enabled, synced);
+    const channels = config.channels.filter((channel) => !isAutodlChannel(channel.id));
+    const insertAt = Math.max(0, config.channels.findIndex((channel) => isAutodlChannel(channel.id)));
+    channels.splice(Math.min(insertAt, channels.length), 0, ...fresh);
+    return { ...config, channels, autodlEnabledModels: enabled, autodlSyncedModels: synced, autodlSyncedAt: patch.syncedAt ?? config.autodlSyncedAt };
+}
 
 export function isAutodlChannel(channelId: string) {
     return (AUTODL_CHANNEL_IDS as readonly string[]).includes(channelId);
@@ -171,6 +182,9 @@ export const defaultConfig: AiConfig = {
     proxyUrl: FRAMEDOCK_PROXY_URL,
     nodeRegenerateBehavior: "new-node",
     autoFocusOnSelect: false,
+    autodlEnabledModels: AUTODL_CURATED_NAMES,
+    autodlSyncedModels: [],
+    autodlSyncedAt: "",
 };
 
 export const defaultWebdavSyncConfig: WebdavSyncConfig = {
@@ -304,9 +318,12 @@ export const useConfigStore = create<ConfigStore>()(
                 if (mockChannel && !channels.some((channel) => channel.id === "mock")) channels.unshift(mockChannel);
                 // Config is shared by every browser (server storage), so origin-bound addresses follow the current page.
                 if (mockChannel) channels.forEach((channel, index) => { if (channel.id === "mock") channels[index] = { ...channel, baseUrl: mockChannel.baseUrl }; });
-                // AutoDL channels are fixed: endpoints, format and models always follow the catalog; one key is shared by both.
+                // AutoDL channels are fixed: endpoints, format and models always follow the catalog and the
+                // enabled list; one key is shared by both.
                 const autodlKey = channels.find((channel) => isAutodlChannel(channel.id) && channel.apiKey)?.apiKey || "";
-                autodlChannels.forEach((preset) => {
+                const autodlSyncedModels = Array.isArray(config.autodlSyncedModels) ? config.autodlSyncedModels.filter((model) => model?.name && ["text", "image", "video"].includes(model.capability)) : [];
+                const autodlEnabledModels = Array.isArray(config.autodlEnabledModels) ? config.autodlEnabledModels.filter((name) => typeof name === "string") : AUTODL_CURATED_NAMES;
+                buildAutodlChannels("", autodlEnabledModels, autodlSyncedModels).forEach((preset) => {
                     const index = channels.findIndex((channel) => channel.id === preset.id);
                     const fixed = { ...preset, apiKey: autodlKey };
                     if (index < 0) channels.push(fixed);
@@ -342,6 +359,9 @@ export const useConfigStore = create<ConfigStore>()(
                         proxyUrl: isBuiltinProxyUrl(config.proxyUrl) ? FRAMEDOCK_PROXY_URL : config.proxyUrl,
                         nodeRegenerateBehavior: config.nodeRegenerateBehavior === "overwrite" ? "overwrite" : "new-node",
                         autoFocusOnSelect: Boolean(config.autoFocusOnSelect),
+                        autodlEnabledModels,
+                        autodlSyncedModels,
+                        autodlSyncedAt: config.autodlSyncedAt || "",
                     },
                 };
             },

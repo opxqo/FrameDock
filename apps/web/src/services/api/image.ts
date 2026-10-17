@@ -503,6 +503,66 @@ async function requestStreamingResponse(config: AiConfig, body: Record<string, u
     return { ...result, content: state.text || result.content };
 }
 
+// FrameDock: AutoDL relays chat models through the OpenAI-compatible /chat/completions, not /responses.
+function usesChatCompletions(config: AiConfig) {
+    return /autodl\.art/i.test(config.baseUrl);
+}
+
+type ChatStreamState = { buffer: string; text: string; error?: string };
+type ChatCompletionChunk = { choices?: Array<{ delta?: { content?: string | null }; message?: { content?: string | null } }>; error?: { message?: string }; code?: number; msg?: string };
+
+function consumeChatStreamText(state: ChatStreamState, text: string, onDelta?: (text: string) => void, flush = false) {
+    state.buffer += text;
+    const lines = state.buffer.split(/\r?\n/);
+    state.buffer = flush ? "" : lines.pop() || "";
+    for (const line of lines) {
+        const data = line.startsWith("data:") ? line.slice(5).trim() : "";
+        if (!data || data === "[DONE]") continue;
+        const chunk = JSON.parse(data) as ChatCompletionChunk;
+        const errorMessage = responseErrorMessage(chunk);
+        if (errorMessage) state.error = errorMessage;
+        const delta = chunk.choices?.[0]?.delta?.content ?? chunk.choices?.[0]?.message?.content;
+        if (delta) {
+            state.text += delta;
+            onDelta?.(state.text);
+        }
+    }
+}
+
+async function requestStreamingChatCompletion(config: AiConfig, messages: ResponseInputMessage[], onDelta?: (text: string) => void, options?: RequestOptions) {
+    // AiTextMessage content already uses the chat format ({ type: "text" } / { type: "image_url" }).
+    const chatMessages = messages.filter((message): message is AiTextMessage => !("type" in message) && message.role !== "tool");
+    const response = await fetch(aiApiUrl(config, "/chat/completions"), {
+        method: "POST",
+        headers: { ...aiHeaders(config, "application/json"), Accept: "text/event-stream" },
+        body: JSON.stringify({
+            model: config.model,
+            messages: chatMessages,
+            stream: true,
+            ...(config.reasoningEffort === "auto" ? {} : { reasoning_effort: config.reasoningEffort }),
+        }),
+        signal: options?.signal,
+    });
+    if (!response.ok) throw new Error(await readFetchError(response, apiText("requestFailed")));
+    if (!response.body) {
+        const payload = (await response.json()) as ChatCompletionChunk;
+        validateResponsePayload(payload);
+        return payload.choices?.[0]?.message?.content || "";
+    }
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    const state: ChatStreamState = { buffer: "", text: "" };
+    for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        consumeChatStreamText(state, decoder.decode(value, { stream: true }), onDelta);
+        if (state.error) throw new Error(state.error);
+    }
+    consumeChatStreamText(state, decoder.decode(), onDelta, true);
+    if (state.error) throw new Error(state.error);
+    return state.text;
+}
+
 function toGeminiBody(config: AiConfig, messages: ResponseInputMessage[], extra?: Record<string, unknown>) {
     const systemText = [
         config.systemPrompt.trim(),
@@ -844,6 +904,11 @@ export async function requestImageQuestion(config: AiConfig, messages: AiTextMes
     try {
         if (requestConfig.apiFormat === "gemini") {
             const answer = (await requestGeminiStreamingResponse(requestConfig, toGeminiBody(requestConfig, messages), onDelta, options)).content || apiText("noContent");
+            if (answer === apiText("noContent")) onDelta(answer);
+            return answer;
+        }
+        if (usesChatCompletions(requestConfig)) {
+            const answer = (await requestStreamingChatCompletion(requestConfig, withSystemMessage(requestConfig, messages), onDelta, options)) || apiText("noContent");
             if (answer === apiText("noContent")) onDelta(answer);
             return answer;
         }

@@ -4,7 +4,7 @@ import { findAutodlModel } from "@/lib/autodl-catalog";
 import { useTranslation } from "react-i18next";
 
 import i18n from "@/i18n";
-import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { modelOptionLabel, modelOptionName, selectableModelsByCapability, type AiConfig, type ModelCapability } from "@/stores/use-config-store";
 
@@ -70,7 +70,19 @@ export function ModelPicker({ config, value, onChange, capability, className, fu
                 onPointerDown={(event) => event.stopPropagation()}
                 onMouseDown={(event) => event.stopPropagation()}
             >
-                {options.length ? (
+                {options.length > GROUP_THRESHOLD ? (
+                    // FrameDock: long lists (e.g. all AutoDL models) are grouped by vendor.
+                    groupByVendor(options).map(([vendor, models]) => (
+                        <SelectGroup key={vendor}>
+                            <SelectLabel>{vendor}</SelectLabel>
+                            {models.map((model) => (
+                                <SelectItem key={model} value={model} textValue={modelOptionLabel(config, model)}>
+                                    <ModelLabel config={config} model={model} />
+                                </SelectItem>
+                            ))}
+                        </SelectGroup>
+                    ))
+                ) : options.length ? (
                     options.map((model) => (
                         <SelectItem key={model} value={model} textValue={modelOptionLabel(config, model)}>
                             <ModelLabel config={config} model={model} />
@@ -102,7 +114,18 @@ function ModelLabel({ config, model }: { config: AiConfig; model: string }) {
     );
 }
 
-function ModelIcon({ model }: { model: string }) {
+const GROUP_THRESHOLD = 12;
+
+function groupByVendor(models: string[]) {
+    const groups = new Map<string, string[]>();
+    models.forEach((model) => {
+        const vendor = resolveModelVendor(modelOptionName(model));
+        groups.set(vendor, [...(groups.get(vendor) || []), model]);
+    });
+    return Array.from(groups.entries());
+}
+
+export function ModelIcon({ model }: { model: string }) {
     const icon = resolveModelIcon(modelOptionName(model));
     if (!icon) return <Cpu className="size-4 shrink-0 opacity-70" />;
     // Only monochrome logos are inverted in dark mode; brand-colored ones keep their colors.
@@ -111,29 +134,35 @@ function ModelIcon({ model }: { model: string }) {
 
 // FrameDock: logos from LobeHub Icons (@lobehub/icons-static-svg, MIT), see THIRD_PARTY_NOTICES.md.
 // Order matters: more specific names (hailuo, sora, gpt-image) come before their vendors.
-const MODEL_ICON_RULES: Array<[RegExp, string]> = [
-    [/claude|anthropic/, "claude-color"],
-    [/gemini|nano-banana|imagen|veo/, "gemini-color"],
-    [/sora/, "sora-color"],
-    [/gpt|openai|dall-e|o\d-/, "openai"],
-    [/grok/, "grok"],
-    [/deepseek/, "deepseek-color"],
-    [/glm|zhipu|cogview|cogvideo/, "zhipu-color"],
-    [/hailuo/, "hailuo-color"],
-    [/minimax|abab/, "minimax-color"],
-    [/qwen|z-image|tongyi/, "qwen-color"],
-    [/^wan|wanx|wan\d/, "alibabacloud-color"],
-    [/kling|kolors/, "kling-color"],
-    [/seedance|seedream|doubao|jimeng/, "doubao-color"],
-    [/vidu/, "vidu-color"],
-    [/hunyuan|^hy\d/, "hunyuan-color"],
-    [/kimi|moonshot/, "kimi-color"],
-    [/midjourney|^mj/, "midjourney"],
-    [/flux/, "flux"],
-    [/stable|sdxl|^sd\d|stability/, "stability-color"],
+const MODEL_ICON_RULES: Array<[RegExp, string, string]> = [
+    [/claude|anthropic/, "claude-color", "Anthropic"],
+    [/gemini|nano-banana|imagen|veo/, "gemini-color", "Google"],
+    [/sora/, "sora-color", "OpenAI"],
+    [/gpt|openai|dall-e|o\d-/, "openai", "OpenAI"],
+    [/grok/, "grok", "xAI"],
+    [/deepseek/, "deepseek-color", "DeepSeek"],
+    [/glm|zhipu|cogview|cogvideo/, "zhipu-color", "智谱"],
+    [/hailuo/, "hailuo-color", "MiniMax"],
+    [/minimax|abab/, "minimax-color", "MiniMax"],
+    [/qwen|z-image|tongyi|qwq/, "qwen-color", "通义"],
+    [/^wan|wanx|wan\d/, "alibabacloud-color", "通义万相"],
+    [/kling|kolors/, "kling-color", "可灵"],
+    [/seedance|seedream|doubao|jimeng/, "doubao-color", "字节跳动"],
+    [/vidu/, "vidu-color", "Vidu"],
+    [/hunyuan|^hy\d/, "hunyuan-color", "腾讯混元"],
+    [/kimi|moonshot/, "kimi-color", "月之暗面"],
+    [/midjourney|^mj/, "midjourney", "Midjourney"],
+    [/flux/, "flux", "Black Forest Labs"],
+    [/stable|sdxl|^sd\d|stability/, "stability-color", "Stability"],
 ];
 
 function resolveModelIcon(model: string) {
     const name = model.toLowerCase();
     return MODEL_ICON_RULES.find(([pattern]) => pattern.test(name))?.[1] || "";
+}
+
+/** Vendor label used to group long model lists; unknown names fall into "其他". */
+export function resolveModelVendor(model: string) {
+    const name = model.toLowerCase();
+    return MODEL_ICON_RULES.find(([pattern]) => pattern.test(name))?.[2] || "其他";
 }

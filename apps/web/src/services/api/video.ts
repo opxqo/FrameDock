@@ -8,7 +8,7 @@ import { getMediaBlob, resolveMediaUrl, uploadMediaFile, type UploadedFile } fro
 import { imageToDataUrl } from "@/services/image-storage";
 import { boolConfig, buildApiUrl, modelOptionName, resolveModelRequestConfig, resolveModelScript, withLocalProxy, type AiConfig } from "@/stores/use-config-store";
 import { runModelPlugin } from "./model-plugin";
-import { findAutodlModel, nearestOption } from "@/lib/autodl-catalog";
+import { findAutodlModel, guessAutodlFamily, nearestOption } from "@/lib/autodl-catalog";
 import type { ReferenceImage } from "@/types/image";
 import type { ReferenceAudio, ReferenceVideo } from "@/types/media";
 
@@ -86,7 +86,7 @@ export async function createVideoGenerationTask(config: AiConfig, prompt: string
     if (script) return createPluginVideoTask(requestConfig, selectedModel, script, prompt, references, options);
     assertVideoConfig(requestConfig, requestConfig.model);
     if (requestConfig.apiFormat === "gemini") return createGeminiVideoTask(requestConfig, selectedModel, prompt, references, options);
-    const autodlProvider = autodlVideoProvider(requestConfig.model);
+    const autodlProvider = autodlVideoProvider(requestConfig.model, requestConfig.baseUrl);
     if (autodlProvider === "minimax") return createMiniMaxVideoTask(requestConfig, selectedModel, prompt, references, options);
     if (autodlProvider === "kling") return createKlingVideoTask(requestConfig, selectedModel, prompt, references, options);
     if (autodlProvider === "ark") return createArkVideoTask(requestConfig, selectedModel, prompt, references, options);
@@ -116,10 +116,12 @@ function isAutodlVideoProvider(provider: VideoGenerationTask["provider"]): provi
 }
 
 /** Native adapters for AutoDL video families; MiniMax Hailuo names also work on the official MiniMax API. */
-function autodlVideoProvider(model: string): AutodlVideoProvider | undefined {
-    const family = findAutodlModel(modelOptionName(model))?.family;
+function autodlVideoProvider(model: string, baseUrl = ""): AutodlVideoProvider | undefined {
+    const name = modelOptionName(model);
+    // Models synced from the AutoDL account are not in the catalog; their family is guessed from the name.
+    const family = findAutodlModel(name)?.family || (/autodl\.art/i.test(baseUrl) ? guessAutodlFamily(name, "video") : undefined);
     if (family === "minimax" || family === "kling" || family === "ark" || family === "wan") return family;
-    return /^minimax-hailuo/i.test(modelOptionName(model)) ? "minimax" : undefined;
+    return /^minimax-hailuo/i.test(name) ? "minimax" : undefined;
 }
 
 /** Duration snapped to what the catalog allows for this model. */

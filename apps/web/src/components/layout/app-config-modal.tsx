@@ -189,7 +189,7 @@ export function AppConfigPanel({ showDoneButton = false, initialTab = "channels"
                         label: t("config.tabs.channels"),
                         children: (
                             <div>
-                                <ConfigAutodl channels={config.channels} onChannelsChange={updateChannels} />
+                                <ConfigAutodl config={config} onConfigChange={(next) => saveConfig(withChannels(next, next.channels))} />
                                 <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                                     <div className="text-xs text-stone-500">{t("config.channels.description")}</div>
                                     <Button type="primary" icon={<Plus className="size-4" />} onClick={addChannel}>
