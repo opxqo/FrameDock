@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
 import { Segmented, Switch, Tooltip } from "antd";
-import { CircleDot, Eraser, Grid2x2, Group, Hand, Image as ImageIcon, Info, LocateFixed, Moon, MousePointer2, Music2, Palette, Puzzle, Settings2, Square, Sun, Trash2, Type, Upload, Video, SquareTerminal } from "lucide-react";
+import { CircleDot, Eraser, Grid2x2, Group, Hand, Image as ImageIcon, Info, LocateFixed, Moon, MousePointer2, Music2, Palette, Puzzle, Settings2, Square, Sun, Trash2, Type, Upload, Video } from "lucide-react";
+import { CodexLogo } from "@/components/codex-logo";
 
 import { type CanvasBackgroundMode } from "@/lib/canvas-theme";
 import { getNodePluginId, listNodeDefinitions, useNodeRegistryVersion } from "@/lib/canvas/node-registry";
@@ -102,7 +103,7 @@ export function CanvasToolbar({
                     <Settings2 />
                 </RailButton>
                 <RailButton label={t("canvas.toolbar.codex")} onClick={onAddCodex}>
-                    <SquareTerminal />
+                    <CodexLogo className="size-4" />
                 </RailButton>
                 <RailButton label={t("canvas.toolbar.group")} shortcut="⌘G" onClick={onAddGroup}>
                     <Group />

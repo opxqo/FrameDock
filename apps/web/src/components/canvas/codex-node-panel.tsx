@@ -5,7 +5,8 @@ import { useTranslation } from "react-i18next";
 
 import { canvasThemes } from "@/lib/canvas-theme";
 import type { CanvasResourceReference } from "@/lib/canvas/canvas-resource-references";
-import { fetchCodexStatus, type CodexStatus } from "@/services/api/codex";
+import { fetchCodexModels, fetchCodexStatus, type CodexModel, type CodexStatus } from "@/services/api/codex";
+import { CodexLogo } from "@/components/codex-logo";
 import { useThemeStore } from "@/stores/use-theme-store";
 import type { CanvasNodeData } from "@/types/canvas";
 import { CanvasNodeReferenceBar } from "./canvas-node-reference-bar";
@@ -35,6 +36,9 @@ export function CodexNodePanel({ node, nodes, connectedNodes = [], mentionRefere
     const [prompt, setPrompt] = useState(node.metadata?.prompt ?? "");
     const [expanded, setExpanded] = useState(false);
     const [status, setStatus] = useState<CodexStatus | null>(null);
+    const [models, setModels] = useState<CodexModel[]>([]);
+    const model = models.find((item) => item.slug === node.metadata?.codexModel);
+    const effortOptions = (model?.efforts.length ? model.efforts : ["low", "medium", "high"]).map((value) => ({ value, label: effortLabel(t, value) }));
 
     useEffect(() => {
         setPrompt(node.metadata?.prompt ?? "");
@@ -42,6 +46,7 @@ export function CodexNodePanel({ node, nodes, connectedNodes = [], mentionRefere
     }, [node.id]);
     useEffect(() => {
         void fetchCodexStatus().then(setStatus);
+        void fetchCodexModels().then(setModels);
     }, []);
 
     const updatePrompt = (value: string) => {
@@ -102,19 +107,26 @@ export function CodexNodePanel({ node, nodes, connectedNodes = [], mentionRefere
                             { value: "image", label: t("canvas.codexNode.modeImage") },
                         ]}
                     />
-                    <Tooltip title={t("canvas.codexNode.effort")}>
+                    <Tooltip title={t("canvas.codexNode.model")}>
                         <Select
                             size="middle"
-                            className="w-[84px]"
-                            value={effort}
+                            className="w-[150px]"
+                            value={node.metadata?.codexModel || ""}
                             disabled={isRunning}
-                            onChange={(value) => onConfigChange(node.id, { codexEffort: value })}
+                            popupMatchSelectWidth={false}
+                            onChange={(value) => {
+                                // Keep the reasoning level when the new model supports it, otherwise use its default.
+                                const next = models.find((item) => item.slug === value);
+                                onConfigChange(node.id, { codexModel: value || undefined, ...(next && !next.efforts.includes(effort) ? { codexEffort: next.defaultEffort } : {}) });
+                            }}
                             options={[
-                                { value: "low", label: t("canvas.codexNode.effortLow") },
-                                { value: "medium", label: t("canvas.codexNode.effortMedium") },
-                                { value: "high", label: t("canvas.codexNode.effortHigh") },
+                                { value: "", label: <span className="inline-flex items-center gap-1.5"><CodexLogo className="size-3.5" />{t("canvas.codexNode.defaultModel")}</span> },
+                                ...models.map((item) => ({ value: item.slug, label: <span className="inline-flex items-center gap-1.5"><CodexLogo className="size-3.5" />{item.name}</span> })),
                             ]}
                         />
+                    </Tooltip>
+                    <Tooltip title={t("canvas.codexNode.effort")}>
+                        <Select size="middle" className="w-[84px]" value={effort} disabled={isRunning} popupMatchSelectWidth={false} onChange={(value) => onConfigChange(node.id, { codexEffort: value })} options={effortOptions} />
                     </Tooltip>
                 </div>
                 <Button
@@ -152,4 +164,9 @@ export function CodexNodePanel({ node, nodes, connectedNodes = [], mentionRefere
             </Modal>
         </div>
     );
+}
+
+function effortLabel(t: (key: string) => string, value: string) {
+    const key = { low: "effortLow", medium: "effortMedium", high: "effortHigh", xhigh: "effortXhigh", max: "effortMax", ultra: "effortUltra" }[value];
+    return key ? t(`canvas.codexNode.${key}`) : value;
 }

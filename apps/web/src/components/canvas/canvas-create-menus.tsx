@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
-import { ImageIcon, List, Music2, Settings2, Video, X, SquareTerminal } from "lucide-react";
+import { ImageIcon, List, Music2, Settings2, Video, X } from "lucide-react";
+import { CodexLogo } from "@/components/codex-logo";
 import { useTranslation } from "react-i18next";
 
 import { canvasThemes } from "@/lib/canvas-theme";
@@ -48,7 +49,7 @@ export function ConnectionCreateMenu({
                 <ConnectionCreateOption theme={theme} icon={<Video className="size-4" />} title={t("canvas.createMenu.video")} onClick={() => onCreate(CanvasNodeType.Video)} />
                 <ConnectionCreateOption theme={theme} icon={<Music2 className="size-4" />} title={t("canvas.createMenu.audio")} onClick={() => onCreate(CanvasNodeType.Audio)} />
                 <ConnectionCreateOption theme={theme} icon={<Settings2 className="size-4" />} title={t("canvas.createMenu.config")} description={t("canvas.createMenu.configDescription")} onClick={() => onCreate(CanvasNodeType.Config)} />
-                <ConnectionCreateOption theme={theme} icon={<SquareTerminal className="size-4" />} title="Codex" description={t("canvas.codexNode.emptyText")} onClick={() => onCreate(CanvasNodeType.Codex)} />
+                <ConnectionCreateOption theme={theme} icon={<CodexLogo className="size-4" />} title="Codex" description={t("canvas.codexNode.emptyText")} onClick={() => onCreate(CanvasNodeType.Codex)} />
             </div>
         </div>
     );

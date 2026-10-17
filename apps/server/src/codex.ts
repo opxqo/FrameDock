@@ -19,8 +19,65 @@ type RunBody = {
   mode?: "text" | "image";
   prompt?: string;
   images?: string[];
-  effort?: "low" | "medium" | "high";
+  effort?: string;
+  model?: string;
 };
+
+type CodexModel = {
+  slug: string;
+  name: string;
+  defaultEffort: string;
+  efforts: string[];
+};
+type CatalogEntry = {
+  slug?: string;
+  display_name?: string;
+  visibility?: string;
+  default_reasoning_level?: string;
+  supported_reasoning_levels?: Array<{ effort?: string }>;
+};
+
+let modelCache: { at: number; models: CodexModel[] } | null = null;
+
+/** Models offered to this Codex login (`codex debug models`, visible ones only), cached for 10 minutes. */
+function listModels(): Promise<CodexModel[]> {
+  if (modelCache && Date.now() - modelCache.at < 10 * 60 * 1000)
+    return Promise.resolve(modelCache.models);
+  return new Promise((resolve) => {
+    execFile(
+      CODEX_BIN,
+      ["debug", "models"],
+      { timeout: 20_000, maxBuffer: 32 * 1024 * 1024 },
+      (error, stdout) => {
+        if (error) return resolve([]);
+        try {
+          const catalog = JSON.parse(stdout) as { models?: CatalogEntry[] };
+          const models = (catalog.models || [])
+            .filter((entry) => entry.slug && entry.visibility === "list")
+            .map((entry) => ({
+              slug: entry.slug as string,
+              name: entry.display_name || (entry.slug as string),
+              defaultEffort: entry.default_reasoning_level || "medium",
+              efforts: (entry.supported_reasoning_levels || []).flatMap(
+                (level) => (level.effort ? [level.effort] : []),
+              ),
+            }));
+          modelCache = { at: Date.now(), models };
+          resolve(models);
+        } catch {
+          resolve([]);
+        }
+      },
+    );
+  });
+}
+
+/** Codex sometimes appends ChatGPT UI hints such as "[创建图像](chatgpt-system-hint://picture_v2)". */
+function cleanText(text: string) {
+  return text
+    .replace(/\[[^\]]*\]\(chatgpt-system-hint:\/\/[^)]*\)/g, "")
+    .trim();
+}
 
 type CodexEvent = {
   type?: string;
@@ -80,6 +137,8 @@ function activityFor(event: CodexEvent): string | undefined {
 }
 
 const codexApi: FastifyPluginAsync = async (app) => {
+  app.get("/models", async () => ({ models: await listModels() }));
+
   app.get("/status", async () => {
     const version = await run(CODEX_BIN, ["--version"]);
     if (!version.ok) return { available: false, loggedIn: false, version: "" };
@@ -101,7 +160,18 @@ const codexApi: FastifyPluginAsync = async (app) => {
         prompt = "",
         images = [],
         effort = "low",
+        model = "",
       } = request.body || {};
+      // Only accept a model and effort that this Codex login actually offers.
+      const models = await listModels();
+      const selected = models.find((item) => item.slug === model);
+      const safeEffort = selected
+        ? selected.efforts.includes(effort)
+          ? effort
+          : selected.defaultEffort
+        : ["low", "medium", "high"].includes(effort)
+          ? effort
+          : "low";
       if (!prompt.trim() && !images.length)
         return reply.code(400).send({ error: "提示词不能为空" });
 
@@ -127,7 +197,8 @@ const codexApi: FastifyPluginAsync = async (app) => {
         "-C",
         runDir,
         "-c",
-        `model_reasoning_effort=${["low", "medium", "high"].includes(effort) ? effort : "low"}`,
+        `model_reasoning_effort=${safeEffort}`,
+        ...(selected ? ["-m", selected.slug] : []),
         ...(mode === "image" ? ["--enable", "image_generation"] : []),
         ...imageFiles.flatMap((file) => ["-i", file]),
         "--",
@@ -224,7 +295,7 @@ const codexApi: FastifyPluginAsync = async (app) => {
           if (code !== 0 && !failure)
             failure = stderr.trim().split("\n").pop() || `Codex 退出码 ${code}`;
           if (failure) send({ type: "error", message: failure });
-          else send({ type: "done", text: finalText });
+          else send({ type: "done", text: cleanText(finalText) });
         } finally {
           res.end();
           await rm(runDir, { recursive: true, force: true });

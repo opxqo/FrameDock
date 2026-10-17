@@ -88,8 +88,11 @@ export type CanvasNodeMetadata = {
     groupId?: string;
     // FrameDock Codex node.
     codexMode?: "text" | "image";
-    codexEffort?: "low" | "medium" | "high";
+    codexEffort?: string;
     codexActivity?: string;
+    codexModel?: string;
+    /** Set on image nodes produced by a Codex node, so re-runs write back into the same image node. */
+    codexSourceId?: string;
     interactive?: boolean; // Plugin node interaction/move state; see CanvasNodeDefinition.interactionToggle.
 };
 

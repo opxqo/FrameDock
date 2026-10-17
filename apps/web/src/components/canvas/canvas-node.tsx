@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { ReactNode } from "react";
-import { ChevronRight, Copy, Download, Group, Image as ImageIcon, Music2, Puzzle, RefreshCw, SquareTerminal, Star, Trash2, Video } from "lucide-react";
+import { ChevronRight, Copy, Download, Group, Image as ImageIcon, Music2, Puzzle, RefreshCw, Star, Trash2, Video } from "lucide-react";
+import { CodexLogo } from "@/components/codex-logo";
 
 import { canvasThemes } from "@/lib/canvas-theme";
 import { formatBytes } from "@/lib/image-utils";
@@ -521,13 +522,21 @@ function CodexContent(props: NodeContentRendererProps) {
         );
     }
     if (node.metadata?.status === "error") return <ErrorContent node={node} theme={theme} onRetry={props.onRetry} />;
+    if (imageMode && node.metadata?.status === "success" && !node.metadata.content) {
+        return (
+            <div className="flex h-full w-full flex-col items-center justify-center gap-2 px-4 text-center" style={{ color: theme.node.muted }}>
+                <CodexLogo className="size-7" />
+                <span className="inline-flex items-center gap-1 text-xs"><ImageIcon className="size-3.5" />{t("canvas.codexNode.imageOutput")} →</span>
+            </div>
+        );
+    }
     if (node.metadata?.content) {
         if (imageMode) return <img src={node.metadata.content} alt={node.title} draggable={false} className="h-full w-full rounded-[inherit] object-contain" />;
         return <TextContent {...props} />;
     }
     return (
         <div className="flex h-full w-full flex-col items-center justify-center gap-2 px-4 text-center" style={{ color: theme.node.placeholder }}>
-            <SquareTerminal className="size-7 opacity-50" />
+            <CodexLogo className="size-7 opacity-50" />
             <span className="text-sm">Codex</span>
             <span className="text-[11px] opacity-70">{t(imageMode ? "canvas.codexNode.emptyImage" : "canvas.codexNode.emptyText")}</span>
         </div>

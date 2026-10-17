@@ -2467,13 +2467,39 @@ function InfiniteCanvasPage() {
                 try {
                     const context = await hydrateNodeGenerationContext(buildNodeGenerationContext(nodeId, nodesRef.current, connectionsRef.current, request));
                     const images = context.referenceImages.map((image) => image.dataUrl).filter((url) => url.startsWith("data:"));
-                    const result = await runCodex({ mode: codexMode, prompt: context.prompt, images, effort: sourceNode.metadata?.codexEffort || "low" }, (event) => {
+                    const result = await runCodex({ mode: codexMode, prompt: context.prompt, images, effort: sourceNode.metadata?.codexEffort || "low", model: sourceNode.metadata?.codexModel }, (event) => {
                         if (event.type === "status") patchNode({ codexActivity: event.text });
                     }, controller.signal);
                     if (codexMode === "image") {
                         if (!result.images[0]) throw new Error("Codex 没有生成图片");
                         const uploaded = await uploadImage(result.images[0], { signal: controller.signal });
-                        patchNode({ ...imageMetadata(uploaded), texts: undefined, status: NODE_STATUS_SUCCESS, codexActivity: undefined });
+                        // The image goes into a real image node (created once, then reused), so previews, assets and
+                        // every image tool treat it as an image; downstream nodes connect from that image node.
+                        const source = nodesRef.current.find((node) => node.id === nodeId) || sourceNode;
+                        const outputId = connectionsRef.current
+                            .filter((connection) => connection.fromNodeId === nodeId)
+                            .map((connection) => nodesRef.current.find((node) => node.id === connection.toNodeId))
+                            .filter((node): node is CanvasNodeData => node?.type === CanvasNodeType.Image && node.metadata?.codexSourceId === nodeId)
+                            .at(-1)?.id;
+                        const imageSpec = NODE_DEFAULT_SIZE[CanvasNodeType.Image];
+                        const fitted = fitNodeSize(uploaded.width, uploaded.height, imageSpec.width, imageSpec.height);
+                        const outputMetadata = { ...imageMetadata(uploaded), codexSourceId: nodeId, status: NODE_STATUS_SUCCESS, errorDetails: undefined };
+                        if (outputId) {
+                            setNodes((prev) => prev.map((node) => (node.id === outputId ? { ...node, ...fitted, metadata: { ...node.metadata, ...outputMetadata, images: undefined, primaryImageId: undefined } } : node)));
+                        } else {
+                            const imageId = nanoid();
+                            const imageNode: CanvasNodeData = {
+                                id: imageId,
+                                type: CanvasNodeType.Image,
+                                title: request.slice(0, 32) || "Codex",
+                                position: { x: source.position.x + source.width + 96, y: source.position.y + source.height / 2 - fitted.height / 2 },
+                                ...fitted,
+                                metadata: outputMetadata,
+                            };
+                            setNodes((prev) => [...prev, imageNode]);
+                            setConnections((prev) => [...prev, { id: nanoid(), fromNodeId: nodeId, toNodeId: imageId }]);
+                        }
+                        patchNode({ content: "", storageKey: undefined, texts: undefined, status: NODE_STATUS_SUCCESS, codexActivity: undefined });
                     } else {
                         patchNode({ content: result.text, texts: undefined, storageKey: undefined, status: NODE_STATUS_SUCCESS, codexActivity: undefined });
                     }

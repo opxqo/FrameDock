@@ -2,7 +2,24 @@
 
 export type CodexStatus = { available: boolean; loggedIn: boolean; version: string };
 export type CodexRunEvent = { type: "status"; text: string } | { type: "image"; dataUrl: string } | { type: "done"; text: string } | { type: "error"; message: string };
-export type CodexRunRequest = { mode: "text" | "image"; prompt: string; images: string[]; effort: "low" | "medium" | "high" };
+export type CodexRunRequest = { mode: "text" | "image"; prompt: string; images: string[]; effort: string; model?: string };
+export type CodexModel = { slug: string; name: string; defaultEffort: string; efforts: string[] };
+
+let modelsCache: Promise<CodexModel[]> | null = null;
+
+/** Models offered to the local Codex login (from `codex debug models`). */
+export function fetchCodexModels(): Promise<CodexModel[]> {
+    if (!modelsCache) {
+        modelsCache = fetch("/api/codex/models", { cache: "no-store" })
+            .then((response) => response.json() as Promise<{ models: CodexModel[] }>)
+            .then((payload) => payload.models || [])
+            .catch(() => {
+                modelsCache = null;
+                return [];
+            });
+    }
+    return modelsCache;
+}
 
 let statusCache: Promise<CodexStatus> | null = null;
 
