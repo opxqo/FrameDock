@@ -62,3 +62,7 @@ SOFTWARE.
 ## Solar Icon Set
 
 `apps/web` 的界面图标来自 [Solar Icon Set](https://www.figma.com/community/file/1166831539721848736)（作者 480 Design / R4IN80W），按 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) 许可使用。图标数据来自 npm 包 [`@iconify-json/solar`](https://www.npmjs.com/package/@iconify-json/solar)（[Iconify](https://iconify.design/) 整理），未做修改；构建时由 [`unplugin-icons`](https://github.com/unplugin/unplugin-icons)（MIT License，Copyright (c) 2020 Anthony Fu）编译为 React 组件。统一入口是 `apps/web/src/components/icons.tsx`，其中“抓手”图标是 FrameDock 自绘的。
+
+## MOKE AIGC（在线资料，不随仓库分发）
+
+FrameDock 可以通过服务端只读代理（`apps/server/src/moke.ts`）匿名检索 [MOKE AIGC](https://www.mokeaigc.ai/) 的 Skill。资料只在用户选用时实时读取，并缓存在本机数据目录，仓库里不包含任何 MOKE 的 Skill 正文或代码，也不会执行其中的脚本。每个 Skill 的使用都以其包内许可和作者授权为准，界面上会标注作者和原页链接。内置的提示词配方和内置 Skill 是 FrameDock 自己编写的，参考了公开的摄影与编剧方法，没有复制 MOKE 的内容。
