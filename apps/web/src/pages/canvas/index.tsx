@@ -1,7 +1,7 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { App, Button } from "antd";
-import { Download, FileUp, Plus } from "lucide-react";
+import { App, Button, Input } from "antd";
+import { Download, FileUp, Plus, Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { readZip } from "@/lib/zip";
@@ -9,6 +9,7 @@ import { setMediaBlob } from "@/services/file-storage";
 import { setImageBlob } from "@/services/image-storage";
 import { CanvasDeleteProjectsDialog } from "@/components/canvas/canvas-delete-projects-dialog";
 import { CanvasProjectCard } from "@/components/canvas/canvas-project-card";
+import { SetupBanner } from "@/components/layout/setup-banner";
 import type { CanvasExportFile } from "@/types/canvas-export";
 import { useCanvasStore } from "@/stores/canvas/use-canvas-store";
 import { useCanvasUiStore } from "@/stores/canvas/use-canvas-ui-store";
@@ -28,6 +29,10 @@ export default function CanvasPage() {
     const importProject = useCanvasStore((state) => state.importProject);
     const selectedIds = useCanvasUiStore((state) => state.selectedProjectIds);
     const setDeleteIds = useCanvasUiStore((state) => state.setDeleteProjectIds);
+    const [keyword, setKeyword] = useState("");
+    // Most recently edited first: the list is where work resumes.
+    const sortedProjects = useMemo(() => [...projects].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)), [projects]);
+    const visibleProjects = keyword.trim() ? sortedProjects.filter((project) => project.title.toLowerCase().includes(keyword.trim().toLowerCase())) : sortedProjects;
 
     const mode = searchParams.get("mode");
     const agentMode = mode === "new" || mode === "recent" || mode === "choose";
@@ -72,28 +77,24 @@ export default function CanvasPage() {
     if (hydrated && (mode === "new" || mode === "recent")) return <main className="flex h-full items-center justify-center bg-background text-sm text-stone-500">{t("canvas.opening")}</main>;
 
     return (
-        <main className="h-full overflow-auto bg-background text-stone-950 dark:text-stone-100">
-            <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-10">
-                <header className="flex flex-wrap items-end justify-between gap-4 border-b border-stone-200 pb-6 dark:border-stone-800">
-                    <div>
-                        <p className="text-xs text-stone-500">{t("canvas.library")}</p>
-                        <h1 className="mt-3 text-3xl font-semibold">{t("canvas.title")}</h1>
-                    </div>
-                    <div className="flex items-center gap-2">
+        <main className="h-full overflow-auto bg-background text-foreground">
+            <div className="flex w-full flex-col gap-5 px-4 py-5">
+                <header className="flex flex-wrap items-center gap-3">
+                    <h1 className="text-xl font-semibold">{t("projects.title")}</h1>
+                    {hydrated && projects.length ? <span className="tnum text-sm text-muted-foreground">{t("projects.count", { count: projects.length })}</span> : null}
+                    <div className="ml-auto flex flex-wrap items-center gap-2">
                         {selectedIds.length ? (
                             <>
+                                <span className="tnum text-sm text-muted-foreground">{t("canvas.sidePanel.selected", { count: selectedIds.length })}</span>
                                 <Button disabled={!hydrated} icon={<Download className="size-4" />} onClick={() => void exportCanvasProjects(projects.filter((project) => selectedIds.includes(project.id)), `${t("canvas.title")}-${selectedIds.length}`)}>
                                     {t("canvas.exportSelected")}
                                 </Button>
-                                <Button disabled={!hydrated} onClick={() => setDeleteIds(selectedIds)}>
+                                <Button danger disabled={!hydrated} onClick={() => setDeleteIds(selectedIds)}>
                                     {t("canvas.deleteSelected")}
                                 </Button>
                             </>
-                        ) : null}
-                        {projects.length ? (
-                            <Button disabled={!hydrated} onClick={() => setDeleteIds(projects.map((project) => project.id))}>
-                                {t("canvas.deleteAll")}
-                            </Button>
+                        ) : projects.length ? (
+                            <Input allowClear prefix={<Search className="size-3.5 text-muted-foreground" />} placeholder={t("projects.search")} value={keyword} onChange={(event) => setKeyword(event.target.value)} className="!w-56" />
                         ) : null}
                         <Button disabled={!hydrated} icon={<FileUp className="size-4" />} onClick={() => inputRef.current?.click()}>
                             {t("canvas.import")}
@@ -104,21 +105,50 @@ export default function CanvasPage() {
                     </div>
                 </header>
 
+                <SetupBanner />
+
                 {!hydrated ? (
-                    <section className="flex min-h-[360px] items-center justify-center border-y border-stone-200 text-sm text-stone-500 dark:border-stone-800">{t("canvas.loading")}</section>
-                ) : projects.length ? (
-                    <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-                        {projects.map((project) => (
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 min-[1900px]:grid-cols-5" aria-busy>
+                        {Array.from({ length: 4 }, (_, index) => (
+                            <div key={index} className="overflow-hidden rounded-lg border border-border bg-card">
+                                <div className="aspect-[16/10] animate-pulse bg-secondary/60" />
+                                <div className="space-y-2 px-3 py-3">
+                                    <div className="h-3.5 w-1/2 animate-pulse rounded bg-secondary" />
+                                    <div className="h-3 w-1/3 animate-pulse rounded bg-secondary/70" />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : visibleProjects.length ? (
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 min-[1900px]:grid-cols-5">
+                        {visibleProjects.map((project) => (
                             <CanvasProjectCard key={project.id} project={project} />
                         ))}
                     </div>
+                ) : projects.length ? (
+                    <p className="py-16 text-center text-sm text-muted-foreground">{t("projects.noMatch", { keyword: keyword.trim() })}</p>
                 ) : (
-                    <section className="flex min-h-[360px] flex-col items-center justify-center border-y border-stone-200 text-center dark:border-stone-800">
-                        <h2 className="text-xl font-medium">{t("canvas.empty")}</h2>
-                        <p className="mt-3 text-sm text-stone-500">{t("canvas.emptyDescription")}</p>
-                        <Button type="primary" className="mt-6" icon={<Plus className="size-4" />} onClick={createAndEnter}>
-                            {t("canvas.create")}
-                        </Button>
+                    <section className="grid gap-8 rounded-lg border border-border bg-card p-6 sm:p-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] md:items-center">
+                        <div>
+                            <h2 className="text-lg font-semibold">{t("projects.emptyTitle")}</h2>
+                            <ol className="mt-4 space-y-3">
+                                {(t("projects.emptySteps", { returnObjects: true }) as string[]).map((step, index) => (
+                                    <li key={step} className="flex gap-3 text-sm text-muted-foreground">
+                                        <span className="tnum flex size-5 shrink-0 items-center justify-center rounded-full border border-border font-mono text-xs text-foreground">{index + 1}</span>
+                                        <span className="pt-px">{step}</span>
+                                    </li>
+                                ))}
+                            </ol>
+                            <div className="mt-6 flex flex-wrap gap-2">
+                                <Button type="primary" icon={<Plus className="size-4" />} onClick={createAndEnter}>
+                                    {t("canvas.create")}
+                                </Button>
+                                <Button icon={<FileUp className="size-4" />} onClick={() => inputRef.current?.click()}>
+                                    {t("canvas.import")}
+                                </Button>
+                            </div>
+                        </div>
+                        <EmptyChainDiagram />
                     </section>
                 )}
             </div>
@@ -126,5 +156,28 @@ export default function CanvasPage() {
             <input ref={inputRef} type="file" accept="application/zip,.zip" className="hidden" onChange={(event) => void importCanvas(event.target.files?.[0])} />
             <CanvasDeleteProjectsDialog />
         </main>
+    );
+}
+
+/** A text → image → video chain, drawn with the canvas' own vocabulary: node boxes, tally lamps and wires. */
+function EmptyChainDiagram() {
+    const { t } = useTranslation();
+    const steps = [
+        { label: t("canvas.nodeTypes.text"), lamp: "bg-tally-ok" },
+        { label: t("canvas.nodeTypes.image"), lamp: "bg-tally-ok" },
+        { label: t("canvas.nodeTypes.video"), lamp: "bg-tally-live animate-pulse" },
+    ];
+    return (
+        <div className="flex items-center justify-center gap-0 rounded-md border border-border bg-background px-4 py-10" aria-hidden>
+            {steps.map((step, index) => (
+                <div key={step.label} className="flex items-center">
+                    {index ? <span className={index === 2 ? "h-0.5 w-8 bg-tally-live sm:w-12" : "h-px w-8 bg-muted-foreground/40 sm:w-12"} /> : null}
+                    <div className="flex h-16 w-20 flex-col justify-between rounded-md border border-border bg-card p-2 sm:w-24">
+                        <span className={`size-2 rounded-full ${step.lamp}`} />
+                        <span className="text-xs text-muted-foreground">{step.label}</span>
+                    </div>
+                </div>
+            ))}
+        </div>
     );
 }

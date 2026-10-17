@@ -23,11 +23,11 @@ export function MobileNavDrawer({ open, activeToolSlug, onClose }: MobileNavDraw
                     return (
                         <Link
                             key={tool.slug}
-                            to={`/${tool.slug}`}
+                            to={tool.slug === "canvas" ? "/" : `/${tool.slug}`}
                             onClick={onClose}
                             className={cn(
-                                "flex items-center gap-3 rounded-lg px-3 py-3 text-base transition",
-                                active ? "bg-stone-100 font-medium text-stone-950 dark:bg-stone-800 dark:text-stone-100" : "text-stone-600 hover:bg-stone-100 hover:text-stone-950 dark:text-stone-300 dark:hover:bg-stone-800 dark:hover:text-stone-100",
+                                "flex items-center gap-3 rounded-md px-3 py-2.5 text-sm transition-colors",
+                                active ? "bg-accent font-medium text-foreground" : "text-muted-foreground hover:bg-accent hover:text-foreground",
                             )}
                         >
                             <Icon className="size-5" />

@@ -1,12 +1,12 @@
-import { Bot, Menu } from "lucide-react";
-import { Button, Tooltip } from "antd";
+import { Menu } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import { navigationTools, type NavigationToolSlug } from "@/constant/navigation-tools";
 import { AppConfigModal } from "@/components/layout/app-config-modal";
+import { CommandPalette } from "@/components/layout/command-palette";
 import { MobileNavDrawer } from "@/components/layout/mobile-nav-drawer";
-import { UserStatusActions } from "@/components/layout/user-status-actions";
+import { UserStatusActions, iconButtonClass } from "@/components/layout/user-status-actions";
 import { cn } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
 import { useAgentStore } from "@/stores/use-agent-store";
@@ -20,10 +20,9 @@ export function AppTopNav() {
     const agentEnabled = useAgentStore((state) => state.enabled);
     const agentConnected = useAgentStore((state) => state.connected);
     const connectAgent = useAgentStore((state) => state.connectAgent);
-    const togglePanel = useAgentStore((state) => state.togglePanel);
-    const panelOpen = useAgentStore((state) => state.panelOpen);
     const hideHeader = /^\/canvas\/[^/]+/.test(pathname);
-    const slug = pathname.split("/").filter(Boolean)[0];
+    // "/" is the project list, so it highlights the canvas destination.
+    const slug = pathname.split("/").filter(Boolean)[0] || "canvas";
     const activeToolSlug = navigationTools.some((tool) => tool.slug === slug) ? (slug as NavigationToolSlug) : undefined;
 
     useEffect(() => {
@@ -35,43 +34,29 @@ export function AppTopNav() {
     return (
         <>
             {!hideHeader ? (
-                <header className="sticky top-0 z-20 h-14 shrink-0 border-b border-stone-200 bg-background/90 backdrop-blur-xl dark:border-stone-800">
-                    <div className="mx-auto flex h-full max-w-7xl items-stretch justify-between gap-5 px-6">
-                        <div className="flex min-w-0 items-center">
-                            <Link to="/" className="flex h-full shrink-0 items-center gap-2 text-sm font-semibold leading-none tracking-tight text-stone-950 transition hover:text-stone-600 dark:text-stone-100 dark:hover:text-stone-300">
-                                <span
-                                    className="size-5 shrink-0 bg-current"
-                                    style={{
-                                        mask: "url(/logo.svg) center / contain no-repeat",
-                                        WebkitMask: "url(/logo.svg) center / contain no-repeat",
-                                    }}
-                                />
-                                <span className="text-base font-medium">{t("meta.title")}</span>
+                <header className="sticky top-0 z-30 h-12 shrink-0 border-b border-border bg-background">
+                    <div className="flex h-full items-stretch justify-between gap-4 px-3 sm:px-4">
+                        <div className="flex min-w-0 items-center gap-1">
+                            <button type="button" className={cn(iconButtonClass, "md:hidden")} onClick={() => setMobileNavOpen(true)} aria-label={t("topNav.openMenu")}>
+                                <Menu />
+                            </button>
+                            <Link to="/" className="flex h-full shrink-0 items-center gap-2 pr-4 text-sm font-semibold text-foreground">
+                                <span className="size-[18px] shrink-0 bg-signal" style={{ mask: "url(/logo.svg) center / contain no-repeat", WebkitMask: "url(/logo.svg) center / contain no-repeat" }} />
+                                <span>FrameDock</span>
                             </Link>
 
-                            <button
-                                type="button"
-                                className="ml-3 inline-flex size-8 shrink-0 items-center justify-center text-stone-600 transition hover:text-stone-950 md:hidden dark:text-stone-300 dark:hover:text-white"
-                                onClick={() => setMobileNavOpen(true)}
-                                aria-label={t("topNav.openMenu")}
-                                title={t("topNav.menu")}
-                            >
-                                <Menu className="size-5" />
-                            </button>
-
-                            <nav className="hide-scrollbar ml-8 hidden h-14 min-w-0 items-center gap-7 overflow-x-auto md:flex">
+                            <nav aria-label={t("topNav.navigation")} className="hide-scrollbar hidden h-12 min-w-0 items-stretch gap-1 overflow-x-auto md:flex">
                                 {navigationTools.map((tool) => {
                                     const Icon = tool.icon;
                                     const active = tool.slug === activeToolSlug;
                                     return (
                                         <Link
                                             key={tool.slug}
-                                            to={`/${tool.slug}`}
+                                            to={tool.slug === "canvas" ? "/" : `/${tool.slug}`}
+                                            aria-current={active ? "page" : undefined}
                                             className={cn(
-                                                "relative flex h-14 shrink-0 items-center gap-2 text-sm leading-6 transition after:absolute after:inset-x-0 after:bottom-0 after:h-px",
-                                                active
-                                                    ? "font-medium text-stone-950 after:bg-stone-950 dark:text-stone-100 dark:after:bg-stone-100"
-                                                    : "text-stone-500 after:bg-transparent hover:text-stone-950 dark:text-stone-400 dark:hover:text-stone-100",
+                                                "relative flex shrink-0 items-center gap-1.5 px-2.5 text-sm transition-colors duration-150 after:absolute after:inset-x-2.5 after:bottom-0 after:h-0.5 after:rounded-full",
+                                                active ? "font-medium text-foreground after:bg-signal" : "text-muted-foreground after:bg-transparent hover:text-foreground",
                                             )}
                                         >
                                             <Icon className="size-4" />
@@ -82,10 +67,7 @@ export function AppTopNav() {
                             </nav>
                         </div>
 
-                        <div className="my-auto flex h-9 min-w-0 items-center justify-end gap-2 justify-self-end whitespace-nowrap">
-                            <Tooltip title={t(panelOpen ? "topNav.closeAgent" : "topNav.openAgent")}>
-                                <Button type="text" shape="circle" className="!h-8 !w-8 !min-w-8" icon={<Bot className="size-4" />} onClick={togglePanel} aria-label={t(panelOpen ? "topNav.closeAgent" : "topNav.openAgent")} />
-                            </Tooltip>
+                        <div className="flex min-w-0 items-center justify-end">
                             <UserStatusActions />
                         </div>
                     </div>
@@ -94,6 +76,7 @@ export function AppTopNav() {
 
             <MobileNavDrawer open={mobileNavOpen} activeToolSlug={activeToolSlug} onClose={() => setMobileNavOpen(false)} />
             <AppConfigModal />
+            <CommandPalette />
         </>
     );
 }

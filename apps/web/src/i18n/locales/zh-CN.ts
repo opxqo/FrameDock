@@ -325,12 +325,12 @@ export default {
         },
     },
     navigation: {
-        canvas: "我的画布",
-        image: "生图工作台",
-        video: "视频创作台",
+        canvas: "画布",
+        image: "生图",
+        video: "视频",
         prompts: "提示词库",
-        assets: "我的资产",
-        config: "配置",
+        assets: "素材",
+        config: "设置",
     },
     topNav: {
         openMenu: "打开导航菜单",
@@ -344,6 +344,7 @@ export default {
         shortcuts: "快捷键",
         lightTheme: "切换到浅色主题",
         darkTheme: "切换到深色主题",
+        more: "更多", version: "版本更新", upstreamDocs: "infinite-canvas 文档", upstreamGithub: "infinite-canvas 源码",
     },
     home: {
         promptError: "获取提示词失败",
@@ -659,6 +660,20 @@ export default {
             imageTooLarge: "图片过大", imagePayloadTooLarge: "图片附件超过 30MB，请删减后再发送。", imagesSent: "发送了 {{count}} 张图片", canvasReferencesSent: "引用了 {{count}} 个画布素材", someCanvasReferencesMissing: "部分引用的画布素材已不存在", canvasReferencesMissing: "引用的画布素材已不存在，请重新选择", readingCanvasImages: "正在读取画布图片", canvasImageReadFailed: "画布图片读取失败", tooManyImages: "图片数量过多", imageCountLimit: "上传图片和引用的画布图片合计最多 {{count}} 张。", sending: "发送中", defaultModel: "默认模型", defaultEffort: "默认强度", sendTask: "发送任务", attachmentCount: "附件 {{count}}", canvasReferenceCount: "画布素材 {{count}}", attachmentsOnly: "仅附件", canvasReferencesOnly: "画布素材", startConversationFailed: "启动对话失败", attachmentHistoryFailed: "保存附件历史失败", sendFailed: "发送失败", conversationSynced: "会话已同步", taskStillRunning: "任务仍在运行", stopping: "停止中", stopTask: "停止任务", taskStopped: "任务已停止", stopFailed: "停止失败", imageLimit: "图片附件最多约 30MB。", imageReadFailed: "图片读取失败", pendingCanvasTool: "仍有待确认的画布工具调用", awaitingConfirmation: "等待确认", toolCompleted: "{{tool}}完成", toolExecutionFailed: "工具执行失败", openCanvasFirst: "当前不在画布页，请先用 site_navigate 打开画布", canvasOperationFailed: "画布操作失败", canvasToolCanceled: "用户取消了画布工具调用",
             submittingApproval: "正在提交权限决定", waitingCodexApproval: "等待 Codex 确认权限", approvalFailed: "权限审批失败", enableFullAccess: "启用完全访问权限", fullAccessDescription: "Codex 将不受沙箱限制，可访问互联网及本机任意文件。请仅在信任当前任务时使用。", enableFullAccessAction: "启用完全访问", offline: "离线", addressRequired: "请填写本地 Agent 地址", agentNotFound: "没有发现本地 Agent，请先在 Codex 使用插件或手动启动 Canvas Agent", invalidAddress: "本地 Agent 地址格式不正确", connecting: "连接中", creatingConversation: "正在新建对话", newConversation: "新对话", newConversationFailed: "新建对话失败", conversationResumed: "已恢复会话", resumeConversationFailed: "恢复对话失败", recordsDeleted: "已删除 {{count}} 条记录", deleteConversationFailed: "删除对话失败", deleteConversations: "删除 {{count}} 条对话记录", deleteConversationsDescription: "删除后无法恢复，确定继续吗？", importGeneratedImages: "导入生成图片", addedToSourceCanvas: "已添加到发起任务的画布", imageGenerated: "图片已生成", noImageAttachments: "没有可添加的图片附件", invalidAttachmentNode: "图片附件节点参数无效", attachmentReadFailed: "读取图片附件失败", referenceImage: "参考图", generatedImageReadFailed: "读取 Codex 生成图片失败", generatedImageName: "生成图片 {{index}}",
         },
+    },
+    palette: {
+        title: "命令面板", trigger: "搜索或运行命令", placeholder: "搜索项目、页面或命令…", empty: "没有匹配的命令",
+        groups: { go: "前往", create: "新建", recent: "最近的画布", preferences: "偏好", canvas: "当前画布" },
+        newCanvas: "新建画布", openSettings: "打开设置", hintMove: "选择", hintRun: "执行", hintClose: "关闭",
+    },
+    projects: {
+        title: "画布", count: "{{count}} 个", search: "搜索画布", noMatch: "没有名称包含“{{keyword}}”的画布",
+        nodes: "{{count}} 个节点", emptyPreview: "空画布", justNow: "刚刚",
+        emptyTitle: "从一张画布开始",
+        emptySteps: ["新建画布，双击空白处添加文本、图片或视频节点", "从一个节点拖出连线到下一个节点，连线就是数据依赖", "在节点上选择“运行到此处”或“运行下游”，整条链按顺序生成"],
+    },
+    setup: {
+        title: "还没有可用的模型", description: "填写 AutoDL API Key 后即可使用对话、图片和视频模型，每个模型都会显示价格提示。", action: "填写 API Key",
     },
     locale: {
         zhCN: "简体中文",

@@ -21,15 +21,22 @@ function releaseTypeLabel(type: string, t: TFunction) {
 type VersionReleaseModalProps = {
     className?: string;
     style?: CSSProperties;
+    /** FrameDock: controlled mode without the version trigger, opened from the "more" menu. */
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
 };
 
-export function VersionReleaseModal({ className, style }: VersionReleaseModalProps) {
+export function VersionReleaseModal({ className, style, open: openProp, onOpenChange }: VersionReleaseModalProps) {
     const { t } = useTranslation();
-    const { open, setOpen, openReleaseModal, latestVersion, releases, checking, hasNewVersion, checkLatestRelease } = useVersionCheck();
+    const versionCheck = useVersionCheck();
+    const { openReleaseModal, latestVersion, releases, checking, hasNewVersion, checkLatestRelease } = versionCheck;
+    const controlled = openProp !== undefined;
+    const open = controlled ? openProp : versionCheck.open;
+    const setOpen = controlled ? (value: boolean) => onOpenChange?.(value) : versionCheck.setOpen;
 
     return (
         <>
-            <button
+            {controlled ? null : <button
                 type="button"
                 className={className || "shrink-0 cursor-pointer text-xs font-medium text-stone-500 transition hover:text-stone-950 dark:text-stone-400 dark:hover:text-white"}
                 style={style}
@@ -40,7 +47,7 @@ export function VersionReleaseModal({ className, style }: VersionReleaseModalPro
                     {APP_VERSION}
                     {hasNewVersion ? <span className="absolute -right-1.5 -top-1 size-1.5 rounded-full bg-green-500" /> : null}
                 </span>
-            </button>
+            </button>}
             <Modal title={t("version.title")} open={open} width={680} centered footer={null} onCancel={() => setOpen(false)}>
                 <div className="mb-5 grid grid-cols-2 gap-3">
                     <div className="rounded-lg border border-stone-200 p-3 dark:border-stone-800">

@@ -1,9 +1,10 @@
-import { FileText, ImagePlus, Images, Maximize2, Settings2, Video } from "lucide-react";
+import { ImagePlus, Images, LayoutGrid, Video } from "lucide-react";
 
+// FrameDock: four primary destinations. Prompts, settings and the rest live in the "more" menu and ⌘K.
 export const navigationTools = [
     {
         slug: "canvas",
-        icon: Maximize2,
+        icon: LayoutGrid,
     },
     {
         slug: "image",
@@ -14,16 +15,8 @@ export const navigationTools = [
         icon: Video,
     },
     {
-        slug: "prompts",
-        icon: FileText,
-    },
-    {
         slug: "assets",
         icon: Images,
-    },
-    {
-        slug: "config",
-        icon: Settings2,
     },
 ] as const;
 
