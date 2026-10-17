@@ -256,9 +256,9 @@ export default {
         agentDisconnected: "Codex 未连接",
         connecting: "连接中",
         openAgent: "打开本地 Codex 面板",
-        nodeTypes: { image: "图片", text: "文本", config: "生成配置", video: "视频", audio: "音频", group: "组" },
+        nodeTypes: { image: "图片", text: "文本", config: "生成配置", video: "视频", audio: "音频", group: "组", codex: "Codex" },
         toolbar: {
-            rail: "画布工具", add: "添加", select: "选择", pan: "移动", focus: "居中聚焦", text: "文本", image: "图片", video: "视频", audio: "音频", config: "生成配置", group: "组", extensions: "扩展节点", upload: "上传素材", appearance: "画布外观", clear: "清空画布",
+            rail: "画布工具", add: "添加", select: "选择", pan: "移动", focus: "居中聚焦", text: "文本", image: "图片", video: "视频", audio: "音频", config: "生成配置", codex: "Codex 智能体", group: "组", extensions: "扩展节点", upload: "上传素材", appearance: "画布外观", clear: "清空画布",
             themeMode: "主题模式", light: "浅色", dark: "深色", gridStyle: "网格样式", dots: "点", lines: "线", blank: "空白", imageInfo: "图片信息",
         },
         project: {
@@ -284,6 +284,7 @@ export default {
         assetPicker: { title: "选择素材", insert: "插入", search: "搜索素材", empty: "没有素材" },
         imageTools: { copyPrompt: "复制提示词", copyPromptTitle: "复制生成该图片的提示词", reversePrompt: "反推提示词", reversePromptTitle: "创建反推提示词的文本和配置节点", replace: "替换图片", locked: "锁比例", free: "自由比例", lockTitle: "切换为等比缩放", freeTitle: "切换为自由比例", mask: "局部编辑", maskTitle: "添加蒙版遮罩后局部修改", crop: "裁剪", cropTitle: "裁剪并生成新节点", split: "切图", splitTitle: "按行列切分图片", upscale: "放大", upscaleTitle: "放大图片分辨率", superResolve: "超分", superResolveTitle: "AI 超分", angle: "多角度", angleTitle: "生成角度", view: "查看大图", viewTitle: "查看图片详情", more: "更多", configure: "配置快捷工具", customize: "自定义工具栏", showLabels: "显示按钮文字", description: "选择你想在图片节点编辑栏中使用的快捷工具。", preview: "节点预览", imageNode: "图片节点", quickTools: "快捷工具" },
         nodeToolbar: { noPrompt: "暂无可复制的提示词", infoTitle: "查看节点信息", info: "信息", removeTitle: "移除节点", retryTitle: "重新生成", queryVideoTask: "获取任务状态", queryVideoTaskTitle: "使用任务 ID 查询视频生成状态", videoTaskId: "任务 ID", saveAsset: "存素材", downloadAudio: "下载音频", downloadVideo: "下载视频", downloadImage: "下载图片", editTextTitle: "编辑文本", editText: "编辑文字", decreaseFont: "减小字号", increaseFont: "增大字号", zoomOut: "缩小", zoomIn: "放大", uploadImage: "上传图片", replaceVideo: "替换视频", uploadVideo: "上传视频", replaceAudio: "替换音频", uploadAudio: "上传音频", nodeInfo: "节点信息", name: "名称", type: "类型", size: "尺寸", position: "位置", status: "状态", imageGroup: "图片组", imageSize: "图片大小", group: "打组", groupTitle: "用组节点包住选中节点", ungroup: "解散组", ungroupTitle: "取消节点分组" },
+        codexNode: { emptyText: "让 Codex 写文案、写提示词", emptyImage: "让 Codex 生成图片", modeText: "文本", modeImage: "图片", effort: "推理强度", effortLow: "低", effortMedium: "中", effortHigh: "高", quota: "ChatGPT 订阅额度", placeholderText: "让 Codex 写点什么，例如：写一段中国高中课堂的生图提示词", placeholderImage: "描述要生成的图片，例如：一只橘猫坐在草地上，写实摄影", unavailable: "未检测到 Codex CLI，请先安装：npm i -g @openai/codex", notLoggedIn: "Codex 未登录，请在终端运行 codex login", run: "运行", stop: "停止" },
         configNode: { price: "价格提示：{{price}}", title: "生成配置", image: "生图", text: "文本", video: "视频", audio: "音频", prompt: "提示词", references: "参考图", videoReferences: "参考视频", audioReferences: "参考音频", items: "{{count}} 个", images: "{{count}} 张", compose: "组装提示词", stop: "停止", generate: "开始生成" },
         workflow: { runDownstream: "运行下游", runUpstream: "运行到此处", stop: "停止工作流", alreadyRunning: "已有工作流在运行", cycle: "连线存在循环，无法运行", nothingToRun: "没有可运行的节点", progress: "工作流运行中：{{current}} / {{total}}", finished: "工作流完成，共运行 {{total}} 个节点", finishedWithFailures: "工作流结束：{{failed}} 个失败，{{skipped}} 个因上游失败被跳过", canceled: "工作流已停止" },
         projectPage: {

@@ -84,6 +84,11 @@ export function workflowStepForNode(node: CanvasNodeData, nodes: CanvasNodeData[
             .at(-1);
         return { nodeId: node.id, mode, prompt: rawNodePrompt(node), targetNodeId: target?.id };
     }
+    // FrameDock: Codex nodes always regenerate in place from their own prompt.
+    if (node.type === CanvasNodeType.Codex) {
+        const prompt = rawNodePrompt(node);
+        return prompt ? { nodeId: node.id, mode: "text", prompt } : null;
+    }
     const mode = IN_PLACE_MODE[node.type];
     if (!mode) return null;
     // Results produced by a config node are re-generated through that config node, not on their own.

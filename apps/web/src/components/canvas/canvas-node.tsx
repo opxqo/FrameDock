@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { ReactNode } from "react";
-import { ChevronRight, Copy, Download, Group, Image as ImageIcon, Music2, Puzzle, RefreshCw, Star, Trash2, Video } from "lucide-react";
+import { ChevronRight, Copy, Download, Group, Image as ImageIcon, Music2, Puzzle, RefreshCw, SquareTerminal, Star, Trash2, Video } from "lucide-react";
 
 import { canvasThemes } from "@/lib/canvas-theme";
 import { formatBytes } from "@/lib/image-utils";
@@ -481,6 +481,7 @@ function NodeContent(props: NodeContentRendererProps) {
     if (props.node.type === CanvasNodeType.Config && props.renderNodeContent) return props.renderNodeContent(props.node);
     if (props.isBatchRoot && props.node.type === CanvasNodeType.Image) return <ImageNodeContent {...props} />;
     if (props.node.type === CanvasNodeType.Text && props.node.metadata?.texts?.length && (props.node.metadata.status !== "error" || props.node.metadata.texts.some((text) => text.content))) return <TextContent {...props} />;
+    if (props.node.type === CanvasNodeType.Codex) return <CodexContent {...props} />;
     if (props.node.metadata?.status === "loading") return <LoadingContent theme={props.theme} />;
     if (props.node.metadata?.status === "error") return <ErrorContent node={props.node} theme={props.theme} onRetry={props.onRetry} />;
 
@@ -503,7 +504,35 @@ const nodeContentRenderers = {
     [CanvasNodeType.Video]: VideoNodeContent,
     [CanvasNodeType.Audio]: AudioNodeContent,
     [CanvasNodeType.Group]: GroupNodeContent,
+    [CanvasNodeType.Codex]: CodexContent,
 } satisfies Record<CanvasNodeType, (props: NodeContentRendererProps) => ReactNode>;
+
+// FrameDock: Codex node — shows what Codex is doing while running, then its text or image output.
+function CodexContent(props: NodeContentRendererProps) {
+    const { node, theme } = props;
+    const { t } = useTranslation();
+    const imageMode = node.metadata?.codexMode === "image";
+    if (node.metadata?.status === "loading") {
+        return (
+            <div className="flex h-full w-full flex-col items-center justify-center gap-3 px-5 text-center" style={{ color: theme.node.activeStroke }}>
+                <div className="size-10 animate-spin rounded-full border-2" style={{ borderColor: theme.node.stroke, borderTopColor: theme.node.activeStroke }} />
+                <span className="line-clamp-2 max-w-[260px] text-[11px] leading-4" style={{ color: theme.node.muted }}>{node.metadata.codexActivity || t("canvas.node.generating")}</span>
+            </div>
+        );
+    }
+    if (node.metadata?.status === "error") return <ErrorContent node={node} theme={theme} onRetry={props.onRetry} />;
+    if (node.metadata?.content) {
+        if (imageMode) return <img src={node.metadata.content} alt={node.title} draggable={false} className="h-full w-full rounded-[inherit] object-contain" />;
+        return <TextContent {...props} />;
+    }
+    return (
+        <div className="flex h-full w-full flex-col items-center justify-center gap-2 px-4 text-center" style={{ color: theme.node.placeholder }}>
+            <SquareTerminal className="size-7 opacity-50" />
+            <span className="text-sm">Codex</span>
+            <span className="text-[11px] opacity-70">{t(imageMode ? "canvas.codexNode.emptyImage" : "canvas.codexNode.emptyText")}</span>
+        </div>
+    );
+}
 
 function GroupNodeContent({ node, theme, groupChildCount }: NodeContentRendererProps) {
     const { t } = useTranslation();

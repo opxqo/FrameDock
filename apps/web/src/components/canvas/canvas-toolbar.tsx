@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
 import { Segmented, Switch, Tooltip } from "antd";
-import { CircleDot, Eraser, Grid2x2, Group, Hand, Image as ImageIcon, Info, LocateFixed, Moon, MousePointer2, Music2, Palette, Puzzle, Settings2, Square, Sun, Trash2, Type, Upload, Video } from "lucide-react";
+import { CircleDot, Eraser, Grid2x2, Group, Hand, Image as ImageIcon, Info, LocateFixed, Moon, MousePointer2, Music2, Palette, Puzzle, Settings2, Square, Sun, Trash2, Type, Upload, Video, SquareTerminal } from "lucide-react";
 
 import { type CanvasBackgroundMode } from "@/lib/canvas-theme";
 import { getNodePluginId, listNodeDefinitions, useNodeRegistryVersion } from "@/lib/canvas/node-registry";
@@ -22,6 +22,7 @@ export function CanvasToolbar({
     onAddAudio,
     onAddText,
     onAddConfig,
+    onAddCodex,
     onAddGroup,
     onAddExtensionNode,
     onUpload,
@@ -43,6 +44,7 @@ export function CanvasToolbar({
     onAddAudio: () => void;
     onAddText: () => void;
     onAddConfig: () => void;
+    onAddCodex: () => void;
     onAddGroup: () => void;
     onAddExtensionNode: (type: string) => void;
     onUndo?: () => void;
@@ -98,6 +100,9 @@ export function CanvasToolbar({
                 </RailButton>
                 <RailButton label={t("canvas.toolbar.config")} onClick={onAddConfig}>
                     <Settings2 />
+                </RailButton>
+                <RailButton label={t("canvas.toolbar.codex")} onClick={onAddCodex}>
+                    <SquareTerminal />
                 </RailButton>
                 <RailButton label={t("canvas.toolbar.group")} shortcut="⌘G" onClick={onAddGroup}>
                     <Group />

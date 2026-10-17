@@ -16,6 +16,8 @@ export enum CanvasNodeType {
     Video = "video",
     Audio = "audio",
     Group = "group",
+    // FrameDock: runs the local Codex CLI and outputs text or an image.
+    Codex = "codex",
 }
 
 // Node types are open strings: built-ins use CanvasNodeType and plugins use "<pluginId>:<name>".
@@ -84,6 +86,10 @@ export type CanvasNodeMetadata = {
     videoTaskId?: string;
     videoTaskProvider?: "openai" | "gemini" | "minimax" | "kling" | "ark" | "wan";
     groupId?: string;
+    // FrameDock Codex node.
+    codexMode?: "text" | "image";
+    codexEffort?: "low" | "medium" | "high";
+    codexActivity?: string;
     interactive?: boolean; // Plugin node interaction/move state; see CanvasNodeDefinition.interactionToggle.
 };
 

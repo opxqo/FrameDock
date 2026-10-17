@@ -1,7 +1,7 @@
 import { memo, useEffect, useMemo, useRef, useState, useSyncExternalStore, type PointerEvent as ReactPointerEvent } from "react";
 import { App, Empty, Input, Popconfirm, Select, Spin, Tag } from "antd";
 import { useQuery } from "@tanstack/react-query";
-import { BookOpen, Check, ChevronRight, Download, Eye, FileText, Image as ImageIcon, LayoutGrid, ListChecks, Music2, Plus, Rows3, Search, Settings2, Square, Trash2, Type, Video } from "lucide-react";
+import { BookOpen, Check, ChevronRight, Download, Eye, FileText, Image as ImageIcon, LayoutGrid, ListChecks, Music2, Plus, Rows3, Search, Settings2, Square, Trash2, Type, Video, SquareTerminal } from "lucide-react";
 import { motion } from "motion/react";
 import { useTranslation } from "react-i18next";
 
@@ -42,6 +42,7 @@ const NODE_TYPE_ICON: Record<string, typeof Square> = {
     [CanvasNodeType.Text]: Type,
     [CanvasNodeType.Config]: Settings2,
     [CanvasNodeType.Group]: Square,
+    [CanvasNodeType.Codex]: SquareTerminal,
 };
 
 // FrameDock: same tally vocabulary as the lamps on canvas nodes.

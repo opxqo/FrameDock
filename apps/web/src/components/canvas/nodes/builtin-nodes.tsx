@@ -1,4 +1,4 @@
-import { FileText, Group, Image as ImageIcon, Music2, Settings2, Video } from "lucide-react";
+import { FileText, Group, Image as ImageIcon, Music2, Settings2, SquareTerminal, Video } from "lucide-react";
 
 import i18n from "@/i18n";
 
@@ -14,6 +14,8 @@ function builtinResource(node: CanvasNodeData): CanvasNodeResource | null {
     if (node.type === CanvasNodeType.Video && node.metadata?.content) return { kind: "video", url: node.metadata.content };
     if (node.type === CanvasNodeType.Audio && node.metadata?.content) return { kind: "audio", url: node.metadata.content };
     if (node.type === CanvasNodeType.Text && (node.metadata?.content || node.metadata?.prompt)) return { kind: "text", text: node.metadata.content || node.metadata.prompt };
+    // Codex nodes act as a text node or an image node depending on their output mode.
+    if (node.type === CanvasNodeType.Codex && node.metadata?.content) return node.metadata.codexMode === "image" ? { kind: "image", url: node.metadata.content } : { kind: "text", text: node.metadata.content };
     return null;
 }
 
@@ -26,6 +28,7 @@ const BUILTIN_DEFINITIONS: CanvasNodeDefinition[] = [
     { type: CanvasNodeType.Audio, title: i18n.t("assets.kinds.audio"), icon: <Music2 className={iconClass} />, minimapColor: "#a855f7", resource: builtinResource },
     { type: CanvasNodeType.Config, title: i18n.t("canvas.configNode.title"), icon: <Settings2 className={iconClass} />, minimapColor: "#60a5fa", hasSourceHandle: false },
     { type: CanvasNodeType.Group, title: i18n.t("canvas.node.group"), icon: <Group className={iconClass} />, minimapColor: "#94a3b8" },
+    { type: CanvasNodeType.Codex, title: "Codex", icon: <SquareTerminal className={iconClass} />, minimapColor: "#0ea5e9", keepAspectRatio: () => false, resource: builtinResource },
 ].map((def) => {
     const spec = NODE_SPECS[def.type];
     return { ...def, title: spec.title, defaultSize: { width: spec.width, height: spec.height }, defaultMetadata: spec.metadata };

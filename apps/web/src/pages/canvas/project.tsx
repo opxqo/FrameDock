@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { CodexNodePanel } from "@/components/canvas/codex-node-panel";
+import { runCodex } from "@/services/api/codex";
 import { estimateAutodlCost, generationCostParams } from "@/lib/autodl-pricing";
 import type { ChangeEvent as ReactChangeEvent, DragEvent as ReactDragEvent, MouseEvent as ReactMouseEvent, PointerEvent as ReactPointerEvent } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
@@ -645,7 +647,7 @@ function InfiniteCanvasPage() {
     );
 
     const createConnectedNode = useCallback(
-        (type: CanvasNodeType.Image | CanvasNodeType.Text | CanvasNodeType.Config | CanvasNodeType.Video | CanvasNodeType.Audio, pending: PendingConnectionCreate) => {
+        (type: CanvasNodeType.Image | CanvasNodeType.Text | CanvasNodeType.Config | CanvasNodeType.Video | CanvasNodeType.Audio | CanvasNodeType.Codex, pending: PendingConnectionCreate) => {
             const metadata = type === CanvasNodeType.Config ? { model: effectiveConfig.imageModel || effectiveConfig.model, size: effectiveConfig.size, count: getGenerationCount(effectiveConfig.canvasImageCount || effectiveConfig.count) } : undefined;
             const newNode = createCanvasNode(type, pending.position, metadata);
             const connection = normalizeConnection(pending.connection.nodeId, newNode.id, [...nodesRef.current, newNode], pending.connection.handleType);
@@ -2453,6 +2455,41 @@ function InfiniteCanvasPage() {
     const handleGenerateNode = useCallback(
         async (nodeId: string, mode: CanvasNodeGenerationMode, prompt: string, options: GenerateNodeOptions = {}) => {
             const sourceNode = nodesRef.current.find((node) => node.id === nodeId);
+            // FrameDock: Codex nodes run the local Codex CLI (ChatGPT plan) and write text or an image back to themselves.
+            if (sourceNode?.type === CanvasNodeType.Codex) {
+                const request = prompt.trim();
+                if (!request) return;
+                const codexMode = sourceNode.metadata?.codexMode === "image" ? "image" : "text";
+                const patchNode = (patch: Partial<CanvasNodeData["metadata"]>) => setNodes((prev) => prev.map((node) => (node.id === nodeId ? { ...node, metadata: { ...node.metadata, ...patch } } : node)));
+                setRunningNodeId(nodeId);
+                const controller = startGenerationRequest(nodeId, nodeId, nodeId);
+                patchNode({ prompt: request, status: NODE_STATUS_LOADING, errorDetails: undefined, codexActivity: "正在启动 Codex…" });
+                try {
+                    const context = await hydrateNodeGenerationContext(buildNodeGenerationContext(nodeId, nodesRef.current, connectionsRef.current, request));
+                    const images = context.referenceImages.map((image) => image.dataUrl).filter((url) => url.startsWith("data:"));
+                    const result = await runCodex({ mode: codexMode, prompt: context.prompt, images, effort: sourceNode.metadata?.codexEffort || "low" }, (event) => {
+                        if (event.type === "status") patchNode({ codexActivity: event.text });
+                    }, controller.signal);
+                    if (codexMode === "image") {
+                        if (!result.images[0]) throw new Error("Codex 没有生成图片");
+                        const uploaded = await uploadImage(result.images[0], { signal: controller.signal });
+                        patchNode({ ...imageMetadata(uploaded), texts: undefined, status: NODE_STATUS_SUCCESS, codexActivity: undefined });
+                    } else {
+                        patchNode({ content: result.text, texts: undefined, storageKey: undefined, status: NODE_STATUS_SUCCESS, codexActivity: undefined });
+                    }
+                } catch (error) {
+                    if (isGenerationCanceled(error) || controller.signal.aborted) patchNode({ status: NODE_STATUS_IDLE, codexActivity: undefined });
+                    else {
+                        const errorDetails = error instanceof Error ? error.message : t("canvas.projectPage.generationFailed");
+                        message.error(errorDetails);
+                        patchNode({ status: NODE_STATUS_ERROR, errorDetails, codexActivity: undefined });
+                    }
+                } finally {
+                    finishGenerationRequest(nodeId, controller);
+                    setRunningNodeId(null);
+                }
+                return;
+            }
             // FrameDock workflow runs write a config node's result back into its existing result node.
             const retargetNode = options.targetNodeId ? nodesRef.current.find((node) => node.id === options.targetNodeId) : undefined;
             const generationConfig = buildGenerationConfig(effectiveConfig, sourceNode, mode);
@@ -3329,6 +3366,20 @@ function InfiniteCanvasPage() {
         (panelNode: CanvasNodeData) =>
             getNodeDefinition(panelNode.type)?.Panel ? (
                 renderPluginPanel(panelNode)
+            ) : panelNode.type === CanvasNodeType.Codex ? (
+                <CodexNodePanel
+                    node={panelNode}
+                    nodes={nodes}
+                    isRunning={runningNodeId === panelNode.id}
+                    mentionReferences={mentionReferencesByNodeId.get(panelNode.id) || EMPTY_REFERENCES}
+                    connectedNodes={connectedNodesByNodeId.get(panelNode.id) || []}
+                    onPromptChange={handleNodePromptChange}
+                    onConfigChange={handleConfigNodeChange}
+                    onRun={(nodeId, prompt) => void handleGenerateNode(nodeId, "text", prompt)}
+                    onStop={confirmStopGeneration}
+                    onDisconnectReference={disconnectNodeReference}
+                    onStartReferenceSelection={startNodeReferenceSelection}
+                />
             ) : panelNode.type === CanvasNodeType.Config ? (
                 <CanvasConfigComposer
                     nodeId={panelNode.id}
@@ -3637,6 +3688,7 @@ function InfiniteCanvasPage() {
                     onAddAudio={() => createNode(CanvasNodeType.Audio)}
                     onAddText={() => createNode(CanvasNodeType.Text)}
                     onAddConfig={() => createNode(CanvasNodeType.Config)}
+                    onAddCodex={() => createNode(CanvasNodeType.Codex)}
                     onAddGroup={() => createNode(CanvasNodeType.Group)}
                     onAddExtensionNode={(type) => createNode(type)}
                     onUndo={undoCanvas}
