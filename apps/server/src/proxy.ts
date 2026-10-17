@@ -3,7 +3,17 @@
 // Forwards /proxy/<full-target-url> so the browser can reach providers and media hosts without CORS limits.
 import { Readable } from "node:stream";
 import type { FastifyPluginAsync, FastifyReply, FastifyRequest } from "fastify";
+import { Agent, fetch, type Response } from "undici";
 import packageJson from "../package.json" with { type: "json" };
+
+// Image edits and video tasks on relays such as AutoDL can take well over Node fetch's default
+// 5-minute headers timeout; keep the upstream connection open for up to 20 minutes.
+const UPSTREAM_TIMEOUT_MS = 20 * 60 * 1000;
+const dispatcher = new Agent({
+  headersTimeout: UPSTREAM_TIMEOUT_MS,
+  bodyTimeout: UPSTREAM_TIMEOUT_MS,
+  connectTimeout: 30_000,
+});
 
 const CORS_HEADERS = {
   "access-control-allow-origin": "*",
@@ -73,11 +83,10 @@ async function forward(
 ) {
   const hasBody = request.method !== "GET" && request.method !== "HEAD";
   const upstream = await fetch(target, {
+    dispatcher,
     method: request.method,
     headers: requestHeaders(request),
-    body: hasBody
-      ? (request.body as unknown as BodyInit | undefined)
-      : undefined,
+    body: hasBody ? (request.body as Buffer | undefined) : undefined,
     redirect: "follow",
   });
   reply.hijack();
@@ -130,7 +139,12 @@ const proxy: FastifyPluginAsync = async (app) => {
           "Proxy forward",
         );
       } catch (error) {
-        const reason = error instanceof Error ? error.message : String(error);
+        // undici reports "fetch failed" and keeps the real reason (timeout, reset, DNS) in `cause`.
+        const cause =
+          error instanceof Error && error.cause instanceof Error
+            ? `: ${error.cause.message}`
+            : "";
+        const reason = `${error instanceof Error ? error.message : String(error)}${cause}`;
         request.log.warn({ target, reason }, "Proxy forward failed");
         if (reply.raw.headersSent) {
           reply.raw.destroy();
