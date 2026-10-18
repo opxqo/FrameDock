@@ -1,0 +1,715 @@
+{
+  "id": "f_BZqbVQPCgtztUtbR0Ub",
+  "title": "帧坞 3",
+  "createdAt": "2026-10-18T00:49:57.719Z",
+  "updatedAt": "2026-10-18T03:37:04.229Z",
+  "nodes": [
+    {
+      "id": "image-1792284618666-siuln",
+      "type": "image",
+      "title": "clipboard-image.png",
+      "position": {
+        "x": 218.53007518796994,
+        "y": -59.5
+      },
+      "width": 261.51879699248116,
+      "height": 465,
+      "metadata": {
+        "content": "blob:http://localhost:5173/844717e7-2636-4388-b498-c761c42d4c9a",
+        "storageKey": "image:thnuQqA7usuqv62NFoe0q",
+        "status": "success",
+        "naturalWidth": 374,
+        "naturalHeight": 665,
+        "bytes": 255865,
+        "mimeType": "image/png",
+        "images": []
+      }
+    },
+    {
+      "id": "image-1792284628395-yy3rb",
+      "type": "image",
+      "title": "基于参考图，按照以下要求生成四视展示图。建议采用1:1比例或9:",
+      "position": {
+        "x": 586.4019835098825,
+        "y": 310.5
+      },
+      "width": 240,
+      "height": 240,
+      "metadata": {
+        "content": "blob:http://localhost:5173/832975c8-b326-4ca6-8afd-eed4e690f93a",
+        "status": "success",
+        "prompt": "基于参考图，按照以下要求生成四视展示图。建议采用1:1比例或9:16比例构图，4K清晰度。\n\n【尺寸与构图】\n保持原图宽高比，分辨率放大至原图两倍。将画面精确四等分为左上、右上、左下、右下四个相同大小的区域，每个区域各放置一个视角，内容居中于各自区域内；不添加任何分割线、边框、标注文字或装饰元素；\n左上区域为正面视图（0度），右上区域为左侧面视图（90度，面朝左边），左下区域为背面视图（180度），右下区域为右侧面视图（270度，面朝右边）；右上区域和右下区域的视图方向刚好相反，一左一右，请不要出现两者朝向一致方向。\n\n【关键约束】\n主体在每个区域内上下左右居中放置，与区域边缘保留不少于区域宽度10%的安全边距。单个区域中仅放置1个主体。\n\n【表面细节】\n完整还原原设定图中所有材质细节、纹理、花纹、配色、装饰物，不添加、不遗漏、不改动任何设计元素，贴图精度等效4K。四个视角保持完全一致的配色、材质、结构细节和设计语言，确保主体在不同角度下的绝对一致性；\n\n【整体画面】\n纯中性灰背景 #888888 ，无环境反射干扰。部件边界处以干净的几何切割面收束。部件悬浮于画面中心，无底座，轻微投射接触阴影增强立体感，部件周围保留充足的负空间便于观察轮廓。",
+        "size": "auto",
+        "composerContent": "基于参考图，按照以下要求生成四视展示图。建议采用1:1比例或9:16比例构图，4K清晰度。\n\n【尺寸与构图】\n保持原图宽高比，分辨率放大至原图两倍。将画面精确四等分为左上、右上、左下、右下四个相同大小的区域，每个区域各放置一个视角，内容居中于各自区域内；不添加任何分割线、边框、标注文字或装饰元素；\n左上区域为正面视图（0度），右上区域为左侧面视图（90度，面朝左边），左下区域为背面视图（180度），右下区域为右侧面视图（270度，面朝右边）；右上区域和右下区域的视图方向刚好相反，一左一右，请不要出现两者朝向一致方向。\n\n【关键约束】\n主体在每个区域内上下左右居中放置，与区域边缘保留不少于区域宽度10%的安全边距。单个区域中仅放置1个主体。\n\n【表面细节】\n完整还原原设定图中所有材质细节、纹理、花纹、配色、装饰物，不添加、不遗漏、不改动任何设计元素，贴图精度等效4K。四个视角保持完全一致的配色、材质、结构细节和设计语言，确保主体在不同角度下的绝对一致性；\n\n【整体画面】\n纯中性灰背景 #888888 ，无环境反射干扰。部件边界处以干净的几何切割面收束。部件悬浮于画面中心，无底座，轻微投射接触阴影增强立体感，部件周围保留充足的负空间便于观察轮廓。",
+        "images": [
+          {
+            "id": "_9HgkVjHHUyjQ4bQrAC8V",
+            "status": "success",
+            "content": "blob:http://localhost:5173/832975c8-b326-4ca6-8afd-eed4e690f93a",
+            "storageKey": "image:-dos_kbb9Qq6gIZl0vZPt",
+            "naturalWidth": 1254,
+            "naturalHeight": 1254,
+            "bytes": 1287740,
+            "mimeType": "image/png"
+          }
+        ],
+        "primaryImageId": "_9HgkVjHHUyjQ4bQrAC8V",
+        "generationType": "edit",
+        "model": "autodl::gpt-image-2.5-flare",
+        "quality": "auto",
+        "count": 1,
+        "references": [
+          "image:thnuQqA7usuqv62NFoe0q",
+          "image:MRAJOuhXlO7sEjnWLG4OP"
+        ],
+        "storageKey": "image:-dos_kbb9Qq6gIZl0vZPt",
+        "naturalWidth": 1254,
+        "naturalHeight": 1254,
+        "bytes": 1287740,
+        "mimeType": "image/png"
+      }
+    },
+    {
+      "id": "image-1792284662376-thu4v",
+      "type": "image",
+      "title": "clipboard-image.png",
+      "position": {
+        "x": 125.78947368421052,
+        "y": 494.6666144743919
+      },
+      "width": 361,
+      "height": 364,
+      "metadata": {
+        "content": "blob:http://localhost:5173/93cb5d90-2d4e-4fa7-ba6c-0f78cbaad965",
+        "storageKey": "image:MRAJOuhXlO7sEjnWLG4OP",
+        "status": "success",
+        "naturalWidth": 361,
+        "naturalHeight": 364,
+        "bytes": 124879,
+        "mimeType": "image/png",
+        "images": []
+      }
+    },
+    {
+      "id": "text-1792284785436-bjy8n",
+      "type": "text",
+      "title": "生成改图提示词：将斧头改为长剑，要符合角色身份；角色披风不对，优",
+      "position": {
+        "x": 962.5433796992332,
+        "y": 15.5
+      },
+      "width": 340,
+      "height": 240,
+      "metadata": {
+        "prompt": "生成改图提示词：将斧头改为长剑，要符合角色身份；角色披风不对，优化一下；小猫角色的身材可以再娇小一点；注意不要丢失细节",
+        "status": "success",
+        "fontSize": 14,
+        "model": "autodl::DeepSeek-V4.1-Flash",
+        "reasoningEffort": "auto",
+        "textCount": 1,
+        "texts": [
+          {
+            "id": "vbTRtZfh7nC6LxihJzYVf",
+            "status": "success",
+            "content": "针对您的需求，由于原图是一个标准的“四视图（正、背、侧）角色设定图”，且材质是高精度3D渲染风格（写实毛发+金属盔甲），在生成改图提示词时，需要明确保留原有构图和精细度，同时精准替换元素。\n\n建议配合**图生图（Img2Img）+ ControlNet（控制姿态和轮廓）**使用以下提示词。\n\n### 🎨 英文提示词（推荐直接用于 Midjourney / Stable Diffusion）\n\n**正向提示词 (Positive Prompt):**\n> A 4-view character design sheet, front view, back view, side views, grey background. A tiny, petite, cute fluffy kitten knight with a large head and small delicate body, light cream-colored fur, wearing a pink bow. Wearing ornate silver knight armor with intricate engravings. The kitten is holding an elegant, beautifully designed knight's longsword with a detailed hilt, proportionally fitting for a knight. Wearing a pristine, elegant, flowing white knight's cape with a clean hem and subtle gold embroidery, not torn or ragged. Photorealistic, hyper-detailed, 8k resolution, cinematic lighting, intricate metal texture, soft fluffy fur texture, high-quality 3D render, character turnaround sheet, consistent character design.\n\n**反向提示词 (Negative Prompt) - 极其重要，防止AI变回原样:**\n> battle axe, giant axe, double-bladed axe, torn cape, ragged clothes, dirty, messy cloak, muscular body, large body, bulky, different poses, missing armor, text, watermark, blurry.\n\n---\n\n### 🇨🇳 中文提示词（适用于国内AI绘画工具，如触站、Liblib等）\n\n**正向提示词:**\n> 4视图角色设定图，正面视图，背面视图，侧面视图，灰色背景。一只极其娇小、可爱、毛茸茸的小猫骑士，大头小身体（Q版写实比例），浅奶油色毛发，戴着粉色蝴蝶结。穿着精致的银色骑士盔甲，带有复杂的雕花。小猫手持一把优雅精美的骑士长剑，剑柄细节丰富，比例符合骑士身份。披着一件干净、优雅、飘逸的白色骑士披风，下摆整洁，有精致的金色刺绣，不是破烂的。照片级真实，超高细节，8K分辨率，电影级光影，金属质感，柔软的毛发质感，高质量3D渲染，角色转面图，角色设计一致。\n\n**反向提示词:**\n> 战斧，巨斧，双刃斧，破烂的披风，破布条，脏乱，肌肉发达的身体，体型庞大，笨重，姿势不一致，缺失盔甲，文字，水印，模糊。\n\n---\n\n### 💡 局部重绘与调整建议（实操技巧）：\n\n1. **修改武器（斧头变长剑）**：可以在图生图时，涂抹原图的斧头区域进行**局部重绘（Inpainting）**，提示词输入 `elegant knight's longsword, holding a sword`。长剑的设计可以偏向细长的刺剑或标准的骑士剑，与娇小的身躯形成反差萌。\n2. **优化披风（去除破烂感）**：在原图中，披风边缘破旧。同样建议使用局部重绘，涂抹披风边缘，提示词输入 `pristine white cape, clean hem, elegant fabric`，让AI将其改为材质挺括、有光泽的高级骑士披风。\n3. **身材娇小化**：可以在图生图时加入 `chibi proportions`（Q版比例）或 `petite body`（娇小身体）来引导AI调整形体。但注意不要调得太夸张，以免丢失盔甲的细节。\n4. **保持细节**：一定要开启 ControlNet（建议使用 Lineart 线稿 或 Depth 深度图 模型），强度设置在 0.7-0.9 之间，这样能完美锁死原图的四视图排版和盔甲花纹！"
+          }
+        ],
+        "primaryTextId": "vbTRtZfh7nC6LxihJzYVf",
+        "content": "针对您的需求，由于原图是一个标准的“四视图（正、背、侧）角色设定图”，且材质是高精度3D渲染风格（写实毛发+金属盔甲），在生成改图提示词时，需要明确保留原有构图和精细度，同时精准替换元素。\n\n建议配合**图生图（Img2Img）+ ControlNet（控制姿态和轮廓）**使用以下提示词。\n\n### 🎨 英文提示词（推荐直接用于 Midjourney / Stable Diffusion）\n\n**正向提示词 (Positive Prompt):**\n> A 4-view character design sheet, front view, back view, side views, grey background. A tiny, petite, cute fluffy kitten knight with a large head and small delicate body, light cream-colored fur, wearing a pink bow. Wearing ornate silver knight armor with intricate engravings. The kitten is holding an elegant, beautifully designed knight's longsword with a detailed hilt, proportionally fitting for a knight. Wearing a pristine, elegant, flowing white knight's cape with a clean hem and subtle gold embroidery, not torn or ragged. Photorealistic, hyper-detailed, 8k resolution, cinematic lighting, intricate metal texture, soft fluffy fur texture, high-quality 3D render, character turnaround sheet, consistent character design.\n\n**反向提示词 (Negative Prompt) - 极其重要，防止AI变回原样:**\n> battle axe, giant axe, double-bladed axe, torn cape, ragged clothes, dirty, messy cloak, muscular body, large body, bulky, different poses, missing armor, text, watermark, blurry.\n\n---\n\n### 🇨🇳 中文提示词（适用于国内AI绘画工具，如触站、Liblib等）\n\n**正向提示词:**\n> 4视图角色设定图，正面视图，背面视图，侧面视图，灰色背景。一只极其娇小、可爱、毛茸茸的小猫骑士，大头小身体（Q版写实比例），浅奶油色毛发，戴着粉色蝴蝶结。穿着精致的银色骑士盔甲，带有复杂的雕花。小猫手持一把优雅精美的骑士长剑，剑柄细节丰富，比例符合骑士身份。披着一件干净、优雅、飘逸的白色骑士披风，下摆整洁，有精致的金色刺绣，不是破烂的。照片级真实，超高细节，8K分辨率，电影级光影，金属质感，柔软的毛发质感，高质量3D渲染，角色转面图，角色设计一致。\n\n**反向提示词:**\n> 战斧，巨斧，双刃斧，破烂的披风，破布条，脏乱，肌肉发达的身体，体型庞大，笨重，姿势不一致，缺失盔甲，文字，水印，模糊。\n\n---\n\n### 💡 局部重绘与调整建议（实操技巧）：\n\n1. **修改武器（斧头变长剑）**：可以在图生图时，涂抹原图的斧头区域进行**局部重绘（Inpainting）**，提示词输入 `elegant knight's longsword, holding a sword`。长剑的设计可以偏向细长的刺剑或标准的骑士剑，与娇小的身躯形成反差萌。\n2. **优化披风（去除破烂感）**：在原图中，披风边缘破旧。同样建议使用局部重绘，涂抹披风边缘，提示词输入 `pristine white cape, clean hem, elegant fabric`，让AI将其改为材质挺括、有光泽的高级骑士披风。\n3. **身材娇小化**：可以在图生图时加入 `chibi proportions`（Q版比例）或 `petite body`（娇小身体）来引导AI调整形体。但注意不要调得太夸张，以免丢失盔甲的细节。\n4. **保持细节**：一定要开启 ControlNet（建议使用 Lineart 线稿 或 Depth 深度图 模型），强度设置在 0.7-0.9 之间，这样能完美锁死原图的四视图排版和盔甲花纹！"
+      }
+    },
+    {
+      "id": "image-1792285044198-f2zfv",
+      "type": "image",
+      "title": "生图吧\n\n【文本1】\n针对您的需求，由于原图是一个标准的“四视图",
+      "position": {
+        "x": 1496.6086553315045,
+        "y": 310.5
+      },
+      "width": 240,
+      "height": 240,
+      "metadata": {
+        "content": "blob:http://localhost:5173/5f92a69e-b406-4ab2-a588-c35c92be19b4",
+        "status": "success",
+        "prompt": "生图吧\n\n【文本1】\n针对您的需求，由于原图是一个标准的“四视图（正、背、侧）角色设定图”，且材质是高精度3D渲染风格（写实毛发+金属盔甲），在生成改图提示词时，需要明确保留原有构图和精细度，同时精准替换元素。\n\n建议配合**图生图（Img2Img）+ ControlNet（控制姿态和轮廓）**使用以下提示词。\n\n### 🎨 英文提示词（推荐直接用于 Midjourney / Stable Diffusion）\n\n**正向提示词 (Positive Prompt):**\n> A 4-view character design sheet, front view, back view, side views, grey background. A tiny, petite, cute fluffy kitten knight with a large head and small delicate body, light cream-colored fur, wearing a pink bow. Wearing ornate silver knight armor with intricate engravings. The kitten is holding an elegant, beautifully designed knight's longsword with a detailed hilt, proportionally fitting for a knight. Wearing a pristine, elegant, flowing white knight's cape with a clean hem and subtle gold embroidery, not torn or ragged. Photorealistic, hyper-detailed, 8k resolution, cinematic lighting, intricate metal texture, soft fluffy fur texture, high-quality 3D render, character turnaround sheet, consistent character design.\n\n**反向提示词 (Negative Prompt) - 极其重要，防止AI变回原样:**\n> battle axe, giant axe, double-bladed axe, torn cape, ragged clothes, dirty, messy cloak, muscular body, large body, bulky, different poses, missing armor, text, watermark, blurry.\n\n---\n\n### 🇨🇳 中文提示词（适用于国内AI绘画工具，如触站、Liblib等）\n\n**正向提示词:**\n> 4视图角色设定图，正面视图，背面视图，侧面视图，灰色背景。一只极其娇小、可爱、毛茸茸的小猫骑士，大头小身体（Q版写实比例），浅奶油色毛发，戴着粉色蝴蝶结。穿着精致的银色骑士盔甲，带有复杂的雕花。小猫手持一把优雅精美的骑士长剑，剑柄细节丰富，比例符合骑士身份。披着一件干净、优雅、飘逸的白色骑士披风，下摆整洁，有精致的金色刺绣，不是破烂的。照片级真实，超高细节，8K分辨率，电影级光影，金属质感，柔软的毛发质感，高质量3D渲染，角色转面图，角色设计一致。\n\n**反向提示词:**\n> 战斧，巨斧，双刃斧，破烂的披风，破布条，脏乱，肌肉发达的身体，体型庞大，笨重，姿势不一致，缺失盔甲，文字，水印，模糊。\n\n---\n\n### 💡 局部重绘与调整建议（实操技巧）：\n\n1. **修改武器（斧头变长剑）**：可以在图生图时，涂抹原图的斧头区域进行**局部重绘（Inpainting）**，提示词输入 `elegant knight's longsword, holding a sword`。长剑的设计可以偏向细长的刺剑或标准的骑士剑，与娇小的身躯形成反差萌。\n2. **优化披风（去除破烂感）**：在原图中，披风边缘破旧。同样建议使用局部重绘，涂抹披风边缘，提示词输入 `pristine white cape, clean hem, elegant fabric`，让AI将其改为材质挺括、有光泽的高级骑士披风。\n3. **身材娇小化**：可以在图生图时加入 `chibi proportions`（Q版比例）或 `petite body`（娇小身体）来引导AI调整形体。但注意不要调得太夸张，以免丢失盔甲的细节。\n4. **保持细节**：一定要开启 ControlNet（建议使用 Lineart 线稿 或 Depth 深度图 模型），强度设置在 0.7-0.9 之间，这样能完美锁死原图的四视图排版和盔甲花纹！",
+        "size": "auto",
+        "composerContent": "生图吧",
+        "images": [
+          {
+            "id": "BJe0t4J0Is_MDInW4YWCq",
+            "status": "success",
+            "content": "blob:http://localhost:5173/5f92a69e-b406-4ab2-a588-c35c92be19b4",
+            "storageKey": "image:LmS1kBvmQQYQktmjIkvbt",
+            "naturalWidth": 1254,
+            "naturalHeight": 1254,
+            "bytes": 1455442,
+            "mimeType": "image/png"
+          }
+        ],
+        "primaryImageId": "BJe0t4J0Is_MDInW4YWCq",
+        "generationType": "edit",
+        "model": "autodl::gpt-image-2.5-flare",
+        "quality": "auto",
+        "count": 1,
+        "references": [
+          "image:-dos_kbb9Qq6gIZl0vZPt"
+        ],
+        "storageKey": "image:LmS1kBvmQQYQktmjIkvbt",
+        "naturalWidth": 1254,
+        "naturalHeight": 1254,
+        "bytes": 1455442,
+        "mimeType": "image/png"
+      }
+    },
+    {
+      "id": "text-1792285167566-v88m4",
+      "type": "text",
+      "title": "图生图提示词：给角色武器来个细节展示图",
+      "position": {
+        "x": 1877.7422816071344,
+        "y": 15.5
+      },
+      "width": 340,
+      "height": 240,
+      "metadata": {
+        "prompt": "图生图提示词：给角色武器来个细节展示图",
+        "status": "success",
+        "fontSize": 14,
+        "model": "autodl::DeepSeek-V4.1-Flash",
+        "reasoningEffort": "auto",
+        "textCount": 1,
+        "texts": [
+          {
+            "id": "td81kuOceveTrbDpx8YJw",
+            "status": "success",
+            "content": "基于你提供的这张“猫咪骑士”四视图设定图，如果你想要通过图生图（Img2Img）功能生成**武器（长剑）的细节展示图**，核心在于改变画面的构图焦点（从角色全身转为武器特写或道具设定），同时保留原有的美术风格（写实奇幻、精致金属质感、白披风配色）。\n\n直接使用原图进行图生图时，AI很容易继续生成“四只猫”。因此，建议在提示词中强调**“道具设定图 (Weapon sheet)”**、**“特写 (Close-up)”**或**“静物展示 (Still life)”**，并在参数上适当调高重绘幅度（Denoising strength），或配合ControlNet（控制网）的边缘/深度检测来重塑武器细节。\n\n以下为你提供几组不同侧重点的图生图提示词及建议：\n\n### 方案一：武器设定图（多角度细节展示，与原图排版类似）\n**中文提示词：**\n> 一把华丽的中世纪骑士长剑，武器细节展示图，多角度呈现（正面、侧面、剑柄特写、剑刃特写），银色金属刀刃，精雕细琢的十字剑格，带有金色华丽花纹，尖刺状剑首，游戏道具设计图，专业武器概念设计，纯白背景（或纯灰背景），高分辨率，极其精细的金属纹理，打光清晰，8k，杰作。\n\n**英文提示词（推荐用于SD/MJ等）：**\n> A magnificent medieval knight's longsword, weapon detail showcase, multi-angle presentation (front view, side view, hilt close-up, blade close-up), silver metal blade, intricately carved crossguard, ornate gold floral patterns, pointed pommel, game prop design sheet, professional weapon concept art, solid white background, high resolution, extremely detailed metal texture, clear lighting, 8k, masterpiece.\n\n### 方案二：极致特写（聚焦剑柄与金属质感）\n**中文提示词：**\n> 骑士长剑的极近距离特写，聚焦华丽的剑柄与十字剑格，银色与金色的金属光泽，精美的雕刻与戒环，皮革缠柄，景深效果，微距摄影，电影级打光，极高细节，写实金属质感，带有淡淡的白披风边缘作为背景虚化（呼应原图）。\n\n**英文提示词：**\n> Extreme close-up of a knight's longsword, focus on the ornate hilt and crossguard, silver and gold metallic luster, exquisite engravings and rings, leather wrapped grip, depth of field, macro photography, cinematic lighting, extreme detail, photorealistic metal texture, with a subtle blurred edge of a white cape in the background.\n\n### 方案三：猫咪骑士查看武器的场景（保留角色温情感）\n**中文提示词：**\n> 毛茸茸的橘色小猫骑士，头戴粉色蝴蝶结，穿着银色盔甲，正用两只毛茸茸的爪子捧着一把华丽的银色长剑，低头仔细查看剑刃的细节，白色披风随意的披在肩上，柔和的影棚光线，特写镜头，毛发的极致细节，逼真的金属反光，温暖的色调，8k。\n\n**英文提示词：**\n> Fluffy orange kitten knight wearing a pink bow, wearing silver armor, holding a magnificent silver longsword with two fluffy paws, looking down at the details of the blade, white cape draped over the shoulders, soft studio lighting, close-up shot, extreme fur detail, realistic metal reflection, warm tone, 8k.\n\n---\n\n### 💡 图生图（Img2Img）实操建议：\n\n1. **重绘幅度（Denoising Strength）**：建议设置在 **0.6 - 0.75**。太低会导致画面还是四视图，太高会完全放飞失去原有的猫咪设计风格。\n2. **ControlNet 使用**：\n   * 如果使用 **Canny（边缘检测）** 或 **Depth（深度图）**，可以让长剑的轮廓与原图保持一致，只优化材质和光效。\n   * 如果希望生成全新的排版（如单独横放的长剑），建议**不启用 ControlNet**，或者只给原图很少的权重。\n3. **背景处理**：原图是灰色背景，可以在提示词中加入 `white background, simple gray background, studio lighting`，让武器细节更加凸显。\n4. **负面提示词（Negative Prompt）**：\n   > (worst quality, low quality:1.4), four cats, multiple characters, full body shot, blurry, deformed weapons, extra limbs, text, watermark. （即：低质量，四只猫，多角色，全身镜头，模糊，畸形武器，多余肢体，文字，水印）"
+          }
+        ],
+        "primaryTextId": "td81kuOceveTrbDpx8YJw",
+        "content": "基于你提供的这张“猫咪骑士”四视图设定图，如果你想要通过图生图（Img2Img）功能生成**武器（长剑）的细节展示图**，核心在于改变画面的构图焦点（从角色全身转为武器特写或道具设定），同时保留原有的美术风格（写实奇幻、精致金属质感、白披风配色）。\n\n直接使用原图进行图生图时，AI很容易继续生成“四只猫”。因此，建议在提示词中强调**“道具设定图 (Weapon sheet)”**、**“特写 (Close-up)”**或**“静物展示 (Still life)”**，并在参数上适当调高重绘幅度（Denoising strength），或配合ControlNet（控制网）的边缘/深度检测来重塑武器细节。\n\n以下为你提供几组不同侧重点的图生图提示词及建议：\n\n### 方案一：武器设定图（多角度细节展示，与原图排版类似）\n**中文提示词：**\n> 一把华丽的中世纪骑士长剑，武器细节展示图，多角度呈现（正面、侧面、剑柄特写、剑刃特写），银色金属刀刃，精雕细琢的十字剑格，带有金色华丽花纹，尖刺状剑首，游戏道具设计图，专业武器概念设计，纯白背景（或纯灰背景），高分辨率，极其精细的金属纹理，打光清晰，8k，杰作。\n\n**英文提示词（推荐用于SD/MJ等）：**\n> A magnificent medieval knight's longsword, weapon detail showcase, multi-angle presentation (front view, side view, hilt close-up, blade close-up), silver metal blade, intricately carved crossguard, ornate gold floral patterns, pointed pommel, game prop design sheet, professional weapon concept art, solid white background, high resolution, extremely detailed metal texture, clear lighting, 8k, masterpiece.\n\n### 方案二：极致特写（聚焦剑柄与金属质感）\n**中文提示词：**\n> 骑士长剑的极近距离特写，聚焦华丽的剑柄与十字剑格，银色与金色的金属光泽，精美的雕刻与戒环，皮革缠柄，景深效果，微距摄影，电影级打光，极高细节，写实金属质感，带有淡淡的白披风边缘作为背景虚化（呼应原图）。\n\n**英文提示词：**\n> Extreme close-up of a knight's longsword, focus on the ornate hilt and crossguard, silver and gold metallic luster, exquisite engravings and rings, leather wrapped grip, depth of field, macro photography, cinematic lighting, extreme detail, photorealistic metal texture, with a subtle blurred edge of a white cape in the background.\n\n### 方案三：猫咪骑士查看武器的场景（保留角色温情感）\n**中文提示词：**\n> 毛茸茸的橘色小猫骑士，头戴粉色蝴蝶结，穿着银色盔甲，正用两只毛茸茸的爪子捧着一把华丽的银色长剑，低头仔细查看剑刃的细节，白色披风随意的披在肩上，柔和的影棚光线，特写镜头，毛发的极致细节，逼真的金属反光，温暖的色调，8k。\n\n**英文提示词：**\n> Fluffy orange kitten knight wearing a pink bow, wearing silver armor, holding a magnificent silver longsword with two fluffy paws, looking down at the details of the blade, white cape draped over the shoulders, soft studio lighting, close-up shot, extreme fur detail, realistic metal reflection, warm tone, 8k.\n\n---\n\n### 💡 图生图（Img2Img）实操建议：\n\n1. **重绘幅度（Denoising Strength）**：建议设置在 **0.6 - 0.75**。太低会导致画面还是四视图，太高会完全放飞失去原有的猫咪设计风格。\n2. **ControlNet 使用**：\n   * 如果使用 **Canny（边缘检测）** 或 **Depth（深度图）**，可以让长剑的轮廓与原图保持一致，只优化材质和光效。\n   * 如果希望生成全新的排版（如单独横放的长剑），建议**不启用 ControlNet**，或者只给原图很少的权重。\n3. **背景处理**：原图是灰色背景，可以在提示词中加入 `white background, simple gray background, studio lighting`，让武器细节更加凸显。\n4. **负面提示词（Negative Prompt）**：\n   > (worst quality, low quality:1.4), four cats, multiple characters, full body shot, blurry, deformed weapons, extra limbs, text, watermark. （即：低质量，四只猫，多角色，全身镜头，模糊，畸形武器，多余肢体，文字，水印）"
+      }
+    },
+    {
+      "id": "image-1792285294708-d6am6",
+      "type": "image",
+      "title": "生图吧\n\n【文本1】\n基于你提供的这张“猫咪骑士”四视图设定图，",
+      "position": {
+        "x": 2349.4050066355603,
+        "y": 310.5
+      },
+      "width": 240,
+      "height": 240,
+      "metadata": {
+        "status": "success",
+        "prompt": "生图吧\n\n【文本1】\n基于你提供的这张“猫咪骑士”四视图设定图，如果你想要通过图生图（Img2Img）功能生成**武器（长剑）的细节展示图**，核心在于改变画面的构图焦点（从角色全身转为武器特写或道具设定），同时保留原有的美术风格（写实奇幻、精致金属质感、白披风配色）。\n\n直接使用原图进行图生图时，AI很容易继续生成“四只猫”。因此，建议在提示词中强调**“道具设定图 (Weapon sheet)”**、**“特写 (Close-up)”**或**“静物展示 (Still life)”**，并在参数上适当调高重绘幅度（Denoising strength），或配合ControlNet（控制网）的边缘/深度检测来重塑武器细节。\n\n以下为你提供几组不同侧重点的图生图提示词及建议：\n\n### 方案一：武器设定图（多角度细节展示，与原图排版类似）\n**中文提示词：**\n> 一把华丽的中世纪骑士长剑，武器细节展示图，多角度呈现（正面、侧面、剑柄特写、剑刃特写），银色金属刀刃，精雕细琢的十字剑格，带有金色华丽花纹，尖刺状剑首，游戏道具设计图，专业武器概念设计，纯白背景（或纯灰背景），高分辨率，极其精细的金属纹理，打光清晰，8k，杰作。\n\n**英文提示词（推荐用于SD/MJ等）：**\n> A magnificent medieval knight's longsword, weapon detail showcase, multi-angle presentation (front view, side view, hilt close-up, blade close-up), silver metal blade, intricately carved crossguard, ornate gold floral patterns, pointed pommel, game prop design sheet, professional weapon concept art, solid white background, high resolution, extremely detailed metal texture, clear lighting, 8k, masterpiece.\n\n### 方案二：极致特写（聚焦剑柄与金属质感）\n**中文提示词：**\n> 骑士长剑的极近距离特写，聚焦华丽的剑柄与十字剑格，银色与金色的金属光泽，精美的雕刻与戒环，皮革缠柄，景深效果，微距摄影，电影级打光，极高细节，写实金属质感，带有淡淡的白披风边缘作为背景虚化（呼应原图）。\n\n**英文提示词：**\n> Extreme close-up of a knight's longsword, focus on the ornate hilt and crossguard, silver and gold metallic luster, exquisite engravings and rings, leather wrapped grip, depth of field, macro photography, cinematic lighting, extreme detail, photorealistic metal texture, with a subtle blurred edge of a white cape in the background.\n\n### 方案三：猫咪骑士查看武器的场景（保留角色温情感）\n**中文提示词：**\n> 毛茸茸的橘色小猫骑士，头戴粉色蝴蝶结，穿着银色盔甲，正用两只毛茸茸的爪子捧着一把华丽的银色长剑，低头仔细查看剑刃的细节，白色披风随意的披在肩上，柔和的影棚光线，特写镜头，毛发的极致细节，逼真的金属反光，温暖的色调，8k。\n\n**英文提示词：**\n> Fluffy orange kitten knight wearing a pink bow, wearing silver armor, holding a magnificent silver longsword with two fluffy paws, looking down at the details of the blade, white cape draped over the shoulders, soft studio lighting, close-up shot, extreme fur detail, realistic metal reflection, warm tone, 8k.\n\n---\n\n### 💡 图生图（Img2Img）实操建议：\n\n1. **重绘幅度（Denoising Strength）**：建议设置在 **0.6 - 0.75**。太低会导致画面还是四视图，太高会完全放飞失去原有的猫咪设计风格。\n2. **ControlNet 使用**：\n   * 如果使用 **Canny（边缘检测）** 或 **Depth（深度图）**，可以让长剑的轮廓与原图保持一致，只优化材质和光效。\n   * 如果希望生成全新的排版（如单独横放的长剑），建议**不启用 ControlNet**，或者只给原图很少的权重。\n3. **背景处理**：原图是灰色背景，可以在提示词中加入 `white background, simple gray background, studio lighting`，让武器细节更加凸显。\n4. **负面提示词（Negative Prompt）**：\n   > (worst quality, low quality:1.4), four cats, multiple characters, full body shot, blurry, deformed weapons, extra limbs, text, watermark. （即：低质量，四只猫，多角色，全身镜头，模糊，畸形武器，多余肢体，文字，水印）",
+        "composerContent": "生图吧",
+        "images": [
+          {
+            "id": "FyWrh67m4OEmI3D4dLfxp",
+            "status": "error",
+            "content": "",
+            "naturalWidth": 0,
+            "naturalHeight": 0,
+            "bytes": 0,
+            "mimeType": "",
+            "errorDetails": "页面刷新后生成已中断，请重新生成。"
+          }
+        ],
+        "generationType": "edit",
+        "model": "autodl::gpt-image-2.5-flare",
+        "size": "1:1",
+        "quality": "auto",
+        "count": 1,
+        "references": [
+          "image:LmS1kBvmQQYQktmjIkvbt"
+        ],
+        "content": "blob:http://localhost:5173/23019410-2d76-42b7-b048-5a07fbd0b6bf",
+        "storageKey": "image:emQrvHRNoKo89zpazdw6c",
+        "naturalWidth": 1024,
+        "naturalHeight": 1024,
+        "bytes": 1202866,
+        "mimeType": "image/png",
+        "primaryImageId": "orK3G6ESBEq8RNwFzOKeO"
+      }
+    },
+    {
+      "id": "image-1792286387563-yarn6",
+      "type": "image",
+      "title": "clipboard-image.png",
+      "position": {
+        "x": -153.2105263157895,
+        "y": 1053.6978456627205
+      },
+      "width": 640,
+      "height": 439.1523713420787,
+      "metadata": {
+        "content": "blob:http://localhost:5173/4af68537-42d0-4ca6-b080-ec9bfc3f6ad2",
+        "storageKey": "image:d08zOozHYq9Mbh-_lNNUC",
+        "status": "success",
+        "naturalWidth": 991,
+        "naturalHeight": 680,
+        "bytes": 404072,
+        "mimeType": "image/png",
+        "images": []
+      }
+    },
+    {
+      "id": "image-1792286416049-uwyle",
+      "type": "image",
+      "title": "开始生图吧\n\n【文本1】\n针对你的需求，原提示词中的确有一些适用",
+      "position": {
+        "x": 1496.6086553315045,
+        "y": 813.6978456627204
+      },
+      "width": 240,
+      "height": 240,
+      "metadata": {
+        "content": "blob:http://localhost:5173/6ccadf54-b781-473a-b045-535e208f5873",
+        "status": "success",
+        "prompt": "开始生图吧\n\n【文本1】\n针对你的需求，原提示词中的确有一些适用于“人型角色”或“机甲部件”的词汇（如“部件悬浮”、“装饰物”、“面朝左边”），直接套用在西方巨龙上可能会导致AI生成出错（比如翅膀或四肢脱离身体悬浮）。\n\n我为你优化了这段提示词，**保留了原有的严谨四视图构图逻辑，同时针对“西方巨龙”的形体特征（鳞片、翅膀、尾巴、四肢着地或站立姿态）进行了针对性调整**。建议把这套优化后的提示词输入给AI画图工具（如Midjourney, Stable Diffusion的ControlNet等）。\n\n---\n\n### 优化后的提示词：\n\n基于参考图（图2的西方巨龙），按照以下要求生成四视展示图。建议采用1:1比例或9:16比例构图，4K清晰度。\n\n【尺寸与构图】\n保持原图宽高比，分辨率放大至原图两倍。将画面精确四等分为左上、右上、左下、右下四个相同大小的区域，每个区域各放置一个完整的巨龙主体，内容居中于各自区域内；不添加任何分割线、边框、标注文字或装饰元素；\n左上区域为正面视图（0度，龙头及躯干正对镜头），右上区域为左侧面视图（90度，龙头及身体朝向画面左侧），左下区域为背面视图（180度，展示龙背部的脊椎与尾巴），右下区域为右侧面视图（270度，龙头及身体朝向画面右侧）；右上区域和右下区域的视图方向刚好相反，一左一右，请不要出现两者朝向一致方向。\n\n【关键约束】\n巨龙主体在每个区域内上下左右居中放置，与区域边缘保留不少于区域宽度10%的安全边距。单个区域中仅放置1个完整的西方巨龙，全身入镜，没有裁剪。巨龙的双翼、四肢与尾巴保持自然的生理连接与解剖结构，绝对不能出现部件脱离或悬浮。\n\n【主体特征与表面细节】\n主体为西方巨龙，具备深色（黑褐色）重型鳞片、巨大的膜状双翼、尖锐的背刺、弯曲的龙角与粗壮的尾巴。完整还原原设定图中所有材质细节、纹理、鳞片质感、配色与生理特征，不添加、不遗漏、不改动任何设计元素，贴图精度等效4K。四个视角保持完全一致的配色、材质、结构细节和设计语言，确保巨龙在不同角度下的绝对一致性；（*注：可在此处补充图2中未看清但你想加入的具体细节，如“狰狞的头部”、“脚趾利爪”等*）\n\n【整体画面】\n纯中性灰背景 #888888 ，无环境反射干扰。巨龙保持统一站姿（或收翼站立姿态），双脚踏实踩在虚拟平面上，无底座，通过轻微投射接触阴影增强立体感（避免完全悬浮）。主体周围保留充足的负空间便于观察轮廓。\n\n---\n\n### 💡 主要修改点说明（供你参考）：\n1. **替换人型/机甲术语**：将“部件”改为“双翼、四肢与尾巴保持自然的生理连接与解剖结构”，去掉了“悬浮”，防止AI把翅膀、头、尾巴分别截取悬浮在画面里。\n2. **细化“侧面朝向”**：龙类的身体较长，明确要求“龙头及躯干/身体”朝向哪边，AI才不会只转头或者翅膀乱长。\n3. **针对性特征强化**：在原提示词的“表面细节”中，主动增加了图2的特征描述（深色鳞片、膜状双翼、背刺、弯曲龙角），帮助AI在参考模糊图时更具象化。\n4. **阴影与重心调整**：将“部件悬浮于中心”改为“双脚踏实踩在虚拟平面上”、“通过轻微投射接触阴影”，更符合龙类作为大型生物的视觉重心。\n\n**💡 给AI绘图工具的额外建议**：\n图2稍微有些模糊，为了神似，建议在出图时结合 **ControlNet 的 Depth（深度图）或 Canny（边缘检测）** 功能，提取图1的四视图网格结构（如果打算用图1的网格作为底图），然后结合图2的提示词特征进行重绘。",
+        "size": "auto",
+        "composerContent": "开始生图吧",
+        "images": [
+          {
+            "id": "XOcq1hV5b29821yMUqsCK",
+            "status": "success",
+            "content": "blob:http://localhost:5173/6ccadf54-b781-473a-b045-535e208f5873",
+            "storageKey": "image:eo54ZJ49uMSnot7TT07dh",
+            "naturalWidth": 1254,
+            "naturalHeight": 1254,
+            "bytes": 1992530,
+            "mimeType": "image/png"
+          }
+        ],
+        "primaryImageId": "XOcq1hV5b29821yMUqsCK",
+        "generationType": "edit",
+        "model": "autodl::gpt-image-2.5-flare",
+        "quality": "auto",
+        "count": 1,
+        "references": [
+          "image:MRAJOuhXlO7sEjnWLG4OP",
+          "image:d08zOozHYq9Mbh-_lNNUC"
+        ],
+        "storageKey": "image:eo54ZJ49uMSnot7TT07dh",
+        "naturalWidth": 1254,
+        "naturalHeight": 1254,
+        "bytes": 1992530,
+        "mimeType": "image/png"
+      }
+    },
+    {
+      "id": "text-1792286470780-m4ifg",
+      "type": "text",
+      "title": "需要优化一下面这段提示词，因为这段提示词多是针对人型角色的，这次",
+      "position": {
+        "x": 584.7581288640771,
+        "y": 834
+      },
+      "width": 340,
+      "height": 240,
+      "metadata": {
+        "prompt": "需要优化一下面这段提示词，因为这段提示词多是针对人型角色的，这次是针对西方巨龙形象：基于参考图，按照以下要求生成四视展示图。建议采用1:1比例或9:16比例构图，4K清晰度。\n\n【尺寸与构图】\n保持原图宽高比，分辨率放大至原图两倍。将画面精确四等分为左上、右上、左下、右下四个相同大小的区域，每个区域各放置一个视角，内容居中于各自区域内；不添加任何分割线、边框、标注文字或装饰元素；\n左上区域为正面视图（0度），右上区域为左侧面视图（90度，面朝左边），左下区域为背面视图（180度），右下区域为右侧面视图（270度，面朝右边）；右上区域和右下区域的视图方向刚好相反，一左一右，请不要出现两者朝向一致方向。\n\n【关键约束】\n主体在每个区域内上下左右居中放置，与区域边缘保留不少于区域宽度10%的安全边距。单个区域中仅放置1个主体。\n\n【表面细节】\n完整还原原设定图中所有材质细节、纹理、花纹、配色、装饰物，不添加、不遗漏、不改动任何设计元素，贴图精度等效4K。四个视角保持完全一致的配色、材质、结构细节和设计语言，确保主体在不同角度下的绝对一致性；\n\n【整体画面】\n纯中性灰背景 #888888 ，无环境反射干扰。部件边界处以干净的几何切割面收束。部件悬浮于画面中心，无底座，轻微投射接触阴影增强立体感，部件周围保留充足的负空间便于观察轮廓。",
+        "composerContent": "需要优化一下面这段提示词，因为这段提示词多是针对人型角色的，这次是针对西方巨龙形象：基于参考图，按照以下要求生成四视展示图。建议采用1:1比例或9:16比例构图，4K清晰度。\n\n【尺寸与构图】\n保持原图宽高比，分辨率放大至原图两倍。将画面精确四等分为左上、右上、左下、右下四个相同大小的区域，每个区域各放置一个视角，内容居中于各自区域内；不添加任何分割线、边框、标注文字或装饰元素；\n左上区域为正面视图（0度），右上区域为左侧面视图（90度，面朝左边），左下区域为背面视图（180度），右下区域为右侧面视图（270度，面朝右边）；右上区域和右下区域的视图方向刚好相反，一左一右，请不要出现两者朝向一致方向。\n\n【关键约束】\n主体在每个区域内上下左右居中放置，与区域边缘保留不少于区域宽度10%的安全边距。单个区域中仅放置1个主体。\n\n【表面细节】\n完整还原原设定图中所有材质细节、纹理、花纹、配色、装饰物，不添加、不遗漏、不改动任何设计元素，贴图精度等效4K。四个视角保持完全一致的配色、材质、结构细节和设计语言，确保主体在不同角度下的绝对一致性；\n\n【整体画面】\n纯中性灰背景 #888888 ，无环境反射干扰。部件边界处以干净的几何切割面收束。部件悬浮于画面中心，无底座，轻微投射接触阴影增强立体感，部件周围保留充足的负空间便于观察轮廓。",
+        "status": "success",
+        "fontSize": 14,
+        "model": "autodl::DeepSeek-V4.1-Flash",
+        "reasoningEffort": "auto",
+        "textCount": 1,
+        "texts": [
+          {
+            "id": "jeBzBPN5lYVCiUM5elG-0",
+            "status": "success",
+            "content": "针对你的需求，原提示词中的确有一些适用于“人型角色”或“机甲部件”的词汇（如“部件悬浮”、“装饰物”、“面朝左边”），直接套用在西方巨龙上可能会导致AI生成出错（比如翅膀或四肢脱离身体悬浮）。\n\n我为你优化了这段提示词，**保留了原有的严谨四视图构图逻辑，同时针对“西方巨龙”的形体特征（鳞片、翅膀、尾巴、四肢着地或站立姿态）进行了针对性调整**。建议把这套优化后的提示词输入给AI画图工具（如Midjourney, Stable Diffusion的ControlNet等）。\n\n---\n\n### 优化后的提示词：\n\n基于参考图（图2的西方巨龙），按照以下要求生成四视展示图。建议采用1:1比例或9:16比例构图，4K清晰度。\n\n【尺寸与构图】\n保持原图宽高比，分辨率放大至原图两倍。将画面精确四等分为左上、右上、左下、右下四个相同大小的区域，每个区域各放置一个完整的巨龙主体，内容居中于各自区域内；不添加任何分割线、边框、标注文字或装饰元素；\n左上区域为正面视图（0度，龙头及躯干正对镜头），右上区域为左侧面视图（90度，龙头及身体朝向画面左侧），左下区域为背面视图（180度，展示龙背部的脊椎与尾巴），右下区域为右侧面视图（270度，龙头及身体朝向画面右侧）；右上区域和右下区域的视图方向刚好相反，一左一右，请不要出现两者朝向一致方向。\n\n【关键约束】\n巨龙主体在每个区域内上下左右居中放置，与区域边缘保留不少于区域宽度10%的安全边距。单个区域中仅放置1个完整的西方巨龙，全身入镜，没有裁剪。巨龙的双翼、四肢与尾巴保持自然的生理连接与解剖结构，绝对不能出现部件脱离或悬浮。\n\n【主体特征与表面细节】\n主体为西方巨龙，具备深色（黑褐色）重型鳞片、巨大的膜状双翼、尖锐的背刺、弯曲的龙角与粗壮的尾巴。完整还原原设定图中所有材质细节、纹理、鳞片质感、配色与生理特征，不添加、不遗漏、不改动任何设计元素，贴图精度等效4K。四个视角保持完全一致的配色、材质、结构细节和设计语言，确保巨龙在不同角度下的绝对一致性；（*注：可在此处补充图2中未看清但你想加入的具体细节，如“狰狞的头部”、“脚趾利爪”等*）\n\n【整体画面】\n纯中性灰背景 #888888 ，无环境反射干扰。巨龙保持统一站姿（或收翼站立姿态），双脚踏实踩在虚拟平面上，无底座，通过轻微投射接触阴影增强立体感（避免完全悬浮）。主体周围保留充足的负空间便于观察轮廓。\n\n---\n\n### 💡 主要修改点说明（供你参考）：\n1. **替换人型/机甲术语**：将“部件”改为“双翼、四肢与尾巴保持自然的生理连接与解剖结构”，去掉了“悬浮”，防止AI把翅膀、头、尾巴分别截取悬浮在画面里。\n2. **细化“侧面朝向”**：龙类的身体较长，明确要求“龙头及躯干/身体”朝向哪边，AI才不会只转头或者翅膀乱长。\n3. **针对性特征强化**：在原提示词的“表面细节”中，主动增加了图2的特征描述（深色鳞片、膜状双翼、背刺、弯曲龙角），帮助AI在参考模糊图时更具象化。\n4. **阴影与重心调整**：将“部件悬浮于中心”改为“双脚踏实踩在虚拟平面上”、“通过轻微投射接触阴影”，更符合龙类作为大型生物的视觉重心。\n\n**💡 给AI绘图工具的额外建议**：\n图2稍微有些模糊，为了神似，建议在出图时结合 **ControlNet 的 Depth（深度图）或 Canny（边缘检测）** 功能，提取图1的四视图网格结构（如果打算用图1的网格作为底图），然后结合图2的提示词特征进行重绘。"
+          }
+        ],
+        "primaryTextId": "jeBzBPN5lYVCiUM5elG-0",
+        "content": "针对你的需求，原提示词中的确有一些适用于“人型角色”或“机甲部件”的词汇（如“部件悬浮”、“装饰物”、“面朝左边”），直接套用在西方巨龙上可能会导致AI生成出错（比如翅膀或四肢脱离身体悬浮）。\n\n我为你优化了这段提示词，**保留了原有的严谨四视图构图逻辑，同时针对“西方巨龙”的形体特征（鳞片、翅膀、尾巴、四肢着地或站立姿态）进行了针对性调整**。建议把这套优化后的提示词输入给AI画图工具（如Midjourney, Stable Diffusion的ControlNet等）。\n\n---\n\n### 优化后的提示词：\n\n基于参考图（图2的西方巨龙），按照以下要求生成四视展示图。建议采用1:1比例或9:16比例构图，4K清晰度。\n\n【尺寸与构图】\n保持原图宽高比，分辨率放大至原图两倍。将画面精确四等分为左上、右上、左下、右下四个相同大小的区域，每个区域各放置一个完整的巨龙主体，内容居中于各自区域内；不添加任何分割线、边框、标注文字或装饰元素；\n左上区域为正面视图（0度，龙头及躯干正对镜头），右上区域为左侧面视图（90度，龙头及身体朝向画面左侧），左下区域为背面视图（180度，展示龙背部的脊椎与尾巴），右下区域为右侧面视图（270度，龙头及身体朝向画面右侧）；右上区域和右下区域的视图方向刚好相反，一左一右，请不要出现两者朝向一致方向。\n\n【关键约束】\n巨龙主体在每个区域内上下左右居中放置，与区域边缘保留不少于区域宽度10%的安全边距。单个区域中仅放置1个完整的西方巨龙，全身入镜，没有裁剪。巨龙的双翼、四肢与尾巴保持自然的生理连接与解剖结构，绝对不能出现部件脱离或悬浮。\n\n【主体特征与表面细节】\n主体为西方巨龙，具备深色（黑褐色）重型鳞片、巨大的膜状双翼、尖锐的背刺、弯曲的龙角与粗壮的尾巴。完整还原原设定图中所有材质细节、纹理、鳞片质感、配色与生理特征，不添加、不遗漏、不改动任何设计元素，贴图精度等效4K。四个视角保持完全一致的配色、材质、结构细节和设计语言，确保巨龙在不同角度下的绝对一致性；（*注：可在此处补充图2中未看清但你想加入的具体细节，如“狰狞的头部”、“脚趾利爪”等*）\n\n【整体画面】\n纯中性灰背景 #888888 ，无环境反射干扰。巨龙保持统一站姿（或收翼站立姿态），双脚踏实踩在虚拟平面上，无底座，通过轻微投射接触阴影增强立体感（避免完全悬浮）。主体周围保留充足的负空间便于观察轮廓。\n\n---\n\n### 💡 主要修改点说明（供你参考）：\n1. **替换人型/机甲术语**：将“部件”改为“双翼、四肢与尾巴保持自然的生理连接与解剖结构”，去掉了“悬浮”，防止AI把翅膀、头、尾巴分别截取悬浮在画面里。\n2. **细化“侧面朝向”**：龙类的身体较长，明确要求“龙头及躯干/身体”朝向哪边，AI才不会只转头或者翅膀乱长。\n3. **针对性特征强化**：在原提示词的“表面细节”中，主动增加了图2的特征描述（深色鳞片、膜状双翼、背刺、弯曲龙角），帮助AI在参考模糊图时更具象化。\n4. **阴影与重心调整**：将“部件悬浮于中心”改为“双脚踏实踩在虚拟平面上”、“通过轻微投射接触阴影”，更符合龙类作为大型生物的视觉重心。\n\n**💡 给AI绘图工具的额外建议**：\n图2稍微有些模糊，为了神似，建议在出图时结合 **ControlNet 的 Depth（深度图）或 Canny（边缘检测）** 功能，提取图1的四视图网格结构（如果打算用图1的网格作为底图），然后结合图2的提示词特征进行重绘。"
+      }
+    },
+    {
+      "id": "image-1792287143334-5sows",
+      "type": "image",
+      "title": "clipboard-image.png",
+      "position": {
+        "x": -153.21052631578948,
+        "y": 1654.3052848875918
+      },
+      "width": 640,
+      "height": 362.66666666666663,
+      "metadata": {
+        "content": "blob:http://localhost:5173/b2d31cfb-e1d5-47b4-b650-44fb47ded154",
+        "storageKey": "image:DSnY64ZZLySfSdS37CR-1",
+        "status": "success",
+        "naturalWidth": 1140,
+        "naturalHeight": 646,
+        "bytes": 488159,
+        "mimeType": "image/png",
+        "images": []
+      }
+    },
+    {
+      "id": "text-1792287159891-divm8",
+      "type": "text",
+      "title": "帮我写图生图提示词：只保留场景，也就是说我需要一个场景样例图，不",
+      "position": {
+        "x": 584.7581288640771,
+        "y": 1443.1183027903285
+      },
+      "width": 340,
+      "height": 240,
+      "metadata": {
+        "prompt": "帮我写图生图提示词：只保留场景，也就是说我需要一个场景样例图，不要搞错了",
+        "composerContent": "帮我写图生图提示词：只保留场景，也就是说我需要一个场景样例图，不要搞错了",
+        "status": "success",
+        "fontSize": 14,
+        "model": "autodl::DeepSeek-V4.1-Flash",
+        "reasoningEffort": "auto",
+        "textCount": 1,
+        "texts": [
+          {
+            "id": "AQsVudklTPbuCmHElQCRW",
+            "status": "success",
+            "content": "明白了。你需要的是**移除掉图中的巨型怪兽和仓鼠骑士，仅保留原本的背景环境、地形和雾霾天气**，生成一张“空场景概念图”。\n\n针对图生图（Img2Img）或重绘（Inpainting），我为你准备了中英文对照的提示词和操作建议。\n\n### 🎨 正向提示词（Prompt）—— 描述你想要的场景\n**中文版：**\n空旷的草原战场，野外草地，浓雾弥漫，阴沉的阴天，史诗感暗黑奇幻氛围，电影级光影，远处模糊的废墟轮廓，低视角构图，前景虚化的草丛，景深效果，极其细腻的环境刻画，空无一人，寂静的环境，低饱和度冷灰色调。\n\n**英文版（推荐使用英文，AI理解更精准）：**\n> Empty grassland battlefield, wilderness meadow, heavy fog, dense mist, overcast sky, epic dark fantasy atmosphere, cinematic lighting, distant blurred ruins silhouette, low angle shot, blurred grass in foreground, depth of field, highly detailed environment, empty scene, no characters, silent environment, desaturated cold grey and muted green tones, scenery concept art.\n\n---\n\n### 🚫 反向提示词（Negative Prompt）—— 强制剔除生物和角色\n这一步非常关键，必须明确告诉AI不要画原图里的事物：\n**中文版：**\n怪兽，巨兽，巨型生物，龙，恐龙，动物，仓鼠，骑士，人类，人物，盔甲，武器，剑，斗篷，剪影，任何角色，建筑群。\n\n**英文版：**\n> monster, giant creature, kaiju, dragon, dinosaur, animal, hamster, cat, rodent, knight, warrior, human, person, character, armor, weapon, sword, cape, silhouette, any creatures, crowd, buildings.\n\n---\n\n### 💡 实操避坑建议（重要！）\n\n单纯依靠提示词写“不要怪兽”，在**高重绘幅度**下AI可能会在原位置生成奇怪的石头或树木来填补空白；在**低重绘幅度**下，AI大概率会把怪兽的轮廓保留下来。\n\n为了完美得到场景图，建议你这样操作：\n\n1. **使用局部重绘（Inpainting）**：\n   将原图拖入图生图，用画笔把怪兽和仓鼠涂黑（蒙版），让AI只重绘被遮挡的场景部分（补全草地和雾气）。\n2. **调整重绘幅度（Denoising Strength）**：\n   * 如果使用局部重绘：重绘幅度可以设为 `0.75 - 0.85`，让AI彻底重写被遮挡的部分。\n   * 如果直接整图图生图：重绘幅度必须调高到 `0.8 - 0.9`，否则怪兽的残影一定会留在画面里。但这可能会改变原本的地形结构。\n3. **推荐使用 ControlNet**：\n   如果你想保留精确的地平线和草丛前景，可以使用 **ControlNet Depth（深度图）** 或 **Canny（边缘线）**。但在跑图前，先用修图软件把怪兽粗略涂抹掉，或者只用Depth控制地形而不控制角色。\n4. **比例（Aspect Ratio）**：保持与原图一致（通常是16:9或21:9），以维持电影级的宽幅构图。\n\n按照这样操作，你就能得到一张纯粹的、带着末日迷雾氛围的野外空地场景图了。"
+          }
+        ],
+        "primaryTextId": "AQsVudklTPbuCmHElQCRW",
+        "content": "明白了。你需要的是**移除掉图中的巨型怪兽和仓鼠骑士，仅保留原本的背景环境、地形和雾霾天气**，生成一张“空场景概念图”。\n\n针对图生图（Img2Img）或重绘（Inpainting），我为你准备了中英文对照的提示词和操作建议。\n\n### 🎨 正向提示词（Prompt）—— 描述你想要的场景\n**中文版：**\n空旷的草原战场，野外草地，浓雾弥漫，阴沉的阴天，史诗感暗黑奇幻氛围，电影级光影，远处模糊的废墟轮廓，低视角构图，前景虚化的草丛，景深效果，极其细腻的环境刻画，空无一人，寂静的环境，低饱和度冷灰色调。\n\n**英文版（推荐使用英文，AI理解更精准）：**\n> Empty grassland battlefield, wilderness meadow, heavy fog, dense mist, overcast sky, epic dark fantasy atmosphere, cinematic lighting, distant blurred ruins silhouette, low angle shot, blurred grass in foreground, depth of field, highly detailed environment, empty scene, no characters, silent environment, desaturated cold grey and muted green tones, scenery concept art.\n\n---\n\n### 🚫 反向提示词（Negative Prompt）—— 强制剔除生物和角色\n这一步非常关键，必须明确告诉AI不要画原图里的事物：\n**中文版：**\n怪兽，巨兽，巨型生物，龙，恐龙，动物，仓鼠，骑士，人类，人物，盔甲，武器，剑，斗篷，剪影，任何角色，建筑群。\n\n**英文版：**\n> monster, giant creature, kaiju, dragon, dinosaur, animal, hamster, cat, rodent, knight, warrior, human, person, character, armor, weapon, sword, cape, silhouette, any creatures, crowd, buildings.\n\n---\n\n### 💡 实操避坑建议（重要！）\n\n单纯依靠提示词写“不要怪兽”，在**高重绘幅度**下AI可能会在原位置生成奇怪的石头或树木来填补空白；在**低重绘幅度**下，AI大概率会把怪兽的轮廓保留下来。\n\n为了完美得到场景图，建议你这样操作：\n\n1. **使用局部重绘（Inpainting）**：\n   将原图拖入图生图，用画笔把怪兽和仓鼠涂黑（蒙版），让AI只重绘被遮挡的场景部分（补全草地和雾气）。\n2. **调整重绘幅度（Denoising Strength）**：\n   * 如果使用局部重绘：重绘幅度可以设为 `0.75 - 0.85`，让AI彻底重写被遮挡的部分。\n   * 如果直接整图图生图：重绘幅度必须调高到 `0.8 - 0.9`，否则怪兽的残影一定会留在画面里。但这可能会改变原本的地形结构。\n3. **推荐使用 ControlNet**：\n   如果你想保留精确的地平线和草丛前景，可以使用 **ControlNet Depth（深度图）** 或 **Canny（边缘线）**。但在跑图前，先用修图软件把怪兽粗略涂抹掉，或者只用Depth控制地形而不控制角色。\n4. **比例（Aspect Ratio）**：保持与原图一致（通常是16:9或21:9），以维持电影级的宽幅构图。\n\n按照这样操作，你就能得到一张纯粹的、带着末日迷雾氛围的野外空地场景图了。"
+      }
+    },
+    {
+      "id": "image-1792287330345-ixaem",
+      "type": "image",
+      "title": "生图吧\n\n【文本1】\n明白了。你需要的是**移除掉图中的巨型怪兽",
+      "position": {
+        "x": 1048.030431836396,
+        "y": 1739.3120876086803
+      },
+      "width": 340,
+      "height": 192.6530612244898,
+      "metadata": {
+        "content": "blob:http://localhost:5173/9e137d30-5095-42ed-a3f0-466c14eac30d",
+        "status": "success",
+        "prompt": "生图吧\n\n【文本1】\n明白了。你需要的是**移除掉图中的巨型怪兽和仓鼠骑士，仅保留原本的背景环境、地形和雾霾天气**，生成一张“空场景概念图”。\n\n针对图生图（Img2Img）或重绘（Inpainting），我为你准备了中英文对照的提示词和操作建议。\n\n### 🎨 正向提示词（Prompt）—— 描述你想要的场景\n**中文版：**\n空旷的草原战场，野外草地，浓雾弥漫，阴沉的阴天，史诗感暗黑奇幻氛围，电影级光影，远处模糊的废墟轮廓，低视角构图，前景虚化的草丛，景深效果，极其细腻的环境刻画，空无一人，寂静的环境，低饱和度冷灰色调。\n\n**英文版（推荐使用英文，AI理解更精准）：**\n> Empty grassland battlefield, wilderness meadow, heavy fog, dense mist, overcast sky, epic dark fantasy atmosphere, cinematic lighting, distant blurred ruins silhouette, low angle shot, blurred grass in foreground, depth of field, highly detailed environment, empty scene, no characters, silent environment, desaturated cold grey and muted green tones, scenery concept art.\n\n---\n\n### 🚫 反向提示词（Negative Prompt）—— 强制剔除生物和角色\n这一步非常关键，必须明确告诉AI不要画原图里的事物：\n**中文版：**\n怪兽，巨兽，巨型生物，龙，恐龙，动物，仓鼠，骑士，人类，人物，盔甲，武器，剑，斗篷，剪影，任何角色，建筑群。\n\n**英文版：**\n> monster, giant creature, kaiju, dragon, dinosaur, animal, hamster, cat, rodent, knight, warrior, human, person, character, armor, weapon, sword, cape, silhouette, any creatures, crowd, buildings.\n\n---\n\n### 💡 实操避坑建议（重要！）\n\n单纯依靠提示词写“不要怪兽”，在**高重绘幅度**下AI可能会在原位置生成奇怪的石头或树木来填补空白；在**低重绘幅度**下，AI大概率会把怪兽的轮廓保留下来。\n\n为了完美得到场景图，建议你这样操作：\n\n1. **使用局部重绘（Inpainting）**：\n   将原图拖入图生图，用画笔把怪兽和仓鼠涂黑（蒙版），让AI只重绘被遮挡的场景部分（补全草地和雾气）。\n2. **调整重绘幅度（Denoising Strength）**：\n   * 如果使用局部重绘：重绘幅度可以设为 `0.75 - 0.85`，让AI彻底重写被遮挡的部分。\n   * 如果直接整图图生图：重绘幅度必须调高到 `0.8 - 0.9`，否则怪兽的残影一定会留在画面里。但这可能会改变原本的地形结构。\n3. **推荐使用 ControlNet**：\n   如果你想保留精确的地平线和草丛前景，可以使用 **ControlNet Depth（深度图）** 或 **Canny（边缘线）**。但在跑图前，先用修图软件把怪兽粗略涂抹掉，或者只用Depth控制地形而不控制角色。\n4. **比例（Aspect Ratio）**：保持与原图一致（通常是16:9或21:9），以维持电影级的宽幅构图。\n\n按照这样操作，你就能得到一张纯粹的、带着末日迷雾氛围的野外空地场景图了。",
+        "size": "auto",
+        "composerContent": "生图吧",
+        "images": [
+          {
+            "id": "iQsPv9dyfBEYkiPQjsoxy",
+            "status": "success",
+            "content": "blob:http://localhost:5173/9e137d30-5095-42ed-a3f0-466c14eac30d",
+            "storageKey": "image:w_J8NWFH6HJmoAdAG63Pu",
+            "naturalWidth": 1666,
+            "naturalHeight": 944,
+            "bytes": 1521375,
+            "mimeType": "image/png"
+          }
+        ],
+        "primaryImageId": "iQsPv9dyfBEYkiPQjsoxy",
+        "generationType": "edit",
+        "model": "autodl::gpt-image-2.5-flare",
+        "quality": "auto",
+        "count": 1,
+        "references": [
+          "image:DSnY64ZZLySfSdS37CR-1"
+        ],
+        "storageKey": "image:w_J8NWFH6HJmoAdAG63Pu",
+        "naturalWidth": 1666,
+        "naturalHeight": 944,
+        "bytes": 1521375,
+        "mimeType": "image/png"
+      }
+    },
+    {
+      "id": "text-1792287465822-doma6",
+      "type": "text",
+      "title": "根据现有数字资产，生成一部30秒短片的脚本剧本，不要对话纯激烈打",
+      "position": {
+        "x": 2773.7662789633323,
+        "y": 813.6978456627204
+      },
+      "width": 340,
+      "height": 240,
+      "metadata": {
+        "prompt": "根据现有数字资产，生成一部30秒短片的脚本剧本，不要对话纯激烈打斗",
+        "composerContent": "根据现有数字资产，生成一部30秒短片的脚本剧本，不要对话纯激烈打斗",
+        "status": "success",
+        "fontSize": 14,
+        "model": "autodl::DeepSeek-V4.1-Flash",
+        "reasoningEffort": "xhigh",
+        "textCount": 1,
+        "texts": [
+          {
+            "id": "S5Fpd__wOVqHijna_jn-j",
+            "status": "success",
+            "content": "基于您提供的数字资产（毛茸茸的骑士猫、精美的宝剑细节、废墟荒野场景、暗黑巨龙），是一部充满强烈反差感与史诗感的奇幻动作短片。\n\n以下是为您定制的**30秒无对白纯打斗短片脚本**。全片以高速剪辑和极具张力的声效为主，突出“萌系重甲”与“恐怖巨龙”的极致碰撞。\n\n---\n\n# 短片名称：《微光与巨兽》（The Knight & The Behemoth）\n**时长**：30秒\n**风格**：暗黑奇幻、史诗动作、无对白、极度激烈\n**核心视听反差**：毛茸茸的可爱外表 VS 极致的钢铁暴力美学\n\n---\n\n### 🎬 0:00 - 0:05 | 序幕：肃杀之景（参考图3、图2）\n**【视觉】**\n*   **镜头1（极低微观视角）**：屏幕被灰暗的杂草填满（参考图3“视角1”），雨滴砸在叶片上。\n*   **镜头2（推近特写）**：画面升起，聚焦在骑士猫（参考图1）身上。它缓缓拔出那柄带有菱形宝石与金色繁复花纹的十字长剑（参考图2，剑身特写）。\n*   **镜头3（环绕近景）**：雨水顺着银色重甲和粉色蝴蝶结滴落，白色披风在“阴雨连绵”（参考图3·场景B）的废土狂风中猎猎作响。\n**【音效】** 闷雷滚滚，狂风呼啸，雨水拍打金属的清脆声，剑刃出鞘的金属摩擦声（铮——）。\n\n### 🎬 0:05 - 0:10 | 突袭：巨兽降临（参考图4、图3）\n**【视觉】**\n*   **镜头4（无人机高空俯拍，参考图3“视角2”）**：雾气翻滚的荒野废墟上空，云层骤然撕裂。\n*   **镜头5（仰视，参考图3“视角4”）**：巨大的黑龙（参考图4）破雾而出，双翼展开遮天蔽日，发出狂暴的咆哮。它庞大的身躯直接撞碎了高耸的哥特式废墟石柱。\n*   **镜头6（高速跟随）**：黑龙俯冲，利爪撕裂地面。\n**【音效】** 震耳欲聋的龙啸声，建筑崩塌的巨响，狂风被撕裂的尖啸。\n\n### 🎬 0:10 - 0:20 | 交锋：刀光剑影（参考图1、图2、图4）\n**【视觉】**\n*   **镜头7（极速推拉，快剪）**：黑龙巨口咬下。骑士猫奋力一跃，踩着一块飞溅的碎石腾空而起。黑龙的牙齿与骑士擦肩而过，咬碎地面。\n*   **镜头8（微距特写）**：骑士猫在半空中转动剑柄（参考图2，握柄细节），剑刃上的金色符文在雨中亮起微光。它双手紧握长剑，凌空劈下。\n*   **镜头9（第一人称视角）**：黑龙粗粝的龙鳞（参考图4背部细节）与宝剑碰撞，擦出刺目的火花。骑士猫借着反作用力在龙背上连续翻滚跳跃，避开扫来的布满尖刺的龙尾。\n*   **镜头10（破晓微光，参考图3·场景A）**：天边透出一丝冷峻的晨光，照亮了半空中交锋的剪影。黑龙蓄力，口中凝聚出炽热的暗红色火焰。\n**【音效】** 极速的兵器碰撞声（铛！铛！铛！），龙鳞被切割的刺耳声，高速移动的破风声。\n\n### 🎬 0:20 - 0:25 | 决胜：刺破黑暗（参考图2、图1）\n**【视觉】**\n*   **镜头11（极限特写，慢动作）**：骑士猫蓝色的猫眼在头盔下露出决绝的光芒。它倒持长剑（参考图2，剑身前段及底端特写），剑尖直指俯冲而来的黑龙巨口。\n*   **镜头12（全景转主观视角）**：黑龙吞噬一切的黑影压顶。骑士猫毫无退缩，迎面冲锋。\n*   **镜头13（动作高潮）**：在龙息喷吐的瞬间，骑士猫身形一矮，贴着地面滑铲进入黑龙身下，双手将宝剑【极度爆发的力量】向上垂直刺入龙腹。金色剑芒与暗红龙息同时爆发，画面白光炸裂。\n**【音效】** 心跳声放大，然后是极具爆发力的撞击声、宝石碎裂声、全频段的白噪音轰鸣。\n\n### 🎬 0:25 - 0:30 | 尾声：废墟之上（参考图1背面、图3诡异月夜）\n**【视觉】**\n*   **镜头14（远景，慢镜头，诡异月夜，参考图3·场景C）**：月光穿透迷雾。漫天飞灰与碎石缓缓坠落。\n*   **镜头15（背影特写，参考图1背影）**：巨大的黑龙轰然倒地，激起漫天尘土。画面正中，骑士猫背对镜头，单膝跪地。那把华丽的长剑（参考图2）深深插在泥土中，支撑着它的身体。破烂的白色披风（背面视角）在风中微微起伏，头上的粉色蝴蝶结依旧傲然挺立。\n*   **镜头16**：骑士猫缓缓抬起头，望向废墟深处。细雨重新落下。\n**【音效】** 所有的打斗声瞬间抽空，只剩下轻柔的风雨声，以及一声极轻**“喵呜~”**（极度疲惫却充满压迫感）。\n\n---\n**剧终（End）**"
+          }
+        ],
+        "primaryTextId": "S5Fpd__wOVqHijna_jn-j",
+        "content": "基于您提供的数字资产（毛茸茸的骑士猫、精美的宝剑细节、废墟荒野场景、暗黑巨龙），是一部充满强烈反差感与史诗感的奇幻动作短片。\n\n以下是为您定制的**30秒无对白纯打斗短片脚本**。全片以高速剪辑和极具张力的声效为主，突出“萌系重甲”与“恐怖巨龙”的极致碰撞。\n\n---\n\n# 短片名称：《微光与巨兽》（The Knight & The Behemoth）\n**时长**：30秒\n**风格**：暗黑奇幻、史诗动作、无对白、极度激烈\n**核心视听反差**：毛茸茸的可爱外表 VS 极致的钢铁暴力美学\n\n---\n\n### 🎬 0:00 - 0:05 | 序幕：肃杀之景（参考图3、图2）\n**【视觉】**\n*   **镜头1（极低微观视角）**：屏幕被灰暗的杂草填满（参考图3“视角1”），雨滴砸在叶片上。\n*   **镜头2（推近特写）**：画面升起，聚焦在骑士猫（参考图1）身上。它缓缓拔出那柄带有菱形宝石与金色繁复花纹的十字长剑（参考图2，剑身特写）。\n*   **镜头3（环绕近景）**：雨水顺着银色重甲和粉色蝴蝶结滴落，白色披风在“阴雨连绵”（参考图3·场景B）的废土狂风中猎猎作响。\n**【音效】** 闷雷滚滚，狂风呼啸，雨水拍打金属的清脆声，剑刃出鞘的金属摩擦声（铮——）。\n\n### 🎬 0:05 - 0:10 | 突袭：巨兽降临（参考图4、图3）\n**【视觉】**\n*   **镜头4（无人机高空俯拍，参考图3“视角2”）**：雾气翻滚的荒野废墟上空，云层骤然撕裂。\n*   **镜头5（仰视，参考图3“视角4”）**：巨大的黑龙（参考图4）破雾而出，双翼展开遮天蔽日，发出狂暴的咆哮。它庞大的身躯直接撞碎了高耸的哥特式废墟石柱。\n*   **镜头6（高速跟随）**：黑龙俯冲，利爪撕裂地面。\n**【音效】** 震耳欲聋的龙啸声，建筑崩塌的巨响，狂风被撕裂的尖啸。\n\n### 🎬 0:10 - 0:20 | 交锋：刀光剑影（参考图1、图2、图4）\n**【视觉】**\n*   **镜头7（极速推拉，快剪）**：黑龙巨口咬下。骑士猫奋力一跃，踩着一块飞溅的碎石腾空而起。黑龙的牙齿与骑士擦肩而过，咬碎地面。\n*   **镜头8（微距特写）**：骑士猫在半空中转动剑柄（参考图2，握柄细节），剑刃上的金色符文在雨中亮起微光。它双手紧握长剑，凌空劈下。\n*   **镜头9（第一人称视角）**：黑龙粗粝的龙鳞（参考图4背部细节）与宝剑碰撞，擦出刺目的火花。骑士猫借着反作用力在龙背上连续翻滚跳跃，避开扫来的布满尖刺的龙尾。\n*   **镜头10（破晓微光，参考图3·场景A）**：天边透出一丝冷峻的晨光，照亮了半空中交锋的剪影。黑龙蓄力，口中凝聚出炽热的暗红色火焰。\n**【音效】** 极速的兵器碰撞声（铛！铛！铛！），龙鳞被切割的刺耳声，高速移动的破风声。\n\n### 🎬 0:20 - 0:25 | 决胜：刺破黑暗（参考图2、图1）\n**【视觉】**\n*   **镜头11（极限特写，慢动作）**：骑士猫蓝色的猫眼在头盔下露出决绝的光芒。它倒持长剑（参考图2，剑身前段及底端特写），剑尖直指俯冲而来的黑龙巨口。\n*   **镜头12（全景转主观视角）**：黑龙吞噬一切的黑影压顶。骑士猫毫无退缩，迎面冲锋。\n*   **镜头13（动作高潮）**：在龙息喷吐的瞬间，骑士猫身形一矮，贴着地面滑铲进入黑龙身下，双手将宝剑【极度爆发的力量】向上垂直刺入龙腹。金色剑芒与暗红龙息同时爆发，画面白光炸裂。\n**【音效】** 心跳声放大，然后是极具爆发力的撞击声、宝石碎裂声、全频段的白噪音轰鸣。\n\n### 🎬 0:25 - 0:30 | 尾声：废墟之上（参考图1背面、图3诡异月夜）\n**【视觉】**\n*   **镜头14（远景，慢镜头，诡异月夜，参考图3·场景C）**：月光穿透迷雾。漫天飞灰与碎石缓缓坠落。\n*   **镜头15（背影特写，参考图1背影）**：巨大的黑龙轰然倒地，激起漫天尘土。画面正中，骑士猫背对镜头，单膝跪地。那把华丽的长剑（参考图2）深深插在泥土中，支撑着它的身体。破烂的白色披风（背面视角）在风中微微起伏，头上的粉色蝴蝶结依旧傲然挺立。\n*   **镜头16**：骑士猫缓缓抬起头，望向废墟深处。细雨重新落下。\n**【音效】** 所有的打斗声瞬间抽空，只剩下轻柔的风雨声，以及一声极轻**“喵呜~”**（极度疲惫却充满压迫感）。\n\n---\n**剧终（End）**"
+      }
+    },
+    {
+      "id": "image-1792287602568-t825t",
+      "type": "image",
+      "title": "生图吧\n\n【文本1】\n作为AI大语言模型，我无法直接为你“画”出",
+      "position": {
+        "x": 2009.4050066355603,
+        "y": 1739.3120876086803
+      },
+      "width": 340,
+      "height": 191.35167464114832,
+      "metadata": {
+        "content": "blob:http://localhost:5173/7bad3071-7f4a-4d35-8b04-eac15a39d595",
+        "status": "success",
+        "size": "auto",
+        "prompt": "生图吧\n\n【文本1】\n作为AI大语言模型，我无法直接为你“画”出图片，但我完全理解你的需求——基于你提供的这张浓雾废墟图和你给出的【文本1】（清理怪兽和骑士，保留纯粹环境），你需要**多视角、多场景**的概念设计图。\n\n结合你原图的视觉特征（极低视角的草丛前景、大雾、远处的废土城堡剪影、冷灰绿色调），我为你设计了**4个视角 + 3种场景变化**的专业AI绘画提示词。你可以直接复制这些提示词到Midjourney、Stable Diffusion等工具中生成图片。\n\n（反向提示词始终沿用你【文本1】中提供的：`monster, giant creature, kaiju, dragon, dinosaur, animal, hamster, cat, rodent, knight, warrior, human, person, character, armor, weapon, sword, cape, silhouette, any creatures, crowd, buildings.`）\n\n---\n\n### 📷 多视角设定（基于原图延伸）\n\n#### 视角1：极致入地的微观低视角（原图视角，靠前一步）\n**中文描述**：极低视角，几乎贴在地面上，前景是极其虚化的茂密草叶，中景是起伏的荒野，远处是浓雾中若隐若现的废墟塔楼。景深极浅，冷灰色调，空无一人。\n**英文Prompt**：\n> Extreme low angle shot, ground level, extreme close-up blurred grass blades in foreground, wilderness meadow in midground, distant blurred ruins castle silhouette in heavy fog, dense mist, shallow depth of field, bokeh, overcast sky, epic dark fantasy atmosphere, cinematic lighting, empty scene, no characters, silent environment, desaturated cold grey and muted green tones, scenery concept art, photorealistic, 8k, --ar 21:9\n\n#### 视角2：无人机高空俯视（揭示宏大世界观）\n**中文描述**：无人机高空航拍视角，广阔的灰绿色荒野战场被浓雾覆盖，远处的哥特式废墟建筑群在雾海中矗立，地形起伏有致，史诗感宏大。\n**英文Prompt**：\n> Aerial view, drone shot, high angle, vast wasteland wilderness covered in heavy fog and dense mist, gothic ruined castle silhouette emerging from the ocean of mist in background, rolling terrain, epic scale, dark fantasy atmosphere, overcast sky, cinematic lighting, empty scene, no characters, desaturated cold grey and muted green tones, scenery concept art, photorealistic, --ar 16:9\n\n#### 视角3：废墟探索者视角（平视废墟）\n**中文描述**：平视远景视角，穿过浓雾看向远处的废墟，中间的荒野上散布着破碎的石块，雾气缭绕，气氛压抑且神秘。\n**英文Prompt**：\n> Eye level shot, distant view, looking through dense fog at abandoned ruins silhouette, scattered broken stones in the misty wilderness, heavy fog pulling back slightly, mysterious and oppressive atmosphere, epic dark fantasy, cinematic lighting, empty scene, no characters, desaturated cold grey and muted green tones, scenery concept art, --ar 16:9\n\n#### 视角4：废墟近景（仰视）\n**中文描述**：站在废墟脚下的仰视视角，残破的高塔直插云霄，浓雾在建筑间穿梭，前景有一些荒芜的藤蔓和枯草，压迫感极强。\n**英文Prompt**：\n> Low angle shot, worm's eye view, standing at the foot of the ruins, looking up at the broken tall tower piercing the heavy fog, mist swirling around the ancient stone architecture, desolate vines and dead grass in foreground, oppressive and majestic, epic dark fantasy, cinematic lighting, empty scene, desaturated cold grey tones, concept art, --ar 9:16\n\n---\n\n### 🌤️ 多场景设定（天气与时间变化）\n\n#### 场景A：破晓微光（带有一丝希望）\n**中文描述**：破晓时分，微弱的冷黄色晨光试图穿透厚重的阴云和浓雾，在荒野和废墟上投下淡淡的轮廓光，冷灰色调中带有一丝微弱的暖光。\n**英文Prompt**：\n> Empty grassland battlefield, dense mist, overcast sky, break of dawn, faint pale yellow morning light trying to pierce through heavy clouds and fog, subtle rim light on the distant blurred ruins silhouette, low angle shot, blurred grass foreground, depth of field, cold grey tones with a hint of muted warm light, epic dark fantasy atmosphere, empty scene, no characters, concept art, --ar 21:9\n\n#### 场景B：阴雨连绵（更压抑的氛围）\n**中文描述**：灰暗的雨天，细密的雨丝落在杂草和荒野上，地面积水反光，远处废墟在雨幕中更加模糊，低饱和度的冷绿色和深灰色交织。\n**英文Prompt**：\n> Empty grassland battlefield, rainy day, overcast sky, heavy rain and mist, damp ground with water reflections, distant blurred ruins heavily obscured by rain curtain, low angle shot, wet blurred grass in foreground, depth of field, desaturated cold grey and dark muted green tones, melancholic epic dark fantasy atmosphere, empty scene, no characters, scenery concept art, --ar 21:9\n\n#### 场景C：诡异月夜（暗黑奇幻氛围拉满）\n**中文描述**：夜晚，一轮模糊的冷月透过浓雾洒下幽幽的蓝光，荒野和草丛呈现出暗蓝灰色，远处的废墟在月光下如同巨兽的骨骼。\n**英文Prompt**：\n> Empty grassland battlefield at night, heavy fog, overcast sky, faint blurred cold moon shining through dense mist, eerie blue light, desaturated cold blue and dark grey tones, distant blurred ruins silhouette looking like giant bones under moonlight, low angle shot, blurred grass in foreground, depth of field, dark fantasy atmosphere, empty scene, no characters, --ar 21:9\n\n---\n\n### 💡 进阶生成建议（结合你文本1的避坑指南）\n\n1. **必须使用局部重绘（Inpainting）**：如果你是基于原图进行修改，务必先涂抹掉原图中的怪兽和骑士，再使用上述Prompt。\n2. **重绘幅度（Denoising Strength）**：如果要追求完全不同的视角（如俯视或仰视），建议放弃图生图，直接**使用文生图（Txt2Img）**，因为图生图在高重绘幅度下容易产生扭曲的残影。\n3. **构图控制（ControlNet）**：如果你希望保留原图完美的“前景草-中景野-远景废墟”的三段式层次感，请提取原图的**深度图（Depth）**或**边缘图（Canny）**作为ControlNet输入，这样AI生成的图片会有极强的空间透视感。\n4. **色彩参数（CFG Scale）**：建议CFG Scale设置为7-9，确保AI能严格遵守“冷灰色调”和“没有角色”的反向约束。",
+        "composerContent": "生图吧",
+        "images": [
+          {
+            "id": "e1O6epYHGdVL-ngwyZezG",
+            "status": "success",
+            "content": "blob:http://localhost:5173/7bad3071-7f4a-4d35-8b04-eac15a39d595",
+            "storageKey": "image:gKMKYgK7VLKpI9ANFl2MV",
+            "naturalWidth": 1672,
+            "naturalHeight": 941,
+            "bytes": 2106371,
+            "mimeType": "image/png"
+          }
+        ],
+        "primaryImageId": "e1O6epYHGdVL-ngwyZezG",
+        "generationType": "edit",
+        "model": "autodl::gpt-image-2.5-flare",
+        "quality": "auto",
+        "count": 1,
+        "references": [
+          "image:w_J8NWFH6HJmoAdAG63Pu"
+        ],
+        "storageKey": "image:gKMKYgK7VLKpI9ANFl2MV",
+        "naturalWidth": 1672,
+        "naturalHeight": 941,
+        "bytes": 2106371,
+        "mimeType": "image/png"
+      }
+    },
+    {
+      "id": "text-1792287646660-f6l0d",
+      "type": "text",
+      "title": "给我多场景多视角的场景图\n\n【文本1】\n明白了。你需要的是**移",
+      "position": {
+        "x": 1496.6086553315045,
+        "y": 1443.1183027903285
+      },
+      "width": 340,
+      "height": 240,
+      "metadata": {
+        "prompt": "给我多场景多视角的场景图\n\n【文本1】\n明白了。你需要的是**移除掉图中的巨型怪兽和仓鼠骑士，仅保留原本的背景环境、地形和雾霾天气**，生成一张“空场景概念图”。\n\n针对图生图（Img2Img）或重绘（Inpainting），我为你准备了中英文对照的提示词和操作建议。\n\n### 🎨 正向提示词（Prompt）—— 描述你想要的场景\n**中文版：**\n空旷的草原战场，野外草地，浓雾弥漫，阴沉的阴天，史诗感暗黑奇幻氛围，电影级光影，远处模糊的废墟轮廓，低视角构图，前景虚化的草丛，景深效果，极其细腻的环境刻画，空无一人，寂静的环境，低饱和度冷灰色调。\n\n**英文版（推荐使用英文，AI理解更精准）：**\n> Empty grassland battlefield, wilderness meadow, heavy fog, dense mist, overcast sky, epic dark fantasy atmosphere, cinematic lighting, distant blurred ruins silhouette, low angle shot, blurred grass in foreground, depth of field, highly detailed environment, empty scene, no characters, silent environment, desaturated cold grey and muted green tones, scenery concept art.\n\n---\n\n### 🚫 反向提示词（Negative Prompt）—— 强制剔除生物和角色\n这一步非常关键，必须明确告诉AI不要画原图里的事物：\n**中文版：**\n怪兽，巨兽，巨型生物，龙，恐龙，动物，仓鼠，骑士，人类，人物，盔甲，武器，剑，斗篷，剪影，任何角色，建筑群。\n\n**英文版：**\n> monster, giant creature, kaiju, dragon, dinosaur, animal, hamster, cat, rodent, knight, warrior, human, person, character, armor, weapon, sword, cape, silhouette, any creatures, crowd, buildings.\n\n---\n\n### 💡 实操避坑建议（重要！）\n\n单纯依靠提示词写“不要怪兽”，在**高重绘幅度**下AI可能会在原位置生成奇怪的石头或树木来填补空白；在**低重绘幅度**下，AI大概率会把怪兽的轮廓保留下来。\n\n为了完美得到场景图，建议你这样操作：\n\n1. **使用局部重绘（Inpainting）**：\n   将原图拖入图生图，用画笔把怪兽和仓鼠涂黑（蒙版），让AI只重绘被遮挡的场景部分（补全草地和雾气）。\n2. **调整重绘幅度（Denoising Strength）**：\n   * 如果使用局部重绘：重绘幅度可以设为 `0.75 - 0.85`，让AI彻底重写被遮挡的部分。\n   * 如果直接整图图生图：重绘幅度必须调高到 `0.8 - 0.9`，否则怪兽的残影一定会留在画面里。但这可能会改变原本的地形结构。\n3. **推荐使用 ControlNet**：\n   如果你想保留精确的地平线和草丛前景，可以使用 **ControlNet Depth（深度图）** 或 **Canny（边缘线）**。但在跑图前，先用修图软件把怪兽粗略涂抹掉，或者只用Depth控制地形而不控制角色。\n4. **比例（Aspect Ratio）**：保持与原图一致（通常是16:9或21:9），以维持电影级的宽幅构图。\n\n按照这样操作，你就能得到一张纯粹的、带着末日迷雾氛围的野外空地场景图了。",
+        "composerContent": "给我多场景多视角的场景图",
+        "status": "success",
+        "fontSize": 14,
+        "model": "autodl::DeepSeek-V4.1-Flash",
+        "reasoningEffort": "auto",
+        "textCount": 1,
+        "texts": [
+          {
+            "id": "4wLT0MatAMBRnNyPPAchq",
+            "status": "success",
+            "content": "作为AI大语言模型，我无法直接为你“画”出图片，但我完全理解你的需求——基于你提供的这张浓雾废墟图和你给出的【文本1】（清理怪兽和骑士，保留纯粹环境），你需要**多视角、多场景**的概念设计图。\n\n结合你原图的视觉特征（极低视角的草丛前景、大雾、远处的废土城堡剪影、冷灰绿色调），我为你设计了**4个视角 + 3种场景变化**的专业AI绘画提示词。你可以直接复制这些提示词到Midjourney、Stable Diffusion等工具中生成图片。\n\n（反向提示词始终沿用你【文本1】中提供的：`monster, giant creature, kaiju, dragon, dinosaur, animal, hamster, cat, rodent, knight, warrior, human, person, character, armor, weapon, sword, cape, silhouette, any creatures, crowd, buildings.`）\n\n---\n\n### 📷 多视角设定（基于原图延伸）\n\n#### 视角1：极致入地的微观低视角（原图视角，靠前一步）\n**中文描述**：极低视角，几乎贴在地面上，前景是极其虚化的茂密草叶，中景是起伏的荒野，远处是浓雾中若隐若现的废墟塔楼。景深极浅，冷灰色调，空无一人。\n**英文Prompt**：\n> Extreme low angle shot, ground level, extreme close-up blurred grass blades in foreground, wilderness meadow in midground, distant blurred ruins castle silhouette in heavy fog, dense mist, shallow depth of field, bokeh, overcast sky, epic dark fantasy atmosphere, cinematic lighting, empty scene, no characters, silent environment, desaturated cold grey and muted green tones, scenery concept art, photorealistic, 8k, --ar 21:9\n\n#### 视角2：无人机高空俯视（揭示宏大世界观）\n**中文描述**：无人机高空航拍视角，广阔的灰绿色荒野战场被浓雾覆盖，远处的哥特式废墟建筑群在雾海中矗立，地形起伏有致，史诗感宏大。\n**英文Prompt**：\n> Aerial view, drone shot, high angle, vast wasteland wilderness covered in heavy fog and dense mist, gothic ruined castle silhouette emerging from the ocean of mist in background, rolling terrain, epic scale, dark fantasy atmosphere, overcast sky, cinematic lighting, empty scene, no characters, desaturated cold grey and muted green tones, scenery concept art, photorealistic, --ar 16:9\n\n#### 视角3：废墟探索者视角（平视废墟）\n**中文描述**：平视远景视角，穿过浓雾看向远处的废墟，中间的荒野上散布着破碎的石块，雾气缭绕，气氛压抑且神秘。\n**英文Prompt**：\n> Eye level shot, distant view, looking through dense fog at abandoned ruins silhouette, scattered broken stones in the misty wilderness, heavy fog pulling back slightly, mysterious and oppressive atmosphere, epic dark fantasy, cinematic lighting, empty scene, no characters, desaturated cold grey and muted green tones, scenery concept art, --ar 16:9\n\n#### 视角4：废墟近景（仰视）\n**中文描述**：站在废墟脚下的仰视视角，残破的高塔直插云霄，浓雾在建筑间穿梭，前景有一些荒芜的藤蔓和枯草，压迫感极强。\n**英文Prompt**：\n> Low angle shot, worm's eye view, standing at the foot of the ruins, looking up at the broken tall tower piercing the heavy fog, mist swirling around the ancient stone architecture, desolate vines and dead grass in foreground, oppressive and majestic, epic dark fantasy, cinematic lighting, empty scene, desaturated cold grey tones, concept art, --ar 9:16\n\n---\n\n### 🌤️ 多场景设定（天气与时间变化）\n\n#### 场景A：破晓微光（带有一丝希望）\n**中文描述**：破晓时分，微弱的冷黄色晨光试图穿透厚重的阴云和浓雾，在荒野和废墟上投下淡淡的轮廓光，冷灰色调中带有一丝微弱的暖光。\n**英文Prompt**：\n> Empty grassland battlefield, dense mist, overcast sky, break of dawn, faint pale yellow morning light trying to pierce through heavy clouds and fog, subtle rim light on the distant blurred ruins silhouette, low angle shot, blurred grass foreground, depth of field, cold grey tones with a hint of muted warm light, epic dark fantasy atmosphere, empty scene, no characters, concept art, --ar 21:9\n\n#### 场景B：阴雨连绵（更压抑的氛围）\n**中文描述**：灰暗的雨天，细密的雨丝落在杂草和荒野上，地面积水反光，远处废墟在雨幕中更加模糊，低饱和度的冷绿色和深灰色交织。\n**英文Prompt**：\n> Empty grassland battlefield, rainy day, overcast sky, heavy rain and mist, damp ground with water reflections, distant blurred ruins heavily obscured by rain curtain, low angle shot, wet blurred grass in foreground, depth of field, desaturated cold grey and dark muted green tones, melancholic epic dark fantasy atmosphere, empty scene, no characters, scenery concept art, --ar 21:9\n\n#### 场景C：诡异月夜（暗黑奇幻氛围拉满）\n**中文描述**：夜晚，一轮模糊的冷月透过浓雾洒下幽幽的蓝光，荒野和草丛呈现出暗蓝灰色，远处的废墟在月光下如同巨兽的骨骼。\n**英文Prompt**：\n> Empty grassland battlefield at night, heavy fog, overcast sky, faint blurred cold moon shining through dense mist, eerie blue light, desaturated cold blue and dark grey tones, distant blurred ruins silhouette looking like giant bones under moonlight, low angle shot, blurred grass in foreground, depth of field, dark fantasy atmosphere, empty scene, no characters, --ar 21:9\n\n---\n\n### 💡 进阶生成建议（结合你文本1的避坑指南）\n\n1. **必须使用局部重绘（Inpainting）**：如果你是基于原图进行修改，务必先涂抹掉原图中的怪兽和骑士，再使用上述Prompt。\n2. **重绘幅度（Denoising Strength）**：如果要追求完全不同的视角（如俯视或仰视），建议放弃图生图，直接**使用文生图（Txt2Img）**，因为图生图在高重绘幅度下容易产生扭曲的残影。\n3. **构图控制（ControlNet）**：如果你希望保留原图完美的“前景草-中景野-远景废墟”的三段式层次感，请提取原图的**深度图（Depth）**或**边缘图（Canny）**作为ControlNet输入，这样AI生成的图片会有极强的空间透视感。\n4. **色彩参数（CFG Scale）**：建议CFG Scale设置为7-9，确保AI能严格遵守“冷灰色调”和“没有角色”的反向约束。"
+          }
+        ],
+        "primaryTextId": "4wLT0MatAMBRnNyPPAchq",
+        "content": "作为AI大语言模型，我无法直接为你“画”出图片，但我完全理解你的需求——基于你提供的这张浓雾废墟图和你给出的【文本1】（清理怪兽和骑士，保留纯粹环境），你需要**多视角、多场景**的概念设计图。\n\n结合你原图的视觉特征（极低视角的草丛前景、大雾、远处的废土城堡剪影、冷灰绿色调），我为你设计了**4个视角 + 3种场景变化**的专业AI绘画提示词。你可以直接复制这些提示词到Midjourney、Stable Diffusion等工具中生成图片。\n\n（反向提示词始终沿用你【文本1】中提供的：`monster, giant creature, kaiju, dragon, dinosaur, animal, hamster, cat, rodent, knight, warrior, human, person, character, armor, weapon, sword, cape, silhouette, any creatures, crowd, buildings.`）\n\n---\n\n### 📷 多视角设定（基于原图延伸）\n\n#### 视角1：极致入地的微观低视角（原图视角，靠前一步）\n**中文描述**：极低视角，几乎贴在地面上，前景是极其虚化的茂密草叶，中景是起伏的荒野，远处是浓雾中若隐若现的废墟塔楼。景深极浅，冷灰色调，空无一人。\n**英文Prompt**：\n> Extreme low angle shot, ground level, extreme close-up blurred grass blades in foreground, wilderness meadow in midground, distant blurred ruins castle silhouette in heavy fog, dense mist, shallow depth of field, bokeh, overcast sky, epic dark fantasy atmosphere, cinematic lighting, empty scene, no characters, silent environment, desaturated cold grey and muted green tones, scenery concept art, photorealistic, 8k, --ar 21:9\n\n#### 视角2：无人机高空俯视（揭示宏大世界观）\n**中文描述**：无人机高空航拍视角，广阔的灰绿色荒野战场被浓雾覆盖，远处的哥特式废墟建筑群在雾海中矗立，地形起伏有致，史诗感宏大。\n**英文Prompt**：\n> Aerial view, drone shot, high angle, vast wasteland wilderness covered in heavy fog and dense mist, gothic ruined castle silhouette emerging from the ocean of mist in background, rolling terrain, epic scale, dark fantasy atmosphere, overcast sky, cinematic lighting, empty scene, no characters, desaturated cold grey and muted green tones, scenery concept art, photorealistic, --ar 16:9\n\n#### 视角3：废墟探索者视角（平视废墟）\n**中文描述**：平视远景视角，穿过浓雾看向远处的废墟，中间的荒野上散布着破碎的石块，雾气缭绕，气氛压抑且神秘。\n**英文Prompt**：\n> Eye level shot, distant view, looking through dense fog at abandoned ruins silhouette, scattered broken stones in the misty wilderness, heavy fog pulling back slightly, mysterious and oppressive atmosphere, epic dark fantasy, cinematic lighting, empty scene, no characters, desaturated cold grey and muted green tones, scenery concept art, --ar 16:9\n\n#### 视角4：废墟近景（仰视）\n**中文描述**：站在废墟脚下的仰视视角，残破的高塔直插云霄，浓雾在建筑间穿梭，前景有一些荒芜的藤蔓和枯草，压迫感极强。\n**英文Prompt**：\n> Low angle shot, worm's eye view, standing at the foot of the ruins, looking up at the broken tall tower piercing the heavy fog, mist swirling around the ancient stone architecture, desolate vines and dead grass in foreground, oppressive and majestic, epic dark fantasy, cinematic lighting, empty scene, desaturated cold grey tones, concept art, --ar 9:16\n\n---\n\n### 🌤️ 多场景设定（天气与时间变化）\n\n#### 场景A：破晓微光（带有一丝希望）\n**中文描述**：破晓时分，微弱的冷黄色晨光试图穿透厚重的阴云和浓雾，在荒野和废墟上投下淡淡的轮廓光，冷灰色调中带有一丝微弱的暖光。\n**英文Prompt**：\n> Empty grassland battlefield, dense mist, overcast sky, break of dawn, faint pale yellow morning light trying to pierce through heavy clouds and fog, subtle rim light on the distant blurred ruins silhouette, low angle shot, blurred grass foreground, depth of field, cold grey tones with a hint of muted warm light, epic dark fantasy atmosphere, empty scene, no characters, concept art, --ar 21:9\n\n#### 场景B：阴雨连绵（更压抑的氛围）\n**中文描述**：灰暗的雨天，细密的雨丝落在杂草和荒野上，地面积水反光，远处废墟在雨幕中更加模糊，低饱和度的冷绿色和深灰色交织。\n**英文Prompt**：\n> Empty grassland battlefield, rainy day, overcast sky, heavy rain and mist, damp ground with water reflections, distant blurred ruins heavily obscured by rain curtain, low angle shot, wet blurred grass in foreground, depth of field, desaturated cold grey and dark muted green tones, melancholic epic dark fantasy atmosphere, empty scene, no characters, scenery concept art, --ar 21:9\n\n#### 场景C：诡异月夜（暗黑奇幻氛围拉满）\n**中文描述**：夜晚，一轮模糊的冷月透过浓雾洒下幽幽的蓝光，荒野和草丛呈现出暗蓝灰色，远处的废墟在月光下如同巨兽的骨骼。\n**英文Prompt**：\n> Empty grassland battlefield at night, heavy fog, overcast sky, faint blurred cold moon shining through dense mist, eerie blue light, desaturated cold blue and dark grey tones, distant blurred ruins silhouette looking like giant bones under moonlight, low angle shot, blurred grass in foreground, depth of field, dark fantasy atmosphere, empty scene, no characters, --ar 21:9\n\n---\n\n### 💡 进阶生成建议（结合你文本1的避坑指南）\n\n1. **必须使用局部重绘（Inpainting）**：如果你是基于原图进行修改，务必先涂抹掉原图中的怪兽和骑士，再使用上述Prompt。\n2. **重绘幅度（Denoising Strength）**：如果要追求完全不同的视角（如俯视或仰视），建议放弃图生图，直接**使用文生图（Txt2Img）**，因为图生图在高重绘幅度下容易产生扭曲的残影。\n3. **构图控制（ControlNet）**：如果你希望保留原图完美的“前景草-中景野-远景废墟”的三段式层次感，请提取原图的**深度图（Depth）**或**边缘图（Canny）**作为ControlNet输入，这样AI生成的图片会有极强的空间透视感。\n4. **色彩参数（CFG Scale）**：建议CFG Scale设置为7-9，确保AI能严格遵守“冷灰色调”和“没有角色”的反向约束。"
+      }
+    },
+    {
+      "id": "image-1792294533479-5btya",
+      "type": "image",
+      "title": "生成吧\n\n【文本1】\n基于您提供的数字资产（毛茸茸的骑士猫、精美",
+      "position": {
+        "x": 4100.936129630952,
+        "y": 813.6978456627206
+      },
+      "width": 340,
+      "height": 240,
+      "metadata": {
+        "status": "error",
+        "prompt": "生成吧\n\n【文本1】\n基于您提供的数字资产（毛茸茸的骑士猫、精美的宝剑细节、废墟荒野场景、暗黑巨龙），是一部充满强烈反差感与史诗感的奇幻动作短片。\n\n以下是为您定制的**30秒无对白纯打斗短片脚本**。全片以高速剪辑和极具张力的声效为主，突出“萌系重甲”与“恐怖巨龙”的极致碰撞。\n\n---\n\n# 短片名称：《微光与巨兽》（The Knight & The Behemoth）\n**时长**：30秒\n**风格**：暗黑奇幻、史诗动作、无对白、极度激烈\n**核心视听反差**：毛茸茸的可爱外表 VS 极致的钢铁暴力美学\n\n---\n\n### 🎬 0:00 - 0:05 | 序幕：肃杀之景（参考图3、图2）\n**【视觉】**\n*   **镜头1（极低微观视角）**：屏幕被灰暗的杂草填满（参考图3“视角1”），雨滴砸在叶片上。\n*   **镜头2（推近特写）**：画面升起，聚焦在骑士猫（参考图1）身上。它缓缓拔出那柄带有菱形宝石与金色繁复花纹的十字长剑（参考图2，剑身特写）。\n*   **镜头3（环绕近景）**：雨水顺着银色重甲和粉色蝴蝶结滴落，白色披风在“阴雨连绵”（参考图3·场景B）的废土狂风中猎猎作响。\n**【音效】** 闷雷滚滚，狂风呼啸，雨水拍打金属的清脆声，剑刃出鞘的金属摩擦声（铮——）。\n\n### 🎬 0:05 - 0:10 | 突袭：巨兽降临（参考图4、图3）\n**【视觉】**\n*   **镜头4（无人机高空俯拍，参考图3“视角2”）**：雾气翻滚的荒野废墟上空，云层骤然撕裂。\n*   **镜头5（仰视，参考图3“视角4”）**：巨大的黑龙（参考图4）破雾而出，双翼展开遮天蔽日，发出狂暴的咆哮。它庞大的身躯直接撞碎了高耸的哥特式废墟石柱。\n*   **镜头6（高速跟随）**：黑龙俯冲，利爪撕裂地面。\n**【音效】** 震耳欲聋的龙啸声，建筑崩塌的巨响，狂风被撕裂的尖啸。\n\n### 🎬 0:10 - 0:20 | 交锋：刀光剑影（参考图1、图2、图4）\n**【视觉】**\n*   **镜头7（极速推拉，快剪）**：黑龙巨口咬下。骑士猫奋力一跃，踩着一块飞溅的碎石腾空而起。黑龙的牙齿与骑士擦肩而过，咬碎地面。\n*   **镜头8（微距特写）**：骑士猫在半空中转动剑柄（参考图2，握柄细节），剑刃上的金色符文在雨中亮起微光。它双手紧握长剑，凌空劈下。\n*   **镜头9（第一人称视角）**：黑龙粗粝的龙鳞（参考图4背部细节）与宝剑碰撞，擦出刺目的火花。骑士猫借着反作用力在龙背上连续翻滚跳跃，避开扫来的布满尖刺的龙尾。\n*   **镜头10（破晓微光，参考图3·场景A）**：天边透出一丝冷峻的晨光，照亮了半空中交锋的剪影。黑龙蓄力，口中凝聚出炽热的暗红色火焰。\n**【音效】** 极速的兵器碰撞声（铛！铛！铛！），龙鳞被切割的刺耳声，高速移动的破风声。\n\n### 🎬 0:20 - 0:25 | 决胜：刺破黑暗（参考图2、图1）\n**【视觉】**\n*   **镜头11（极限特写，慢动作）**：骑士猫蓝色的猫眼在头盔下露出决绝的光芒。它倒持长剑（参考图2，剑身前段及底端特写），剑尖直指俯冲而来的黑龙巨口。\n*   **镜头12（全景转主观视角）**：黑龙吞噬一切的黑影压顶。骑士猫毫无退缩，迎面冲锋。\n*   **镜头13（动作高潮）**：在龙息喷吐的瞬间，骑士猫身形一矮，贴着地面滑铲进入黑龙身下，双手将宝剑【极度爆发的力量】向上垂直刺入龙腹。金色剑芒与暗红龙息同时爆发，画面白光炸裂。\n**【音效】** 心跳声放大，然后是极具爆发力的撞击声、宝石碎裂声、全频段的白噪音轰鸣。\n\n### 🎬 0:25 - 0:30 | 尾声：废墟之上（参考图1背面、图3诡异月夜）\n**【视觉】**\n*   **镜头14（远景，慢镜头，诡异月夜，参考图3·场景C）**：月光穿透迷雾。漫天飞灰与碎石缓缓坠落。\n*   **镜头15（背影特写，参考图1背影）**：巨大的黑龙轰然倒地，激起漫天尘土。画面正中，骑士猫背对镜头，单膝跪地。那把华丽的长剑（参考图2）深深插在泥土中，支撑着它的身体。破烂的白色披风（背面视角）在风中微微起伏，头上的粉色蝴蝶结依旧傲然挺立。\n*   **镜头16**：骑士猫缓缓抬起头，望向废墟深处。细雨重新落下。\n**【音效】** 所有的打斗声瞬间抽空，只剩下轻柔的风雨声，以及一声极轻**“喵呜~”**（极度疲惫却充满压迫感）。\n\n---\n**剧终（End）**",
+        "composerContent": "生成吧",
+        "images": [
+          {
+            "id": "zJUszWffaI1W0tule1D-k",
+            "status": "error",
+            "content": "",
+            "naturalWidth": 0,
+            "naturalHeight": 0,
+            "bytes": 0,
+            "mimeType": "",
+            "errorDetails": "提示词超过 1024 字符"
+          }
+        ],
+        "generationType": "edit",
+        "model": "yfai::mj_imagine",
+        "yfaiParams": "{\"mj_imagine\":{\"aspect_ratio\":\"16:9\"}}",
+        "size": "1:1",
+        "quality": "auto",
+        "count": 1,
+        "references": [
+          "image:LmS1kBvmQQYQktmjIkvbt",
+          "image:emQrvHRNoKo89zpazdw6c",
+          "image:w_J8NWFH6HJmoAdAG63Pu"
+        ],
+        "errorDetails": "提示词超过 1024 字符"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "id": "conn-1792284630951",
+      "fromNodeId": "image-1792284618666-siuln",
+      "toNodeId": "image-1792284628395-yy3rb"
+    },
+    {
+      "id": "conn-1792284667963",
+      "fromNodeId": "image-1792284662376-thu4v",
+      "toNodeId": "image-1792284628395-yy3rb"
+    },
+    {
+      "id": "conn-1792284822237",
+      "fromNodeId": "image-1792284628395-yy3rb",
+      "toNodeId": "text-1792284785436-bjy8n"
+    },
+    {
+      "id": "conn-1792285050006",
+      "fromNodeId": "text-1792284785436-bjy8n",
+      "toNodeId": "image-1792285044198-f2zfv"
+    },
+    {
+      "id": "conn-1792285051869",
+      "fromNodeId": "image-1792284628395-yy3rb",
+      "toNodeId": "image-1792285044198-f2zfv"
+    },
+    {
+      "id": "conn-1792285173322",
+      "fromNodeId": "image-1792285044198-f2zfv",
+      "toNodeId": "text-1792285167566-v88m4"
+    },
+    {
+      "id": "conn-1792285299779",
+      "fromNodeId": "image-1792285044198-f2zfv",
+      "toNodeId": "image-1792285294708-d6am6"
+    },
+    {
+      "id": "conn-1792285305207",
+      "fromNodeId": "text-1792285167566-v88m4",
+      "toNodeId": "image-1792285294708-d6am6"
+    },
+    {
+      "id": "conn-1792286421749",
+      "fromNodeId": "image-1792284662376-thu4v",
+      "toNodeId": "image-1792286416049-uwyle"
+    },
+    {
+      "id": "conn-1792286424693",
+      "fromNodeId": "image-1792286387563-yarn6",
+      "toNodeId": "image-1792286416049-uwyle"
+    },
+    {
+      "id": "conn-1792286474311",
+      "fromNodeId": "image-1792284662376-thu4v",
+      "toNodeId": "text-1792286470780-m4ifg"
+    },
+    {
+      "id": "conn-1792286476061",
+      "fromNodeId": "image-1792286387563-yarn6",
+      "toNodeId": "text-1792286470780-m4ifg"
+    },
+    {
+      "id": "conn-1792286563215",
+      "fromNodeId": "text-1792286470780-m4ifg",
+      "toNodeId": "image-1792286416049-uwyle"
+    },
+    {
+      "id": "conn-1792287165221",
+      "fromNodeId": "image-1792287143334-5sows",
+      "toNodeId": "text-1792287159891-divm8"
+    },
+    {
+      "id": "conn-1792287437528",
+      "fromNodeId": "text-1792287159891-divm8",
+      "toNodeId": "image-1792287330345-ixaem"
+    },
+    {
+      "id": "conn-1792287439646",
+      "fromNodeId": "image-1792287143334-5sows",
+      "toNodeId": "image-1792287330345-ixaem"
+    },
+    {
+      "id": "conn-1792287481470",
+      "fromNodeId": "image-1792285044198-f2zfv",
+      "toNodeId": "text-1792287465822-doma6"
+    },
+    {
+      "id": "conn-1792287485272",
+      "fromNodeId": "image-1792285294708-d6am6",
+      "toNodeId": "text-1792287465822-doma6"
+    },
+    {
+      "id": "conn-1792287608667",
+      "fromNodeId": "image-1792287330345-ixaem",
+      "toNodeId": "image-1792287602568-t825t"
+    },
+    {
+      "id": "conn-1792287655939",
+      "fromNodeId": "text-1792287159891-divm8",
+      "toNodeId": "text-1792287646660-f6l0d"
+    },
+    {
+      "id": "conn-1792287662327",
+      "fromNodeId": "image-1792287330345-ixaem",
+      "toNodeId": "text-1792287646660-f6l0d"
+    },
+    {
+      "id": "conn-1792287664249",
+      "fromNodeId": "text-1792287646660-f6l0d",
+      "toNodeId": "image-1792287602568-t825t"
+    },
+    {
+      "id": "conn-1792287747683",
+      "fromNodeId": "image-1792287602568-t825t",
+      "toNodeId": "text-1792287465822-doma6"
+    },
+    {
+      "id": "conn-1792287839376",
+      "fromNodeId": "image-1792286416049-uwyle",
+      "toNodeId": "text-1792287465822-doma6"
+    },
+    {
+      "id": "conn-1792294538199",
+      "fromNodeId": "text-1792287465822-doma6",
+      "toNodeId": "image-1792294533479-5btya"
+    },
+    {
+      "id": "conn-1792294543767",
+      "fromNodeId": "image-1792285044198-f2zfv",
+      "toNodeId": "image-1792294533479-5btya"
+    },
+    {
+      "id": "conn-1792294546048",
+      "fromNodeId": "image-1792285294708-d6am6",
+      "toNodeId": "image-1792294533479-5btya"
+    },
+    {
+      "id": "conn-1792294554267",
+      "fromNodeId": "image-1792287330345-ixaem",
+      "toNodeId": "image-1792294533479-5btya"
+    }
+  ],
+  "chatSessions": [],
+  "activeChatId": null,
+  "backgroundMode": "lines",
+  "showImageInfo": false,
+  "viewport": {
+    "x": -2331.962817502702,
+    "y": -489.1973145149108,
+    "k": 1.0246823055401062
+  }
+}

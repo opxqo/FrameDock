@@ -1,3 +1,4 @@
+import { isYfaiUrl, prepareYfaiParams, submitYfaiTask, waitYfaiTask, yfaiTaskUrls } from "./yfai";
 import axios from "axios";
 
 import i18n from "@/i18n";
@@ -23,6 +24,19 @@ function aiHeaders(config: AiConfig) {
 export async function requestAudioGeneration(config: AiConfig, prompt: string, options?: RequestOptions): Promise<Blob> {
     const requestConfig = resolveModelRequestConfig(config, config.model || config.audioModel);
     const model = requestConfig.model.trim();
+    if (isYfaiUrl(requestConfig.baseUrl)) {
+        assertAudioConfig(requestConfig, requestConfig.model);
+        const prepared = await prepareYfaiParams(requestConfig, [], options);
+        const task = await waitYfaiTask(requestConfig.apiKey, await submitYfaiTask(requestConfig, prepared.model, prompt, prepared.params, options), options);
+        const url = yfaiTaskUrls(task, "audios")[0];
+        if (!url) throw new Error(apiText("audioGenerationFailed"));
+        const response = await fetch(withLocalProxy(url), { signal: options?.signal });
+        if (!response.ok) throw new Error(apiText("audioGenerationFailed"));
+        const blob = await response.blob();
+        await assertAudioBlob(blob);
+        return blob;
+    }
+
     const format = normalizeAudioFormatValue(config.audioFormat);
     const script = resolveModelScript(config, config.model || config.audioModel);
     if (script) {

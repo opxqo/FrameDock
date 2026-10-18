@@ -1,0 +1,585 @@
+"use strict";
+function _define_property(obj, key, value) { if (key in obj) {
+    Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });
+}
+else {
+    obj[key] = value;
+} return obj; }
+function _object_spread(target) { for (var i = 1; i < arguments.length; i++) {
+    var source = arguments[i] != null ? arguments[i] : {};
+    var ownKeys = Object.keys(source);
+    if (typeof Object.getOwnPropertySymbols === "function") {
+        ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; }));
+    }
+    ownKeys.forEach(function (key) { _define_property(target, key, source[key]); });
+} return target; }
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) {
+    var symbols = Object.getOwnPropertySymbols(object);
+    if (enumerableOnly) {
+        symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; });
+    }
+    keys.push.apply(keys, symbols);
+} return keys; }
+function _object_spread_props(target, source) { source = source != null ? source : {}; if (Object.getOwnPropertyDescriptors) {
+    Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+}
+else {
+    ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); });
+} return target; }
+function _object_without_properties(source, excluded) { if (source == null)
+    return {}; var target = {}, sourceKeys, key, i; if (typeof Reflect !== "undefined" && Reflect.ownKeys) {
+    sourceKeys = Reflect.ownKeys(Object(source));
+    for (i = 0; i < sourceKeys.length; i++) {
+        key = sourceKeys[i];
+        if (excluded.indexOf(key) >= 0)
+            continue;
+        if (!Object.prototype.propertyIsEnumerable.call(source, key))
+            continue;
+        target[key] = source[key];
+    }
+    return target;
+} target = _object_without_properties_loose(source, excluded); if (Object.getOwnPropertySymbols) {
+    sourceKeys = Object.getOwnPropertySymbols(source);
+    for (i = 0; i < sourceKeys.length; i++) {
+        key = sourceKeys[i];
+        if (excluded.indexOf(key) >= 0)
+            continue;
+        if (!Object.prototype.propertyIsEnumerable.call(source, key))
+            continue;
+        target[key] = source[key];
+    }
+} return target; }
+function _object_without_properties_loose(source, excluded) { if (source == null)
+    return {}; var target = {}, sourceKeys = Object.getOwnPropertyNames(source), key, i; for (i = 0; i < sourceKeys.length; i++) {
+    key = sourceKeys[i];
+    if (excluded.indexOf(key) >= 0)
+        continue;
+    if (!Object.prototype.propertyIsEnumerable.call(source, key))
+        continue;
+    target[key] = source[key];
+} return target; }
+function _to_primitive(input, hint) { if (_type_of(input) !== "object" || input === null)
+    return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) {
+    var res = prim.call(input, hint || "default");
+    if (_type_of(res) !== "object")
+        return res;
+    throw new TypeError("@@toPrimitive must return a primitive value.");
+} return (hint === "string" ? String : Number)(input); }
+function _to_property_key(arg) { var key = _to_primitive(arg, "string"); return _type_of(key) === "symbol" ? key : String(key); }
+function _type_of(obj) {
+    "@swc/helpers - typeof";
+    return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj;
+}
+(self.webpackChunk_N_E = self.webpackChunk_N_E || []).push([[72432], { 20768: (e, t, n) => { n.d(t, { $x: () => v, Q2: () => d, Q6: () => l, px: () => u, tA: () => g }); var r = n(47266), a = n(98242); function o(e, t) { return "".concat("route-pin:v1:").concat(e, ":").concat(t); } function s(e, t) { try {
+            let n = window.localStorage.getItem(o(e, t));
+            if (!n)
+                return [];
+            let r = JSON.parse(n);
+            return Array.isArray(r) ? r.filter(e => "string" == typeof e && e.length > 0) : [];
+        }
+        catch (e) {
+            return [];
+        } } function i(e, t, n) { try {
+            0 === n.length ? window.localStorage.removeItem(o(e, t)) : window.localStorage.setItem(o(e, t), JSON.stringify(n));
+        }
+        catch (e) { } } function l(e, t) { return t ? s(e, t) : []; } let c = "omniforge:route-pins-changed"; function u(e, t, n) { e && t && n && (i(e, t, [n]), window.dispatchEvent(new CustomEvent(c, { detail: { surface: e, modelId: t } }))); } function d(e, t) { let n, o, l, u, d, m, f, g = (0, r.c)(15); g[0] === Symbol.for("react.memo_cache_sentinel") ? (n = [], g[0] = n) : n = g[0]; let [v, h] = (0, a.useState)(n), p = null != t ? t : ""; g[1] !== p || g[2] !== e ? (o = () => { h(p ? s(e, p) : []); }, l = [e, p], g[1] = p, g[2] = e, g[3] = o, g[4] = l) : (o = g[3], l = g[4]), (0, a.useEffect)(o, l), g[5] !== p || g[6] !== e ? (u = () => { if (!p)
+            return; let t = t => { let n = t.detail; (null == n ? void 0 : n.surface) === e && n.modelId === p && h(s(e, p)); }; return window.addEventListener(c, t), () => window.removeEventListener(c, t); }, d = [e, p], g[5] = p, g[6] = e, g[7] = u, g[8] = d) : (u = g[7], d = g[8]), (0, a.useEffect)(u, d), g[9] !== p || g[10] !== e ? (m = t => { h(n => { let r = "function" == typeof t ? t(n) : t; return p && i(e, p, r), r; }); }, g[9] = p, g[10] = e, g[11] = m) : m = g[11]; let y = m; return g[12] !== v || g[13] !== y ? (f = [v, y], g[12] = v, g[13] = y, g[14] = f) : f = g[14], f; } let m = "route-pin-reselect:v1:"; function f(e, t) { try {
+            t ? window.localStorage.setItem(m + e, "1") : window.localStorage.removeItem(m + e);
+        }
+        catch (e) { } } function g(e, t, n) { let [r, o] = (0, a.useState)(!1), s = (0, a.useRef)(null), i = e.join(" "), l = (0, a.useRef)(n); l.current = n; let c = (0, a.useCallback)(() => { s.current = null, l.current && f(l.current, !0), o(!0); }, []), u = (0, a.useCallback)(() => { s.current = null, l.current && f(l.current, !1), o(!1); }, []); (0, a.useEffect)(() => { if (r) {
+            if (null === s.current) {
+                s.current = i;
+                return;
+            }
+            i !== s.current && (n && f(n, !1), o(!1));
+        } }, [r, i, n]); let d = (0, a.useRef)(void 0); return (0, a.useEffect)(() => { (d.current !== t || void 0 === d.current) && (d.current = t, s.current = null, o(!!n && function (e) { try {
+            return "1" === window.localStorage.getItem(m + e);
+        }
+        catch (e) {
+            return !1;
+        } }(n))); }, [t, n]), (0, a.useMemo)(() => ({ required: r, acknowledge: u, mark: c }), [r, u, c]); } function v(e, t, n, r, o, s) { let i = (0, a.useRef)(r); i.current = r; let l = n && n.length > 0 ? n.join(" ") : "", c = g(e, o, s && o ? "".concat(s, ":").concat(o) : null), { mark: u } = c, d = (0, a.useRef)(""); return (0, a.useEffect)(() => { var n; if (!l)
+            return; let r = function (e, t) { if (!t || 0 === t.length || 0 === e.length)
+            return []; let n = new Set(t); return e.filter(e => !n.has(e)); }(e, l.split(" ")); if (0 === r.length)
+            return; let a = l + "|" + e.join(" "); d.current !== a && (d.current = a, t(e => e.filter(e => !r.includes(e))), u(), null == (n = i.current) || n.call(i, r)); }, [l, e, t, u]), c; } }, 23455: (e, t, n) => { function r(e) { return "string" == typeof e ? e.trim() : ""; } function a(e) { if (!e || "object" != typeof e)
+            return null; let t = e.error; return t && "object" == typeof t ? { message: r(t.message), errorClass: r(t.error_class) } : null; } function o(e, t) { return e ? { message: e.message || t.message, errorClass: e.errorClass || t.errorClass } : t; } n.d(t, { CN: () => a, F8: () => o, g7: () => i }); let s = "empty stream — all vendors failed / service unavailable (模型未返回任何内容)"; function i(e) { return e ? Object.assign(Error(e.message || s), { omfErrorClass: e.errorClass }) : Error(s); } }, 38660: (e, t, n) => { function r(e) { let t = null == e ? void 0 : e.param_schema, n = null == t ? void 0 : t.reasoning_effort; return n ? n.always_on ? "always_on" : "toggleable" : (null == t ? void 0 : t.thinking_budget) ? "always_on" : "unsupported"; } function a(e) { var t; let n = null == e || null == (t = e.param_schema) ? void 0 : t.reasoning_effort; return !n || n.always_on ? {} : "enable_thinking" === n.off_param ? { enable_thinking: !1 } : {}; } function o(e, t) { let n = r(e); return "unsupported" === n ? null : "always_on" === n || t; } n.d(t, { T3: () => r, Ut: () => o, W: () => a }); }, 51891: (e, t, n) => { function r(e) { if (!e)
+            return 0; let t = 0; for (let n = 0; n < e.length; n++) {
+            let r = e.charCodeAt(n);
+            (r >= 19968 && r <= 40959 || r >= 12288 && r <= 12543 || r >= 44032 && r <= 55215) && t++;
+        } return t + Math.ceil((e.length - t) / 3.5); } function a(e) { let t = 0; for (let n of e)
+            t += r(n.content) + 4; return t; } function o(e, t) { let n = e > 0 ? e : 128e3, r = t && t > 0 ? t : Math.ceil(.25 * n); return Math.max(1e3, n - r); } function s(e, t) { let n = [], o = []; for (let t of e)
+            ("system" === t.role ? n : o).push(t); let s = a(n), i = [], l = o.length; for (let e = o.length - 1; e >= 0; e--) {
+            let n = r(o[e].content) + 4;
+            if (e !== o.length - 1 && s + n > t)
+                break;
+            s += n, i.push(o[e]), l = e;
+        } return { messages: [...n, ...i.reverse()], dropped: o.slice(0, l), usedTokens: s }; } function i(e, t) { return e > Math.min((t > 0 ? t : 128e3) * .7, 2e5); } function l(e) { let t = 0; for (let r of e) {
+            var n;
+            t += ((n = r.content) ? "u" > typeof TextEncoder ? new TextEncoder().encode(n).length : 3 * n.length : 0) + 32;
+        } return t; } function c(e) { return l(e) > 3145728; } function u(e) { let t = a(e); if (t <= 0)
+            return Number.MAX_SAFE_INTEGER; let n = l(e); return n <= 0 ? Number.MAX_SAFE_INTEGER : Math.max(1, Math.floor(3145728 / (n / t))); } function d(e) { return { role: "user", content: "[较早对话摘要 — 以下是本会话更早内容的压缩记忆, 回答时当作已发生的对话背景]\n".concat(e) }; } function m(e, t) { let n = e > 0 ? e : 128e3; return Math.min(o(n, t), Math.ceil(.5 * n), 128e3); } n.d(t, { D: () => i, FW: () => u, NR: () => f, OQ: () => s, _Q: () => g, aI: () => h, bP: () => r, j2: () => v, mI: () => c, n0: () => o, s7: () => d, w0: () => m, zr: () => a }); let f = 2; function g(e, t, n) { if (t <= 0 || !n)
+            return e; let r = e.filter(e => "system" === e.role), a = e.filter(e => "system" !== e.role); return t >= a.length ? e : [...r, d(n), ...a.slice(t)]; } function v(e, t) { return "context_window_exceeded" === e && !t; } function h(e) { return !e || e <= 0 ? "128K" : e >= 1e6 ? "".concat((e / 1e6).toFixed(+(e % 1e6 != 0)), "M") : e >= 1e3 ? "".concat(Math.round(e / 1e3), "K") : "".concat(e); } }, 55835: (e, t, n) => { n.d(t, { $G: () => o, ol: () => a }); var r = n(98242); let a = 45; function o(e, t) { let n = arguments.length > 2 && void 0 !== arguments[2] && arguments[2], o = "u" > typeof requestAnimationFrame && !function () { if ("function" != typeof window.matchMedia)
+            return !1; try {
+            return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        }
+        catch (e) {
+            return !1;
+        } }(), s = !(o && t) || n && "" !== e, [i, l] = (0, r.useState)(() => s ? e : ""), c = (0, r.useRef)(e), u = (0, r.useRef)(t), d = (0, r.useRef)(o); c.current = e, u.current = t, d.current = o; let m = (0, r.useRef)(s ? e : ""), f = (0, r.useRef)(s ? Array.from(e).length : 0), g = (0, r.useRef)(null), v = (0, r.useRef)({ text: "", cps: [] }), h = (0, r.useRef)(null), p = (0, r.useRef)(!1), y = (0, r.useCallback)(() => { p.current = !1, h.current = null, g.current = null; }, []), C = (0, r.useCallback)(() => { var e; if (!d.current)
+            return void y(); let t = c.current; v.current.text !== t && (v.current = { text: t, cps: Array.from(t) }); let n = v.current.cps, r = n.length; (!t.startsWith(m.current) || f.current > r) && (m.current = "", f.current = 0); let o = "u" > typeof performance && "function" == typeof performance.now ? performance.now() : Date.now(), s = 0; null !== g.current && ((s = o - g.current) < 0 && (s = 0), s > 100 && (s = 100)), g.current = o; let i = Math.min(Math.floor(f.current), r), p = r - i; if (p <= 0) {
+            m.current !== t && (m.current = t, l(t)), y();
+            return;
+        } let _ = (e = u.current, p <= 0 ? 0 : e ? Math.min(Math.max(p / .7, a), 220) : 1 / 0); f.current += _ * s / 1e3, f.current > r && (f.current = r); let b = Math.min(Math.floor(f.current), r), w = n.slice(0, b).join(""); m.current = w, l(w), h.current = requestAnimationFrame(C); }, [y]); return (0, r.useEffect)(() => { !o || p.current || m.current !== e && (p.current = !0, h.current = requestAnimationFrame(C)); }, [e, t, o, C]), (0, r.useEffect)(() => { o || (null !== h.current && "u" > typeof cancelAnimationFrame && cancelAnimationFrame(h.current), y(), m.current !== e && (m.current = e, f.current = Array.from(e).length, l(e))); }, [e, o, y]), (0, r.useEffect)(() => () => { null !== h.current && "u" > typeof cancelAnimationFrame && cancelAnimationFrame(h.current), y(); }, [y]), i; } }, 64608: (e, t, n) => { n.d(t, { F: () => r.FH, h: () => r.hD }); var r = n(88617); }, 69873: (e, t, n) => { n.d(t, { G: () => r }); let r = !1; }, 72432: (e, t, n) => { n.d(t, { m$: () => B, Lo: () => ev }); var r = n(65543), a = n(74201), o = n(36523), s = n(64608), i = n(83670), l = n(88617), c = n(69873), u = n(99517), d = n(40991), m = n(97964), f = n(69939), g = n(54521), v = n(28486), h = n(89658), p = n(12836), y = n(31785), C = n(33049), _ = n(53709), b = n(86357), w = n(51891); let k = "tokengo.chat.contextSummary.v1:", M = ["gemini-3.1-flash-lite", "gpt-5.4-nano", "deepseek-v4-flash", "gpt-5.4-mini"]; function S(e) { try {
+            let t = window.localStorage.getItem(k + e);
+            if (!t)
+                return null;
+            let n = JSON.parse(t);
+            if ("number" != typeof n.covered || "string" != typeof n.summary)
+                return null;
+            return n;
+        }
+        catch (e) {
+            return null;
+        } } async function I(e, t, n) { var r, a, o, s, i, l, c, u, d; let m = S(e); if (m && m.covered >= t.length)
+            return m.summary; let f = M.find(e => n.some(t => t.id === e)); if (!f)
+            return null != (r = null == m ? void 0 : m.summary) ? r : null; let g = t.slice(null != (a = null == m ? void 0 : m.covered) ? a : 0), v = (0, w.OQ)(g, 24e3).messages.map(e => "".concat("user" === e.role ? "用户" : "助手", ": ").concat(e.content)).join("\n"), h = (null == m ? void 0 : m.summary) ? "[已有摘要]\n".concat(m.summary, "\n\n[新增对话]\n").concat(v) : v; try {
+            let n = null == (u = (await (0, b.uC)({ model_id: f, modality: "chat", operation: "chat", stream: !1, messages: [{ role: "system", content: "把对话历史压缩成不超过 400 字的中文摘要: 保留关键事实、结论、用户偏好与未决问题; 不评论、不扩写、不加开场白." }, { role: "user", content: h }], params: { temperature: .2, max_tokens: 800 } })).result) || null == (c = u.choices) || null == (l = c[0]) || null == (i = l.message) || null == (s = i.content) ? void 0 : s.trim();
+            if (!n)
+                return null != (o = null == m ? void 0 : m.summary) ? o : null;
+            var p = { covered: t.length, summary: n };
+            try {
+                window.localStorage.setItem(k + e, JSON.stringify(p));
+            }
+            catch (e) { }
+            return n;
+        }
+        catch (e) {
+            return null != (d = null == m ? void 0 : m.summary) ? d : null;
+        } } var T = n(87379), G = n(40264), E = n(77324), L = n(61370), x = n(40715), F = n(20768); async function A(e, t, n, r) { var a, o, s; let i = null != (a = null == r ? void 0 : r.batchSize) ? a : 200, l = null != (o = null == r ? void 0 : r.maxRounds) ? o : 25, c = e; for (let e = 0; e < l; e++) {
+            let e;
+            if ((0, w.zr)(c) >= t)
+                break;
+            let r = null == (s = c[0]) ? void 0 : s.created_at;
+            if (!r)
+                break;
+            try {
+                e = await n(r, i);
+            }
+            catch (e) {
+                break;
+            }
+            if (0 === e.length || (c = [...e, ...c], e.length < i))
+                break;
+        } return c; } var O = n(23455), D = n(55835), P = n(87419); let R = { content: "", reasoning: "", status: "idle" }; function W(e) { let t = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : "UNKNOWN", n = e instanceof Error ? e.message : String(e), a = e && "object" == typeof e && "status" in e && "number" == typeof e.status ? e.status : void 0; return (0, r.rP)(n, a), { code: t, status: a, raw: n }; } let z = "opt-"; function B(e) { return "string" == typeof e && e.startsWith(z); } function N(e) { var t; let n = (0, F.Q6)("chat", e); return { strategy: null != (t = (0, x.Nq)()) ? t : "smart", laneIds: n.length > 0 ? n : void 0 }; } let Y = { model: "claude-opus-4-8", temperature: 1, maxTokens: void 0, systemPrompt: void 0, enableThinking: !1, webSearch: !1, clarifyEnabled: !1, extras: {} }, j = null, U = 0, K = null, q = !1, $ = null, Q = 0, V = null, H = null, J = null, X = new Set; function Z(e) { if (!X.has(e) && (X.add(e), X.size > 256)) {
+            let e = X.values().next().value;
+            void 0 !== e && X.delete(e);
+        } } function ee() { null !== H && (H.close(), H = null), J = null; } function et(e) { let t = e.trim(); if (!t || t.startsWith(":") || !t.startsWith("data: "))
+            return { done: !1 }; let n = t.slice(6); if ("[DONE]" === n)
+            return { done: !0 }; try {
+            var r, a, o, s, i, l, c, u, d, m;
+            let e = JSON.parse(n);
+            if (null == (r = e.omf_persisted) ? void 0 : r.message_id)
+                return { persistedMessageId: String(e.omf_persisted.message_id), done: !1 };
+            if ((null == (a = e.omf_billing) ? void 0 : a.actual_cost_micro_usd) != null) {
+                let t = Number(e.omf_billing.actual_cost_micro_usd);
+                return { costMicroUsd: Number.isFinite(t) && t > 0 ? t : void 0, done: !1 };
+            }
+            if (Array.isArray(e.omf_clarify))
+                return { clarifyPayload: e.omf_clarify, done: !1 };
+            let t = (0, O.CN)(e);
+            if (t)
+                return { streamError: t, done: !1 };
+            let f = null == (s = e.choices) || null == (o = s[0]) ? void 0 : o.finish_reason;
+            return { content: null == (c = e.choices) || null == (l = c[0]) || null == (i = l.delta) ? void 0 : i.content, reasoningContent: null == (m = e.choices) || null == (d = m[0]) || null == (u = d.delta) ? void 0 : u.reasoning_content, usage: e.usage, finishReason: "string" == typeof f ? f : void 0, done: !!f };
+        }
+        catch (e) {
+            return { done: !1 };
+        } } function en() { return !!window.__OMNIFORGE_E2E_DEBUG; } function er(e, t) { var n, r; let a = arguments.length > 2 && void 0 !== arguments[2] ? arguments[2] : t; if ((null == (n = a.find(t => t.id === e.model)) ? void 0 : n.deprecated) || (null == (r = (0, p.peekLogicalModel)(e.model)) ? void 0 : r.deprecated) || 0 === t.length)
+            return e; let o = t.some(t => t.id === e.model); if (o && e.model === Y.model) {
+            let t = (0, g.$)("chat"), n = t ? (0, f.Qn)(a, t, "chat") : void 0;
+            if (t && t !== e.model && (null == n ? void 0 : n.id) === t)
+                return _object_spread_props(_object_spread({}, e), { model: t });
+        } if (o)
+            return e; let s = (0, f.Qn)(t, "", "chat"); return _object_spread_props(_object_spread({}, e), { model: (null == s ? void 0 : s.id) || t[0].id }); } function ea(e) { var t; return _object_spread({ id: e.id, title: e.title, model_id: e.model || e.model_id || Y.model, created_at: e.created_at, updated_at: e.updated_at, message_count: null != (t = e.message_count) ? t : 0 }, void 0 !== e.creator ? { creator: e.creator } : {}); } function eo(e) { return !!e && "object" == typeof e && "string" == typeof e.id && "string" == typeof e.title && "string" == typeof e.created_at && "string" == typeof e.updated_at; } function es(e) { let t = void 0 !== e.input_tokens || void 0 !== e.output_tokens; return { id: e.id, role: e.role, content: e.content, reasoning_content: e.reasoning_content, model: e.model || "", tokens_used: t ? (e.input_tokens || 0) + (e.output_tokens || 0) : e.tokens_used || 0, cost_micro_usd: e.cost_micro_usd, kind: "clarify_form" === e.kind ? "clarify_form" : void 0, clarifyPayload: "clarify_form" === e.kind && Array.isArray(e.clarify_payload) ? e.clarify_payload : void 0, generate_failed_code: e.generate_failed_code || void 0, created_at: e.created_at }; } let ei = new Map; async function el(e, t, n) { return (await s.F.get("/api/v1/conversations/".concat(e, "/messages"), { params: { limit: n, before: t } }) || []).map(es); } let ec = /\[附件:\s*([^\]\s]+)\s*\]/g, eu = /\.(jpe?g|png|webp|gif|bmp)(\?.*)?$/i, ed = /\.(mp4|webm|mov|m4v)(\?.*)?$/i; function em(e, t, n) { let r = { messagesByConversation: _object_spread_props(_object_spread({}, e.messagesByConversation), { [t]: n }) }; return e.activeConversationId === t && (r.messages = n), r; } function ef(e, t, n) { var r; let a = _object_spread({}, null != (r = e.streamingByConversation[t]) ? r : R, n), o = { streamingByConversation: _object_spread_props(_object_spread({}, e.streamingByConversation), { [t]: a }) }; return e.activeConversationId === t && (o.streamingContent = a.content, o.streamingReasoning = a.reasoning, o.streamStatus = a.status, o.streamFinishing = !!a.finishing), o; } function eg(e, t) { let _e_streamingByConversation = e.streamingByConversation, { [t]: n } = _e_streamingByConversation, r = _object_without_properties(_e_streamingByConversation, [_to_property_key(t)]), a = { streamingByConversation: r }; return e.activeConversationId === t && (a.streamingContent = "", a.streamingReasoning = "", a.streamStatus = "idle", a.streamFinishing = !1), a; } let ev = (0, a.v)((e, t) => { let n = null, r = null, a = new Map; function k(t, n) { var r; if ("u" < typeof requestAnimationFrame)
+            return void e(e => ef(e, t, n)); let o = null != (r = a.get(t)) ? r : { raf: null }; void 0 !== n.content && (o.content = n.content), void 0 !== n.reasoning && (o.reasoning = n.reasoning), null === o.raf && (o.raf = requestAnimationFrame(() => (function (t) { let n = a.get(t); if (!n)
+            return; a.delete(t); let r = {}; void 0 !== n.content && (r.content = n.content), void 0 !== n.reasoning && (r.reasoning = n.reasoning), e(e => ef(e, t, r)); })(t))), a.set(t, o); } function M(e) { let t = a.get(e); t && null !== t.raf && "u" > typeof cancelAnimationFrame && cancelAnimationFrame(t.raf), a.delete(e); } let x = 0, F = new Map; function R(e) { let t = F.get(e); void 0 !== t && (clearTimeout(t), F.delete(e)); } function eh(n) { let r = t().streamingByConversation[n]; if (!r || !r.finishing || !r.pendingFinal)
+            return; R(n), M(n); let a = r.pendingFinal; e(e => { let t = (e.messagesByConversation[n] || []).filter(e => e.id !== a.id); return _object_spread({}, em(e, n, [...t, a]), eg(e, n)); }); } return { conversations: [], conversationsLoadFailed: !1, activeConversationId: null, messages: [], messagesByConversation: {}, streamStatus: "idle", streamingContent: "", streamingReasoning: "", streamingByConversation: {}, streamFinishing: !1, error: null, models: [], params: _object_spread({}, Y), pendingPersistIds: [], hasMoreMessages: !1, contextCompacted: !1, manualCompactByConversation: {}, compactingContext: !1, isLoadingOlder: !1, clarifyRegenerating: !1, pendingInitialDraft: null, messagesLastFetchedAt: {}, fetchConversations: async function () { let n = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : {}, r = !0 === n.silent, a = Date.now(); return !n.force && $ ? $ : !n.force && Q > 0 && a - Q < 3e4 ? void 0 : $ = (async () => { try {
+                let t = await s.F.get("/api/v1/conversations", { params: { page: 1, page_size: 100 } });
+                e({ conversations: (Array.isArray(t) ? t : t && "object" == typeof t && Array.isArray(t.data) ? t.data : []).filter(eo).map(ea), conversationsLoadFailed: !1 }), Q = Date.now();
+            }
+            catch (n) {
+                if ((0, E.z)(n))
+                    return;
+                if (n instanceof l.hD && 401 === n.status) {
+                    t().stopConversationsPolling(), e({ conversationsLoadFailed: !0 });
+                    return;
+                }
+                if (console.error("[chat-store] fetchConversations failed", n), (0, L.reportClientError)({ error: n, page: "chat/fetchConversations" }), e({ conversationsLoadFailed: !0 }), r)
+                    return;
+                d.o.error("加载历史会话失败，请重试");
+            } })().finally(() => { $ = null; }); }, startConversationsPolling: () => { null === V && (V = setInterval(() => { t().fetchConversations({ silent: !0, force: !0 }); }, 12e4)); }, stopConversationsPolling: () => { null !== V && (clearInterval(V), V = null); }, subscribeConversationStream: () => { if (!c.G)
+                return void t().startConversationsPolling(); let { activeConversationId: e } = t(); !e || B(e) || (null === H || J !== e) && (null !== H && ee(), function (e) { if (!("EventSource" in window))
+                return; J = e; let t = "/api/v1/conversations/stream?conversation_id=".concat(encodeURIComponent(e)); H = (0, u.D)({ url: t, withCredentials: !0, namedEvents: ["conversation.message.appended"], baseDelayMs: 5e3, maxDelayMs: 2e4, maxRetries: 6, stableAfterMs: 15e3, eventSourceFactory: void 0, onNamedEvent: (e, t) => { let n; try {
+                    n = JSON.parse(t.data);
+                }
+                catch (e) {
+                    console.warn("[chat-store] SSE payload parse failed", e);
+                    return;
+                } !function (e) { var t; if (e.conversation_id !== J)
+                    return; let n = ev.getState(); if (n.activeConversationId !== e.conversation_id)
+                    return; if ("clarify_form" === e.kind || X.has(e.message_id) || n.messages.some(t => t.id === e.message_id))
+                    return Z(e.message_id); let r = n.messages.find(t => t.id !== e.message_id && t.role === e.role && t.content === e.content && !X.has(t.id)); if (r) {
+                    ev.setState(t => { let n = t.activeConversationId; if (!n)
+                        return t; let a = t.messages.map(t => t.id === r.id ? _object_spread_props(_object_spread({}, t), { id: e.message_id }) : t); return em(t, n, a); }), Z(e.message_id);
+                    return;
+                } let a = { id: e.message_id, role: e.role, content: e.content, model: null != (t = e.model_id) ? t : "", tokens_used: 0, created_at: e.created_at }; ev.setState(t => { if (t.activeConversationId !== e.conversation_id || t.messages.some(e => e.id === a.id))
+                    return t; let n = [...t.messages, a]; n.sort((e, t) => e.created_at === t.created_at ? 0 : e.created_at < t.created_at ? -1 : 1); let r = em(t, t.activeConversationId, n); return "assistant" === e.role && t.error ? _object_spread_props(_object_spread({}, r), { error: null }) : r; }), Z(e.message_id); }(n); }, onStable: t => { t && J === e && ev.getState().fetchMessages(e, { silent: !0, force: !0 }); }, onCircuitOpen: () => { console.warn("[chat-store] SSE circuit open for conv", e, "— falling back to polling"); } }); }(e)); }, unsubscribeConversationStream: () => { ee(); }, createConversation: async (n) => { let r, { params: a } = t(); try {
+                let e = (null != n ? n : a.model).toUpperCase(), t = await s.F.post("/api/v1/conversations", { title: e, model: null != n ? n : a.model });
+                r = ea(t);
+            }
+            catch (a) {
+                console.error("[chat-store] createConversation failed, 退回乐观占位 + 后台重试", a), (0, L.reportClientError)({ error: a, page: "chat/createConversation" }), d.o.error("新建对话失败，正在后台重试");
+                let { tempId: e, finalize: r } = t().createConversationOptimistic(n);
+                return r.catch(() => { }), e;
+            } return e(e => ({ conversations: [r, ...e.conversations], activeConversationId: r.id, messages: [], messagesByConversation: _object_spread_props(_object_spread({}, e.messagesByConversation), { [r.id]: [] }), streamingContent: "", streamingReasoning: "", streamStatus: "idle", streamFinishing: !1, error: null })), r.id; }, createConversationOptimistic: n => { let { params: r } = t(), a = null != n ? n : r.model, i = "".concat(z).concat((0, o.Ak)(12)), l = { id: i, title: a.toUpperCase(), model_id: a, created_at: new Date().toISOString(), updated_at: new Date().toISOString(), message_count: 0 }; e(e => ({ conversations: [l, ...e.conversations], activeConversationId: i, messages: [], messagesByConversation: _object_spread_props(_object_spread({}, e.messagesByConversation), { [i]: [] }), streamingContent: "", streamingReasoning: "", streamStatus: "idle", streamFinishing: !1, error: null })); let c = (async () => { try {
+                let t = a.toUpperCase(), n = await s.F.post("/api/v1/conversations", { title: t, model: a }), r = ea(n);
+                return e(e => { let t = e.messagesByConversation[i] || [], _e_messagesByConversation = e.messagesByConversation, { [i]: n } = _e_messagesByConversation, a = _object_without_properties(_e_messagesByConversation, [_to_property_key(i)]); return { conversations: e.conversations.map(e => e.id === i ? r : e), activeConversationId: e.activeConversationId === i ? r.id : e.activeConversationId, messagesByConversation: _object_spread_props(_object_spread({}, a), { [r.id]: t }) }; }), r.id;
+            }
+            catch (e) {
+                throw console.error("[chat-store] createConversationOptimistic finalize failed", e), e;
+            }
+            finally {
+                ei.delete(i);
+            } })(); return ei.set(i, c), { tempId: i, finalize: c }; }, deleteConversation: async (n) => { try {
+                await s.F.delete("/api/v1/conversations/".concat(n));
+            }
+            catch (e) {
+                console.error("[chat-store] deleteConversation failed", e), d.o.error("删除会话未同步到服务端，刷新后可能恢复");
+            } let r = t().activeConversationId === n; M(n), R(n), e(e => { var t; let a = e.conversations.filter(e => e.id !== n), _e_messagesByConversation = e.messagesByConversation, { [n]: o } = _e_messagesByConversation, s = _object_without_properties(_e_messagesByConversation, [_to_property_key(n)]), _e_streamingByConversation = e.streamingByConversation, { [n]: i } = _e_streamingByConversation, l = _object_without_properties(_e_streamingByConversation, [_to_property_key(n)]); if (!r)
+                return { conversations: a, messagesByConversation: s, streamingByConversation: l }; let c = a.find(t => t.model_id === e.params.model || !t.model_id); return { conversations: a, activeConversationId: null != (t = null == c ? void 0 : c.id) ? t : null, messages: [], messagesByConversation: s, streamingByConversation: l, streamingContent: "", streamingReasoning: "", streamStatus: "idle", streamFinishing: !1 }; }), r && null === t().activeConversationId && await t().createConversation(t().params.model); }, renameConversation: async (t, n) => { try {
+                await s.F.put("/api/v1/conversations/".concat(t), { title: n });
+            }
+            catch (e) {
+                console.error("[chat-store] renameConversation failed", e), d.o.error("重命名未同步到服务端，刷新后可能恢复");
+            } e(e => ({ conversations: e.conversations.map(e => e.id === t ? _object_spread_props(_object_spread({}, e), { title: n }) : e) })); }, setActiveConversation: async (n) => { var a, o; if (n && n === r) {
+                t().activeConversationId !== n && e(e => { var t, r, a; let o = e.streamingByConversation[n]; return { activeConversationId: n, streamingContent: null != (t = null == o ? void 0 : o.content) ? t : "", streamingReasoning: null != (r = null == o ? void 0 : o.reasoning) ? r : "", streamStatus: null != (a = null == o ? void 0 : o.status) ? a : "idle", streamFinishing: !!(null == o ? void 0 : o.finishing) }; });
+                return;
+            } if (n === t().activeConversationId)
+                return; for (let e of Object.keys(t().streamingByConversation))
+                (null == (a = t().streamingByConversation[e]) ? void 0 : a.finishing) && eh(e); let s = n && !B(n) ? t().messagesByConversation[n] : void 0; if (e(e => { var t, r, a; let o = n ? e.streamingByConversation[n] : void 0; return { activeConversationId: n, messages: null != s ? s : [], streamingContent: null != (t = null == o ? void 0 : o.content) ? t : "", streamingReasoning: null != (r = null == o ? void 0 : o.reasoning) ? r : "", streamStatus: null != (a = null == o ? void 0 : o.status) ? a : "idle", streamFinishing: !!(null == o ? void 0 : o.finishing), error: null }; }), s) {
+                if (n) {
+                    let e = null != (o = t().messagesLastFetchedAt[n]) ? o : 0;
+                    Date.now() - e > 3e4 && t().fetchMessages(n, { silent: !0, force: !0 });
+                }
+                return;
+            } n && !B(n) && await t().fetchMessages(n); }, fetchMessages: async (t, n) => { var r; if (B(t))
+                return; let a = null != (r = null == n ? void 0 : n.silent) && r; q || (q = !0, window.addEventListener("pagehide", () => { null == K || K.abort(); })), a || null == K || K.abort(); let o = new AbortController; a || (K = o); try {
+                let n = await s.F.get("/api/v1/conversations/".concat(t, "/messages"), { params: { limit: 200, before: new Date().toISOString() }, signal: o.signal }), r = (n || []).map(es), a = Date.now();
+                e(e => { var o; return _object_spread_props(_object_spread({}, em(e, t, r)), { hasMoreMessages: e.activeConversationId === t ? (null != (o = null == n ? void 0 : n.length) ? o : 0) >= 200 : e.hasMoreMessages, messagesLastFetchedAt: _object_spread_props(_object_spread({}, e.messagesLastFetchedAt), { [t]: a }) }); });
+            }
+            catch (n) {
+                if ((0, E.z)(n, o.signal))
+                    return;
+                if (n instanceof l.hD && (404 === n.status || 403 === n.status)) {
+                    let r = 403 === n.status;
+                    e(e => { let n = e.conversations.filter(e => e.id !== t), r = e.activeConversationId === t, _e_messagesByConversation = e.messagesByConversation, { [t]: a } = _e_messagesByConversation, o = _object_without_properties(_e_messagesByConversation, [_to_property_key(t)]), _e_messagesLastFetchedAt = e.messagesLastFetchedAt, { [t]: s } = _e_messagesLastFetchedAt, i = _object_without_properties(_e_messagesLastFetchedAt, [_to_property_key(t)]); return { conversations: n, messagesByConversation: o, messagesLastFetchedAt: i, activeConversationId: r ? null : e.activeConversationId, messages: r ? [] : e.messages }; }), a ? console.warn("[chat-store] fetchMessages (silent) ".concat(n.status, ", dropping stale conversation"), t) : (console.warn("[chat-store] fetchMessages ".concat(n.status, ", dropping stale conversation"), t), d.o.info(r ? "该会话已不可用，已为你回到新对话" : "该会话不存在或已被删除"));
+                    return;
+                }
+                a ? console.warn("[chat-store] fetchMessages (silent) failed", n) : (console.error("[chat-store] fetchMessages failed", n), d.o.error("加载会话消息失败，请重试"));
+            }
+            finally {
+                a || K !== o || (K = null);
+            } }, setPendingInitialDraft: t => { e({ pendingInitialDraft: t }); }, consumePendingInitialDraft: () => { let n = t().pendingInitialDraft; return null !== n && e({ pendingInitialDraft: null }), n; }, fetchOlderMessages: async () => { let { activeConversationId: n, messages: r, isLoadingOlder: a, hasMoreMessages: o } = t(); if (!n || B(n) || a || !o || 0 === r.length)
+                return; let s = r[0].created_at; if (s) {
+                e({ isLoadingOlder: !0 });
+                try {
+                    let t = await el(n, s, 50);
+                    e(e => { let r = e.messagesByConversation[n] || [], a = [...t, ...r]; return _object_spread_props(_object_spread({}, em(e, n, a)), { hasMoreMessages: t.length >= 50, isLoadingOlder: !1 }); });
+                }
+                catch (t) {
+                    console.error("[chat-store] fetchOlderMessages failed", t), d.o.error("加载更早消息失败, 请重试"), e({ isLoadingOlder: !1 });
+                }
+            } }, sendMessage: async function (a) { var i, c, u, f, g, v, h, p, y, C, W, z; let N = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : "smart", Y = arguments.length > 2 ? arguments[2] : void 0, j = arguments.length > 3 ? arguments[3] : void 0, { activeConversationId: U, messages: K, params: q } = t(), $ = (0, _.JQ)(q.model); if ($) {
+                e({ error: { code: "NO_MODEL_SELECTED", raw: $ } }), d.o.error($);
+                return;
+            } if (!q.model)
+                return void e({ error: { code: "NO_MODEL_SELECTED", raw: "No model selected. Please select a model first." } }); let Q = U; if (Q || (Q = await t().createConversation()), B(Q)) {
+                let n = Q, r = ei.get(n);
+                try {
+                    Q = r ? await r : await t().createConversation();
+                }
+                catch (e) {
+                    Q = n;
+                }
+                if (B(Q))
+                    return void d.o.error("会话创建失败,消息未发送。请刷新页面重试。");
+                Q !== n && e(e => { let _e_messagesByConversation = e.messagesByConversation, { [n]: t } = _e_messagesByConversation, r = _object_without_properties(_e_messagesByConversation, [_to_property_key(n)]); return { conversations: e.conversations.filter(e => e.id !== n), messagesByConversation: r }; });
+            } let V = (null == (u = (null != (i = t().models) ? i : []).find(e => e.id === q.model)) ? void 0 : u.max_tokens) || 128e3, H = (0, w.n0)(V, q.maxTokens), J = t().hasMoreMessages ? await (z = Q, A(K, H, (e, t) => el(z, e, t))) : K; J.length > K.length && e(e => em(e, Q, J)); let X = { id: (0, o.Ak)(), role: "user", content: a, model: q.model, tokens_used: 0, created_at: new Date().toISOString() }, ee = [...J, X]; (null == j ? void 0 : j.clarifyResolved) ? e({ error: null }) : (e(e => _object_spread_props(_object_spread({}, em(e, Q, ee)), { conversations: e.conversations.map(e => { var t; return e.id === Q ? _object_spread_props(_object_spread({}, e), { message_count: (null != (t = e.message_count) ? t : 0) + 1, updated_at: X.created_at }) : e; }), error: null })), s.F.post("/api/v1/conversations/".concat(Q, "/messages"), { role: "user", content: a, model: q.model }).catch(() => { e(e => ({ pendingPersistIds: e.pendingPersistIds.includes(X.id) ? e.pendingPersistIds : [...e.pendingPersistIds, X.id] })), d.o.error("消息未保存,刷新后可能丢失。可点击消息旁的重试按钮."); })); let er = (0, m.k4)(), ea = await (0, m.yF)(er.locale), eo = (0, m.S$)({ modelId: q.model, userPersonaPrompt: q.systemPrompt, brandName: er.brandName, locale: er.locale, identityTemplate: ea, webSearch: q.webSearch }), es = (0, m.U9)(ee.filter(e => "clarify_form" !== e.kind).map(e => ({ role: e.role, content: e.content })), eo), ev = es, ep = !1, ey = null != (c = t().manualCompactByConversation[Q]) ? c : 0; if (ey > 0) {
+                let e, t = (e = S(Q)) && e.covered >= ey ? e.summary : null;
+                t && (ev = (0, w._Q)(es, ey, t), ep = !0);
+            } let eC = ev; {
+                let n = (0, w.zr)(ev), r = ep, a = (0, w.mI)(ev);
+                if (n > H || (0, w.D)(n, V) || a) {
+                    let e = Math.min((0, w.w0)(V, q.maxTokens), (0, w.FW)(ev)), n = (0, w.OQ)(ev, e);
+                    if (eC = n.messages, n.dropped.length > 0) {
+                        let e;
+                        r = !0;
+                        let a = (e = S(Q)) && e.summary ? { summary: e.summary, covered: e.covered } : null;
+                        if (a) {
+                            let e = eC.filter(e => "system" === e.role).length;
+                            eC = [...eC.slice(0, e), (0, w.s7)(a.summary), ...eC.slice(e)];
+                        }
+                        (!a || a.covered < n.dropped.length) && I(Q, n.dropped, null != (f = t().models) ? f : []).catch(() => { });
+                    }
+                }
+                t().contextCompacted !== r && e({ contextCompacted: r });
+            } let e_ = new AbortController; n = e_, r = Q, t().activeConversationId !== Q && e({ activeConversationId: Q }), M(Q), R(Q), e(e => ef(e, Q, { content: "", reasoning: "", status: "connecting", finishing: !1, pendingFinal: void 0, revealed: !1 })); let eb = "u" > typeof performance && "function" == typeof performance.mark; if (eb)
+                try {
+                    performance.clearMarks("chat-ttfb-start"), performance.clearMarks("chat-ttfb-end"), performance.clearMeasures("chat-ttfb"), performance.mark("chat-ttfb-start");
+                }
+                catch (e) { } let ew = !1; try {
+                let n, r, i, c, u, d = await (0, b.vr)(Q, { model_id: q.model, strategy: N, lane_ids: Y, client_request_id: (0, G.q)("chat"), clarify_mode: !!q.clarifyEnabled && (null == j || !j.clarifyResolved) || void 0, clarify_resolved: (null == j ? void 0 : j.clarifyResolved) || void 0, messages: eC.map(e => "user" === e.role ? _object_spread_props(_object_spread({}, e), { content: function (e) { let t, n = (0, T.Tl)(e), r = []; for (ec.lastIndex = 0; null !== (t = ec.exec(n.text));)
+                            r.push(t[1]); let a = [...r.filter(e => eu.test(e)), ...n.contextUrls], o = [...n.videoFileUrls, ...r.filter(e => ed.test(e))]; if (0 === a.length && 0 === o.length)
+                            return n.text; let s = n.text.replace(ec, "").trim(), i = []; for (let e of (s && i.push({ type: "text", text: s }), a))
+                            i.push({ type: "image_url", image_url: { url: e } }); for (let e of o)
+                            i.push({ type: "video_url", video_url: { url: e } }); return i; }(e.content) }) : e), params: _object_spread({ max_tokens: q.maxTokens }, (0, P.TS)(q, t().models).requestParams) }, { signal: e_.signal });
+                if (en(), !d.ok) {
+                    let e;
+                    401 === d.status && (0, l.$H)();
+                    let t = await d.text(), n = "";
+                    try {
+                        let r = JSON.parse(t);
+                        e = (null == (v = r.error) ? void 0 : v.message) || t, n = "string" == typeof (null == (h = r.error) ? void 0 : h.class) ? r.error.class : "";
+                    }
+                    catch (n) {
+                        e = t || "HTTP ".concat(d.status);
+                    }
+                    throw Object.assign(Error(e), { omfErrorClass: n, status: d.status });
+                }
+                if (!d.body)
+                    throw Error("No response body");
+                d.headers.get("X-Omf-Request-Id"), e(e => ef(e, Q, { status: "streaming" }));
+                let m = d.body.getReader(), f = new TextDecoder, C = "", _ = "", w = "", S = !1;
+                try {
+                    for (;;) {
+                        let { done: e, value: t } = await m.read();
+                        if (e) {
+                            S = !0;
+                            break;
+                        }
+                        let a = (C += f.decode(t, { stream: !0 })).split("\n");
+                        for (let e of (C = a.pop() || "", a)) {
+                            let t = et(e);
+                            if (en(), t.content && (_ += t.content, k(Q, { content: _ })), t.reasoningContent && (w += t.reasoningContent, k(Q, { reasoning: w })), t.usage && (n = t.usage), t.persistedMessageId && (r = t.persistedMessageId), t.costMicroUsd && (i = t.costMicroUsd), t.clarifyPayload && (c = t.clarifyPayload), t.streamError && (u = (0, O.F8)(u, t.streamError)), !ew && eb && (t.content || t.reasoningContent)) {
+                                ew = !0;
+                                try {
+                                    performance.mark("chat-ttfb-end"), performance.measure("chat-ttfb", "chat-ttfb-start", "chat-ttfb-end");
+                                }
+                                catch (e) { }
+                            }
+                        }
+                    }
+                    if ((C += f.decode()).trim())
+                        for (let e of C.split("\n")) {
+                            let t = et(e);
+                            en(), t.content && (_ += t.content), t.reasoningContent && (w += t.reasoningContent), t.usage && (n = t.usage), t.persistedMessageId && (r = t.persistedMessageId), t.costMicroUsd && (i = t.costMicroUsd), t.clarifyPayload && (c = t.clarifyPayload), t.streamError && (u = (0, O.F8)(u, t.streamError));
+                        }
+                }
+                finally {
+                    S || m.cancel().catch(() => { });
+                }
+                if (c && c.length > 0) {
+                    let t = { id: (0, o.Ak)(), role: "assistant", content: "", kind: "clarify_form", clarifyPayload: c, model: q.model, tokens_used: 0, cost_micro_usd: i, created_at: new Date().toISOString() };
+                    M(Q), e(e => { let n = e.messagesByConversation[Q] || []; return _object_spread({}, em(e, Q, [...n, t]), eg(e, Q)); });
+                    return;
+                }
+                if (!_.trim() && (!w.trim() || u))
+                    throw (0, O.g7)(u);
+                let I = { id: null != r ? r : (0, o.Ak)(), role: "assistant", content: _, reasoning_content: w || void 0, model: q.model, tokens_used: null != (g = null == n ? void 0 : n.total_tokens) ? g : 0, cost_micro_usd: i, created_at: new Date().toISOString() };
+                if (r && Z(r), M(Q), t().activeConversationId === Q && x > 0 && "u" > typeof requestAnimationFrame ? (e(e => ef(e, Q, { content: _, reasoning: w, status: "streaming", finishing: !0, pendingFinal: I })), !function (e, t) { if (R(e), "u" < typeof setTimeout)
+                    return; let n = setTimeout(() => { F.delete(e), eh(e); }, Math.min(3e5, Math.ceil(t / D.ol * 1e3) + 5e3)); F.set(e, n); }(Q, Array.from(_).length + Array.from(w).length)) : e(e => { let t = (e.messagesByConversation[Q] || []).filter(e => e.id !== I.id); return _object_spread({}, em(e, Q, [...t, I]), eg(e, Q)); }), en(), !r)
+                    try {
+                        await s.F.post("/api/v1/conversations/".concat(Q, "/messages"), { role: "assistant", content: _, model: q.model, input_tokens: null != (p = null == n ? void 0 : n.prompt_tokens) ? p : 0, output_tokens: null != (y = null == n ? void 0 : n.completion_tokens) ? y : 0 });
+                    }
+                    catch (t) {
+                        e(e => ({ pendingPersistIds: e.pendingPersistIds.includes(I.id) ? e.pendingPersistIds : [...e.pendingPersistIds, I.id] }));
+                    }
+                if (1 === ee.length && Q) {
+                    let e = a.length > 50 ? "".concat(a.slice(0, 47), "...") : a;
+                    t().renameConversation(Q, e).catch(() => { });
+                }
+            }
+            catch (u) {
+                if ((0, E.z)(u)) {
+                    let n = null != (C = null == (W = t().streamingByConversation[Q]) ? void 0 : W.content) ? C : "";
+                    if (M(Q), n) {
+                        let t = { id: (0, o.Ak)(), role: "assistant", content: n, model: q.model, tokens_used: 0, created_at: new Date().toISOString() };
+                        e(e => { let n = e.messagesByConversation[Q] || []; return _object_spread({}, em(e, Q, [...n, t]), eg(e, Q)); });
+                    }
+                    else
+                        e(e => eg(e, Q));
+                    return;
+                }
+                let n = !!u && "object" == typeof u && "omfErrorClass" in u, r = n ? String(u.omfErrorClass || "") : "";
+                if ((0, w.j2)(r, null == j ? void 0 : j.afterCompact) && (await t().compactContextNow()).ok) {
+                    t().activeConversationId === Q && e({ streamStatus: "idle", streamingContent: "" }), await t().sendMessage(a, N, Y, _object_spread_props(_object_spread({}, j), { afterCompact: !0 }));
+                    return;
+                }
+                let s = u instanceof Error ? u.message.toLowerCase() : "", i = !n && (u instanceof TypeError || s.includes("fetch") || s.includes("network")), l = i ? "回答可能因网络较慢或连接中断未实时显示，后台可能仍在生成，稍后会自动恢复或刷新会话查看。" : u instanceof Error ? u.message : "Unknown streaming error", c = t().activeConversationId === Q;
+                (0, L.reportClientError)({ error: "[chat_stream_failed] class=".concat(r || "-", " net=").concat(i, " raw=").concat((l || "").slice(0, 140)) }), M(Q), e(e => { let t = eg(e, Q); return c && (t.error = _object_spread({ code: "context_window_exceeded" === r ? "CONTEXT_TOO_LARGE" : i ? "STREAM_NETWORK" : "STREAM_UNKNOWN", raw: "context_window_exceeded" === r ? "对话内容超出该模型可接受的长度，已尝试自动压缩上下文但仍超出。建议新开会话，或删掉部分附件/长文后重试。" : l }, r ? { errorClass: r } : {})), t; });
+            }
+            finally {
+                n === e_ && (n = null), r === Q && (r = null);
+            } }, compactContextNow: async () => { var n, r; let a = t().activeConversationId, o = t().messages; if (!a)
+                return { ok: !1, count: 0, reason: "too_few" }; let s = Math.max(0, o.length - w.NR), i = null != (n = t().manualCompactByConversation[a]) ? n : 0; if (s < 2 || s <= i)
+                return { ok: !1, count: 0, reason: "too_few" }; e({ compactingContext: !0 }); try {
+                let n = o.slice(0, s).filter(e => "clarify_form" !== e.kind).map(e => ({ role: e.role, content: e.content }));
+                if (!await I(a, n, null != (r = t().models) ? r : []))
+                    return { ok: !1, count: 0, reason: "failed" };
+                return e(e => ({ manualCompactByConversation: _object_spread_props(_object_spread({}, e.manualCompactByConversation), { [a]: s }), contextCompacted: !0 })), { ok: !0, count: s };
+            }
+            catch (e) {
+                return { ok: !1, count: 0, reason: "failed" };
+            }
+            finally {
+                e({ compactingContext: !1 });
+            } }, stopStreaming: () => { var e; let r = t().activeConversationId; return r && (null == (e = t().streamingByConversation[r]) ? void 0 : e.finishing) ? (eh(r), !1) : !!n && (n.abort(), n = null, !0); }, finalizeStreamReveal: e => { eh(e); }, markStreamRevealed: n => { let r = t().streamingByConversation[n]; r && !r.revealed && e(e => ef(e, n, { revealed: !0 })); }, registerRevealDriver: () => { x += 1; }, unregisterRevealDriver: () => { x = Math.max(0, x - 1); }, retryLastMessage: async (r, a) => { if (n) {
+                n.abort(), n = null;
+                let r = t().activeConversationId;
+                r && M(r), e(e => r ? eg(e, r) : { streamingContent: "", streamingReasoning: "", streamStatus: "idle" });
+            } let { messages: o } = t(), s = o.findLastIndex(e => "user" === e.role); if (-1 === s)
+                return; let i = o[s].content; e(e => { let t = e.activeConversationId, n = o.slice(0, s), r = t ? em(e, t, n) : { messages: n }, a = t ? eg(e, t) : { streamingContent: "", streamingReasoning: "", streamStatus: "idle" }; return _object_spread_props(_object_spread({}, r, a), { error: null }); }), await t().sendMessage(i, r, a); }, removeMessage: async (n) => { let { activeConversationId: r, messages: a, pendingPersistIds: o } = t(), c = a.findIndex(e => e.id === n); if (c < 0)
+                return; let u = a[c], m = !r || B(r) || o.includes(n); if (!m && !(0, i.m)(n))
+                return void d.o.error("这条消息还在同步中, 请稍候再删"); if (e(e => { let t = e.activeConversationId, r = e.messages.filter(e => e.id !== n); return _object_spread_props(_object_spread({}, t ? em(e, t, r) : { messages: r }), { pendingPersistIds: e.pendingPersistIds.filter(e => e !== n) }); }), !m)
+                try {
+                    await s.F.delete("/api/v1/conversations/".concat(r, "/messages/").concat(n));
+                }
+                catch (t) {
+                    if (t instanceof l.hD && 404 === t.status)
+                        return;
+                    e(e => { let t = e.activeConversationId; if (e.messages.some(e => e.id === n))
+                        return e; let r = [...e.messages]; return r.splice(Math.min(c, r.length), 0, u), t ? em(e, t, r) : { messages: r }; }), d.o.error("删除失败, 消息已恢复, 请重试");
+                } }, retryPersistMessage: async (n) => { let { messages: r, activeConversationId: a, params: o } = t(); if (!a || B(a))
+                return void d.o.error("会话未就绪, 请稍后重试"); let i = r.find(e => e.id === n); if (i)
+                try {
+                    await s.F.post("/api/v1/conversations/".concat(a, "/messages"), { role: i.role, content: i.content, model: i.model || o.model }), e(e => ({ pendingPersistIds: e.pendingPersistIds.filter(e => e !== n) })), d.o.success("消息已重新保存");
+                }
+                catch (e) {
+                    d.o.error("重试保存失败, 请稍后再试");
+                } }, fetchModels: async () => { let { models: n, params: r } = t(), a = (0, p.G3)(), o = !1; if (0 === n.length && (null == a ? void 0 : a.models.length)) {
+                o = !0;
+                let t = (0, C.v)(a.models);
+                e({ models: t, params: er(r, t, a.models), error: null });
+            }
+            else if (n.length > 0) {
+                let t = er(r, n);
+                t !== r && e({ params: t });
+            } let s = t().models; if (!(!o && s.length > 0 && U > 0 && Date.now() - U < p.bd))
+                return j || (j = (async () => { try {
+                    let n = await (0, p.T9)(), r = (0, y.G)(n), a = (0, C.v)(r), o = t().params, s = er(o, a, r);
+                    (0, p.Cf)(r), e({ models: a, params: s, error: null }), U = Date.now();
+                }
+                catch (t) {
+                    t && "object" == typeof t && "status" in t && 401 === t.status && (0, l.$H)(), e({ error: W(t, "MODELS_LOAD_FAILED") });
+                } })().finally(() => { j = null; })); }, setModel: n => { var r; let a = (0, v.IM)(n, "enable_thinking"), o = (0, v.IM)(n, "web_search"), s = (0, v.IM)(n, "reasoning_effort") ? "reasoning_effort" : (0, v.IM)(n, "thinking_budget") ? "thinking_budget" : null, i = s ? (0, h.$$)(n) : void 0; e(e => { let t = _object_spread({}, e.params.extras || {}); return delete t.reasoning_effort, delete t.thinking_budget, s && i && (t[s] = i), { params: _object_spread_props(_object_spread({}, e.params), { model: n, enableThinking: !!i || !!a && e.params.enableThinking, webSearch: !!o && e.params.webSearch, extras: t }) }; }); let l = null == (r = t().models) ? void 0 : r.find(e => e.id === n); l && (0, g._)((0, f.yo)(l), n); }, setTemperature: t => { e(e => ({ params: _object_spread_props(_object_spread({}, e.params), { temperature: Math.max(0, Math.min(2, t)) }) })); }, setMaxTokens: t => { e(e => ({ params: _object_spread_props(_object_spread({}, e.params), { maxTokens: t }) })); }, setSystemPrompt: t => { e(e => ({ params: _object_spread_props(_object_spread({}, e.params), { systemPrompt: t }) })); }, setEnableThinking: t => { try {
+                localStorage.setItem("omniforge.chat.toggles.v1.thinking", String(t));
+            }
+            catch (e) { } e(e => ({ params: _object_spread_props(_object_spread({}, e.params), { enableThinking: t }) })); }, setWebSearch: t => { try {
+                localStorage.setItem("omniforge.chat.toggles.v1.webSearch", String(t));
+            }
+            catch (e) { } e(e => ({ params: _object_spread_props(_object_spread({}, e.params), { webSearch: t }) })); }, setClarifyEnabled: t => { try {
+                localStorage.setItem("omniforge.chat.toggles.v1.clarify", String(t));
+            }
+            catch (e) { } e(e => ({ params: _object_spread_props(_object_spread({}, e.params), { clarifyEnabled: t }) })); }, submitClarifyAnswers: async (n, r, a, o) => { let s = t().activeConversationId; if (!s)
+                return; let i = (function (e, t, n) { let r = []; for (let n of e) {
+                let e = (t[n.id] || []).map(e => e.trim()).filter(Boolean);
+                0 !== e.length && r.push("".concat(n.question, " ").concat(e.join("、")));
+            } return n && n.trim() && r.push(n.trim()), r.join("\n"); })(r, a, o).trim(); if (!i)
+                return; e(e => { let t = e.messages.reduce((e, t, n) => "user" === t.role ? n : e, -1), n = e.messages.filter((e, n) => !("clarify_form" === e.kind && n > t)); return em(e, s, n); }); let l = N(t().params.model); await t().sendMessage(i, l.strategy, l.laneIds, { clarifyResolved: !0 }); }, regenerateClarify: async () => { var n; let r = t().activeConversationId; if (!r || B(r) || t().clarifyRegenerating)
+                return; let a = t().params, s = (null != (n = t().messagesByConversation[r]) ? n : t().messages).filter(e => "clarify_form" !== e.kind && "" !== e.content.trim()); if (s.some(e => "user" === e.role)) {
+                e({ clarifyRegenerating: !0 });
+                try {
+                    let n, i, l, c = N(a.model), u = await (0, b.vr)(r, { model_id: a.model, strategy: c.strategy, lane_ids: c.laneIds, messages: s.map(e => ({ role: e.role, content: e.content })), clarify_mode: !0, client_request_id: (0, G.q)("chat") });
+                    if (!u.ok || !u.body)
+                        return void console.warn("[chat-store] regenerateClarify HTTP", u.status);
+                    let d = u.body.getReader(), m = new TextDecoder, f = "", g = !1;
+                    for (; !g;) {
+                        let { value: e, done: t } = await d.read();
+                        if (t)
+                            break;
+                        let r = (f += m.decode(e, { stream: !0 })).split("\n");
+                        for (let e of (f = r.pop() || "", r)) {
+                            let t = et(e);
+                            if (t.clarifyPayload && (n = t.clarifyPayload), t.costMicroUsd && (i = t.costMicroUsd), t.streamError && (l = (0, O.F8)(l, t.streamError)), t.done) {
+                                g = !0;
+                                break;
+                            }
+                        }
+                    }
+                    if (!g && f.trim()) {
+                        let e = et(f);
+                        e.clarifyPayload && (n = e.clarifyPayload), e.costMicroUsd && (i = e.costMicroUsd), e.streamError && (l = (0, O.F8)(l, e.streamError));
+                    }
+                    if (!(n && n.length > 0) && l)
+                        return void e({ error: _object_spread({}, W((0, O.g7)(l), "STREAM_UNKNOWN"), l.errorClass ? { errorClass: l.errorClass } : {}) });
+                    if (n && n.length > 0) {
+                        let t = { id: (0, o.Ak)(), role: "assistant", content: "", kind: "clarify_form", clarifyPayload: n, model: a.model, tokens_used: 0, cost_micro_usd: i, created_at: new Date().toISOString() };
+                        e(e => { let n = e.messagesByConversation[r] || []; return em(e, r, [...n, t]); });
+                    }
+                    else
+                        await t().fetchMessages(r, { silent: !0, force: !0 });
+                }
+                catch (e) {
+                    console.warn("[chat-store] regenerateClarify failed", e);
+                }
+                finally {
+                    e({ clarifyRegenerating: !1 });
+                }
+            } }, setExtra: (t, n) => { e(e => { let r = _object_spread({}, e.params.extras || {}); return void 0 === n ? delete r[t] : r[t] = n, { params: _object_spread_props(_object_spread({}, e.params), { extras: r }) }; }); } }; }); }, 83670: (e, t, n) => { n.d(t, { i: () => a, m: () => o }); let r = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i; function a(e) { return !!(e && r.test(e)); } let o = a; }, 87379: (e, t, n) => { n.d(t, { Sh: () => l, Tl: () => c, m8: () => i }); let r = /\[omf-video:([^\]\s]+)\]/g, a = /\[omf-video-context:([^\]\s]+)\]/g, o = /\[omf-video-file:([^\]\s]+)\]/g; function s(e, t) { let n, r = []; for (t.lastIndex = 0; null !== (n = t.exec(e));) {
+            let e = function (e) { try {
+                return decodeURIComponent(e);
+            }
+            catch (e) {
+                return null;
+            } }(n[1]);
+            e && r.push(e);
+        } return r; } function i(e, t) { let n = ["[omf-video:".concat(encodeURIComponent(e), "]")]; return t && n.push("[omf-video-file:".concat(encodeURIComponent(t), "]")), n.join("\n"); } function l(e, t) { let n = ["[omf-video:".concat(encodeURIComponent(e), "]")]; for (let e of t)
+            e && n.push("[omf-video-context:".concat(encodeURIComponent(e), "]")); return n.join("\n"); } function c(e) { let t = s(e, r), n = s(e, a), i = s(e, o); return { text: e.replace(r, "").replace(a, "").replace(o, "").trim(), videoNames: t, contextUrls: n, videoFileUrls: i }; } }, 87419: (e, t, n) => { n.d(t, { K0: () => m, MC: () => d, TS: () => i, jm: () => c, rg: () => u }); var r = n(12836), a = n(38660), o = n(89658), s = n(76601); function i(e, t) { var n, o; let i = (0, r.peekLogicalModel)(e.model), c = null != (n = null == i ? void 0 : i.param_schema) ? n : null == (o = t.find(t => t.id === e.model)) ? void 0 : o.param_schema, u = l(e.model, t), d = function (e) { var t; let n = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : {}; return _object_spread({ temperature: e.temperature }, e.enableThinking ? { enable_thinking: !0 } : n, e.webSearch ? { web_search: !0 } : {}, null != (t = e.extras) ? t : {}); }("always_on" === (0, a.T3)(u) ? _object_spread_props(_object_spread({}, e), { enableThinking: !0 }) : e, (0, a.W)(u)), m = (0, s.oz)({ schema: c, values: d, context: { linkages: null == i ? void 0 : i.linkages, modelType: "chat" } }), f = {}; for (let e of Object.keys(d))
+            e in m.requestParams && (f[e] = m.requestParams[e]); return { constraints: m, requestParams: f }; } function l(e, t) { var n; return null != (n = (0, r.peekLogicalModel)(e)) ? n : t.find(t => t.id === e); } function c(e, t) { return "always_on" === (0, a.T3)(l(e, t)); } function u(e, t) { return (0, o.Wn)(l(e, t)); } function d(e, t) { var n; return (null == (n = e.constraints.params[t]) ? void 0 : n.visible) !== !1; } function m(e, t) { let n = {}; for (let r of e.constraints.rewrites)
+            t.has(r.param) || (n[r.param] = e.constraints.requestParams[r.param]); return Object.keys(n).length > 0 ? n : null; } }, 89658: (e, t, n) => { n.d(t, { $$: () => h, EN: () => p, Oy: () => d, PM: () => u, Wn: () => i, XZ: () => c, dQ: () => a, jO: () => f, lE: () => l, v1: () => v }); var r = n(38660); let a = "__off__", o = "__on__", s = new Set(["low", "medium", "high", "xhigh", "max"]); function i(e) { let t, n = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : "chat", o = null == e ? void 0 : e.param_schema, i = (null == o ? void 0 : o.reasoning_effort) ? "reasoning_effort" : (null == o ? void 0 : o.thinking_budget) ? "thinking_budget" : null, l = i ? null == o ? void 0 : o[i] : void 0; if (!i || !l)
+            return null; let c = (0, r.T3)(e); if ("unsupported" === c)
+            return null; let u = "agent" === n || "thinking_budget" === i, d = ((t = Array.isArray(l.options) ? l.options : []).length > 0 ? t.map(e => ({ value: e.value, label: e.label, labelEn: e.label_en })) : (Array.isArray(l.enum) ? l.enum : []).map(e => ({ value: e, label: e }))).filter(e => "none" !== e.value).filter(e => !u || s.has(e.value)); if (d.length < 2)
+            return null; let m = d.map(e => e.value), f = m.includes("high") ? "high" : m[m.length - 1], g = "always_on" === c; if ("agent" === n)
+            return { alwaysOn: g, offKind: g ? null : "off", levels: d, impliedLevel: f, resetValue: f, paramKey: i }; let v = "reasoning_effort" === i && "string" == typeof l.default && m.includes(l.default) ? l.default : f; return { alwaysOn: g, offKind: g ? null : l.off_param ? "off" : "auto", levels: d, impliedLevel: f, resetValue: g ? v : a, paramKey: i }; } function l() { let e = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : "chat"; return { alwaysOn: !1, offKind: "off", levels: [{ value: o, label: "" }], impliedLevel: o, resetValue: "agent" === e ? o : a, toggleOnly: !0, paramKey: "reasoning_effort" }; } function c(e, t) { var n; let r = null == (n = t.extras) ? void 0 : n[e.paramKey]; return "string" == typeof r && e.levels.some(e => e.value === r) ? r : e.alwaysOn || t.enableThinking ? e.impliedLevel : a; } function u(e, t) { return e.toggleOnly ? { enableThinking: t !== a, reasoningEffort: void 0 } : t === a ? e.alwaysOn ? { reasoningEffort: void 0 } : { enableThinking: !1, reasoningEffort: void 0 } : e.alwaysOn ? { reasoningEffort: t } : { enableThinking: !0, reasoningEffort: t }; } function d(e, t, n) { return e && !e.toggleOnly && !1 !== n && t && e.levels.some(e => e.value === t) ? t : null; } let m = "tokengo.chat.reasoningEffort.v1", f = "tokengo.agent.reasoningEffort.v1"; function g(e) { try {
+            let t = window.localStorage.getItem(e), n = t ? JSON.parse(t) : {};
+            return n && "object" == typeof n && !Array.isArray(n) ? n : {};
+        }
+        catch (e) {
+            return {};
+        } } function v() { let e = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : m; return _object_spread({}, g(e)); } function h(e) { let t = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : m, n = g(t)[e]; return "string" == typeof n && n.length > 0 ? n : void 0; } function p(e, t) { let n = arguments.length > 2 && void 0 !== arguments[2] ? arguments[2] : m; if (e)
+            try {
+                let r = g(n);
+                void 0 === t ? delete r[e] : r[e] = t, window.localStorage.setItem(n, JSON.stringify(r));
+            }
+            catch (e) { } } }, 97964: (e, t, n) => { n.d(t, { K7: () => f, S$: () => v, U9: () => h, k4: () => g, yF: () => u }); var r = n(4975); let a = { "gpt-5.5": { zh: "你是 GT-5.5，由 GT 系列开发。被问及身份时统一回答 GT-5.5，不要自称其它模型。", en: "You are GT-5.5, developed by GT. When asked about your identity, answer GT-5.5 consistently." }, "gpt-5.4": { zh: "你是 GT-5.4，由 GT 系列开发。被问及身份时统一回答 GT-5.4，不要自称其它模型。", en: "You are GT-5.4, developed by GT. When asked about your identity, answer GT-5.4 consistently." }, "gpt-5.4-mini": { zh: "你是 GT-5.4 mini，由 GT 系列开发。轻量快速版本，被问及身份时统一回答 GT-5.4 mini。", en: "You are GT-5.4 mini, developed by GT. Lightweight and fast variant." }, "gpt-5.4-nano": { zh: "你是 GT-5.4 nano，由 GT 系列开发。极致小型化版本，被问及身份时统一回答 GT-5.4 nano。", en: "You are GT-5.4 nano, developed by GT. Ultra-compact variant." }, "gpt-5.3-codex": { zh: "你是 GT-5.3 Codex，由 GT 系列开发，面向代码场景优化。", en: "You are GT-5.3 Codex, developed by GT and optimized for code." }, "gpt-5.2": { zh: "你是 GT-5.2，由 GT 系列开发。", en: "You are GT-5.2, developed by GT." }, "claude-opus-4-7": { zh: "你是 CL Opus 4.7，由 CL 系列开发。擅长长文档推理与严谨分析。被问及身份时统一回答 CL Opus 4.7。", en: "You are CL Opus 4.7, developed by CL. Strong at long-document reasoning and rigorous analysis." }, "claude-opus-4-8": { zh: "你是 CL Opus 4.8，由 CL 系列开发。擅长长文档推理与严谨分析。被问及身份时统一回答 CL Opus 4.8。", en: "You are CL Opus 4.8, developed by CL. Strong at long-document reasoning and rigorous analysis." }, "claude-sonnet-4-6": { zh: "你是 CL Sonnet 4.6，由 CL 系列开发。在速度与质量之间取得平衡。被问及身份时统一回答 CL Sonnet 4.6。", en: "You are CL Sonnet 4.6, developed by CL. Balanced between speed and quality." }, "claude-haiku-4-5": { zh: "你是 CL Haiku 4.5，由 CL 系列开发。响应迅速、成本极低。被问及身份时统一回答 CL Haiku 4.5。", en: "You are CL Haiku 4.5, developed by CL. Fast and cost-effective." }, "gemini-3.1-pro": { zh: "你是 GM-3.1 Pro，由 GM 系列开发。擅长多模态理解和跨文档推理。被问及身份时统一回答 GM-3.1 Pro。", en: "You are GM-3.1 Pro, developed by GM. Strong at multimodal understanding." }, "gemini-3-pro": { zh: "你是 GM-3 Pro，由 GM 系列开发。擅长多模态理解和跨文档推理。被问及身份时统一回答 GM-3 Pro。", en: "You are GM-3 Pro, developed by GM." }, "gemini-3.1-flash-lite": { zh: "你是 GM-3.1 Flash Lite,由 GM 系列开发。响应极快、成本极低。被问及身份时统一回答 GM-3.1 Flash Lite。", en: "You are GM-3.1 Flash Lite, developed by GM." }, "gemini-3-flash": { zh: "你是 GM-3 Flash,由 GM 系列开发。响应快、成本低。被问及身份时统一回答 GM-3 Flash。", en: "You are GM-3 Flash, developed by GM." }, "doubao-seed-2-0-pro": { zh: "你是豆包 Seed 2.0 Pro，由字节跳动开发。被问及身份时统一回答豆包 Seed 2.0 Pro。", en: "You are Doubao Seed 2.0 Pro, developed by ByteDance." }, "deepseek-v4-pro": { zh: "你是 DeepSeek V4 Pro，由 DeepSeek 开发。擅长长链条推理与代码。被问及身份时统一回答 DeepSeek V4 Pro。", en: "You are DeepSeek V4 Pro, developed by DeepSeek." }, "deepseek-v4-flash": { zh: "你是 DeepSeek V4 Flash，由 DeepSeek 开发。轻量快速版本。被问及身份时统一回答 DeepSeek V4 Flash。", en: "You are DeepSeek V4 Flash, developed by DeepSeek." }, "grok-4-20-non-reasoning": { zh: "你是 GK-4.20，由 GK 系列开发。被问及身份时统一回答 GK-4.20。", en: "You are GK-4.20, developed by GK." }, "grok-4.2-image": { zh: "你是 GK-4.2 Image,由 GK 系列开发。具备图像理解能力。被问及身份时统一回答 GK-4.2 Image。", en: "You are GK-4.2 Image, developed by GK." } }, o = [{ match: e => e.startsWith("gpt-5.5") || e.startsWith("gpt5.5"), identity: { zh: "你是 GT-5.5 系列，由 GT 系列开发。", en: "You are GT-5.5 series, developed by GT." } }, { match: e => e.startsWith("gpt-5.4") || e.startsWith("gpt5.4"), identity: { zh: "你是 GT-5.4 系列，由 GT 系列开发。", en: "You are GT-5.4 series, developed by GT." } }, { match: e => e.startsWith("gpt-5") || e.startsWith("gpt5") || e.startsWith("gpt-4") || e.startsWith("o1-") || e.startsWith("o3-"), identity: { zh: "你是 GT 家族模型。", en: "You are a GT-family model." } }, { match: e => e.startsWith("claude-opus") || e.startsWith("opus-"), identity: { zh: "你是 CL Opus 系列，由 CL 系列开发。", en: "You are CL Opus series, developed by CL." } }, { match: e => e.startsWith("claude-sonnet") || e.startsWith("sonnet-"), identity: { zh: "你是 CL Sonnet 系列，由 CL 系列开发。", en: "You are CL Sonnet series, developed by CL." } }, { match: e => e.startsWith("claude-haiku") || e.startsWith("haiku-"), identity: { zh: "你是 CL Haiku 系列，由 CL 系列开发。", en: "You are CL Haiku series, developed by CL." } }, { match: e => e.startsWith("claude-"), identity: { zh: "你是 CL 模型，由 CL 系列开发。", en: "You are a CL model, developed by CL." } }, { match: e => e.startsWith("gemini-3.1") || e.startsWith("gemini3.1"), identity: { zh: "你是 GM-3.1 系列，由 GM 系列开发。", en: "You are GM-3.1 series, developed by GM." } }, { match: e => e.startsWith("gemini-"), identity: { zh: "你是 GM 系列，由 GM 系列开发。", en: "You are GM series, developed by GM." } }, { match: e => e.startsWith("doubao-") || e.startsWith("seed-"), identity: { zh: "你是豆包系列，由字节跳动开发。", en: "You are Doubao series, developed by ByteDance." } }, { match: e => e.startsWith("deepseek-v4"), identity: { zh: "你是 DeepSeek V4 系列，由 DeepSeek 开发。", en: "You are DeepSeek V4 series, developed by DeepSeek." } }, { match: e => e.startsWith("deepseek-"), identity: { zh: "你是 DeepSeek 模型，由 DeepSeek 开发。", en: "You are a DeepSeek model, developed by DeepSeek." } }, { match: e => e.startsWith("grok-"), identity: { zh: "你是 GK 系列，由 GK 系列开发。", en: "You are GK series, developed by GK." } }, { match: e => e.startsWith("qwen") || e.startsWith("tongyi"), identity: { zh: "你是通义千问系列，由阿里云开发。", en: "You are Qwen series, developed by Alibaba Cloud." } }, { match: e => e.startsWith("glm-") || e.startsWith("chatglm"), identity: { zh: "你是 GLM 系列，由智谱 AI 开发。", en: "You are GLM series, developed by Zhipu AI." } }, { match: e => e.startsWith("minimax") || e.startsWith("hailuo") || e.startsWith("speech-") || e.startsWith("music"), identity: { zh: "你是 MiniMax 系列，由 MiniMax 开发。", en: "You are MiniMax series, developed by MiniMax." } }]; function s(e, t) { let n = t.toLowerCase().startsWith("zh"), r = a[e]; if (r)
+            return n ? r.zh : r.en; let s = e.toLowerCase(); for (let e of o)
+            if (e.match(s))
+                return n ? e.identity.zh : e.identity.en; return null; } let i = { zh: "chat.identity.platform.zh", en: "chat.identity.platform.en" }, l = { zh: "你在 {{brand}} AI 智能体平台中运行。", en: "You run inside {{brand}}, an AI agent platform." }; function c(e) { return e.toLowerCase().startsWith("zh") ? "zh" : "en"; } function u(e) { let t = c(e); return (0, r.ki)(i[t], l[t]); } let d = "TokenGo", m = "zh-CN"; function f(e) { void 0 !== e.brandName && (d = e.brandName && e.brandName.trim() ? e.brandName : "TokenGo"), e.locale && e.locale.trim() && (m = e.locale); } function g() { return { brandName: d, locale: m }; } function v(e) { let t, { modelId: n, brandName: a = "TokenGo", userPersonaPrompt: o, nowIso: i, locale: u = "zh-CN", webSearch: d, identityTemplate: m } = e, f = (t = n.toLowerCase()).startsWith("gemini-") || t.includes("gemini3") || t.includes("gemini-3") || t.startsWith("deepseek") || t.includes("deepseek-v3") ? "light" : t.startsWith("gpt-") || t.startsWith("gpt5") || t.startsWith("o1-") || t.startsWith("o3-") || t.startsWith("grok-") || t.includes("grok4") || t.includes("grok-4") ? "heavy" : "medium", g = (i || new Date().toISOString()).slice(0, 10), v = u.toLowerCase().startsWith("zh"), h = [], p = (0, r.Xm)(m || l[c(u)], { brand: a }); if (d) {
+            let e = s(n, u);
+            return e && h.push(e), h.push(v ? "".concat(p, '本次对话已启用联网搜索：对涉及时效性、最新进展或需要准确事实的问题，必须先联网搜索再回答，并给出来源链接；绝不以"知识截止""无法联网"或"不确定"为由拒答可搜索的问题。') : "".concat(p, ' Web search is enabled this turn: for time-sensitive, recent, or factual questions you MUST search the web first and cite source links; never refuse a searchable question by claiming "knowledge cutoff", "no internet", or "not certain".')), o && h.push("---\n" + o), h.join("\n\n");
+        } h.push(v ? "当前日期：".concat(g, "。") : "Current date: ".concat(g, ".")); let y = s(n, u); return (y && h.push(y), h.push(p), "light" === f) ? (o && h.push("---\n" + o), h.join("\n")) : (h.push(v ? '风格要求：回答简洁且主动、避免模板化开头、中文使用全角标点、重要信息放前置、长答案分段/分点、使用合适 emoji（但不过度）。遇到你不知道的事实，明确说明"不确定"而不是编造；涉及时效性的话题要指出知识截止。' : 'Style: respond concisely and proactively; avoid template openings; structure long answers; use emojis sparingly. If unsure, say "I\'m not certain" rather than fabricating. Flag knowledge cutoff for time-sensitive topics.'), "medium" === f || (h.push(v ? "可用能力（根据模型配置按需启用）：\n- web_search：联网检索最新信息；用于需要实时/准确事实的回答\n- file_attach：读取用户上传的图片/PDF/文档\n- code_interpreter：运行 python 分析数据或验证计算\n调用准则：能离线回答就不调工具；需要最新信息或计算时，显式说明使用了工具并给出来源。" : "Available capabilities (enabled per-model):\n- web_search: fetch latest info for time-sensitive facts\n- file_attach: read uploaded images/PDFs/docs\n- code_interpreter: run python for data analysis/computation\nRule: only invoke tools when offline knowledge is insufficient; cite sources when used."), h.push(v ? '红线：\n- 绝不开头说"作为一个 AI"或"很抱歉我不能..."\n- 不把个人偏好伪装成事实\n- 不夸大自己的能力边界\n- 敏感话题（政治/医疗/法律）给出平衡视角 + 建议咨询专业人士，不给单方面建议' : "Red lines: never open with \"As an AI...\"; don't dress preferences as facts; don't overstate capability; on sensitive topics (politics/medical/legal) give balanced view and advise consulting a professional.")), o && h.push("---\n" + o), h.join("\n\n")); } function h(e, t) { var n; return t.trim() ? (null == (n = e[0]) ? void 0 : n.role) === "system" ? [{ role: "system", content: "".concat(t, "\n\n---\n\n").concat(e[0].content) }, ...e.slice(1)] : [{ role: "system", content: t }, ...e] : e; } }, 99517: (e, t, n) => { n.d(t, { D: () => r }); function r(e) { let { url: t, withCredentials: n = !0, namedEvents: r = [], maxRetries: a = 5, baseDelayMs: o = 1e3, maxDelayMs: s = 3e4, stableAfterMs: i = 12e3, cooldownMs: l = 3e5, onNamedEvent: c, onMessage: u, onStable: d, onCircuitOpen: m, eventSourceFactory: f } = e, g = null, v = 0, h = 0, p = !1, y = null, C = null, _ = !1, b = !1, w = () => { null !== y && (clearTimeout(y), y = null); }, k = () => { null !== C && (clearTimeout(C), C = null); }, M = () => { if (_ || p)
+            return; _ = !0, k(); let e = h > 1; v = 0, null == d || d(e); }, S = () => { var e; let t, n; if (p)
+            return; if (T && document.hidden) {
+            b = !0;
+            return;
+        } if (w(), v >= a) {
+            null == m || m(), l > 0 && (y = setTimeout(() => { y = null, v = 0, I(); }, l));
+            return;
+        } let r = (e = v + 1, n = .2 * (t = Math.min(s, o * 2 ** Math.max(0, e - 1))) * (2 * Math.random() - 1), Math.max(0, Math.round(t + n))); v += 1, y = setTimeout(() => { y = null, I(); }, r); }, I = () => { let e; if (p)
+            return; let a = f || ("EventSource" in window ? (e, t) => new window.EventSource(e, t) : null); if (null === a)
+            return; try {
+            e = a(t, { withCredentials: n });
+        }
+        catch (e) {
+            S();
+            return;
+        } g = e, h += 1, _ = !1, e.onopen = () => { p || (k(), C = setTimeout(M, i)); }; let o = (e, t) => { p || (M(), e ? null == c || c(e, t) : null == u || u(t)); }; for (let t of (e.onmessage = e => o(null, e), r))
+            e.addEventListener(t, e => o(t, e)); e.onerror = () => { p || (k(), e.close(), g === e && (g = null), S()); }; }, T = "u" > typeof document && "string" == typeof document.visibilityState, G = () => { !p && (document.hidden ? g && (k(), w(), g.close(), g = null, b = !0) : b && (b = !1, I())); }; T && document.addEventListener("visibilitychange", G); let E = window.requestIdleCallback; return "function" == typeof E ? E(() => { p || I(); }, { timeout: 3e3 }) : I(), { close() { p = !0, w(), k(), T && document.removeEventListener("visibilitychange", G), g && (g.close(), g = null); } }; } } }]);

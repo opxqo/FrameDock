@@ -1,3 +1,5 @@
+import { findYfaiModel } from "@/lib/yfai-catalog";
+import { buildYfaiParams, isYfaiUrl, requestYfaiImages, yfaiRouting } from "./yfai";
 import axios from "axios";
 import { closestAutodlImageSize } from "@/lib/autodl-catalog";
 
@@ -505,7 +507,7 @@ async function requestStreamingResponse(config: AiConfig, body: Record<string, u
 
 // FrameDock: AutoDL relays chat models through the OpenAI-compatible /chat/completions, not /responses.
 function usesChatCompletions(config: AiConfig) {
-    return /autodl\.art/i.test(config.baseUrl);
+    return /autodl\.art/i.test(config.baseUrl) || isYfaiUrl(config.baseUrl);
 }
 
 type ChatStreamState = { buffer: string; text: string; error?: string };
@@ -538,8 +540,9 @@ async function requestStreamingChatCompletion(config: AiConfig, messages: Respon
         body: JSON.stringify({
             model: config.model,
             messages: chatMessages,
+            ...(isYfaiUrl(config.baseUrl) && findYfaiModel(config.model, config.yfaiModels) ? { ...buildYfaiParams(config, findYfaiModel(config.model, config.yfaiModels)!), ...yfaiRouting(config, findYfaiModel(config.model, config.yfaiModels)!) } : {}),
             stream: true,
-            ...(config.reasoningEffort === "auto" ? {} : { reasoning_effort: config.reasoningEffort }),
+            ...((isYfaiUrl(config.baseUrl) || config.reasoningEffort === "auto") ? {} : { reasoning_effort: config.reasoningEffort }),
         }),
         signal: options?.signal,
     });
@@ -756,6 +759,7 @@ function parseGeminiImagePayload(payload: GeminiPayload) {
 
 export async function requestGeneration(config: AiConfig, prompt: string, options?: RequestOptions) {
     const requestConfig = resolveModelRequestConfig(config, config.model || config.imageModel);
+    if (isYfaiUrl(requestConfig.baseUrl)) return requestYfaiImages(requestConfig, withSystemPrompt(requestConfig, prompt), [], options);
     const n = Math.max(1, Math.min(15, Math.floor(Math.abs(Number(config.count)) || 1)));
     const script = resolveModelScript(config, config.model || config.imageModel);
     if (script) {
@@ -816,6 +820,7 @@ export async function requestGeneration(config: AiConfig, prompt: string, option
 
 export async function requestEdit(config: AiConfig, prompt: string, references: ReferenceImage[], options?: RequestOptions) {
     const requestConfig = resolveModelRequestConfig(config, config.model || config.imageModel);
+    if (isYfaiUrl(requestConfig.baseUrl)) return requestYfaiImages(requestConfig, withSystemPrompt(requestConfig, prompt), references, options);
     const n = Math.max(1, Math.min(15, Math.floor(Math.abs(Number(config.count)) || 1)));
     const requestPrompt = buildImageReferencePromptText(prompt, references);
     const script = resolveModelScript(config, config.model || config.imageModel);

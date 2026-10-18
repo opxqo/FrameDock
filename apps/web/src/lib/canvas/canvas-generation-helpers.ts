@@ -107,6 +107,7 @@ export function buildGenerationConfig(config: AiConfig, node: CanvasNodeData | u
     return {
         ...config,
         model: resolveModelForCapability(config, node?.metadata?.model, mode),
+        yfaiParams: node?.metadata?.yfaiParams || config.yfaiParams,
         reasoningEffort: node?.metadata?.reasoningEffort || config.reasoningEffort || defaultConfig.reasoningEffort,
         quality: node?.metadata?.quality || config.quality || defaultConfig.quality,
         size: node?.metadata?.size || config.size || defaultConfig.size,

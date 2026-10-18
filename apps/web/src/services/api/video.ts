@@ -1,13 +1,16 @@
+import { buildYfaiInvoke, isYfaiUrl, prepareYfaiParams, submitYfaiTask, pollYfaiTask, yfaiTaskUrls } from "./yfai";
+import { ackJob, cancelJob, createJob, getJob, resubmitJob, uploadJobFile, watchJob, type Job } from "./jobs";
 import axios from "axios";
 import { nanoid } from "nanoid";
 
 import i18n from "@/i18n";
 import { dataUrlToFile, readFileAsDataUrl } from "@/lib/image-utils";
 import { clampVideoSeconds, computeVideoSize, inferVideoRatio } from "@/lib/media-size";
-import { getMediaBlob, resolveMediaUrl, uploadMediaFile, type UploadedFile } from "@/services/file-storage";
+import { getMediaBlob, loadStoredMedia, resolveMediaUrl, uploadMediaFile, type UploadedFile } from "@/services/file-storage";
 import { imageToDataUrl } from "@/services/image-storage";
 import { boolConfig, buildApiUrl, modelOptionName, resolveModelRequestConfig, resolveModelScript, withLocalProxy, type AiConfig } from "@/stores/use-config-store";
 import { runModelPlugin } from "./model-plugin";
+import { YFAI_BASE_URL } from "@/lib/yfai-catalog";
 import { findAutodlModel, guessAutodlFamily, nearestOption } from "@/lib/autodl-catalog";
 import type { ReferenceImage } from "@/types/image";
 import type { ReferenceAudio, ReferenceVideo } from "@/types/media";
@@ -19,8 +22,8 @@ type RequestOptions = { signal?: AbortSignal };
 type VideoMediaOptions = RequestOptions & { videos?: ReferenceVideo[]; audios?: ReferenceAudio[] };
 const apiText = (key: string, options?: Record<string, unknown>) => i18n.t(`apiErrors.${key}`, options);
 
-export type VideoGenerationResult = { blob?: Blob; url?: string; mimeType?: string };
-export type VideoGenerationTask = { id: string; provider: "openai" | "gemini" | "minimax" | "kling" | "ark" | "wan" | "plugin"; model: string };
+export type VideoGenerationResult = { blob?: Blob; url?: string; mimeType?: string; /** Already in the shared media store (server job output). */ storedKey?: string; /** The server job that produced it; acknowledged once the video is stored. */ jobId?: string };
+export type VideoGenerationTask = { id: string; provider: "openai" | "gemini" | "minimax" | "kling" | "ark" | "wan" | "yfai" | "plugin" | "job"; model: string };
 type AutodlVideoProvider = "minimax" | "kling" | "ark" | "wan";
 type KlingResponse = { code?: number; message?: string; data?: { task_id?: string; task_status?: string; task_status_msg?: string; task_result?: { videos?: Array<{ url?: string }> | null } } };
 type ArkTaskResponse = { id?: string; status?: string; content?: { video_url?: string }; error?: { message?: string } };
@@ -56,8 +59,9 @@ export async function requestVideoGeneration(config: AiConfig, prompt: string, r
 }
 
 export async function waitForVideoGenerationTask(config: AiConfig, task: VideoGenerationTask, options?: RequestOptions): Promise<VideoGenerationResult> {
+    if (task.provider === "job") return resultOfVideoJob(await watchJob(task.id, options?.signal));
     // MiniMax tasks often queue for 15+ minutes on relays such as AutoDL, so poll slower and longer (45 min).
-    const [attempts, intervalMs] = isAutodlVideoProvider(task.provider) ? [270, 10000] : [120, 2500];
+    const [attempts, intervalMs] = (isAutodlVideoProvider(task.provider) || task.provider === "yfai") ? [720, 5000] : [120, 2500];
     for (let attempt = 0; attempt < attempts; attempt += 1) {
         if (options?.signal?.aborted) throw new DOMException("Aborted", "AbortError");
         const state = await pollVideoGenerationTask(config, task, options);
@@ -69,6 +73,36 @@ export async function waitForVideoGenerationTask(config: AiConfig, task: VideoGe
     throw new Error(apiText("videoTimeout", { provider: "" }));
 }
 
+export function isVideoTaskUnknown(error: unknown) {
+    return error instanceof Error && error.name === "VideoTaskUnknown";
+}
+
+/** Server jobs: a failed job is a failed task; `unknown` keeps the task so the user can decide what to do. */
+function resultOfVideoJob(job: Job): VideoGenerationResult {
+    if (job.state === "succeeded" && job.result) return { storedKey: job.result.key, mimeType: job.result.mime, jobId: job.id };
+    if (job.state === "canceled") throw new DOMException("Aborted", "AbortError");
+    if (job.state === "unknown") {
+        const error = new Error(`${apiText("videoTaskUnknown")}${job.error ? `\n${job.error}` : ""}`);
+        error.name = "VideoTaskUnknown";
+        throw error;
+    }
+    throw videoTaskFailed(job.error || apiText("videoGenerationFailed"));
+}
+
+async function pollVideoJob(task: VideoGenerationTask, options?: RequestOptions): Promise<VideoGenerationTaskState> {
+    const job = await getJob(task.id, options?.signal);
+    if (job.state === "succeeded" || job.state === "failed" || job.state === "canceled" || job.state === "unknown") {
+        try {
+            return { status: "completed", result: resultOfVideoJob(job) };
+        } catch (error) {
+            return { status: "failed", error: error instanceof Error ? error.message : apiText("videoGenerationFailed") };
+        }
+    }
+    return { status: "pending" };
+}
+
+export { cancelJob as cancelVideoJob, getJob as getVideoJob, resubmitJob as resubmitVideoJob };
+
 export function isVideoTaskFailed(error: unknown) {
     return error instanceof Error && error.name === "VideoTaskFailed";
 }
@@ -79,28 +113,84 @@ function videoTaskFailed(message: string) {
     return error;
 }
 
+/** A multipart body as a job request: text fields inline, files uploaded once to the server's reference store. */
+async function formToJobRequest(body: FormData) {
+    const fields: Record<string, string | string[]> = {};
+    const files: Array<{ field: string; filename: string; store: string; key: string; mime: string }> = [];
+    const uploaded = new Map<Blob, { store: string; key: string }>();
+    for (const [field, value] of body.entries()) {
+        if (typeof value === "string") {
+            const current = fields[field];
+            fields[field] = current === undefined ? value : Array.isArray(current) ? [...current, value] : [current, value];
+            continue;
+        }
+        // The same file is often appended under two field names (image[] and images): upload it once.
+        let pointer = uploaded.get(value);
+        if (!pointer) {
+            pointer = await uploadJobFile(value);
+            uploaded.set(value, pointer);
+        }
+        files.push({ field, filename: value.name, mime: value.type, ...pointer });
+    }
+    return { fields, files };
+}
+
+/**
+ * Submits the request as a server job. Resolves undefined when jobs are off or the server has no job support
+ * (unreachable, or an older server without /api/jobs), so the caller falls back to the browser-driven path.
+ */
+async function tryVideoJob(config: Pick<AiConfig, "serverJobs">, model: string, adapter: string, request: unknown, credentials: { baseUrl: string; apiKey: string }, options?: RequestOptions): Promise<VideoGenerationTask | undefined> {
+    if (config.serverJobs === false) return undefined;
+    try {
+        const job = await createJob({ kind: "video", adapter, model, request, credentials, signal: options?.signal });
+        return { id: job.id, provider: "job", model };
+    } catch (error) {
+        const status = (error as { status?: number }).status;
+        if (options?.signal?.aborted || (status !== undefined && status !== 404 && status !== 405)) throw error;
+        return undefined;
+    }
+}
+
 export async function createVideoGenerationTask(config: AiConfig, prompt: string, references: ReferenceImage[] = [], options?: VideoMediaOptions): Promise<VideoGenerationTask> {
     const selectedModel = (config.model || config.videoModel).trim();
     const requestConfig = resolveModelRequestConfig(config, selectedModel);
     const script = resolveModelScript(config, selectedModel);
     if (script) return createPluginVideoTask(requestConfig, selectedModel, script, prompt, references, options);
     assertVideoConfig(requestConfig, requestConfig.model);
+    if (isYfaiUrl(requestConfig.baseUrl)) {
+        const { model, params } = await prepareYfaiParams(requestConfig, references, options);
+        const taskParams = { ...params, ...(model.param_schema.count ? { count: 1 } : {}) };
+        const job = await tryVideoJob(config, selectedModel, "yfai", { invoke: buildYfaiInvoke(requestConfig, model, prompt, taskParams) }, { baseUrl: YFAI_BASE_URL, apiKey: requestConfig.apiKey }, options);
+        if (job) return job;
+        const created = await submitYfaiTask(requestConfig, model, prompt, taskParams, options);
+        const id = created.task_id || created.id;
+        if (!id) throw new Error(apiText("noVideoTaskId"));
+        return { id, provider: "yfai", model: selectedModel };
+    }
     if (requestConfig.apiFormat === "gemini") return createGeminiVideoTask(requestConfig, selectedModel, prompt, references, options);
     const autodlProvider = autodlVideoProvider(requestConfig.model, requestConfig.baseUrl);
     if (autodlProvider === "minimax") return createMiniMaxVideoTask(requestConfig, selectedModel, prompt, references, options);
     if (autodlProvider === "kling") return createKlingVideoTask(requestConfig, selectedModel, prompt, references, options);
     if (autodlProvider === "ark") return createArkVideoTask(requestConfig, selectedModel, prompt, references, options);
     if (autodlProvider === "wan") return createWanVideoTask(requestConfig, selectedModel, prompt, references, options);
-    return createOpenAIVideoTask(requestConfig, selectedModel, prompt, references, options);
+    return createOpenAIVideoTask(requestConfig, selectedModel, prompt, references, options, config.serverJobs !== false);
 }
 
 export async function pollVideoGenerationTask(config: AiConfig, task: VideoGenerationTask, options?: RequestOptions): Promise<VideoGenerationTaskState> {
+    if (task.provider === "job") return pollVideoJob(task, options);
     if (task.provider === "plugin") {
         const result = pluginVideoResults.get(task.id);
         return result ? { status: "completed", result } : { status: "failed", error: apiText("pluginVideoExpired") };
     }
     const requestConfig = resolveModelRequestConfig(config, task.model);
     assertVideoConfig(requestConfig, requestConfig.model);
+    if (task.provider === "yfai") {
+        const state = await pollYfaiTask(requestConfig.apiKey, task.id, options);
+        if (!state.is_final) return { status: "pending" };
+        if (state.status !== "completed" || state.error) return { status: "failed", error: readApiErrorMessage(state.error) || apiText("videoGenerationFailed") };
+        const url = yfaiTaskUrls(state, "videos")[0];
+        return url ? { status: "completed", result: await videoResultFromUrl(url, options) } : { status: "failed", error: apiText("noPlayableVideo") };
+    }
     if (task.provider === "gemini") return pollGeminiVideoTask(requestConfig, task, options);
     if (task.provider === "minimax") return pollMiniMaxVideoTask(requestConfig, task, options);
     if (task.provider === "kling") return pollKlingVideoTask(requestConfig, task, options);
@@ -117,6 +207,7 @@ function isAutodlVideoProvider(provider: VideoGenerationTask["provider"]): provi
 
 /** How many input images a native AutoDL video adapter uses (first/last frame); undefined when not limited. */
 export function videoFrameImageLimit(model: string) {
+    if (model.startsWith("yfai::")) return undefined;
     const provider = autodlVideoProvider(model);
     if (!provider) return undefined;
     return provider === "wan" ? 1 : 2;
@@ -358,6 +449,11 @@ function videoPluginResult(result: unknown): VideoGenerationResult {
 }
 
 export async function storeGeneratedVideo(result: VideoGenerationResult): Promise<UploadedFile> {
+    if (result.storedKey) {
+        const stored = await loadStoredMedia(result.storedKey);
+        if (result.jobId) void ackJob(result.jobId).catch(() => undefined);
+        return stored;
+    }
     if (result.blob) return uploadMediaFile(result.blob, "video");
     if (result.url) {
         try {
@@ -369,7 +465,7 @@ export async function storeGeneratedVideo(result: VideoGenerationResult): Promis
     throw new Error(apiText("noPlayableVideo"));
 }
 
-async function createOpenAIVideoTask(config: AiConfig, model: string, prompt: string, references: ReferenceImage[], options?: VideoMediaOptions): Promise<VideoGenerationTask> {
+async function createOpenAIVideoTask(config: AiConfig, model: string, prompt: string, references: ReferenceImage[], options?: VideoMediaOptions, serverJobs = false): Promise<VideoGenerationTask> {
     const images = await Promise.all(references.map(async (image) => dataUrlToFile({ ...image, dataUrl: await imageToDataUrl(image) })));
     const videos = await Promise.all((options?.videos || []).map((video) => referenceMediaToFile(video, "ref.mp4", "invalidReferenceVideo", options)));
     const audios = await Promise.all((options?.audios || []).map((audio) => referenceMediaToFile(audio, "ref.mp3", "invalidReferenceAudio", options)));
@@ -404,6 +500,10 @@ async function createOpenAIVideoTask(config: AiConfig, model: string, prompt: st
     }
     videos.forEach((file) => body.append("video[]", file));
     audios.forEach((file) => body.append("audio[]", file));
+    if (serverJobs) {
+        const job = await tryVideoJob({ serverJobs } as AiConfig, model, "openai-video", await formToJobRequest(body), { baseUrl: config.baseUrl, apiKey: config.apiKey }, options);
+        if (job) return job;
+    }
     try {
         const created = unwrapVideoResponse((await axios.post<ApiVideoResponse>(aiApiUrl(config, "/videos"), body, { headers: aiHeaders(config), signal: options?.signal })).data);
         if (!created.id) throw new Error(apiText("noVideoTaskId"));

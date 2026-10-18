@@ -1,3 +1,4 @@
+import { describeYfaiPrice } from "@/lib/yfai-pricing";
 import { Tooltip } from "antd";
 import { Coins } from "@/components/icons";
 
@@ -19,7 +20,7 @@ export function PriceText({ label, className }: { label: PriceLabel | null; clas
 
 /** Unit price of a model, e.g. in model lists and pickers. */
 export function ModelPrice({ model, className }: { model: string; className?: string }) {
-    return <PriceText label={describeAutodlPrice(model)} className={className} />;
+    return <PriceText label={describeYfaiPrice(model) || describeAutodlPrice(model)} className={className} />;
 }
 
 /** Estimated cost of the next generation with the current settings, shown as a compact coin badge. */

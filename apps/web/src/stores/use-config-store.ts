@@ -1,3 +1,5 @@
+import { setLiveYfaiPrices, type YfaiPrice } from "@/lib/yfai-pricing";
+import { YFAI_BASE_URL, YFAI_MODELS, findYfaiModel, yfaiModels, yfaiCapability, yfaiToolOnly, setLiveYfaiModels, type YfaiModel } from "@/lib/yfai-catalog";
 import { useMemo } from "react";
 import { setLiveAutodlPrices, type AutodlPriceEntry } from "@/lib/autodl-pricing";
 import { create } from "zustand";
@@ -56,9 +58,17 @@ export type AiConfig = {
     canvasImageCount: string;
     proxyEnabled: boolean;
     proxyUrl: string;
+    /** FrameDock: run supported generations as server-side jobs that keep going when the page is closed. */
+    serverJobs: boolean;
     nodeRegenerateBehavior: "new-node" | "overwrite";
     autoFocusOnSelect: boolean;
     /** FrameDock: AutoDL models shown in model pickers (curated + synced). */
+    yfaiModels: YfaiModel[];
+    yfaiEnabledModels: string[];
+    yfaiSyncedAt: string;
+    yfaiPrices: Record<string, YfaiPrice>;
+    /** JSON map keyed by model ID; also stored per canvas node. */
+    yfaiParams: string;
     autodlEnabledModels: string[];
     /** FrameDock: models listed by the AutoDL account at the last sync. */
     autodlSyncedModels: AutodlSyncedModel[];
@@ -138,6 +148,19 @@ export function isAutodlChannel(channelId: string) {
     return (AUTODL_CHANNEL_IDS as readonly string[]).includes(channelId);
 }
 
+export function buildYfaiChannel(apiKey: string, enabled: string[], catalog: YfaiModel[] = []): ModelChannel {
+    return { id: "yfai", name: "YFAI", baseUrl: YFAI_BASE_URL, apiKey, apiFormat: "openai", models: yfaiModels(catalog.length ? catalog : YFAI_MODELS).filter((model) => enabled.includes(model.id) && model.available !== false && !yfaiToolOnly(model)).map((model) => ({ name: model.id, capability: yfaiCapability(model) })) };
+}
+export function withYfaiConfig(config: AiConfig, patch: { apiKey?: string; enabled?: string[]; catalog?: YfaiModel[]; syncedAt?: string }): AiConfig {
+    const catalog = patch.catalog ?? config.yfaiModels;
+    const enabled = patch.enabled ?? config.yfaiEnabledModels;
+    const apiKey = patch.apiKey ?? config.channels.find((channel) => channel.id === "yfai")?.apiKey ?? "";
+    const channel = buildYfaiChannel(apiKey, enabled, catalog);
+    const channels = config.channels.some((item) => item.id === "yfai") ? config.channels.map((item) => item.id === "yfai" ? channel : item) : [...config.channels, channel];
+    return { ...config, channels, models: modelOptionsFromChannels(channels), yfaiModels: catalog, yfaiEnabledModels: enabled, yfaiSyncedAt: patch.syncedAt ?? config.yfaiSyncedAt };
+}
+const yfaiDefaultNames = yfaiModels(YFAI_MODELS).filter((model) => model.available !== false).map((model) => model.id);
+
 export const defaultConfig: AiConfig = {
     channelMode: "local",
     baseUrl: OPENAI_BASE_URL,
@@ -146,6 +169,7 @@ export const defaultConfig: AiConfig = {
     channels: [
         ...(mockChannel ? [mockChannel] : []),
         ...autodlChannels,
+        buildYfaiChannel("", yfaiDefaultNames),
         {
             id: "default",
             name: i18n.t("config.channels.defaultName"),
@@ -184,8 +208,14 @@ export const defaultConfig: AiConfig = {
     canvasImageCount: "3",
     proxyEnabled: true,
     proxyUrl: FRAMEDOCK_PROXY_URL,
+    serverJobs: true,
     nodeRegenerateBehavior: "new-node",
     autoFocusOnSelect: false,
+    yfaiModels: [],
+    yfaiEnabledModels: yfaiDefaultNames,
+    yfaiSyncedAt: "",
+    yfaiPrices: {},
+    yfaiParams: "",
     autodlEnabledModels: AUTODL_CURATED_NAMES,
     autodlSyncedModels: [],
     autodlSyncedAt: "",
@@ -335,6 +365,11 @@ export const useConfigStore = create<ConfigStore>()(
                     if (index < 0) channels.push(fixed);
                     else channels[index] = fixed;
                 });
+                const yfaiCatalog = Array.isArray(config.yfaiModels) ? config.yfaiModels.filter((model) => model?.id && model.param_schema) : [];
+                const yfaiEnabled = Array.isArray(config.yfaiEnabledModels) ? config.yfaiEnabledModels.filter((name) => typeof name === "string") : yfaiDefaultNames;
+                const yfaiIndex = channels.findIndex((channel) => channel.id === "yfai");
+                const yfaiChannel = buildYfaiChannel(yfaiIndex >= 0 ? channels[yfaiIndex].apiKey : "", yfaiEnabled, yfaiCatalog);
+                if (yfaiIndex < 0) channels.push(yfaiChannel); else channels[yfaiIndex] = yfaiChannel;
                 const models = modelOptionsFromChannels(channels);
                 return {
                     ...current,
@@ -363,8 +398,14 @@ export const useConfigStore = create<ConfigStore>()(
                         // Configs still pointing at the upstream canvas-proxy default move to the built-in FrameDock proxy.
                         proxyEnabled: isBuiltinProxyUrl(config.proxyUrl) ? true : Boolean(config.proxyEnabled),
                         proxyUrl: isBuiltinProxyUrl(config.proxyUrl) ? FRAMEDOCK_PROXY_URL : config.proxyUrl,
+                        serverJobs: config.serverJobs !== false,
                         nodeRegenerateBehavior: config.nodeRegenerateBehavior === "overwrite" ? "overwrite" : "new-node",
                         autoFocusOnSelect: Boolean(config.autoFocusOnSelect),
+                        yfaiModels: yfaiCatalog,
+                        yfaiEnabledModels: yfaiEnabled,
+                        yfaiSyncedAt: config.yfaiSyncedAt || "",
+                        yfaiPrices: config.yfaiPrices && typeof config.yfaiPrices === "object" ? config.yfaiPrices : {},
+                        yfaiParams: typeof config.yfaiParams === "string" ? config.yfaiParams : "",
                         autodlEnabledModels,
                         autodlSyncedModels,
                         autodlSyncedAt: config.autodlSyncedAt || "",
@@ -495,7 +536,9 @@ export function modelOptionLabel(config: AiConfig, value: string) {
     const decoded = decodeChannelModel(value);
     if (!decoded) return value;
     const channel = config.channels.find((item) => item.id === decoded.channelId);
-    return channel ? `${decoded.model}（${channel.name}）` : decoded.model;
+    const yfai = decoded.channelId === "yfai" ? findYfaiModel(value, config.yfaiModels) : undefined;
+    const label = yfai ? (i18n.resolvedLanguage?.startsWith("en") ? yfai.display_name_en || yfai.display_name : yfai.display_name) : decoded.model;
+    return channel ? `${label}（${channel.name}）` : decoded.model;
 }
 
 export function modelOptionsFromChannels(channels: ModelChannel[]) {
@@ -597,3 +640,9 @@ setLiveAutodlPrices(useConfigStore.getState().config.autodlPrices);
 useConfigStore.subscribe((state, previous) => {
     if (state.config.autodlPrices !== previous.config.autodlPrices) setLiveAutodlPrices(state.config.autodlPrices);
 });
+
+setLiveYfaiModels(useConfigStore.getState().config.yfaiModels);
+useConfigStore.subscribe((state, previous) => { if (state.config.yfaiModels !== previous.config.yfaiModels) setLiveYfaiModels(state.config.yfaiModels); });
+
+setLiveYfaiPrices(useConfigStore.getState().config.yfaiPrices);
+useConfigStore.subscribe((state, previous) => { if (state.config.yfaiPrices !== previous.config.yfaiPrices) setLiveYfaiPrices(state.config.yfaiPrices); });

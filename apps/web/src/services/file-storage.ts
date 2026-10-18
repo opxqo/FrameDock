@@ -18,6 +18,16 @@ export async function uploadMediaFile(input: string | Blob, prefix = "file"): Pr
     return { url, storageKey, bytes: blob.size, mimeType: blob.type || "application/octet-stream", ...meta };
 }
 
+/** Wraps media that already sits in the shared store (e.g. the output of a finished server job) without copying it. */
+export async function loadStoredMedia(storageKey: string): Promise<UploadedFile> {
+    const blob = await store.getItem<Blob>(storageKey);
+    if (!blob) throw new Error(`Stored media is missing: ${storageKey}`);
+    const url = URL.createObjectURL(blob);
+    objectUrls.set(storageKey, url);
+    const meta = blob.type.startsWith("video/") ? await readVideoMeta(url) : blob.type.startsWith("audio/") ? await readAudioMeta(url) : {};
+    return { url, storageKey, bytes: blob.size, mimeType: blob.type || "application/octet-stream", ...meta };
+}
+
 export async function resolveMediaUrl(storageKey?: string, fallback = "") {
     if (!storageKey) return fallback;
     const cached = objectUrls.get(storageKey);

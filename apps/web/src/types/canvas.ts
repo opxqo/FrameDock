@@ -81,6 +81,7 @@ export type CanvasNodeMetadata = {
     audioFormat?: string;
     audioSpeed?: string;
     audioInstructions?: string;
+    yfaiParams?: string;
     references?: string[];
     naturalWidth?: number;
     naturalHeight?: number;
@@ -92,7 +93,7 @@ export type CanvasNodeMetadata = {
     bytes?: number;
     durationMs?: number;
     videoTaskId?: string;
-    videoTaskProvider?: "openai" | "gemini" | "minimax" | "kling" | "ark" | "wan";
+    videoTaskProvider?: "openai" | "gemini" | "minimax" | "kling" | "ark" | "wan" | "yfai" | "job";
     groupId?: string;
     // FrameDock Codex node.
     codexMode?: "text" | "image";

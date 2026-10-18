@@ -1,0 +1,144 @@
+function _define_property(obj, key, value) { if (key in obj) {
+    Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });
+}
+else {
+    obj[key] = value;
+} return obj; }
+function _object_spread(target) { for (var i = 1; i < arguments.length; i++) {
+    var source = arguments[i] != null ? arguments[i] : {};
+    var ownKeys = Object.keys(source);
+    if (typeof Object.getOwnPropertySymbols === "function") {
+        ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; }));
+    }
+    ownKeys.forEach(function (key) { _define_property(target, key, source[key]); });
+} return target; }
+(self.webpackChunk_N_E = self.webpackChunk_N_E || []).push([[74838], { 484: (e, t, n) => {
+            "use strict";
+            n.d(t, { Jy: () => c, _R: () => F, j0: () => p, ob: () => b });
+            var r = n(47266), i = n(98242), a = n(10408), o = n(55093), l = n(13062), s = n(36069), u = n(88617);
+            let c = ["team", "spaces"];
+            function m(e) { var t; if (null == e ? void 0 : e.role)
+                return e.role; let n = null != (t = null == e ? void 0 : e.spaces) ? t : []; return n.length >= 2 ? "owner" : 1 === n.length && "team" === n[0].account_type ? "member" : "personal"; }
+            function p(e) { let t, n, i, o, s, u, p, b, f = (0, r.c)(23); f[0] !== e ? (t = void 0 === e ? {} : e, f[0] = e, f[1] = t) : t = f[1]; let h = t, { status: F } = (0, l.wV)(), y = !1 !== h.enabled && "authenticated" === F; f[2] !== y ? (n = { queryKey: c, queryFn: v, enabled: y, staleTime: 3e5, refetchInterval: !1, refetchIntervalInBackground: !1, retry: !1 }, f[2] = y, f[3] = n) : n = f[3]; let { data: H, isLoading: _ } = (0, a.I)(n); if (f[4] !== H) {
+                var w, k, N;
+                o = m(H), i = (s = null != (w = null == H ? void 0 : H.spaces) ? w : []).find(g), u = s.filter(d), k = s, N = o, p = k.some(e => e.relation) ? k.find(e => "owner" === e.relation) : "owner" === N ? k.find(e => "team" === e.account_type) : void 0, f[4] = H, f[5] = i, f[6] = o, f[7] = s, f[8] = u, f[9] = p;
+            }
+            else
+                i = f[5], o = f[6], s = f[7], u = f[8], p = f[9]; let S = p, T = (null == i ? void 0 : i.account_type) === "team", D = y && _, I = u.length > 0, M = null == H ? void 0 : H.current_account_id, x = (null == H ? void 0 : H.can_view_team_records) === !0, C = (null == H ? void 0 : H.member_history_isolation_enabled) === !0, z = null == H ? void 0 : H.history_actor; return f[10] !== i || f[11] !== T || f[12] !== S || f[13] !== o || f[14] !== s || f[15] !== u || f[16] !== D || f[17] !== I || f[18] !== M || f[19] !== x || f[20] !== C || f[21] !== z ? (b = { isLoading: D, role: o, isTeamSpace: T, spaces: s, currentSpace: i, switchTargets: u, canSwitch: I, ownedTeamSpace: S, currentAccountId: M, canViewAllTeamRecords: x, memberHistoryIsolationEnabled: C, historyActor: z }, f[10] = i, f[11] = T, f[12] = S, f[13] = o, f[14] = s, f[15] = u, f[16] = D, f[17] = I, f[18] = M, f[19] = x, f[20] = C, f[21] = z, f[22] = b) : b = f[22], b; }
+            function d(e) { return !e.is_current; }
+            function g(e) { return e.is_current; }
+            function v() { return s.Y.spaces(); }
+            function b(e) { let t, n, i, o, l, s, u = (0, r.c)(13); u[0] !== e ? (t = void 0 === e ? {} : e, u[0] = e, u[1] = t) : t = u[1]; let p = !1 !== t.enabled; u[2] !== p ? (n = { queryKey: c, queryFn: h, enabled: p, staleTime: 3e5, refetchInterval: !1, refetchIntervalInBackground: !1, retry: !1 }, u[2] = p, u[3] = n) : n = u[3]; let { data: d } = (0, a.I)(n); if (u[4] !== (null == d ? void 0 : d.spaces)) {
+                var g;
+                i = null != (g = null == d ? void 0 : d.spaces) ? g : [], u[4] = null == d ? void 0 : d.spaces, u[5] = i;
+            }
+            else
+                i = u[5]; u[6] !== i ? (o = i.find(f), u[6] = i, u[7] = o) : o = u[7]; let v = o, b = (null == v ? void 0 : v.account_type) === "team"; u[8] !== d ? (l = m(d), u[8] = d, u[9] = l) : l = u[9]; let F = "owner" === l; return u[10] !== b || u[11] !== F ? (s = { isTeamSpace: b, isTeamOwner: F }, u[10] = b, u[11] = F, u[12] = s) : s = u[12], s; }
+            function f(e) { return e.is_current; }
+            function h() { return s.Y.spaces(); }
+            function F() { let { update: e } = (0, l.wV)(), t = (0, o.jE)(), [n, r] = (0, i.useState)(!1); return { switchTo: (0, i.useCallback)(async (n, i, a) => { r(!0); try {
+                    let r = await s.Y.switchSpace(n);
+                    a && await a(), await e({ switchTokens: { accessToken: r.access_token || r.token, refreshToken: r.refresh_token, accessTokenExpiresAt: r.access_token_expires_at ? Date.parse(r.access_token_expires_at) : void 0, refreshTokenExpiresAt: r.refresh_token_expires_at ? Date.parse(r.refresh_token_expires_at) : void 0, id: r.user.id, role: r.user.role, name: r.user.display_name, image: r.user.avatar_url } }), (0, u.ap)(), t.clear(), window.location.assign(i);
+                }
+                catch (e) {
+                    throw r(!1), e;
+                } }, [e, t]), switching: n }; }
+        }, 1558: (e, t, n) => {
+            "use strict";
+            n.d(t, { KF: () => o, hM: () => i, jz: () => a, o3: () => r });
+            let r = ["today", "yesterday", "last7", "last30", "thisMonth", "lastMonth", "all"];
+            function i(e) { let t = e => String(e).padStart(2, "0"); return "".concat(e.getFullYear(), "-").concat(t(e.getMonth() + 1), "-").concat(t(e.getDate())); }
+            function a(e) { let t = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : new Date, n = t.getFullYear(), r = t.getMonth(), a = t.getDate(), o = e => i(new Date(n, r, a + e)); switch (e) {
+                case "today": return { from: o(0), to: o(0) };
+                case "yesterday": return { from: o(-1), to: o(-1) };
+                case "last7": return { from: o(-6), to: o(0) };
+                case "last30": return { from: o(-29), to: o(0) };
+                case "thisMonth": return { from: i(new Date(n, r, 1)), to: o(0) };
+                case "lastMonth": return { from: i(new Date(n, r - 1, 1)), to: i(new Date(n, r, 0)) };
+                case "all": return { from: "", to: "" };
+            } }
+            function o(e, t) { let n = (e, t) => { let n = /^(\d{4})-(\d{2})-(\d{2})$/.exec(e); if (!n)
+                return; let [, r, i, a] = n; return (t ? new Date(Number(r), Number(i) - 1, Number(a), 23, 59, 59, 999) : new Date(Number(r), Number(i) - 1, Number(a), 0, 0, 0, 0)).toISOString(); }; return { start_at: n(e, !1), end_at: n(t, !0) }; }
+        }, 36069: (e, t, n) => {
+            "use strict";
+            n.d(t, { Y: () => i });
+            var r = n(88617);
+            let i = { historyPolicy: () => r.FH.get("/api/v1/team/history-policy"), historyIsolation: () => r.FH.get("/api/v1/team/history-isolation"), updateHistoryIsolation: e => r.FH.put("/api/v1/team/history-isolation", { enabled: e }), dashboard(e) { let t = {}; return e && (t.month = e), r.FH.get("/api/v1/team/dashboard", { params: t }); }, members: () => r.FH.get("/api/v1/team/members"), consumption() { let { category: e, memberId: t, month: n, page: i = 1, size: a = 30 } = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : {}, o = { page: i, size: a }; return e && "all" !== e && (o.category = e), t && (o.member_id = t), n && (o.month = n), r.FH.get("/api/v1/team/consumption", { params: o }); }, consumptionSummary() { let { memberId: e, month: t } = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : {}, n = {}; return e && (n.member_id = e), t && (n.month = t), r.FH.get("/api/v1/team/consumption-summary", { params: n }); }, async exportConsumptionCsv() { let { category: e, memberId: t, month: n } = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : {}, i = new URLSearchParams; return e && "all" !== e && i.set("category", e), t && i.set("member_id", t), n && i.set("month", n), r.FH.getBlob("/api/v1/team/consumption/export?".concat(i.toString())); }, projects(e) { let t = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : 1, n = arguments.length > 2 && void 0 !== arguments[2] ? arguments[2] : 30; return r.FH.get("/api/v1/team/projects", { params: { type: e, page: t, size: n } }); }, createMember: e => r.FH.post("/api/v1/team/members", e), suspendMember: e => r.FH.post("/api/v1/team/members/".concat(e, "/suspend"), {}), deleteMember: e => r.FH.delete("/api/v1/team/members/".concat(e)), resumeMember: e => r.FH.post("/api/v1/team/members/".concat(e, "/resume"), {}), updateMember: (e, t) => r.FH.put("/api/v1/team/members/".concat(e), t), changeMemberPassword: (e, t) => r.FH.put("/api/v1/team/members/".concat(e, "/password"), { password: t }), spaces: () => r.FH.get("/api/v1/team/spaces"), switchSpace: e => r.FH.post("/api/v1/team/switch", { target_account_id: e }), createTeam: e => r.FH.post("/api/v1/team/create", { team_name: e }), createInvitation: e => r.FH.post("/api/v1/team/invitations", e), teamInvitations: () => r.FH.get("/api/v1/team/invitations"), revokeInvitation: e => r.FH.post("/api/v1/team/invitations/".concat(e, "/revoke"), {}), receivedInvitations: () => r.FH.get("/api/v1/team/invitations/received"), acceptInvitation: e => r.FH.post("/api/v1/team/invitations/".concat(e, "/accept"), {}), declineInvitation: e => r.FH.post("/api/v1/team/invitations/".concat(e, "/decline"), {}), leaveTeam: () => r.FH.post("/api/v1/team/membership/leave", {}), linkPersonal: (e, t) => r.FH.post("/api/v1/team/membership/link-personal", { identifier: e, password: t }) };
+        }, 41257: (e, t, n) => {
+            "use strict";
+            n.d(t, { S: () => i });
+            var r = n(88617);
+            let i = { list: () => r.FH.get("/api/v1/sub-accounts"), myQuota: () => r.FH.get("/api/v1/sub-account/my-quota"), setSpendPriority: e => r.FH.put("/api/v1/sub-account/spend-priority", { spend_priority: e }), create: e => r.FH.post("/api/v1/sub-accounts", e), update: (e, t) => r.FH.put("/api/v1/sub-accounts/".concat(e), t), updatePassword: (e, t) => r.FH.put("/api/v1/sub-accounts/".concat(e, "/password"), { password: t }), suspend: e => r.FH.delete("/api/v1/sub-accounts/".concat(e)), consumption(e) { let t = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : 1, n = arguments.length > 2 && void 0 !== arguments[2] ? arguments[2] : 20; return r.FH.get("/api/v1/sub-accounts/".concat(e, "/consumption"), { params: { page: t, size: n } }); }, summary: () => r.FH.get("/api/v1/sub-accounts/summary"), bulkCreate: e => r.FH.post("/api/v1/sub-accounts/bulk", { accounts: e }) };
+        }, 54719: (e, t, n) => {
+            "use strict";
+            n.d(t, { O_: () => d, Ol: () => o.Ol, XA: () => p, XJ: () => u, Yn: () => l, a$: () => s, cp: () => g, dB: () => c, js: () => m });
+            var r = n(88617), i = n(77648), a = n(85998), o = n(71814);
+            function l(e) { let t = e / 1048576; return !Number.isFinite(t) || t <= 0 ? "0" : t >= 10 ? t.toFixed(1) : t >= .01 ? t.toFixed(2) : "<0.01"; }
+            function s(e) { return e.slice(0, 8); }
+            function u(e) { var t; let n = null == (t = e.metadata) ? void 0 : t.request_id; return "string" == typeof n && "" !== n ? n : null; }
+            function c(e) { var t, n; let r = null != (t = e.reference_id) ? t : ""; if (!r.startsWith("checkin-milestone:"))
+                return null; let i = Number.parseInt(null != (n = r.split(":")[2]) ? n : "", 10); return Number.isFinite(i) && i > 0 ? i : null; }
+            function m(e) { var t; let n = null != (t = e.reference_id) ? t : ""; return n.startsWith("checkin-budget:") ? "draw" : n.startsWith("checkin-budget-refund:") ? "refund" : n.startsWith("checkin-budget-revert:") ? "revert" : n.startsWith("checkin-pool:") ? "pool" : null; }
+            function p(e) { return "unfreeze" === e.type && "refunded" !== d(e); }
+            function d(e) { var t, n, r, i, a, o, l, s, c; switch (e.type) {
+                case "usage": return e.call_interrupted ? "interrupted" : "success";
+                case "subscription": return "success";
+                case "checkin_bonus": return "credited";
+                case "checkin_subsidy": return Number.parseFloat(String(null != (t = e.amount) ? t : "0")) > 0 ? "credited" : "success";
+                case "refund": return "refunded";
+                case "adjustment":
+                    if (Number.parseFloat(String(null != (n = e.amount) ? n : "0")) > 0 && ((null == (r = e.description) ? void 0 : r.includes("goodwill")) || (null == (i = e.description_friendly) ? void 0 : i.includes("退"))))
+                        return "refunded";
+                    return null;
+                case "unfreeze": return null != u(e) || (null == (a = e.description_friendly) ? void 0 : a.includes("退款")) || (null == (o = e.description) ? void 0 : o.includes("(refund)")) || (null == (l = e.description) ? void 0 : l.includes("failed/no-bill freeze")) || (null == (s = e.description) ? void 0 : s.includes("orphan-freeze backstop")) || (null == (c = e.description) ? void 0 : c.includes("expire-release")) ? "refunded" : "unfrozen";
+                case "freeze":
+                    if (e.reconcile_pending)
+                        return "reconciling";
+                    return e.freeze_resolved ? "unfrozen" : "generating";
+                default: return null;
+            } }
+            let g = { getWallet: () => r.FH.get("/api/v1/billing/balance"), getReclaimableFreeze: () => r.FH.get("/api/v1/billing/reclaimable-freeze"), reclaimFreeze: () => r.FH.post("/api/v1/billing/reclaim-freeze"), getTeamAllocationSourceWallet: () => r.FH.get("/api/v1/billing/team/source-balance"), allocateToTeam: (e, t, n) => r.FH.post("/api/v1/billing/team/allocate", _object_spread({ team_id: e, amount: t }, n ? { order_id: n } : {})), reclaimFromTeam: (e, t, n) => r.FH.post("/api/v1/billing/team/reclaim", _object_spread({ team_id: e, amount: t }, n ? { order_id: n } : {})), getTopupPresets: () => r.FH.get("/api/v1/billing/topup/presets"), getSummary() { let e = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : {}; return r.FH.get("/api/v1/billing/summary", { params: e }); }, getApiKeyUsage: e => r.FH.get("/api/v1/billing/api-key-usage", { params: e }), getAvailableProviders: () => r.FH.get("/api/v1/billing/providers"), getCheckoutOptions: () => r.FH.get("/api/v1/billing/checkout-options"), getUsageStats() { let e = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : 7; return r.FH.get("/api/v1/billing/usage", { params: (0, a.JP)(e) }); }, getUsageRange: (e, t) => r.FH.get("/api/v1/billing/usage", { params: { start: e, end: t } }), getUsageBuckets: (e, t, n) => r.FH.get("/api/v1/billing/usage", { params: { start: e, end: t, granularity: n } }), listCalls() { let e = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : {}; return r.FH.get("/api/v1/billing/calls", { params: e }); }, getCallDetail: e => r.FH.get("/api/v1/billing/calls/".concat(encodeURIComponent(e))), getCallsSummary() { let e = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : {}; return r.FH.get("/api/v1/billing/call-summary", { params: e }); }, listTransactions: e => r.FH.getPage("/api/v1/billing/transactions", { params: e }), exportTransactions: e => r.FH.get("/api/v1/billing/transactions/export", { params: e }), createTopup: e => r.FH.post("/api/v1/billing/topup", _object_spread({ provider: e.provider, amount: function (e) { let t = e.trim(); if (!t)
+                        return 0; let n = Number.parseFloat(t); return !Number.isFinite(n) || n <= 0 ? 0 : Math.round(n / (0, i.il)() * 1e6); }(e.amount), origin: window.location.origin }, void 0 !== e.activity_tier_cny ? { activity_tier_cny: e.activity_tier_cny } : {})), redeemCode: e => r.FH.post("/api/v1/billing/redeem", { code: e }), listPublicModels: () => r.FH.get("/api/v1/billing/pricing") };
+        }, 71814: (e, t, n) => {
+            "use strict";
+            n.d(t, { HA: () => m, Jf: () => c, Kt: () => l, Ol: () => o, RN: () => f, UK: () => a, d$: () => g, dh: () => d, eX: () => h, g3: () => p, gm: () => u, mn: () => s, mq: () => b, nB: () => v, op: () => i });
+            var r = n(77648);
+            function i(e) { if (null == e || "" === e)
+                return 0; let t = "number" == typeof e ? e : Number.parseFloat(String(e).trim().replace(/[$,\s]/g, "")); return Number.isFinite(t) ? Math.abs(t) : 0; }
+            function a(e) { return (0, r.H6)(i(e)); }
+            function o(e) { if (null == e || "" === e)
+                return (0, r.H6)(0); let t = "number" == typeof e ? e : Number.parseFloat(String(e)); return Number.isFinite(t) ? (0, r.H6)(Math.abs(t) / 1e6) : (0, r.H6)(0); }
+            function l(e) { if (null == e || "" === e)
+                return (0, r.H6)(0); let t = "number" == typeof e ? e : Number.parseFloat(String(e)); return Number.isFinite(t) ? (0, r.H6)(t / 1e6) : (0, r.H6)(0); }
+            function s(e) { if (null == e || "" === e)
+                return (0, r.H6)(0); let t = "number" == typeof e ? e : Number.parseFloat(String(e).trim().replace(/[$,\s]/g, "")); return Number.isFinite(t) ? (0, r.H6)(t) : (0, r.H6)(0); }
+            function u(e) { return "number" != typeof e || !Number.isFinite(e) || e <= 0 ? "#—" : "#".concat(e); }
+            function c(e, t) { let n = null == e ? void 0 : e.trim(); return n || ("number" == typeof t && Number.isFinite(t) && t > 0 ? "用户".concat(t) : "用户"); }
+            function m(e, t) { let n = (null == e ? void 0 : e.trim()) || "用户"; return "number" == typeof t && Number.isFinite(t) && t > 0 ? "".concat(n, " #").concat(t) : n; }
+            function p(e) { let t = (null != e ? e : "").trim().toLowerCase(); return !!t && (t.endsWith("@users.omniforge.ai") || t.endsWith("@team.local")); }
+            function d(e) { let t = (null != e ? e : "").trim(); if (!t)
+                return ""; let n = t.toLowerCase().match(/^phone-(\d+)@users\.omniforge\.ai$/); return n ? "手机 ".concat(n[1]) : p(t) ? t.split("@")[0] : t; }
+            function g(e) { if (!e)
+                return "—"; let t = new Date(e); return Number.isNaN(t.getTime()) ? e : t.toISOString().slice(0, 10); }
+            function v(e) { let t = new Date(e); if (Number.isNaN(t.getTime()))
+                return "—"; let n = e => String(e).padStart(2, "0"); return "".concat(n(t.getMonth() + 1), "-").concat(n(t.getDate()), " ").concat(n(t.getHours()), ":").concat(n(t.getMinutes())); }
+            function b(e, t) { let n = e instanceof Date ? e : new Date(e); if (!Number.isFinite(n.getTime()))
+                return ""; try {
+                return new Intl.DateTimeFormat(t, { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }).format(n);
+            }
+            catch (e) {
+                return n.toISOString();
+            } }
+            function f(e) { let t = (e || "").trim(); return t.length <= 4 ? t : t.length <= 8 ? "".concat(t.slice(0, 2), "****").concat(t.slice(-2)) : "".concat(t.slice(0, 3), "****").concat(t.slice(-4)); }
+            function h(e) { return e >= 1e3 ? "".concat((e / 1e3).toFixed(1), "k") : String(e); }
+        }, 75253: () => { }, 85998: (e, t, n) => {
+            "use strict";
+            n.d(t, { IB: () => a, JP: () => l, oC: () => s });
+            var r = n(1558);
+            let i = new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Shanghai", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", hourCycle: "h23" });
+            function a() { let e = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : new Date, t = {}; for (let n of i.formatToParts(e))
+                t[n.type] = n.value; return { date: "".concat(t.year, "-").concat(t.month, "-").concat(t.day), hour: Number(t.hour) }; }
+            function o(e) { let [t, n, r] = a(e).date.split("-").map(Number); return new Date(t, n - 1, r, 12); }
+            function l(e) { let t = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : new Date, n = o(t), i = new Date(n); return i.setDate(i.getDate() - (Math.max(1, Math.floor(e)) - 1)), { start: (0, r.hM)(i), end: (0, r.hM)(n) }; }
+            function s(e) { let t = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : new Date; return (0, r.jz)(e, o(t)); }
+        } }]);

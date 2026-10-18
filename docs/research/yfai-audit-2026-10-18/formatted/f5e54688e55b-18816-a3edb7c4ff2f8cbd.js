@@ -1,0 +1,89 @@
+"use strict";
+(self.webpackChunk_N_E = self.webpackChunk_N_E || []).push([[18816], { 11353: (e, t, n) => { function l(e) { return !e || (null === e.runes || e.runes <= 0) && (null === e.bytes || e.bytes <= 0); } function u(e) { let t = e.max_prompt_chars, n = e.max_prompt_bytes; return { runes: "number" == typeof t && Number.isFinite(t) && t > 0 ? t : null, bytes: "number" == typeof n && Number.isFinite(n) && n > 0 ? n : null }; } function i(e, t) { let n = [], l = []; for (let i of null != e ? e : [])
+            p(t, u(i)) ? l.push(i) : n.push(i); return { fits: n, truncates: l }; } function r(e) { let t = null; for (let n of e) {
+            let e = n.user_price_rmb;
+            "number" == typeof e && Number.isFinite(e) && !(e <= 0) && (null === t || e < t) && (t = e);
+        } return t; } function a(e) { if (0 === e.fits.length)
+            return null; let t = r([...e.fits, ...e.truncates]), n = r(e.fits); return null === t || null === n || t <= 0 ? null : { from: t, to: n, ratio: n / t }; } function o(e, t) { if (l(e))
+            return null; let n = null !== e.runes && e.runes > 0 ? e.runes : null, u = null; if (null !== e.bytes && e.bytes > 0) {
+            let n = f(t), l = _(t), i = n > 0 && l > 0 ? Math.max(1, l / n) : 3;
+            u = Math.max(1, Math.floor(e.bytes / i));
+        } return null === n ? u : null === u ? n : Math.min(n, u); } function s(e, t) { let n = o(e, t); return null === n ? 1 : d(n); } function m(e, t) { if (l(t) || !p(e, t))
+            return 0; let n = f(e); return n <= 0 ? 0 : Math.max(0, 1 - s(t, e) / n); } function c(e, t) { return m(e, t) > .5; } function d(e) { return Math.max(1, Math.floor(.92 * e)); } function p(e, t) { return !l(t) && !!(null !== t.runes && t.runes > 0 && f(e) > t.runes || null !== t.bytes && t.bytes > 0 && _(e) > t.bytes); } function f(e) { return [...e].length; } function _(e) { let t = 0; for (let n = 0; n < e.length; n += 1) {
+            let l = e.charCodeAt(n);
+            if (l < 128)
+                t += 1;
+            else if (l < 2048)
+                t += 2;
+            else if (l >= 55296 && l <= 56319) {
+                let l = n + 1 < e.length ? e.charCodeAt(n + 1) : 0;
+                l >= 56320 && l <= 57343 ? (t += 4, n += 1) : t += 3;
+            }
+            else
+                t += 3;
+        } return t; } function h(e, t) { return ((e + 400) * .648 + .648 * Math.max(t, 1) * 4) / 1e6 * 2; } function y(e, t, n) { return e.length > 0 ? { cap: function (e) { if (!e || 0 === e.length)
+                return { cap: { runes: null, bytes: null }, laneCount: 0, declaredCount: 0 }; let t = null, n = null, l = 0; for (let u of e) {
+                let e = u.max_prompt_chars, i = u.max_prompt_bytes, r = "number" == typeof e && Number.isFinite(e) && e > 0, a = "number" == typeof i && Number.isFinite(i) && i > 0;
+                (r || a) && (l += 1, r && (null === t || e < t) && (t = e), a && (null === n || i < n) && (n = i));
+            } return { cap: { runes: t, bytes: n }, laneCount: e.length, declaredCount: l }; }(e).cap, willTruncate: i(e, t).truncates.length > 0, basis: "lanes" } : l(n) ? { cap: { runes: null, bytes: null }, willTruncate: !1, basis: "unknown" } : { cap: n, willTruncate: p(t, n), basis: "model-fallback" }; } n.d(t, { BG: () => i, CJ: () => d, Dw: () => c, P7: () => h, Wf: () => p, XK: () => m, dp: () => _, fl: () => u, hO: () => f, jf: () => l, m0: () => y, nV: () => r, p0: () => s, wi: () => o, wm: () => a }); }, 28486: (e, t, n) => { let l; n.d(t, { Cr: () => w, ZG: () => P, Ef: () => W, kg: () => E, mM: () => B, Ku: () => T, Jl: () => D, vV: () => S, Ev: () => z, nO: () => q, Lz: () => b, uf: () => v, q$: () => C, IM: () => R, dL: () => M, Yl: () => g, qy: () => k, AI: () => x, SX: () => y }); var u = n(47266), i = n(98242), r = n(1916), a = n(12836), o = n(54779); function s(e) { return { controlParam: e.control_param, controlValue: e.control_value, affectedParam: e.affected_param, affectedValues: e.affected_values, action: e.action, reason: e.reason }; } n(58005); let m = { dropdown: "select", radio: "radio", slider: "slider", switch: "switch", input: "input", text: "input", textarea: "textarea", checkbox: "switch", upload: "upload" }; function c(e, t, n) { return e ? e[n.toLowerCase().startsWith("zh") ? "zh" : "en"] || e.en || e.zh || t || "" : null != t ? t : ""; } let d = new Map, p = !1; function f() { return p || (p = !0, l = (0, a.YR)()), l; } let _ = () => () => { }, h = () => void 0; function y(e) { let t, n, l, a = (0, u.c)(7), p = e || ""; a[0] !== p ? (t = p.trim(), a[0] = p, a[1] = t) : t = a[1]; let y = t; a[2] === Symbol.for("react.memo_cache_sentinel") ? (n = document.documentElement.lang || navigator.language || "en", a[2] = n) : n = a[2]; let b = n, { data: v } = (0, r.tQ)(), x = (0, i.useSyncExternalStore)(_, f, h); if (a[3] !== x || a[4] !== v || a[5] !== y) {
+            e: {
+                var g, k, S, P;
+                let e, t, n, u, i, a = (null == v ? void 0 : v.length) ? v : x;
+                if (!y || !(null == a ? void 0 : a.length)) {
+                    l = void 0;
+                    break e;
+                }
+                let p = (0, r.oi)(a, y);
+                if (!p) {
+                    d.set(y, void 0), l = void 0;
+                    break e;
+                }
+                let f = (e = Object.entries(p.param_schema && "object" == typeof p.param_schema ? p.param_schema : {}).map((e, t) => { var n, l, u, i, r, a, s, d, p, f, _, h, y, v, x, g, k, S, P; let w, C, M, D, B, [z, T] = e; return C = c(T.label, "", b) || (0, o.H)(z, b), M = c(T.localized_description, T.description, b), w = "bool" === T.type ? "switch" : "int" === T.type ? "input" === T.ui_widget ? "input" : "slider" : null != (P = m[T.ui_widget]) ? P : T.ui_widget, D = function (e, t) { let n = t.toLowerCase().startsWith("zh"), l = Array.isArray(e.options) ? e.options : [], u = Array.isArray(e.enum) ? e.enum : []; if ("enum" === e.type && l.length > 0)
+                    return l.map((e, t) => { var l, u, i, r, a, o, s, m, c; return { id: null, label: n ? e.label : e.label_en || e.label, value: e.value, description: null != (l = e.description) ? l : "", maxCount: null != (u = e.ref_max) ? u : null, minCount: null != (i = e.ref_min) ? i : null, minVideoCount: null != (r = e.ref_min_videos) ? r : null, promptOptional: null != (a = e.prompt_optional) && a, default: null != (o = e.is_default) && o, sortWeight: t, available: null != (s = e.available) ? s : null, unavailableReason: null != (m = e.unavailable_reason) ? m : null, availableWhen: null != (c = e.available_when) ? c : null }; }); if ("enum" === e.type && u.length > 0)
+                    return u.map((t, n) => { var l; return { id: null, label: t, value: t, description: "", maxCount: null, default: t === String(null != (l = e.default) ? l : ""), sortWeight: n, available: null }; }); if ("bool" === e.type) {
+                    let t = void 0 !== e.default && e.default;
+                    return [{ id: null, label: "true", value: "true", description: "", maxCount: null, default: !0 === t || "true" === t, sortWeight: 0, available: null }, { id: null, label: "false", value: "false", description: "", maxCount: null, default: !1 === t || "false" === t, sortWeight: 1, available: null }];
+                } return []; }(T, b), B = void 0 !== T.default && null !== T.default ? String(T.default) : "", { id: null, label: C, key: z, description: M, controlType: w, required: T.required, default: B, feature: T.affects_l2 ? "l2" : "", maxCount: "int" === T.type && void 0 !== T.max ? T.max : void 0 !== T.max_items ? T.max_items : null, maxCountByQuality: null != (n = T.max_items_by_quality) ? n : null, maxCountByMode: null != (l = T.max_items_by_mode) ? l : null, enumValuesByQuality: null != (u = T.enum_values_by_quality) ? u : null, availableWhen: null != (i = T.available_when) ? i : null, minCount: "int" === T.type && void 0 !== T.min ? T.min : null, maxBytes: null != (r = T.max_bytes) ? r : null, maxVideoBytes: null != (a = T.max_video_bytes) ? a : null, maxEdgePx: null != (s = T.max_edge_px) ? s : null, minEdgePx: null != (d = T.min_edge_px) ? d : null, aspectMin: null != (p = T.aspect_min) ? p : null, aspectMax: null != (f = T.aspect_max) ? f : null, minPixels: null != (_ = T.min_pixels) ? _ : null, maxPixels: null != (h = T.max_pixels) ? h : null, maxTotalDurationSec: null != (y = T.max_total_duration_sec) ? y : null, durationToleranceSec: null != (v = T.duration_tolerance_sec) ? v : null, maxRefPlusOutputSec: null != (x = T.max_ref_plus_output_sec) ? x : null, minDurationSec: null != (g = T.min_duration_sec) ? g : null, minDurationSecByMode: null != (k = T.min_duration_sec_by_mode) ? k : null, combinedDurationBudget: !0 === T.combined_duration_budget, acceptFormats: (null == (S = T.accept_formats) ? void 0 : S.length) ? T.accept_formats : null, requiresVisualReference: !0 === T.requires_visual_reference, sortWeight: t, options: D }; }), t = b.toLowerCase().startsWith("zh") && p.display_name_zh ? p.display_name_zh : p.display_name, n = b.toLowerCase().startsWith("zh") && p.description_zh ? p.description_zh : null != (g = p.description) ? g : "", u = b.toLowerCase().startsWith("zh") && p.input_hint_zh ? p.input_hint_zh : null != (k = null != (S = p.input_hint) ? S : p.input_hint_zh) ? k : "", i = p.linkages ? p.linkages.map(s) : void 0, { id: null, displayName: t, modelName: p.id, modelType: p.type, icon: null != (P = p.icon_key) ? P : "", summary: n, inputHint: u, successRate: null, hasGuide: !1, detailInputHint: "", params: e, linkages: i });
+                d.set(y, f), l = f;
+            }
+            a[3] = x, a[4] = v, a[5] = y, a[6] = l;
+        }
+        else
+            l = a[6]; return l; } function b(e) { return d.get(e.trim()); } function v(e, t) { var n; return null == (n = b(e)) ? void 0 : n.params.find(e => e.key === t); } function x(e) { let t = function (e) { let t, n, l = (0, u.c)(5), i = e || ""; l[0] !== i ? (t = i.trim(), l[0] = i, l[1] = t) : t = l[1]; let a = t, { data: o } = (0, r.tQ)(); e: {
+            let e;
+            if (!a || !o) {
+                n = void 0;
+                break e;
+            }
+            if (l[2] !== o || l[3] !== a) {
+                var s;
+                let t;
+                e = "number" == typeof (t = null == (s = (0, r.oi)(o, a)) ? void 0 : s.max_prompt_chars) && t > 0 ? t : void 0, l[2] = o, l[3] = a, l[4] = e;
+            }
+            else
+                e = l[4];
+            n = e;
+        } return n; }(e); return null != t ? t : 4096; } function g(e) { let t = null == e ? void 0 : e.max_prompt_chars, n = null == e ? void 0 : e.max_prompt_bytes; return { runes: "number" == typeof t && t > 0 ? t : null, bytes: "number" == typeof n && n > 0 ? n : null }; } function k(e) { let t, n, l = (0, u.c)(6), i = e || ""; l[0] !== i ? (t = i.trim(), l[0] = i, l[1] = t) : t = l[1]; let a = t, { data: o } = (0, r.tQ)(); e: {
+            let e;
+            if (!a || !o) {
+                let e;
+                l[2] === Symbol.for("react.memo_cache_sentinel") ? (e = { runes: null, bytes: null }, l[2] = e) : e = l[2], n = e;
+                break e;
+            }
+            l[3] !== o || l[4] !== a ? (e = g((0, r.oi)(o, a)), l[3] = o, l[4] = a, l[5] = e) : e = l[5], n = e;
+        } return n; } function S(e) { var t; let n = (e || "").trim(); if (!n)
+            return; let l = null == (t = v(n, "images")) ? void 0 : t.maxCount; return "number" == typeof l && l > 0 ? l : void 0; } function P(e, t) { var n, l; let u = (e || "").trim(); if (!u)
+            return; let i = null == (l = v(u, "mode")) || null == (n = l.options) ? void 0 : n.find(e => e.value === t), r = null == i ? void 0 : i.maxCount; return "number" == typeof r && r > 0 ? r : void 0; } function w(e, t) { var n, l; let u = (e || "").trim(); if (!u)
+            return !1; let i = null == (l = v(u, "mode")) || null == (n = l.options) ? void 0 : n.find(e => e.value === t); return (null == i ? void 0 : i.promptOptional) === !0; } function C(e) { let t = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : "images", n = (e || "").trim(); if (!n)
+            return; let l = v(n, t); if (!l)
+            return; let u = {}; return "number" == typeof l.maxBytes && l.maxBytes > 0 && (u.maxBytes = l.maxBytes), "number" == typeof l.maxEdgePx && l.maxEdgePx > 0 && (u.maxEdgePx = l.maxEdgePx), "number" == typeof l.minEdgePx && l.minEdgePx > 0 && (u.minEdgePx = l.minEdgePx), "number" == typeof l.minPixels && l.minPixels > 0 && (u.minPixels = l.minPixels), "number" == typeof l.maxPixels && l.maxPixels > 0 && (u.maxPixels = l.maxPixels), "number" == typeof l.minDurationSec && l.minDurationSec > 0 && (u.minDurationSec = l.minDurationSec), l.minDurationSecByMode && "object" == typeof l.minDurationSecByMode && (u.minDurationSecByMode = l.minDurationSecByMode), Object.keys(u).length > 0 ? u : void 0; } function M(e, t) { if (!e)
+            return; let n = (t || "").trim(); if (n && e.minDurationSecByMode) {
+            let t = e.minDurationSecByMode[n];
+            if ("number" == typeof t && t > 0)
+                return t;
+        } return e.minDurationSec; } function D(e) { return C(e, "images"); } function B(e, t) { var n; let l = (e || "").trim(); if (!l)
+            return; let u = null == (n = v(l, t)) ? void 0 : n.maxTotalDurationSec; return "number" == typeof u && u > 0 ? u : void 0; } function z(e) { var t; let n = (e || "").trim(); if (!n)
+            return; let l = null == (t = v(n, "videos")) ? void 0 : t.maxRefPlusOutputSec; return "number" == typeof l && l > 0 ? l : void 0; } function T(e, t) { var n; let l = (e || "").trim(); if (!l)
+            return; let u = null == (n = v(l, t)) ? void 0 : n.durationToleranceSec; return "number" == typeof u && u >= 0 ? u : void 0; } function W(e, t) { var n; let l = (e || "").trim(); if (!l)
+            return; let u = null == (n = v(l, t)) ? void 0 : n.acceptFormats; return (null == u ? void 0 : u.length) ? u : void 0; } function E(e) { var t, n; let l = (e || "").trim(); return !!l && ((null == (t = v(l, "videos")) ? void 0 : t.combinedDurationBudget) === !0 || (null == (n = v(l, "audios")) ? void 0 : n.combinedDurationBudget) === !0); } function q(e, t) { var n; let l = (e || "").trim(); if (!l)
+            return; let u = null == (n = v(l, t)) ? void 0 : n.maxBytes; return "number" == typeof u && u > 0 ? u : void 0; } function R(e, t) { return !!v(e, t); } }, 54779: (e, t, n) => { n.d(t, { H: () => i }); let l = { aspect_ratio: "画面比例", duration: "时长", resolution: "分辨率", mode: "模式", quality: "画质档位", variant: "档位", tier: "档位", fps: "帧率", enable_upsample: "画质增强", enhance_prompt: "提示词增强", hd: "高清", watermark: "水印", audio: "音频", images: "参考图", image: "参考图", reference: "参考图", off_peak: "错峰生成", private: "私密生成", size: "尺寸", n: "数量", count: "数量", style: "风格", response_format: "返回格式", voice: "音色", speed: "语速", pitch: "音调", language: "语言", format: "格式", emotion: "情感", speech_rate: "语速", voice_id: "音色 ID", is_instrumental: "纯音乐", prompt: "风格描述", lyrics: "歌词", thinking: "深度思考", reasoning_effort: "推理强度", thinking_budget: "思考预算", context_1m: "1M 长上下文", enable_thinking: "深度思考", web_search: "联网搜索", websearch: "联网搜索", enable_search: "联网搜索", search: "联网搜索", temperature: "温度", top_p: "Top-P", top_k: "Top-K", max_tokens: "最大字数", presence_penalty: "出现惩罚", frequency_penalty: "重复惩罚", stop: "停止词", seed: "随机种子", customtools: "自定义工具", asr_language: "识别语言", vad_threshold: "静音阈值" }, u = { aspect_ratio: "Aspect Ratio", duration: "Duration", resolution: "Resolution", mode: "Mode", quality: "Quality", variant: "Variant", tier: "Tier", fps: "FPS", enable_upsample: "Upscale", enhance_prompt: "Enhance Prompt", hd: "HD", watermark: "Watermark", audio: "Audio", images: "Reference Images", image: "Reference Image", reference: "Reference", off_peak: "Off-Peak", private: "Private", size: "Size", n: "Count", count: "Count", style: "Style", response_format: "Format", voice: "Voice", speed: "Speed", pitch: "Pitch", language: "Language", format: "Format", emotion: "Emotion", speech_rate: "Speech Rate", voice_id: "Voice ID", is_instrumental: "Instrumental", prompt: "Style Prompt", lyrics: "Lyrics", thinking: "Thinking", reasoning_effort: "Reasoning Effort", thinking_budget: "Thinking Budget", context_1m: "1M Context", enable_thinking: "Thinking", web_search: "Web Search", websearch: "Web Search", enable_search: "Web Search", search: "Web Search", temperature: "Temperature", top_p: "Top-P", top_k: "Top-K", max_tokens: "Max Tokens", presence_penalty: "Presence Penalty", frequency_penalty: "Frequency Penalty", stop: "Stop Words", seed: "Seed", customtools: "Custom Tools", asr_language: "Language", vad_threshold: "VAD Threshold" }; function i(e, t) { var n; return null != (n = (t.toLowerCase().startsWith("zh") ? l : u)[e]) ? n : e.split(/[_\-\s]+/).map(e => e.length > 0 ? e[0].toUpperCase() + e.slice(1).toLowerCase() : "").join(" "); } } }]);

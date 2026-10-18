@@ -1,3 +1,5 @@
+import { YfaiParameters } from "@/components/yfai-parameters";
+import { resolveModelChannel } from "@/stores/use-config-store";
 import { type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -8,7 +10,7 @@ import type { AiConfig } from "@/stores/use-config-store";
 
 const speedOptions = ["0.75", "1", "1.25", "1.5"];
 
-type AudioSettingKey = "audioVoice" | "audioFormat" | "audioSpeed" | "audioInstructions";
+type AudioSettingKey = "audioVoice" | "audioFormat" | "audioSpeed" | "audioInstructions" | "yfaiParams";
 
 type AudioSettingsPanelProps = {
     config: AiConfig;
@@ -23,6 +25,8 @@ export function AudioSettingsPanel({ config, onConfigChange, theme, showTitle = 
     const voice = normalizeAudioVoiceValue(config.audioVoice);
     const format = normalizeAudioFormatValue(config.audioFormat);
     const speed = normalizeAudioSpeedValue(config.audioSpeed);
+
+    if (resolveModelChannel(config, config.model || config.audioModel).id === "yfai") return <div className={className}><YfaiParameters config={{ ...config, model: config.model || config.audioModel }} onChange={(value) => onConfigChange("yfaiParams", value)} singleOutput /></div>;
 
     return (
         <ImageSettingsTheme theme={theme}>

@@ -1,3 +1,7 @@
+import { canvasSettingsVerticalPosition } from "@/lib/canvas/canvas-settings-layout";
+import { CanvasSettingsContent } from "./canvas-settings-content";
+import { YfaiParameters } from "@/components/yfai-parameters";
+import { resolveModelChannel } from "@/stores/use-config-store";
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import { Settings2 } from "@/components/icons";
@@ -13,12 +17,13 @@ type CanvasTextSettingsPopoverProps = {
     config: AiConfig;
     onConfigChange: (key: "reasoningEffort", value: ReasoningEffort) => void;
     count?: number;
+    onYfaiParamsChange?: (value: string) => void;
     onCountChange?: (count: number) => void;
     buttonClassName?: string;
     placement?: "topLeft" | "top" | "topRight" | "bottomLeft" | "bottom" | "bottomRight";
 };
 
-export function CanvasTextSettingsPopover({ config, onConfigChange, count, onCountChange, buttonClassName, placement = "topLeft" }: CanvasTextSettingsPopoverProps) {
+export function CanvasTextSettingsPopover({ config, onConfigChange, count, onCountChange, onYfaiParamsChange, buttonClassName, placement = "topLeft" }: CanvasTextSettingsPopoverProps) {
     const { t } = useTranslation();
     const theme = canvasThemes[useThemeStore((state) => state.theme)];
     const buttonRef = useRef<HTMLSpanElement>(null);
@@ -45,13 +50,13 @@ export function CanvasTextSettingsPopover({ config, onConfigChange, count, onCou
         };
     }, [open]);
 
-    const panel = open && buttonRect ? <TextSettingsPortal buttonRect={buttonRect} panelRef={panelRef} placement={placement} theme={theme} config={config} count={count} onConfigChange={onConfigChange} onCountChange={onCountChange} /> : null;
+    const panel = open && buttonRect ? <TextSettingsPortal buttonRect={buttonRect} panelRef={panelRef} placement={placement} theme={theme} config={config} count={count} onConfigChange={onConfigChange} onYfaiParamsChange={onYfaiParamsChange} onCountChange={onCountChange} /> : null;
 
     return (
         <>
             <span ref={buttonRef} className="inline-flex min-w-0">
                 <Button size="small" type="text" className={buttonClassName || "!h-8 !max-w-[170px] !justify-start !rounded-full !px-2.5"} style={{ background: theme.node.fill, color: theme.node.text }} icon={<Settings2 className="size-3.5" />} onClick={() => setOpen((current) => !current)}>
-                    <span className="truncate">{t("canvas.controls.reasoning")} · {reasoningEffortLabel(config.reasoningEffort)}{onCountChange ? ` · ${t("canvas.controls.generations", { count })}` : ""}</span>
+                    <span className="truncate">{config.model.startsWith("yfai::") ? t("yfai.modelParameters") : <>{t("canvas.controls.reasoning")} · {reasoningEffortLabel(config.reasoningEffort)}{onCountChange ? ` · ${t("canvas.controls.generations", { count })}` : ""}</>}</span>
                 </Button>
             </span>
             {panel}
@@ -59,7 +64,7 @@ export function CanvasTextSettingsPopover({ config, onConfigChange, count, onCou
     );
 }
 
-function TextSettingsPortal({ buttonRect, panelRef, placement, theme, config, count, onConfigChange, onCountChange }: {
+function TextSettingsPortal({ buttonRect, panelRef, placement, theme, config, count, onConfigChange, onCountChange, onYfaiParamsChange }: {
     buttonRect: DOMRect;
     panelRef: RefObject<HTMLDivElement | null>;
     placement: CanvasTextSettingsPopoverProps["placement"];
@@ -67,11 +72,11 @@ function TextSettingsPortal({ buttonRect, panelRef, placement, theme, config, co
     config: AiConfig;
     count?: number;
     onConfigChange: CanvasTextSettingsPopoverProps["onConfigChange"];
+    onYfaiParamsChange?: (value: string) => void;
     onCountChange?: (count: number) => void;
 }) {
     const { t } = useTranslation();
     const width = 356;
-    const gap = 8;
     const margin = 12;
     const alignRight = placement?.endsWith("Right");
     const alignCenter = placement === "top" || placement === "bottom";
@@ -81,24 +86,26 @@ function TextSettingsPortal({ buttonRect, panelRef, placement, theme, config, co
         position: "fixed",
         zIndex: 1200,
         width,
+        overflow: "visible",
         left: Math.max(margin, Math.min(window.innerWidth - width - margin, left)),
-        ...(topPlacement ? { bottom: window.innerHeight - buttonRect.top + gap } : { top: buttonRect.bottom + gap }),
+        ...canvasSettingsVerticalPosition(buttonRect, window.innerHeight, Boolean(topPlacement), window.innerHeight * 0.7),
         background: theme.toolbar.panel,
         borderRadius: 18,
         boxShadow: "0 18px 54px rgba(28, 25, 23, 0.16)",
-        padding: 18,
         color: theme.node.text,
     } as const;
 
     return createPortal(
-        <div ref={panelRef} style={style} onPointerDown={(event) => event.stopPropagation()} onMouseDown={(event) => event.stopPropagation()} onClick={(event) => event.stopPropagation()}>
-            <TextSettingsPanel config={config} onConfigChange={onConfigChange} theme={theme} />
-            {onCountChange ? (
-                <div className="mt-4 space-y-2.5">
-                    <div className="text-sm font-medium" style={{ color: theme.node.muted }}>{t("settingsPanels.text.count")}</div>
-                    <InputNumber className="w-full" min={1} max={15} precision={0} value={count} onChange={(value) => onCountChange(value || 1)} />
-                </div>
-            ) : null}
+        <div ref={panelRef} data-canvas-settings-popover style={style} onPointerDown={(event) => event.stopPropagation()} onMouseDown={(event) => event.stopPropagation()} onClick={(event) => event.stopPropagation()}>
+            <CanvasSettingsContent>
+                {resolveModelChannel(config, config.model).id === "yfai" && onYfaiParamsChange ? <YfaiParameters config={config} onChange={onYfaiParamsChange} /> : <TextSettingsPanel config={config} onConfigChange={onConfigChange} theme={theme} />}
+                {onCountChange ? (
+                    <div className="mt-4 space-y-2.5">
+                        <div className="text-sm font-medium" style={{ color: theme.node.muted }}>{t("settingsPanels.text.count")}</div>
+                        <InputNumber className="w-full" min={1} max={15} precision={0} value={count} onChange={(value) => onCountChange(value || 1)} />
+                    </div>
+                ) : null}
+            </CanvasSettingsContent>
         </div>,
         document.body,
     );

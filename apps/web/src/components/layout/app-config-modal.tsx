@@ -1,3 +1,4 @@
+import { ConfigYfai } from "@/components/layout/config-yfai";
 import { App, Button, Form, Input, Modal, Progress, Radio, Segmented, Select, Switch } from "antd";
 import type { TFunction } from "i18next";
 import { Cloud, Download, Pencil, Plus, RefreshCw, Trash2, Upload, Wifi } from "@/components/icons";
@@ -8,6 +9,7 @@ import { ModelPicker } from "@/components/model-picker";
 import { videoResolutionOptions } from "@/components/video-settings-panel";
 import { ChannelEditorDrawer } from "@/components/layout/channel-editor-drawer";
 import { ConfigAutodl } from "@/components/layout/config-autodl";
+import { ConfigJobAudit } from "@/components/layout/config-job-audit";
 import { ConfigLocalProxy } from "@/components/layout/config-local-proxy";
 import { ConfigPromptSources } from "@/components/layout/config-prompt-sources";
 import { ConfigLocalStorage } from "@/components/layout/config-local-storage";
@@ -78,7 +80,8 @@ export function AppConfigPanel({ showDoneButton = false, initialTab = "channels"
     useEffect(() => setActiveTab(initialTab), [initialTab]);
 
     const saveConfig = (nextConfig: AiConfig) => {
-        (Object.keys(nextConfig) as Array<keyof AiConfig>).forEach((key) => updateConfig(key, nextConfig[key]));
+        const currentConfig = useConfigStore.getState().config;
+        (Object.keys(nextConfig) as Array<keyof AiConfig>).forEach((key) => { if (nextConfig[key] !== currentConfig[key]) updateConfig(key, nextConfig[key]); });
     };
 
     const finishConfig = () => {
@@ -195,6 +198,7 @@ export function AppConfigPanel({ showDoneButton = false, initialTab = "channels"
                         label: t("config.tabs.channels"),
                         children: (
                             <div>
+                                <ConfigYfai config={config} onConfigChange={(next) => saveConfig(withChannels(next, next.channels))} />
                                 <ConfigAutodl config={config} onConfigChange={(next) => saveConfig(withChannels(next, next.channels))} />
                                 <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                                     <div className="text-xs text-stone-500">{t("config.channels.description")}</div>
@@ -203,7 +207,7 @@ export function AppConfigPanel({ showDoneButton = false, initialTab = "channels"
                                     </Button>
                                 </div>
                                 <div className="space-y-2">
-                                    {config.channels.filter((channel) => !isAutodlChannel(channel.id)).map((channel) => (
+                                    {config.channels.filter((channel) => !isAutodlChannel(channel.id) && channel.id !== "yfai").map((channel) => (
                                         <div key={channel.id} className="flex items-center justify-between gap-3 rounded-lg border border-stone-200 px-4 py-3 dark:border-stone-800">
                                             <div className="min-w-0">
                                                 <div className="truncate text-sm font-semibold">{channel.name || t("config.channels.unnamed")}</div>
@@ -228,6 +232,12 @@ export function AppConfigPanel({ showDoneButton = false, initialTab = "channels"
                         advanced: true,
                         label: t("config.tabs.localProxy"),
                         children: <ConfigLocalProxy />,
+                    },
+                    {
+                        key: "job-audit",
+                        advanced: true,
+                        label: t("config.tabs.jobAudit"),
+                        children: <ConfigJobAudit />,
                     },
                     {
                         key: "preferences",

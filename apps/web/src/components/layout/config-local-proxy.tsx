@@ -64,6 +64,15 @@ export function ConfigLocalProxy() {
                     </>
                 ) : null}
             </section>
+            <section className="mt-3 rounded-lg border border-stone-200 p-3 dark:border-stone-800">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                        <div className="text-sm font-semibold">{t("serverJobs.title")}</div>
+                        <div className="mt-1 text-xs text-stone-500">{t("serverJobs.description")}</div>
+                    </div>
+                    <Switch checked={config.serverJobs} onChange={(checked) => updateConfig("serverJobs", checked)} />
+                </div>
+            </section>
         </Form>
     );
 }

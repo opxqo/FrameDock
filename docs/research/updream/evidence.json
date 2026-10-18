@@ -1,0 +1,268 @@
+{
+  "title": "updream canvas design implementation research",
+  "inspection_date": "2026-10-17",
+  "site": "https://www.updream.cn/",
+  "route": "/canvas",
+  "method": [
+    "Published HTML asset discovery",
+    "Read-only inspection of public production JavaScript and CSS",
+    "Authenticated browser DOM and computed style inspection",
+    "Visible node selection, context menu and panel inspection"
+  ],
+  "limitations": [
+    "Production bundles, not original repository sources",
+    "No generation submitted or status scenario induced",
+    "Light theme and mobile branches inspected in code only",
+    "No performance benchmark",
+    "No backend workflow engine verification"
+  ],
+  "offset_convention": "Offsets are Unicode character offsets in UTF-8-decoded original downloaded files; not byte offsets or formatted line numbers.",
+  "sources": [
+    {
+      "id": "S1",
+      "url": "https://s1.hdslb.com/bfs/static/jinkela/ai-tool/assets/index-BCVuoPMJ.js",
+      "bytes": 4898915,
+      "sha256": "ed2d3d5777be36c81f7a35be76c34011d62540729f5dab7e74c1aaf48c15eeec",
+      "review_anchors": [
+        {
+          "anchor": "function applyViewDOM(",
+          "character_offset_zero_based": 4546850
+        },
+        {
+          "anchor": "function getNodePort(",
+          "character_offset_zero_based": 4543389
+        },
+        {
+          "anchor": "function bezier(",
+          "character_offset_zero_based": 4543263
+        },
+        {
+          "anchor": "function updateAllConnectionPaths(",
+          "character_offset_zero_based": 4544508
+        },
+        {
+          "anchor": "function updateNodeEditBarDOM(",
+          "character_offset_zero_based": 4545621
+        },
+        {
+          "anchor": "function updatePanelRightDOM(",
+          "character_offset_zero_based": 4546408
+        },
+        {
+          "anchor": "function getVisibleNodeIds(",
+          "character_offset_zero_based": 4549311
+        },
+        {
+          "anchor": "function getNodeDisplaySize(",
+          "character_offset_zero_based": 1530423
+        },
+        {
+          "anchor": "function isCanvasConnectionVisible(",
+          "character_offset_zero_based": 4541546
+        },
+        {
+          "anchor": "function computeLayout(",
+          "character_offset_zero_based": 1530878
+        },
+        {
+          "anchor": "function commitViewToStore(",
+          "character_offset_zero_based": 4548145
+        },
+        {
+          "anchor": "function focusNode(",
+          "character_offset_zero_based": 4548413
+        },
+        {
+          "anchor": "NODE_MIN_SIZE=200",
+          "character_offset_zero_based": 1160721
+        },
+        {
+          "anchor": "TEXT_NODE_SIZE$1=280",
+          "character_offset_zero_based": 1160804
+        }
+      ]
+    },
+    {
+      "id": "S2",
+      "url": "https://s1.hdslb.com/bfs/static/jinkela/ai-tool/assets/index-kmeCS2CM.css",
+      "bytes": 797709,
+      "sha256": "fb469a3c604536d3a6bf9aafebf927406db4563428098b784f2c4325a172f4d2",
+      "review_anchors": [
+        {
+          "anchor": "--bg-base:var(--p-neutral-950)",
+          "character_offset_zero_based": 20578
+        },
+        {
+          "anchor": "--toolbar-bg:color-mix",
+          "character_offset_zero_based": 22078
+        },
+        {
+          "anchor": ".canvas-node.selected",
+          "character_offset_zero_based": 362807
+        },
+        {
+          "anchor": "._node_1q0bh_3",
+          "character_offset_zero_based": 718357
+        },
+        {
+          "anchor": "._typeLabel_1q0bh_182",
+          "character_offset_zero_based": 721825
+        },
+        {
+          "anchor": "._port_1q0bh_758",
+          "character_offset_zero_based": 731711
+        },
+        {
+          "anchor": "._agentV2RunningBorder_1q0bh_923",
+          "character_offset_zero_based": 734498
+        },
+        {
+          "anchor": "._rect_x0v5y_1",
+          "character_offset_zero_based": 740862
+        },
+        {
+          "anchor": ".conn-path.selected",
+          "character_offset_zero_based": 362085
+        }
+      ]
+    },
+    {
+      "id": "S3",
+      "url": "https://s1.hdslb.com/bfs/static/jinkela/ai-tool/assets/CanvasPage-Bit7BBW2.js",
+      "bytes": 1405077,
+      "sha256": "369375d42b9969949288dd3561c9a7527beeff7234f53b974785b207c7b7a322",
+      "review_anchors": [
+        {
+          "anchor": "function zU(",
+          "character_offset_zero_based": 766573
+        },
+        {
+          "anchor": "AU=.3,DU=4e3,$U=2500",
+          "character_offset_zero_based": 766552
+        },
+        {
+          "anchor": "--node-ui-scale",
+          "character_offset_zero_based": 745778
+        },
+        {
+          "anchor": "function Xie(",
+          "character_offset_zero_based": 1367117
+        },
+        {
+          "anchor": "$m=200,zm=120,Gu=40",
+          "character_offset_zero_based": 1366640
+        },
+        {
+          "anchor": "is_reference",
+          "character_offset_zero_based": 373833
+        },
+        {
+          "anchor": "panel-right--agent-v2",
+          "character_offset_zero_based": 1321311
+        },
+        {
+          "anchor": "data-canvas-ctx-menu",
+          "character_offset_zero_based": 781735
+        }
+      ]
+    },
+    {
+      "id": "S4",
+      "url": "https://s1.hdslb.com/bfs/static/jinkela/ai-tool/assets/CanvasPage-puGmTKz2.css",
+      "bytes": 277749,
+      "sha256": "30dce273cc33b1ad8ff446ebf006db4823ea2a73138c538a84ecf073a00b2f64",
+      "review_anchors": [
+        {
+          "anchor": "._canvasArea_2cxx0_4",
+          "character_offset_zero_based": 59130
+        },
+        {
+          "anchor": "._canvasWorld_2cxx0_132",
+          "character_offset_zero_based": 62382
+        },
+        {
+          "anchor": "._iconBar_vvu8o_4",
+          "character_offset_zero_based": 40019
+        },
+        {
+          "anchor": "._panelContainer_vvu8o_77",
+          "character_offset_zero_based": 41287
+        },
+        {
+          "anchor": "._toolbar_csn0r_2",
+          "character_offset_zero_based": 57438
+        },
+        {
+          "anchor": "._path_ikkt9_12",
+          "character_offset_zero_based": 149615
+        },
+        {
+          "anchor": "._hitarea_ikkt9_33",
+          "character_offset_zero_based": 150031
+        },
+        {
+          "anchor": "._panel_1kysf_1",
+          "character_offset_zero_based": 260945
+        },
+        {
+          "anchor": "._panelContainer_z04aa_1",
+          "character_offset_zero_based": 263562
+        },
+        {
+          "anchor": "._container_lvyx1_2",
+          "character_offset_zero_based": 276768
+        }
+      ]
+    }
+  ],
+  "runtime_observations": {
+    "viewport_css_px": {
+      "width": 1023,
+      "height": 954
+    },
+    "theme": "dark",
+    "zoom_approx": 0.306104,
+    "canvas": {
+      "background": "rgb(10, 10, 10)",
+      "transform_origin": "0 0",
+      "dot_spacing_css_px": 29.38599640933573,
+      "dot_alpha": 0.006782365848793165
+    },
+    "node": {
+      "background": "rgb(38, 38, 38)",
+      "radius_world_px": 8,
+      "selected_outline": "1px solid rgba(255,255,255,0.5)",
+      "selected_shadow": "rgba(255,255,255,0.1) 0px 0px 0px 2px",
+      "label_font_world": "600 15px / 24px PingFang SC with system fallbacks",
+      "selected_port_screen_diameter_approx": 6.1221
+    },
+    "connections": {
+      "idle_stroke": "rgb(82,82,82)",
+      "selected_stroke": "rgb(163,163,163)",
+      "idle_width_screen_approx": 0.76526,
+      "hit_width_screen_approx": 3.67325
+    },
+    "chrome": {
+      "left_rail_width": 52,
+      "left_rail_background": "rgba(23,23,23,0.75)",
+      "left_rail_blur": "35px",
+      "bottom_toolbar_height": 52,
+      "minimap_width": 200,
+      "minimap_height": 148
+    },
+    "text_parameter_panel": {
+      "width": 420,
+      "radius": 20,
+      "background": "rgba(23,23,23,0.75)",
+      "left": 611.265625,
+      "right_derived": 1031.265625,
+      "overflow_right_derived": 8.265625
+    },
+    "group_sample": {
+      "fill": "rgba(200,200,200,0.35)",
+      "note": "Sample per-group configuration, not asserted as a universal default."
+    }
+  },
+  "privacy": "No project identifiers, account details, asset contents or conversation text are included.",
+  "reuse": "Analysis and re-expressed design guidance only. Downloaded proprietary bundles are not included in this project."
+}

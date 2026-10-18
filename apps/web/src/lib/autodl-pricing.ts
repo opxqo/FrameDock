@@ -49,6 +49,7 @@ export async function fetchAutodlPrices(fetchImpl: (url: string, init: RequestIn
 }
 
 export function findAutodlPrice(model: string) {
+    if (model.includes("::") && !model.startsWith("autodl::") && !model.startsWith("autodl-gemini::")) return undefined;
     const name = (model.includes("::") ? model.slice(model.indexOf("::") + 2) : model).trim().toLowerCase();
     return liveEntries.get(name) || snapshotEntries.get(name);
 }

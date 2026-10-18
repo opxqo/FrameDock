@@ -1,0 +1,3 @@
+**分镜一提示词 (Midjourney Prompt)：**
+
+Medium shot, a cute fluffy cat knight wearing ornate silver plate armor and white cloak, firmly holding an intricate royal sword, looking straight into the camera. Background is a vast ethereal void enveloped in dense, cinematic mist and fog. Soft diffused light, muted cool tones, cinematic depth, Kodak film color. --ar 9:16 --raw --profile xyi24yd mokfqud --v 8.2

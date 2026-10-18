@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowUp, LoaderCircle, Maximize2, Square } from "@/components/icons";
+import { ArrowUp, LoaderCircle, Maximize2, RefreshCw, Square } from "@/components/icons";
 import { Button, Modal, Tooltip } from "antd";
 import { useTranslation } from "react-i18next";
 
@@ -28,7 +28,7 @@ type CanvasNodePromptPanelProps = {
     isRunning: boolean;
     onPromptChange: (nodeId: string, prompt: string) => void;
     onConfigChange: (nodeId: string, patch: Partial<CanvasNodeData["metadata"]>) => void;
-    onGenerate: (nodeId: string, mode: CanvasNodeGenerationMode, prompt: string) => void;
+    onGenerate: (nodeId: string, mode: CanvasNodeGenerationMode, prompt: string, options?: { overwrite?: boolean; includeCurrentImageAsReference?: boolean }) => void;
     onStop: (nodeId: string) => void;
     mentionReferences?: CanvasResourceReference[];
     nodes: CanvasNodeData[];
@@ -49,6 +49,9 @@ export function CanvasNodePromptPanel({ node, nodes, isRunning, onPromptChange, 
     const hasTextContent = node.type === CanvasNodeType.Text && Boolean(node.metadata?.content?.trim());
     const hasImageContent = node.type === CanvasNodeType.Image && Boolean(node.metadata?.content);
     const isEditingExistingContent = hasTextContent || hasImageContent;
+    const isRegeneratingText = node.type === CanvasNodeType.Text && hasTextContent;
+    const isRegeneratingImage = node.type === CanvasNodeType.Image && hasImageContent;
+    const isRegeneratingContent = isRegeneratingText || isRegeneratingImage;
     const skill = node.metadata?.skill;
     const [prompt, setPrompt] = useState(node.metadata?.composerContent ?? node.metadata?.prompt ?? "");
     const [expanded, setExpanded] = useState(false);
@@ -68,7 +71,11 @@ export function CanvasNodePromptPanel({ node, nodes, isRunning, onPromptChange, 
     const submit = () => {
         const text = prompt.trim();
         if (!text || isRunning) return;
-        onGenerate(node.id, mode, text);
+        onGenerate(node.id, mode, text, isRegeneratingText
+            ? { overwrite: true }
+            : isRegeneratingImage
+                ? { overwrite: true, includeCurrentImageAsReference: true }
+                : undefined);
     };
 
     const openExpandedEditor = () => {
@@ -129,17 +136,17 @@ export function CanvasNodePromptPanel({ node, nodes, isRunning, onPromptChange, 
                         <>
                             <CanvasSkillPicker skill={skill} onChange={(next) => onConfigChange(node.id, { skill: next })} />
                             <ModelPicker config={config} value={config.model} onChange={(model) => onConfigChange(node.id, { model })} capability="text" onMissingConfig={() => openConfigDialog(true)} className="max-w-[140px]" />
-                            <CanvasTextSettingsPopover config={config} buttonClassName="!h-8 !max-w-[124px] !justify-start !rounded-full !px-2.5" count={node.metadata?.textCount || 1} onConfigChange={(_, value) => onConfigChange(node.id, { reasoningEffort: value })} onCountChange={(textCount) => onConfigChange(node.id, { textCount })} />
+                            <CanvasTextSettingsPopover config={config} onYfaiParamsChange={(yfaiParams) => onConfigChange(node.id, { yfaiParams })} buttonClassName="!h-8 !max-w-[124px] !justify-start !rounded-full !px-2.5" count={node.metadata?.textCount || 1} onConfigChange={(_, value) => onConfigChange(node.id, { reasoningEffort: value })} onCountChange={(textCount) => onConfigChange(node.id, { textCount })} />
                         </>
                     )}
                 </div>
                 <Button
                     type="primary"
-                    className={isRunning ? "!h-8 shrink-0 !rounded-full !px-3" : "!size-8 !min-w-8 shrink-0 !rounded-full !p-0"}
+                    className={isRunning || isRegeneratingContent ? "!h-8 shrink-0 !rounded-full !px-3" : "!size-8 !min-w-8 shrink-0 !rounded-full !p-0"}
                     danger={isRunning}
                     disabled={!isRunning && !prompt.trim()}
                     onClick={() => (isRunning ? onStop(node.id) : submit())}
-                    aria-label={t(isRunning ? "canvas.promptPanel.stopGeneration" : "canvas.promptPanel.generate")}
+                    aria-label={t(isRunning ? "canvas.promptPanel.stopGeneration" : isRegeneratingContent ? "canvas.promptPanel.regenerate" : "canvas.promptPanel.generate")}
                 >
                     <span className="flex items-center gap-1.5">
                         {isRunning ? (
@@ -147,6 +154,11 @@ export function CanvasNodePromptPanel({ node, nodes, isRunning, onPromptChange, 
                                 <LoaderCircle className="size-4 animate-spin" />
                                 <Square className="size-3.5 fill-current" />
                                 <span className="text-xs font-medium">{t("canvas.promptPanel.stop")}</span>
+                            </>
+                        ) : isRegeneratingContent ? (
+                            <>
+                                <RefreshCw className="size-4" />
+                                <span className="text-xs font-medium">{t("canvas.promptPanel.regenerate")}</span>
                             </>
                         ) : (
                             <ArrowUp className="size-4" />
@@ -179,6 +191,7 @@ function buildNodeConfig(globalConfig: AiConfig, node: CanvasNodeData, mode: Can
     return {
         ...globalConfig,
         model: resolveModelForCapability(globalConfig, node.metadata?.model, mode),
+        yfaiParams: node.metadata?.yfaiParams || globalConfig.yfaiParams,
         reasoningEffort: node.metadata?.reasoningEffort || globalConfig.reasoningEffort || defaultConfig.reasoningEffort,
         quality: node.metadata?.quality || globalConfig.quality || defaultConfig.quality,
         size: node.metadata?.size || globalConfig.size || defaultConfig.size,
@@ -208,5 +221,6 @@ function audioConfigPatch(key: CanvasAudioSettingKey, value: string) {
     if (key === "audioVoice") return { audioVoice: value };
     if (key === "audioFormat") return { audioFormat: value };
     if (key === "audioSpeed") return { audioSpeed: value };
+    if (key === "yfaiParams") return { yfaiParams: value };
     return { audioInstructions: value };
 }

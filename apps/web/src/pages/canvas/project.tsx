@@ -11,7 +11,13 @@ import { useTranslation } from "react-i18next";
 
 import { requestEdit, requestGeneration, requestImageQuestion } from "@/services/api/image";
 import { requestAudioGeneration, storeGeneratedAudio } from "@/services/api/audio";
-import { createVideoGenerationTask, isVideoTaskFailed, storeGeneratedVideo, waitForVideoGenerationTask } from "@/services/api/video";
+import { yfaiBalanceIssue, yfaiPromptIssue, type PreflightIssue } from "@/lib/yfai-preflight";
+import { findYfaiModel, isYfaiUrl } from "@/lib/yfai-catalog";
+import { getYfaiQuote } from "@/lib/yfai-pricing";
+import { fetchYfaiAvailableCredits } from "@/services/api/yfai";
+import { UndeliveredJobs } from "@/components/canvas/undelivered-jobs";
+import { ackJob, fetchJobBlob, getJob, type Job } from "@/services/api/jobs";
+import { cancelVideoJob, createVideoGenerationTask, getVideoJob, isVideoTaskFailed, resubmitVideoJob, storeGeneratedVideo, waitForVideoGenerationTask } from "@/services/api/video";
 import { defaultConfig, useConfigStore, useEffectiveConfig } from "@/stores/use-config-store";
 import { ensureImagePreview, resolveImageUrl, uploadImage } from "@/services/image-storage";
 import { resolveMediaUrl, uploadMediaFile, type UploadedFile } from "@/services/file-storage";
@@ -379,7 +385,7 @@ function InfiniteCanvasPage() {
         async (nodeId: string, config: Parameters<typeof buildGenerationConfig>[0], prompt: string, images: Parameters<typeof createVideoGenerationTask>[2], signal: AbortSignal, extra: CanvasNodeData["metadata"] = {}, videos: ReferenceVideo[] = [], audios: ReferenceAudio[] = []) => {
             const task = await createVideoGenerationTask(config, prompt, images, { signal, videos, audios });
             if (task.provider !== "plugin") {
-                setNodes((prev) => prev.map((item) => (item.id === nodeId ? { ...item, metadata: { ...item.metadata, videoTaskId: task.id, videoTaskProvider: task.provider === "plugin" ? "openai" : task.provider, model: config.model } } : item)));
+                setNodes((prev) => prev.map((item) => (item.id === nodeId ? { ...item, metadata: { ...item.metadata, videoTaskId: task.id, videoTaskProvider: task.provider === "plugin" ? "openai" : task.provider, model: config.model, yfaiParams: config.yfaiParams } } : item)));
             }
             const video = await storeGeneratedVideo(await waitForVideoGenerationTask(config, task, { signal }));
             setNodes((prev) => prev.map((item) => (item.id === nodeId ? applyGeneratedVideo(item, video, { prompt, model: config.model, ...extra }) : item)));
@@ -395,13 +401,31 @@ function InfiniteCanvasPage() {
             let controller: AbortController | undefined;
             try {
                 const generationConfig = buildGenerationConfig(effectiveConfig, node, "video");
-                if (!isAiConfigReady(generationConfig, generationConfig.model)) {
+                const isJob = node.metadata?.videoTaskProvider === "job";
+                // A server job already carries its own credentials, so waiting for it needs no channel configuration.
+                if (!isJob && !isAiConfigReady(generationConfig, generationConfig.model)) {
                     if (silent) {
                         setNodes((prev) => prev.map((item) => (item.id === node.id ? { ...item, metadata: { ...item.metadata, status: NODE_STATUS_ERROR, errorDetails: t("workbench.configFirst") } } : item)));
                         return;
                     }
                     openConfigDialog(true);
                     return;
+                }
+                if (isJob && (await getVideoJob(taskId).catch(() => undefined))?.state === "unknown") {
+                    // The submit outcome was unclear, so only the user may decide: submitting again can be billed twice.
+                    if (silent) {
+                        setNodes((prev) => prev.map((item) => (item.id === node.id ? { ...item, metadata: { ...item.metadata, status: NODE_STATUS_ERROR, errorDetails: t("apiErrors.videoTaskUnknown") } } : item)));
+                        return;
+                    }
+                    const resubmit = await new Promise<boolean>((resolve) =>
+                        modal.confirm({ title: t("serverJobs.unknownTitle"), content: t("serverJobs.unknownBody"), okText: t("serverJobs.resubmit"), cancelText: t("serverJobs.abandon"), closable: false, maskClosable: false, keyboard: false, onOk: () => resolve(true), onCancel: () => resolve(false) }),
+                    );
+                    if (!resubmit) {
+                        await cancelVideoJob(taskId).catch(() => undefined);
+                        setNodes((prev) => prev.map((item) => (item.id === node.id ? { ...item, metadata: { ...item.metadata, status: NODE_STATUS_IDLE, errorDetails: undefined, videoTaskId: undefined, videoTaskProvider: undefined } } : item)));
+                        return;
+                    }
+                    await resubmitVideoJob(taskId);
                 }
                 setRunningNodeId(node.id);
                 setNodes((prev) => prev.map((item) => (item.id === node.id ? { ...item, metadata: { ...item.metadata, status: NODE_STATUS_LOADING, errorDetails: undefined } } : item)));
@@ -415,6 +439,7 @@ function InfiniteCanvasPage() {
                                   model: generationConfig.model,
                                   size: generationConfig.size,
                                   seconds: generationConfig.videoSeconds,
+                                  yfaiParams: generationConfig.yfaiParams,
                                   vquality: generationConfig.vquality,
                                   generateAudio: generationConfig.videoGenerateAudio,
                                   watermark: generationConfig.videoWatermark,
@@ -450,8 +475,18 @@ function InfiniteCanvasPage() {
                 }
             }
         },
-        [effectiveConfig, finishGenerationRequest, isAiConfigReady, message, openConfigDialog, startGenerationRequest, t],
+        [effectiveConfig, finishGenerationRequest, isAiConfigReady, message, modal, openConfigDialog, startGenerationRequest, t],
     );
+
+    /** A user stop ends server jobs too; merely leaving the page only stops waiting for them (see the unmount cleanup). */
+    const cancelNodeJobs = useCallback((ids: Set<string> | null) => {
+        nodesRef.current.forEach((node) => {
+            const metadata = node.metadata;
+            // No content check: regenerating over a finished node keeps its old content while the new job runs. Canceling a settled job is a no-op.
+            if ((ids && !ids.has(node.id)) || metadata?.videoTaskProvider !== "job" || !metadata.videoTaskId) return;
+            void cancelVideoJob(metadata.videoTaskId).catch(() => undefined);
+        });
+    }, []);
 
     const stopGenerationByRunningId = useCallback((runningId: string) => {
         const affectedNodeIds = new Set<string>();
@@ -464,6 +499,7 @@ function InfiniteCanvasPage() {
         });
         setRunningNodeId((current) => (current === runningId ? null : current));
         if (!affectedNodeIds.size) return;
+        cancelNodeJobs(affectedNodeIds);
         setNodes((prev) =>
             prev.map((node) =>
                 affectedNodeIds.has(node.id) && node.metadata?.status === NODE_STATUS_LOADING
@@ -471,6 +507,7 @@ function InfiniteCanvasPage() {
                           ...node,
                           metadata: {
                               ...node.metadata,
+                              ...(node.metadata.videoTaskProvider === "job" ? { videoTaskId: undefined, videoTaskProvider: undefined } : {}),
                               status: NODE_STATUS_IDLE,
                               errorDetails: undefined,
                               images: node.metadata.images?.map((image) => (image.status === NODE_STATUS_LOADING ? { ...image, status: NODE_STATUS_ERROR, errorDetails: t("common.requestCanceled") } : image)),
@@ -480,7 +517,7 @@ function InfiniteCanvasPage() {
                     : node,
             ),
         );
-    }, [t]);
+    }, [cancelNodeJobs, t]);
 
     const confirmStopGeneration = useCallback(
         (nodeId: string) => {
@@ -698,6 +735,25 @@ function InfiniteCanvasPage() {
         const rect = containerRef.current?.getBoundingClientRect();
         return screenToCanvas((rect?.left || 0) + (rect?.width || size.width) / 2, (rect?.top || 0) + (rect?.height || size.height) / 2);
     }, [screenToCanvas, size.height, size.width]);
+
+    /** Puts the images of a finished server job back on the canvas, next to the node that asked for them. */
+    const placeRescuedJob = useCallback(
+        async (job: Job) => {
+            const detail = await getJob(job.id);
+            const files = detail.result?.files ?? (detail.result ? [detail.result] : []);
+            const prompt = (detail.request as { invoke?: { params?: { prompt?: string } } } | undefined)?.invoke?.params?.prompt;
+            const origin = nodesRef.current.find((node) => node.id === detail.nodeId);
+            const center = origin ? { x: origin.position.x + origin.width + 160, y: origin.position.y + origin.height / 2 } : getCanvasCenter();
+            const created: CanvasNodeData[] = [];
+            for (const index of files.keys()) {
+                const uploaded = await uploadImage(await fetchJobBlob(detail, index));
+                created.push(createCanvasNode(CanvasNodeType.Image, { x: center.x + index * 260, y: center.y + index * 20 }, { ...imageMetadata(uploaded), prompt, model: detail.model }));
+            }
+            setNodes((prev) => [...prev, ...created]);
+            await ackJob(job.id);
+        },
+        [getCanvasCenter],
+    );
 
     const setConnecting = useCallback((next: ConnectionHandle | null) => {
         connectingParamsRef.current = next;
@@ -1087,6 +1143,7 @@ function InfiniteCanvasPage() {
         (ids: Set<string>) => {
             if (!ids.size) return;
             const allIds = new Set(ids);
+            cancelNodeJobs(allIds);
             abortGenerationsFor(allIds);
             setNodes((prev) => {
                 const next = prev.filter((node) => !allIds.has(node.id));
@@ -1113,7 +1170,7 @@ function InfiniteCanvasPage() {
             setContextMenu((current) => (current?.type === "node" && allIds.has(current.nodeId) ? null : current));
             cleanupCanvasFiles({ projectId, nodes: nodesRef.current.filter((node) => !allIds.has(node.id)), chatSessions });
         },
-        [abortGenerationsFor, chatSessions, cleanupCanvasFiles, projectId],
+        [abortGenerationsFor, cancelNodeJobs, chatSessions, cleanupCanvasFiles, projectId],
     );
 
     const groupSelection = useCallback(() => {
@@ -1200,6 +1257,7 @@ function InfiniteCanvasPage() {
     }, [cancelPendingConnectionCreate]);
 
     const clearCanvas = useCallback(() => {
+        cancelNodeJobs(null);
         abortGenerationsFor(null);
         setNodes([]);
         setConnections([]);
@@ -1212,7 +1270,7 @@ function InfiniteCanvasPage() {
         deselectCanvas();
         setClearConfirmOpen(false);
         cleanupCanvasFiles({ projectId, nodes: [], chatSessions: [] });
-    }, [abortGenerationsFor, cleanupCanvasFiles, deselectCanvas, projectId]);
+    }, [abortGenerationsFor, cancelNodeJobs, cleanupCanvasFiles, deselectCanvas, projectId]);
 
     /** A copy is a new, independent node: no running task, no link to the generator that produced the original. */
     const copyMetadata = (metadata: CanvasNodeData["metadata"]): CanvasNodeData["metadata"] => {
@@ -3071,6 +3129,7 @@ function InfiniteCanvasPage() {
                             model: generationConfig.model,
                             size: generationConfig.size,
                             seconds: generationConfig.videoSeconds,
+                            yfaiParams: generationConfig.yfaiParams,
                             vquality: generationConfig.vquality,
                             generateAudio: generationConfig.videoGenerateAudio,
                             watermark: generationConfig.videoWatermark,
@@ -3092,6 +3151,7 @@ function InfiniteCanvasPage() {
                         await completeVideoNodeTask(videoId, generationConfig, effectivePrompt, generationContext.referenceImages, controller.signal, {
                             size: generationConfig.size,
                             seconds: generationConfig.videoSeconds,
+                            yfaiParams: generationConfig.yfaiParams,
                             vquality: generationConfig.vquality,
                             generateAudio: generationConfig.videoGenerateAudio,
                             watermark: generationConfig.videoWatermark,
@@ -3326,6 +3386,46 @@ function InfiniteCanvasPage() {
             if (!plan.steps.length) {
                 message.info(t("canvas.workflow.nothingToRun"));
                 return;
+            }
+            // FrameDock: free checks before anything is submitted — prompts over a YFAI model's limit, and a balance that
+            // cannot cover what this run will hold back. Prompts that depend on text generated earlier in the same run cannot be known yet.
+            const issues: PreflightIssue[] = [];
+            let reservation = 0;
+            let apiKeyForBalance = "";
+            for (const step of plan.steps) {
+                const node = nodesRef.current.find((item) => item.id === step.nodeId);
+                const stepConfig = buildGenerationConfig(effectiveConfig, node, step.mode);
+                const yfaiModel = isYfaiUrl(stepConfig.baseUrl) ? findYfaiModel(stepConfig.model, stepConfig.yfaiModels) : undefined;
+                if (!yfaiModel) continue;
+                apiKeyForBalance = stepConfig.apiKey;
+                const quote = getYfaiQuote(yfaiModel.id);
+                reservation += quote?.freeze ?? quote?.price ?? 0;
+                const promptIssue = yfaiPromptIssue(yfaiModel, buildNodeGenerationContext(step.nodeId, nodesRef.current, connectionsRef.current, step.prompt).prompt);
+                if (promptIssue) issues.push({ nodeId: step.nodeId, title: node?.title || step.nodeId, reason: promptIssue, severity: "warning" });
+            }
+            if (apiKeyForBalance && reservation > 0) {
+                const balanceIssue = yfaiBalanceIssue(await fetchYfaiAvailableCredits(apiKeyForBalance), reservation);
+                if (balanceIssue) issues.push({ title: t("canvas.workflow.balance"), reason: balanceIssue, severity: "blocker" });
+            }
+            // Only problems that would likely make the run fail stop to ask; the rest is shown and the run goes ahead.
+            const warnings = issues.filter((issue) => issue.severity === "warning");
+            if (warnings.length && warnings.length === issues.length) message.warning(warnings.map((issue) => `${issue.title}：${issue.reason}`).join("\n"), 10);
+            if (issues.some((issue) => issue.severity === "blocker")) {
+                const proceed = await modal.confirm({
+                    title: t("canvas.workflow.preflightTitle", { count: issues.length }),
+                    content: (
+                        <ul className="mt-2 list-disc space-y-1 pl-5 text-sm">
+                            {issues.map((issue, index) => (
+                                <li key={`${issue.nodeId ?? "run"}-${index}`}>
+                                    <b>{issue.title}</b>：{issue.reason}
+                                </li>
+                            ))}
+                        </ul>
+                    ),
+                    okText: t("canvas.workflow.runAnyway"),
+                    cancelText: t("canvas.workflow.backToEdit"),
+                });
+                if (!proceed) return;
             }
             // FrameDock: estimate the whole run (AutoDL prices) before spending; confirm when it is above ¥5.
             const total = plan.steps.reduce(
@@ -3562,6 +3662,7 @@ function InfiniteCanvasPage() {
                     await completeVideoNodeTask(node.id, generationConfig, prompt, retryImages, controller.signal, {
                         size: generationConfig.size,
                         seconds: generationConfig.videoSeconds,
+                        yfaiParams: generationConfig.yfaiParams,
                         vquality: generationConfig.vquality,
                         generateAudio: generationConfig.videoGenerateAudio,
                         watermark: generationConfig.videoWatermark,
@@ -4139,6 +4240,8 @@ function InfiniteCanvasPage() {
                         setTextSplitNodeId(null);
                     }}
                 />
+
+                <UndeliveredJobs projectId={projectId} onPlace={placeRescuedJob} />
 
                 {nodes.length === 0 && !nodeCreatePosition ? <CanvasEmptyHint onAddText={() => createNode(CanvasNodeType.Text)} onAddImage={() => createNode(CanvasNodeType.Image)} onAddVideo={() => createNode(CanvasNodeType.Video)} onUpload={() => handleUploadRequest()} /> : null}
 

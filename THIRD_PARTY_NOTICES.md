@@ -36,6 +36,8 @@ SOFTWARE.
 
 ## LobeHub Icons
 
+YFAI model coverage additionally uses `pixverse-color.svg`, `happyhorse.svg` and `suno.svg` from the same v1.95.1 package listed below.
+
 `apps/web/public/icons/lobehub/*.svg` are copied from [`@lobehub/icons-static-svg`](https://www.npmjs.com/package/@lobehub/icons-static-svg) v1.95.1 ([lobehub/lobe-icons](https://github.com/lobehub/lobe-icons)), MIT License, Copyright (c) LobeHub. `apps/web/src/components/codex-logo.tsx` is a line-icon version of `codex.svg` from the same package. The logos themselves are trademarks of their respective owners and are used only to identify the corresponding models.
 
 ---
@@ -66,3 +68,11 @@ SOFTWARE.
 ## MOKE AIGC（在线资料，不随仓库分发）
 
 FrameDock 可以通过服务端只读代理（`apps/server/src/moke.ts`）匿名检索 [MOKE AIGC](https://www.mokeaigc.ai/) 的 Skill。资料只在用户选用时实时读取，并缓存在本机数据目录，仓库里不包含任何 MOKE 的 Skill 正文或代码，也不会执行其中的脚本。每个 Skill 的使用都以其包内许可和作者授权为准，界面上会标注作者和原页链接。内置的提示词配方和内置 Skill 是 FrameDock 自己编写的，参考了公开的摄影与编剧方法，没有复制 MOKE 的内容。
+
+## YFAI API metadata
+
+`apps/web/src/lib/yfai-models.json` contains model descriptions and parameter metadata from
+[YFAI's public model catalog](https://yf.token6688.com/v1/logical-models), with its snapshot time
+recorded in the file. This is API metadata used for interoperability, not copied YFAI application
+source code, and no MIT license is asserted for this third-party metadata. Protocol references
+are listed in `docs/research/yfai-integration.md`.

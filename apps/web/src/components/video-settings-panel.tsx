@@ -1,3 +1,5 @@
+import { YfaiParameters } from "@/components/yfai-parameters";
+import { resolveModelChannel } from "@/stores/use-config-store";
 import { type ReactNode } from "react";
 import { Slider } from "antd";
 import { useTranslation } from "react-i18next";
@@ -25,7 +27,7 @@ export const videoSecondsRange = { min: VIDEO_SECONDS_MIN, max: VIDEO_SECONDS_MA
 
 type VideoSettingsPanelProps = {
     config: AiConfig;
-    onConfigChange: (key: "vquality" | "size" | "videoSeconds" | "videoGenerateAudio" | "videoWatermark" | "videoMode", value: string) => void;
+    onConfigChange: (key: "vquality" | "size" | "videoSeconds" | "videoGenerateAudio" | "videoWatermark" | "videoMode" | "yfaiParams", value: string) => void;
     theme: CanvasTheme;
     showTitle?: boolean;
     className?: string;
@@ -51,6 +53,8 @@ export function VideoSettingsPanel({ config, onConfigChange, theme, showTitle = 
         if (selectedRatio === "auto") onConfigChange("vquality", nextResolution);
         else applySize(nextResolution, selectedRatio);
     };
+
+    if (resolveModelChannel(config, config.model || config.videoModel).id === "yfai") return <div className={className}><YfaiParameters config={{ ...config, model: config.model || config.videoModel }} onChange={(value) => onConfigChange("yfaiParams", value)} singleOutput /></div>;
 
     return (
         <ImageSettingsTheme theme={theme}>

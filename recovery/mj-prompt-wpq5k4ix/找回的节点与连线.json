@@ -1,0 +1,128 @@
+{
+  "source": "Recovered from SQLite WAL overflow pages; not applied to the live canvas",
+  "projectId": "f_BZqbVQPCgtztUtbR0Ub",
+  "nodes": [
+    {
+      "id": "text-1792292957975-j8ozs",
+      "type": "text",
+      "title": "接下来开始做分镜，用Midjourney模型，我要这种风格“略宽",
+      "position": {
+        "x": 2709.3368006384353,
+        "y": 813.6978456627204
+      },
+      "width": 340,
+      "height": 240,
+      "metadata": {
+        "prompt": "接下来开始做分镜，用Midjourney模型，我要这种风格“略宽的室内全景，空置的古代画师工坊。长木案远侧放方凳，绢本山水长卷朝向方凳，卷尾留白位于当前机位左侧；近侧左案角放旧稿，案左放烛台与砚台。右墙纸窗闭合，左后墙有门，方凳后方地面留出通向右窗的活动空间。后墙偏右为深木色窄格架与低柜，架上有几卷宣纸、收拢画轴、素瓷笔筒和小陶罐，木柱与门框拉开前后层次；摄影机稍拉远以看清地面动线。柔和窗光，暖米白、自然木色与淡灰青协调，柔纱般光线与温润材质，纵深清楚，清简的新中式古装电影感，Kodak胶片色彩。 --ar 9:16 --raw --profile xyi24yd mokfqud --v 8.2”，先来第一个分镜，猫骑士持剑目视前方，身后一篇虚无缥缈、迷雾重重，给我第一镜的提示词即可",
+        "composerContent": "接下来开始做分镜，用Midjourney模型，我要这种风格“略宽的室内全景，空置的古代画师工坊。长木案远侧放方凳，绢本山水长卷朝向方凳，卷尾留白位于当前机位左侧；近侧左案角放旧稿，案左放烛台与砚台。右墙纸窗闭合，左后墙有门，方凳后方地面留出通向右窗的活动空间。后墙偏右为深木色窄格架与低柜，架上有几卷宣纸、收拢画轴、素瓷笔筒和小陶罐，木柱与门框拉开前后层次；摄影机稍拉远以看清地面动线。柔和窗光，暖米白、自然木色与淡灰青协调，柔纱般光线与温润材质，纵深清楚，清简的新中式古装电影感，Kodak胶片色彩。 --ar 9:16 --raw --profile xyi24yd mokfqud --v 8.2”，先来第一个分镜，猫骑士持剑目视前方，身后一篇虚无缥缈、迷雾重重，给我第一镜的提示词即可",
+        "status": "success",
+        "fontSize": 14,
+        "model": "yfai::gemini-3.8-flash",
+        "reasoningEffort": "auto",
+        "textCount": 1,
+        "texts": [
+          {
+            "id": "euM79C7PBwjO0XmK2E-ay",
+            "status": "success",
+            "content": "**分镜一提示词 (Midjourney Prompt)：**\n\nMedium shot, a cute fluffy cat knight wearing ornate silver plate armor and white cloak, firmly holding an intricate royal sword, looking straight into the camera. Background is a vast ethereal void enveloped in dense, cinematic mist and fog. Soft diffused light, muted cool tones, cinematic depth, Kodak film color. --ar 9:16 --raw --profile xyi24yd mokfqud --v 8.2"
+          }
+        ],
+        "primaryTextId": "euM79C7PBwjO0XmK2E-ay",
+        "content": "**分镜一提示词 (Midjourney Prompt)：**\n\nMedium shot, a cute fluffy cat knight wearing ornate silver plate armor and white cloak, firmly holding an intricate royal sword, looking straight into the camera. Background is a vast ethereal void enveloped in dense, cinematic mist and fog. Soft diffused light, muted cool tones, cinematic depth, Kodak film color. --ar 9:16 --raw --profile xyi24yd mokfqud --v 8.2"
+      }
+    },
+    {
+      "id": "image-1792293233251-wcfj3",
+      "type": "image",
+      "title": "开始吧\n\n【文本1】\n**分镜一提示词 (Midjourney ",
+      "position": {
+        "x": 3466.68419660843,
+        "y": 813.6978456627204
+      },
+      "width": 340,
+      "height": 240,
+      "metadata": {
+        "status": "error",
+        "prompt": "开始吧\n\n【文本1】\n**分镜一提示词 (Midjourney Prompt)：**\n\nMedium shot, a cute fluffy cat knight wearing ornate silver plate armor and white cloak, firmly holding an intricate royal sword, looking straight into the camera. Background is a vast ethereal void enveloped in dense, cinematic mist and fog. Soft diffused light, muted cool tones, cinematic depth, Kodak film color. --ar 9:16 --raw --profile xyi24yd mokfqud --v 8.2",
+        "composerContent": "开始吧",
+        "images": [
+          {
+            "id": "rChY5hMIkuzLflZFd2eZ_",
+            "status": "error",
+            "content": "",
+            "naturalWidth": 0,
+            "naturalHeight": 0,
+            "bytes": 0,
+            "mimeType": "",
+            "errorDetails": "生成失败，请稍后重试"
+          }
+        ],
+        "generationType": "edit",
+        "model": "yfai::mj_imagine",
+        "yfaiParams": "{\"mj_imagine\":{\"aspect_ratio\":\"16:9\",\"chaos\":\"25\"}}",
+        "size": "1:1",
+        "quality": "auto",
+        "count": 1,
+        "references": [
+          "image:LmS1kBvmQQYQktmjIkvbt",
+          "image:emQrvHRNoKo89zpazdw6c",
+          "image:eo54ZJ49uMSnot7TT07dh",
+          "image:w_J8NWFH6HJmoAdAG63Pu"
+        ],
+        "errorDetails": "生成失败，请稍后重试"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "id": "conn-1792292965464",
+      "fromNodeId": "image-1792285044198-f2zfv",
+      "toNodeId": "text-1792292957975-j8ozs"
+    },
+    {
+      "id": "conn-1792292967402",
+      "fromNodeId": "image-1792285294708-d6am6",
+      "toNodeId": "text-1792292957975-j8ozs"
+    },
+    {
+      "id": "conn-1792292971926",
+      "fromNodeId": "image-1792286416049-uwyle",
+      "toNodeId": "text-1792292957975-j8ozs"
+    },
+    {
+      "id": "conn-1792292974107",
+      "fromNodeId": "image-1792287330345-ixaem",
+      "toNodeId": "text-1792292957975-j8ozs"
+    },
+    {
+      "id": "conn-1792292975770",
+      "fromNodeId": "image-1792287602568-t825t",
+      "toNodeId": "text-1792292957975-j8ozs"
+    },
+    {
+      "id": "conn-1792293237564",
+      "fromNodeId": "text-1792292957975-j8ozs",
+      "toNodeId": "image-1792293233251-wcfj3"
+    },
+    {
+      "id": "conn-1792293242627",
+      "fromNodeId": "image-1792285044198-f2zfv",
+      "toNodeId": "image-1792293233251-wcfj3"
+    },
+    {
+      "id": "conn-1792293244726",
+      "fromNodeId": "image-1792285294708-d6am6",
+      "toNodeId": "image-1792293233251-wcfj3"
+    },
+    {
+      "id": "conn-1792293246861",
+      "fromNodeId": "image-1792286416049-uwyle",
+      "toNodeId": "image-1792293233251-wcfj3"
+    },
+    {
+      "id": "conn-1792293251261",
+      "fromNodeId": "image-1792287330345-ixaem",
+      "toNodeId": "image-1792293233251-wcfj3"
+    }
+  ]
+}

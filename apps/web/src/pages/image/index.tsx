@@ -18,6 +18,8 @@ import { useThemeStore } from "@/stores/use-theme-store";
 import { nanoid } from "nanoid";
 import { formatBytes, formatDuration } from "@/lib/image-utils";
 import { requestEdit, requestGeneration } from "@/services/api/image";
+import { UndeliveredJobs } from "@/components/canvas/undelivered-jobs";
+import { ackJob, fetchJobBlob, getJob, type Job } from "@/services/api/jobs";
 import { deleteStoredImages, ensureImagePreview, getImagePreviewRevision, previewUrlFor, resolveImageUrl, subscribeImagePreviews, uploadImage } from "@/services/image-storage";
 import { useAssetStore } from "@/stores/use-asset-store";
 import { useWorkbenchAgentStore } from "@/stores/use-workbench-agent-store";
@@ -61,7 +63,7 @@ type GenerationLog = {
     images: GeneratedImage[];
 };
 
-type GenerationLogConfig = Pick<AiConfig, "model" | "imageModel" | "quality" | "size" | "count">;
+type GenerationLogConfig = Pick<AiConfig, "model" | "imageModel" | "quality" | "size" | "count" | "yfaiParams">;
 
 type UpdateAiConfig = <K extends keyof AiConfig>(key: K, value: AiConfig[K]) => void;
 
@@ -294,6 +296,20 @@ export default function ImagePage() {
 
     const refreshLogs = async () => setLogs(await readStoredLogs());
 
+    /** A paid image that finished while this page was closed or reloaded: it goes into the generation history. */
+    const saveRescuedJob = async (job: Job) => {
+        const detail = await getJob(job.id);
+        const prompt = (detail.request as { invoke?: { params?: { prompt?: string } } } | undefined)?.invoke?.params?.prompt || "";
+        const files = detail.result?.files ?? (detail.result ? [detail.result] : []);
+        const images: GeneratedImage[] = [];
+        for (const index of files.keys()) {
+            const stored = await uploadImage(await fetchJobBlob(detail, index));
+            images.push({ id: nanoid(), dataUrl: stored.url, ...(stored.storageKey ? { storageKey: stored.storageKey } : {}), durationMs: Math.max(0, (detail.updatedAt || 0) - (job.updatedAt || 0)), width: stored.width, height: stored.height, bytes: stored.bytes, mimeType: stored.mimeType });
+        }
+        saveLog(buildLog({ prompt, model: detail.model, config: { ...effectiveConfig, model: detail.model, count: String(images.length) }, references: [], durationMs: 0, successCount: images.length, failCount: 0, status: "success", images }));
+        await ackJob(job.id);
+    };
+
     const previewGenerationLog = async (log: GenerationLog) => {
         setPreviewLog(log);
         setLogsOpen(false);
@@ -303,6 +319,7 @@ export default function ImagePage() {
         if (log.config.quality) updateConfig("quality", log.config.quality);
         if (log.config.size) updateConfig("size", log.config.size);
         if (log.config.count) updateConfig("count", log.config.count);
+        if (log.config.yfaiParams !== undefined) updateConfig("yfaiParams", log.config.yfaiParams);
         setResults(log.images.map((image) => ({ id: image.id, status: "success", image })));
     };
 
@@ -364,7 +381,8 @@ export default function ImagePage() {
     };
 
     return (
-        <div className="flex h-full flex-col overflow-hidden bg-background text-foreground">
+        <div className="relative flex h-full flex-col overflow-hidden bg-background text-foreground">
+            <UndeliveredJobs onPlace={saveRescuedJob} placeLabel={t("serverJobs.rescue.placeLog")} />
             <main className="grid min-h-0 flex-1 grid-cols-1 gap-3 overflow-y-auto p-3 lg:grid-cols-[300px_minmax(0,1fr)] lg:overflow-hidden xl:grid-cols-[320px_minmax(0,1fr)]">
                 <aside className="thin-scrollbar hidden min-h-0 overflow-y-auto rounded-[20px] border border-border bg-card p-4 lg:block">
                     <LogPanel
@@ -571,7 +589,7 @@ function GenerationSettings({ config, model, updateConfig, openConfigDialog }: {
                 <ModelPicker config={config} value={model} onChange={(value) => updateConfig("imageModel", value)} capability="image" fullWidth onMissingConfig={() => openConfigDialog(false)} />
             </label>
             <div className="col-span-2">
-                <ImageSettingsPanel config={config} onConfigChange={(key, value) => updateConfig(key, value)} theme={theme} showTitle={false} className="space-y-4" maxCount={10} />
+                <ImageSettingsPanel config={{ ...config, model }} onConfigChange={(key, value) => updateConfig(key, value)} theme={theme} showTitle={false} className="space-y-4" maxCount={10} />
             </div>
         </>
     );
@@ -834,6 +852,7 @@ function serializeLog(log: GenerationLog): GenerationLog {
 function normalizeLogConfig(log: Partial<GenerationLog>): GenerationLogConfig {
     return {
         model: log.config?.model || log.model || "",
+        yfaiParams: log.config?.yfaiParams || "",
         imageModel: log.config?.imageModel || log.model || "",
         quality: log.config?.quality || log.quality || "",
         size: log.config?.size || log.size || "",
@@ -882,6 +901,7 @@ function buildLog({
 }): GenerationLog {
     const logConfig = {
         model: config.model,
+        yfaiParams: config.yfaiParams,
         imageModel: config.imageModel,
         quality: config.quality,
         size: config.size,

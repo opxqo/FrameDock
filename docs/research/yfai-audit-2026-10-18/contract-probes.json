@@ -1,0 +1,886 @@
+[
+  {
+    "name": "api_key",
+    "path": "/v1/models",
+    "status": 200,
+    "input": null,
+    "response": {
+      "model_count": 139
+    },
+    "observed_at": "2026-10-18T13:01:41.470432+00:00"
+  },
+  {
+    "name": "balance_shape",
+    "path": "/v1/skills/balance",
+    "status": 200,
+    "input": null,
+    "response": {
+      "top_level_fields": [
+        "available_balance",
+        "balance",
+        "credits",
+        "currency",
+        "frozen",
+        "unit"
+      ],
+      "credits_fields": [
+        "available",
+        "balance",
+        "frozen",
+        "per_usd",
+        "unit"
+      ]
+    },
+    "observed_at": "2026-10-18T13:01:43.780837+00:00"
+  },
+  {
+    "name": "mj_generate",
+    "path": "/api/v1/model-runtime/dry-run",
+    "status": 200,
+    "input": {
+      "model_id": "mj_imagine",
+      "modality": "image",
+      "params": {
+        "prompt": "A small cat, studio photograph.",
+        "mode": "text-to-image",
+        "quality": "1",
+        "aspect_ratio": "1:1"
+      },
+      "operation": "generate"
+    },
+    "response": {
+      "object": "model_runtime.dry_run",
+      "model": "mj_imagine",
+      "modality": "image",
+      "would_call_vendor": false,
+      "requested_strategy": "balanced",
+      "wire": {
+        "vendor": "VEC",
+        "group": "",
+        "upstream_model": "",
+        "candidate_type": "mj",
+        "method": "POST",
+        "body": {
+          "botType": "MID_JOURNEY",
+          "mode": "text-to-image",
+          "notifyHook": "",
+          "prompt": "A small cat, studio photograph. --quality 1",
+          "state": ""
+        }
+      },
+      "warnings": [
+        "参考素材送厂前收口 (可达性 re-host / 帧率·时长·尺寸自适应 / 格式转换 / 内容审核) 在 dry-run 中**未执行** —— 本响应中的参考素材 URL 是调用方原始值, 不是真实发出去的值。不要用 dry-run 判断参考素材自适应是否生效。"
+      ],
+      "reference_prep_skipped": true,
+      "reference_prep_note": "参考素材送厂前收口 (可达性 re-host / 帧率·时长·尺寸自适应 / 格式转换 / 内容审核) 在 dry-run 中**未执行** —— 本响应中的参考素材 URL 是调用方原始值, 不是真实发出去的值。不要用 dry-run 判断参考素材自适应是否生效。"
+    },
+    "observed_at": "2026-10-18T13:01:45.971024+00:00"
+  },
+  {
+    "name": "mj_edit_missing_attachment",
+    "path": "/api/v1/model-runtime/dry-run",
+    "status": 400,
+    "input": {
+      "model_id": "mj_imagine",
+      "modality": "image",
+      "params": {
+        "prompt": "A small cat, studio photograph.",
+        "mode": "text-to-image",
+        "quality": "1",
+        "aspect_ratio": "1:1"
+      },
+      "operation": "edit"
+    },
+    "response": {
+      "error": {
+        "code": "invalid_request",
+        "message": "operation=edit requires attachments[0] (source image)",
+        "type": "invalid_request"
+      }
+    },
+    "observed_at": "2026-10-18T13:01:46.130890+00:00"
+  },
+  {
+    "name": "mj_three_images",
+    "path": "/api/v1/model-runtime/dry-run",
+    "status": 200,
+    "input": {
+      "model_id": "mj_imagine",
+      "modality": "image",
+      "params": {
+        "prompt": "A small cat, studio photograph.",
+        "mode": "text-to-image",
+        "quality": "1",
+        "aspect_ratio": "1:1",
+        "images": [
+          "https://example.com/reference-1.png",
+          "https://example.com/reference-2.png",
+          "https://example.com/reference-3.png"
+        ]
+      },
+      "operation": "generate"
+    },
+    "response": {
+      "object": "model_runtime.dry_run",
+      "model": "mj_imagine",
+      "modality": "image",
+      "would_call_vendor": false,
+      "requested_strategy": "balanced",
+      "wire": {
+        "vendor": "BB6",
+        "group": "",
+        "upstream_model": "",
+        "candidate_type": "lk666",
+        "method": "POST",
+        "body": {
+          "model": "mj_imagine",
+          "params": {
+            "aspectRatio": "1:1",
+            "botType": "MID_JOURNEY",
+            "images": [
+              "https://example.com/reference-1.png",
+              "https://example.com/reference-2.png",
+              "https://example.com/reference-3.png"
+            ],
+            "quality": "1"
+          },
+          "prompt": "A small cat, studio photograph."
+        }
+      },
+      "warnings": [
+        "参考素材送厂前收口 (可达性 re-host / 帧率·时长·尺寸自适应 / 格式转换 / 内容审核) 在 dry-run 中**未执行** —— 本响应中的参考素材 URL 是调用方原始值, 不是真实发出去的值。不要用 dry-run 判断参考素材自适应是否生效。"
+      ],
+      "reference_prep_skipped": true,
+      "reference_prep_note": "参考素材送厂前收口 (可达性 re-host / 帧率·时长·尺寸自适应 / 格式转换 / 内容审核) 在 dry-run 中**未执行** —— 本响应中的参考素材 URL 是调用方原始值, 不是真实发出去的值。不要用 dry-run 判断参考素材自适应是否生效。"
+    },
+    "observed_at": "2026-10-18T13:01:48.059852+00:00"
+  },
+  {
+    "name": "mj_duplicate_envelope_three",
+    "path": "/api/v1/model-runtime/dry-run",
+    "status": 400,
+    "input": {
+      "model_id": "mj_imagine",
+      "modality": "image",
+      "params": {
+        "prompt": "A small cat, studio photograph.",
+        "mode": "text-to-image",
+        "quality": "1",
+        "aspect_ratio": "1:1",
+        "images": [
+          "https://example.com/reference-1.png",
+          "https://example.com/reference-2.png",
+          "https://example.com/reference-3.png"
+        ]
+      },
+      "operation": "generate",
+      "attachments": [
+        "https://example.com/reference-1.png",
+        "https://example.com/reference-2.png",
+        "https://example.com/reference-3.png"
+      ]
+    },
+    "response": {
+      "error": {
+        "code": "invalid_request",
+        "message": "mj reference[0]: mj_reference_0 fetch http 404",
+        "type": "invalid_request"
+      }
+    },
+    "observed_at": "2026-10-18T13:01:48.511250+00:00"
+  },
+  {
+    "name": "mj_five_images",
+    "path": "/api/v1/model-runtime/dry-run",
+    "status": 200,
+    "input": {
+      "model_id": "mj_imagine",
+      "modality": "image",
+      "params": {
+        "prompt": "A small cat, studio photograph.",
+        "mode": "text-to-image",
+        "quality": "1",
+        "aspect_ratio": "1:1",
+        "images": [
+          "https://example.com/reference-1.png",
+          "https://example.com/reference-2.png",
+          "https://example.com/reference-3.png",
+          "https://example.com/reference-4.png",
+          "https://example.com/reference-5.png"
+        ]
+      },
+      "operation": "generate"
+    },
+    "response": {
+      "object": "model_runtime.dry_run",
+      "model": "mj_imagine",
+      "modality": "image",
+      "would_call_vendor": false,
+      "requested_strategy": "balanced",
+      "wire": {
+        "vendor": "BB6",
+        "group": "",
+        "upstream_model": "",
+        "candidate_type": "lk666",
+        "method": "POST",
+        "body": {
+          "model": "mj_imagine",
+          "params": {
+            "aspectRatio": "1:1",
+            "botType": "MID_JOURNEY",
+            "images": [
+              "https://example.com/reference-1.png",
+              "https://example.com/reference-2.png",
+              "https://example.com/reference-3.png",
+              "https://example.com/reference-4.png"
+            ],
+            "quality": "1"
+          },
+          "prompt": "A small cat, studio photograph."
+        }
+      },
+      "warnings": [
+        "参考素材送厂前收口 (可达性 re-host / 帧率·时长·尺寸自适应 / 格式转换 / 内容审核) 在 dry-run 中**未执行** —— 本响应中的参考素材 URL 是调用方原始值, 不是真实发出去的值。不要用 dry-run 判断参考素材自适应是否生效。"
+      ],
+      "reference_prep_skipped": true,
+      "reference_prep_note": "参考素材送厂前收口 (可达性 re-host / 帧率·时长·尺寸自适应 / 格式转换 / 内容审核) 在 dry-run 中**未执行** —— 本响应中的参考素材 URL 是调用方原始值, 不是真实发出去的值。不要用 dry-run 判断参考素材自适应是否生效。"
+    },
+    "observed_at": "2026-10-18T13:01:50.222798+00:00"
+  },
+  {
+    "name": "mj_long_prompt",
+    "path": "/api/v1/model-runtime/dry-run",
+    "status": 200,
+    "input": {
+      "model_id": "mj_imagine",
+      "modality": "image",
+      "params": {
+        "prompt": {
+          "string_length": 7000,
+          "preview": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+        },
+        "mode": "text-to-image",
+        "quality": "1",
+        "aspect_ratio": "1:1"
+      },
+      "operation": "generate"
+    },
+    "response": {
+      "object": "model_runtime.dry_run",
+      "model": "mj_imagine",
+      "modality": "image",
+      "would_call_vendor": false,
+      "requested_strategy": "balanced",
+      "wire": {
+        "vendor": "VEC",
+        "group": "",
+        "upstream_model": "",
+        "candidate_type": "mj",
+        "method": "POST",
+        "body": {
+          "botType": "MID_JOURNEY",
+          "mode": "text-to-image",
+          "notifyHook": "",
+          "prompt": {
+            "string_length": 7012,
+            "preview": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+          },
+          "state": ""
+        }
+      },
+      "warnings": [
+        "参考素材送厂前收口 (可达性 re-host / 帧率·时长·尺寸自适应 / 格式转换 / 内容审核) 在 dry-run 中**未执行** —— 本响应中的参考素材 URL 是调用方原始值, 不是真实发出去的值。不要用 dry-run 判断参考素材自适应是否生效。"
+      ],
+      "reference_prep_skipped": true,
+      "reference_prep_note": "参考素材送厂前收口 (可达性 re-host / 帧率·时长·尺寸自适应 / 格式转换 / 内容审核) 在 dry-run 中**未执行** —— 本响应中的参考素材 URL 是调用方原始值, 不是真实发出去的值。不要用 dry-run 判断参考素材自适应是否生效。"
+    },
+    "observed_at": "2026-10-18T13:01:50.845437+00:00"
+  },
+  {
+    "name": "seedance_fast_4k",
+    "path": "/api/v1/model-runtime/dry-run",
+    "status": 200,
+    "input": {
+      "model_id": "seedance-2-0-official",
+      "modality": "video",
+      "params": {
+        "prompt": "A landscape.",
+        "mode": "text-to-video",
+        "quality": "fast",
+        "resolution": "4k",
+        "duration": "4"
+      }
+    },
+    "response": {
+      "object": "model_runtime.dry_run",
+      "model": "seedance-2-0-official",
+      "modality": "video",
+      "would_call_vendor": false,
+      "requested_strategy": "balanced",
+      "wire": {
+        "vendor": "NTC",
+        "group": "",
+        "upstream_model": "",
+        "candidate_type": "newtokenclub-ark",
+        "method": "POST",
+        "body": {
+          "content": [
+            {
+              "text": "A landscape.",
+              "type": "text"
+            }
+          ],
+          "duration": 4,
+          "model": "doubao-seedance-2-0-fast-260128",
+          "resolution": "720p",
+          "watermark": false
+        }
+      },
+      "warnings": [
+        "参考素材送厂前收口 (可达性 re-host / 帧率·时长·尺寸自适应 / 格式转换 / 内容审核) 在 dry-run 中**未执行** —— 本响应中的参考素材 URL 是调用方原始值, 不是真实发出去的值。不要用 dry-run 判断参考素材自适应是否生效。"
+      ],
+      "reference_prep_skipped": true,
+      "reference_prep_note": "参考素材送厂前收口 (可达性 re-host / 帧率·时长·尺寸自适应 / 格式转换 / 内容审核) 在 dry-run 中**未执行** —— 本响应中的参考素材 URL 是调用方原始值, 不是真实发出去的值。不要用 dry-run 判断参考素材自适应是否生效。"
+    },
+    "observed_at": "2026-10-18T13:01:52.568609+00:00"
+  },
+  {
+    "name": "seedance_special_10sec",
+    "path": "/api/v1/model-runtime/dry-run",
+    "status": 503,
+    "input": {
+      "model_id": "seedance-2-5-special",
+      "modality": "video",
+      "params": {
+        "prompt": "A landscape.",
+        "mode": "text-to-video",
+        "resolution": "720p",
+        "duration": "10"
+      }
+    },
+    "response": {
+      "error": {
+        "code": "dry_run_no_route",
+        "message": "video model \"seedance-2-5-special\": 支持「生成模式：文生视频」的渠道暂时不可用 (供给维护中), 请去掉该参数或素材后重试, 或换用其它模型。本次未扣费。(完整请求: 视频时长：30秒（特价一口价） / 生成模式：文生视频 / 清晰度：720P 高清) (内部: params=duration=30 / mode=text-to-video / resolution=720p dropped=map[hongniaoai25q3:mode=text-to-video 支持该能力的渠道当前全部不可用 (未提交任何渠道)])",
+        "type": "yamlrunner_error"
+      }
+    },
+    "observed_at": "2026-10-18T13:01:53.104764+00:00"
+  },
+  {
+    "name": "speech_prompt_only",
+    "path": "/api/v1/model-runtime/dry-run",
+    "status": 400,
+    "input": {
+      "model_id": "speech-2.8",
+      "modality": "audio",
+      "params": {
+        "prompt": "Hello world.",
+        "voice": "female-tianmei",
+        "version": "2.8",
+        "tier": "hd"
+      }
+    },
+    "response": {
+      "error": {
+        "code": "invalid_request",
+        "message": "params.input is required",
+        "type": "invalid_request"
+      }
+    },
+    "observed_at": "2026-10-18T13:01:54.627508+00:00"
+  },
+  {
+    "name": "speech_input",
+    "path": "/api/v1/model-runtime/dry-run",
+    "status": 501,
+    "input": {
+      "model_id": "speech-2.8",
+      "modality": "audio",
+      "params": {
+        "input": "Hello world.",
+        "voice": "female-tianmei",
+        "version": "2.8",
+        "tier": "hd"
+      },
+      "operation": "speech"
+    },
+    "response": {
+      "error": {
+        "code": "dry_run_transport_not_instrumented",
+        "message": "拒绝执行: 选中 lane 走专用 adaptor \"minimax-native-t2a\" (vendor=openlux group=Hailuo-1), 它经 VoiceCloner **自管传输**, 绕开 dry-run 短路点 —— 执行会真打厂商、真扣用户钱, 所以这里拒绝而不是\"尽力而为\"。替代方案: ① `cd gateway && go run ./cmd/which-adaptor speech-2.8-hd` 看真实 dispatch, 再读该 adaptor 的 TransformRequest/SubmitNative 源码确认 wire; ② 跑该协议族的 conformance test (¥0)。要让它支持 dry-run: 在该 adaptor 自管传输处插桩短路 (参照 HTTPRunner.Call)。",
+        "type": "yamlrunner_error"
+      }
+    },
+    "observed_at": "2026-10-18T13:01:55.149993+00:00"
+  },
+  {
+    "name": "music_generate",
+    "path": "/api/v1/model-runtime/dry-run",
+    "status": 200,
+    "input": {
+      "model_id": "music",
+      "modality": "audio",
+      "params": {
+        "prompt": "Gentle instrumental piano.",
+        "mode": "instrumental",
+        "version": "chirp-v6"
+      },
+      "operation": "generate"
+    },
+    "response": {
+      "object": "model_runtime.dry_run",
+      "model": "music",
+      "modality": "audio",
+      "would_call_vendor": false,
+      "requested_strategy": "balanced",
+      "wire": {
+        "vendor": "APM",
+        "group": "",
+        "upstream_model": "",
+        "candidate_type": "apimart-suno-async",
+        "method": "POST",
+        "body": {
+          "custom": false,
+          "instrumental": true,
+          "prompt": "Gentle instrumental piano.",
+          "version": "v6"
+        }
+      },
+      "reference_prep_skipped": true,
+      "reference_prep_note": "参考素材送厂前收口 (可达性 re-host / 帧率·时长·尺寸自适应 / 格式转换 / 内容审核) 在 dry-run 中**未执行** —— 本响应中的参考素材 URL 是调用方原始值, 不是真实发出去的值。不要用 dry-run 判断参考素材自适应是否生效。"
+    },
+    "observed_at": "2026-10-18T13:01:56.841741+00:00"
+  },
+  {
+    "name": "whisper_transcribe",
+    "path": "/api/v1/model-runtime/dry-run",
+    "status": 400,
+    "input": {
+      "model_id": "whisper-1",
+      "modality": "audio",
+      "params": {
+        "audios": [
+          "https://example.com/reference.mp3"
+        ],
+        "audio_duration_sec": "18.11"
+      },
+      "operation": "transcribe"
+    },
+    "response": {
+      "error": {
+        "code": "invalid_request",
+        "message": "params.input is required",
+        "type": "invalid_request"
+      }
+    },
+    "observed_at": "2026-10-18T13:01:57.710369+00:00"
+  },
+  {
+    "name": "mj_channels",
+    "path": "/v1/pricing-estimate",
+    "status": 200,
+    "input": {
+      "model": "mj_imagine",
+      "params": {
+        "prompt": "A small cat, studio photograph.",
+        "mode": "text-to-image",
+        "quality": "1",
+        "aspect_ratio": "1:1"
+      },
+      "include_all_channels": true
+    },
+    "response": {
+      "vendor": "VEC",
+      "lane": "mj绘画",
+      "group": "mj绘画",
+      "unit": "call",
+      "estimated_total_usd": 0.07266105000000002,
+      "estimated_total_rmb": 0.07266105000000002,
+      "effective_total_rmb": 0.07266105000000002,
+      "max_effective_total_rmb": 0.4147385088,
+      "required_freeze_rmb": 0.0810864,
+      "health": {
+        "circuit_state": "closed",
+        "recent_30m": {
+          "abnormal": false,
+          "attempts": 22,
+          "success": 19
+        }
+      },
+      "candidate_count": 6,
+      "alternatives": [
+        {
+          "strategy": "cost_first",
+          "vendor": "VEC",
+          "group": "mj绘画",
+          "lane": "mj绘画",
+          "estimated_total_usd": 0.07266105000000002,
+          "estimated_total_rmb": 0.07266105000000002,
+          "effective_total_rmb": 0.07266105000000002,
+          "health": {
+            "circuit_state": "closed",
+            "recent_30m": {
+              "abnormal": false,
+              "attempts": 22,
+              "success": 19
+            }
+          }
+        },
+        {
+          "strategy": "latency_first",
+          "vendor": "DTE",
+          "group": "mj-of-pro",
+          "lane": "mj-of-pro",
+          "estimated_total_usd": 0.012244732500000004,
+          "estimated_total_rmb": 0.08816207400000003,
+          "effective_total_rmb": 0.08816207400000003,
+          "health": {
+            "circuit_state": "closed",
+            "recent_30m": {
+              "abnormal": false,
+              "attempts": 9,
+              "success": 8
+            }
+          }
+        },
+        {
+          "strategy": "reliability_first",
+          "vendor": "BB6",
+          "group": "default",
+          "lane": "default",
+          "estimated_total_usd": 0.3390849,
+          "estimated_total_rmb": 0.3390849,
+          "effective_total_rmb": 0.3390849,
+          "health": {
+            "circuit_state": "closed",
+            "recent_30m": {
+              "abnormal": false,
+              "attempts": 7,
+              "success": 7
+            }
+          }
+        },
+        {
+          "strategy": "quality_first",
+          "vendor": "VEC",
+          "group": "mj绘画",
+          "lane": "mj绘画",
+          "estimated_total_usd": 0.07266105000000002,
+          "estimated_total_rmb": 0.07266105000000002,
+          "effective_total_rmb": 0.07266105000000002,
+          "health": {
+            "circuit_state": "closed",
+            "recent_30m": {
+              "abnormal": false,
+              "attempts": 22,
+              "success": 19
+            }
+          }
+        }
+      ],
+      "strategy": "balanced",
+      "modality": "image",
+      "supports_n": false,
+      "price_basis": {
+        "billing_unit": "call",
+        "output_rmb": 0.07266105000000002
+      },
+      "billing_mode": "fixed_amount",
+      "channels": [
+        {
+          "vendor": "VEC",
+          "group": "mj绘画",
+          "lane": "mj_imagine@VEC:mj-draw",
+          "unit": "call",
+          "estimated_total_rmb": 0.07266105000000002,
+          "effective_total_rmb": 0.07266105000000002,
+          "health": {
+            "circuit_state": "closed",
+            "recent_30m": {
+              "abnormal": false,
+              "attempts": 22,
+              "success": 19
+            }
+          },
+          "billing_mode": "fixed_amount",
+          "param_schema": {
+            "aspect_ratio": [
+              "1:1",
+              "16:9",
+              "9:16",
+              "4:3",
+              "3:4",
+              "3:2",
+              "2:3",
+              "4:5",
+              "5:4",
+              "21:9"
+            ],
+            "hd": [
+              "true"
+            ],
+            "max_images": [
+              "1"
+            ]
+          },
+          "is_delivery_head": true
+        },
+        {
+          "vendor": "DTE",
+          "group": "mj-of-pro",
+          "lane": "mj_imagine@DTE:mj-of-pro",
+          "unit": "call",
+          "estimated_total_rmb": 0.08816207400000003,
+          "effective_total_rmb": 0.08816207400000003,
+          "health": {
+            "circuit_state": "closed",
+            "recent_30m": {
+              "abnormal": false,
+              "attempts": 9,
+              "success": 8
+            }
+          },
+          "billing_mode": "fixed_amount",
+          "param_schema": {
+            "aspect_ratio": [
+              "1:1",
+              "16:9",
+              "9:16",
+              "4:3",
+              "3:4",
+              "3:2",
+              "2:3",
+              "4:5",
+              "5:4",
+              "21:9"
+            ],
+            "hd": [
+              "true"
+            ],
+            "max_images": [
+              "1"
+            ]
+          },
+          "is_delivery_head": false
+        },
+        {
+          "vendor": "BB6",
+          "group": "default",
+          "lane": "mj_imagine@BB6:default",
+          "unit": "call",
+          "estimated_total_rmb": 0.3390849,
+          "effective_total_rmb": 0.3390849,
+          "health": {
+            "circuit_state": "closed",
+            "recent_30m": {
+              "abnormal": false,
+              "attempts": 7,
+              "success": 7
+            }
+          },
+          "billing_mode": "fixed_amount",
+          "param_schema": {
+            "aspect_ratio": [
+              "1:1",
+              "16:9",
+              "9:16",
+              "4:3",
+              "3:4",
+              "3:2",
+              "2:3",
+              "4:5",
+              "5:4",
+              "21:9"
+            ],
+            "hd": [
+              "true"
+            ],
+            "max_images": [
+              "4"
+            ],
+            "quality": [
+              "0.25",
+              "0.5",
+              "1",
+              "2"
+            ]
+          },
+          "is_delivery_head": false
+        },
+        {
+          "vendor": "MXH",
+          "group": "default",
+          "lane": "mj_imagine@MXH:default",
+          "unit": "call",
+          "estimated_total_rmb": 0.26911500000000005,
+          "effective_total_rmb": 0.26911500000000005,
+          "health": {
+            "circuit_state": "unknown"
+          },
+          "billing_mode": "fixed_amount",
+          "param_schema": {
+            "aspect_ratio": [
+              "1:1",
+              "16:9",
+              "9:16",
+              "4:3",
+              "3:4",
+              "3:2",
+              "2:3",
+              "4:5",
+              "5:4",
+              "21:9"
+            ],
+            "hd": [
+              "true"
+            ],
+            "max_images": [
+              "1"
+            ]
+          },
+          "is_delivery_head": false
+        },
+        {
+          "vendor": "OLX",
+          "group": "MJ-3",
+          "lane": "mj_imagine@OLX:mj-3",
+          "unit": "call",
+          "estimated_total_rmb": 0.40351103099999996,
+          "effective_total_rmb": 0.40351103099999996,
+          "health": {
+            "circuit_state": "unknown"
+          },
+          "billing_mode": "fixed_amount",
+          "param_schema": {
+            "aspect_ratio": [
+              "1:1",
+              "16:9",
+              "9:16",
+              "4:3",
+              "3:4",
+              "3:2",
+              "2:3",
+              "4:5",
+              "5:4",
+              "21:9"
+            ],
+            "hd": [
+              "true"
+            ],
+            "max_images": [
+              "4"
+            ]
+          },
+          "is_delivery_head": false
+        },
+        {
+          "vendor": "APM",
+          "group": "default",
+          "lane": "mj_imagine@APM:default",
+          "unit": "call",
+          "estimated_total_rmb": 0.4147385088,
+          "effective_total_rmb": 0.4147385088,
+          "health": {
+            "circuit_state": "unknown"
+          },
+          "billing_mode": "fixed_amount",
+          "param_schema": {
+            "aspect_ratio": [
+              "1:1",
+              "16:9",
+              "9:16",
+              "4:3",
+              "3:4",
+              "3:2",
+              "2:3",
+              "4:5",
+              "5:4",
+              "21:9"
+            ],
+            "hd": [
+              "true"
+            ],
+            "max_images": [
+              "4"
+            ]
+          },
+          "is_delivery_head": false
+        }
+      ]
+    },
+    "observed_at": "2026-10-18T13:02:00.142029+00:00"
+  },
+  {
+    "name": "mj_bb6_pinned",
+    "path": "/api/v1/model-runtime/dry-run",
+    "status": 200,
+    "input": {
+      "model_id": "mj_imagine",
+      "modality": "image",
+      "params": {
+        "prompt": "A small cat, studio photograph.",
+        "mode": "text-to-image",
+        "quality": "1",
+        "aspect_ratio": "1:1"
+      },
+      "operation": "generate",
+      "lane_ids": [
+        "mj_imagine@BB6:default"
+      ]
+    },
+    "response": {
+      "object": "model_runtime.dry_run",
+      "model": "mj_imagine",
+      "modality": "image",
+      "would_call_vendor": false,
+      "requested_strategy": "balanced",
+      "wire": {
+        "vendor": "BB6",
+        "group": "",
+        "upstream_model": "",
+        "candidate_type": "lk666",
+        "method": "POST",
+        "body": {
+          "model": "mj_imagine",
+          "params": {
+            "aspectRatio": "1:1",
+            "botType": "MID_JOURNEY",
+            "quality": "1"
+          },
+          "prompt": "A small cat, studio photograph."
+        }
+      },
+      "warnings": [
+        "参考素材送厂前收口 (可达性 re-host / 帧率·时长·尺寸自适应 / 格式转换 / 内容审核) 在 dry-run 中**未执行** —— 本响应中的参考素材 URL 是调用方原始值, 不是真实发出去的值。不要用 dry-run 判断参考素材自适应是否生效。"
+      ],
+      "reference_prep_skipped": true,
+      "reference_prep_note": "参考素材送厂前收口 (可达性 re-host / 帧率·时长·尺寸自适应 / 格式转换 / 内容审核) 在 dry-run 中**未执行** —— 本响应中的参考素材 URL 是调用方原始值, 不是真实发出去的值。不要用 dry-run 判断参考素材自适应是否生效。"
+    },
+    "observed_at": "2026-10-18T13:02:02.376183+00:00"
+  },
+  {
+    "name": "video_quote_missing_duration",
+    "path": "/v1/pricing-estimate",
+    "status": 422,
+    "input": {
+      "model": "seedance-2-5",
+      "params": {
+        "mode": "reference",
+        "duration": "5",
+        "resolution": "720p",
+        "videos": [
+          "https://example.com/reference.mp4"
+        ]
+      }
+    },
+    "response": {
+      "error": {
+        "code": "reference_video_duration_pending",
+        "message": "参考视频时长尚未就绪，暂时无法估价",
+        "type": "reference_video_duration_pending"
+      }
+    },
+    "observed_at": "2026-10-18T13:02:04.403884+00:00"
+  }
+]

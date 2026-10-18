@@ -1,3 +1,5 @@
+import { YfaiParameters } from "@/components/yfai-parameters";
+import { resolveModelChannel } from "@/stores/use-config-store";
 import { type ReactNode, useState } from "react";
 import { ConfigProvider, Switch } from "antd";
 import { useTranslation } from "react-i18next";
@@ -23,7 +25,7 @@ export const imageScaleOptions = mediaScaleOptions.map((value) => ({ value, labe
 
 type ImageSettingsPanelProps = {
     config: AiConfig;
-    onConfigChange: (key: "quality" | "size" | "count" | "background", value: string) => void;
+    onConfigChange: (key: "quality" | "size" | "count" | "background" | "yfaiParams", value: string) => void;
     theme: CanvasTheme;
     showTitle?: boolean;
     className?: string;
@@ -50,6 +52,8 @@ export function ImageSettingsPanel({ config, onConfigChange, theme, showTitle = 
         const height = key === "height" ? next : dimensions.height;
         onConfigChange("size", `${alignDimension(width, snapDimensionToStep)}x${alignDimension(height, snapDimensionToStep)}`);
     };
+
+    if (resolveModelChannel(config, config.model || config.imageModel).id === "yfai") return <div className={className}><YfaiParameters config={{ ...config, model: config.model || config.imageModel }} onChange={(value) => onConfigChange("yfaiParams", value)} onCountChange={(count) => onConfigChange("count", String(count))} maxCount={maxCount} /></div>;
 
     return (
         <ImageSettingsTheme theme={theme}>

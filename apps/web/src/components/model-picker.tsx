@@ -1,6 +1,6 @@
 import { useEffect, useId, useMemo, useState } from "react";
 import { ModelPrice } from "@/components/autodl-price";
-import { Cpu } from "@/components/icons";
+import { Brush, Cpu } from "@/components/icons";
 import { useTranslation } from "react-i18next";
 
 import i18n from "@/i18n";
@@ -126,7 +126,9 @@ function groupByVendor(models: string[]) {
 }
 
 export function ModelIcon({ model }: { model: string }) {
-    const icon = resolveModelIcon(modelOptionName(model));
+    const name = modelOptionName(model);
+    if (name === "face-repaint") return <Brush className="size-4 shrink-0" />;
+    const icon = resolveModelIcon(name);
     if (!icon) return <Cpu className="size-4 shrink-0 opacity-70" />;
     // Only monochrome logos are inverted in dark mode; brand-colored ones keep their colors.
     return <img src={`/icons/lobehub/${icon}.svg`} alt="" className={`size-4 shrink-0 ${icon.endsWith("-color") ? "" : "dark:invert"}`} />;
@@ -138,14 +140,14 @@ const MODEL_ICON_RULES: Array<[RegExp, string, string]> = [
     [/claude|anthropic/, "claude-color", "Anthropic"],
     [/gemini|nano-banana|imagen|veo/, "gemini-color", "Google"],
     [/sora/, "sora-color", "OpenAI"],
-    [/gpt|openai|dall-e|o\d-/, "openai", "OpenAI"],
+    [/gpt|openai|dall-e|o\d-|^whisper|^codex-auto-review$/, "openai", "OpenAI"],
     [/grok/, "grok", "xAI"],
     [/deepseek/, "deepseek-color", "DeepSeek"],
     [/glm|zhipu|cogview|cogvideo/, "zhipu-color", "智谱"],
     [/hailuo/, "hailuo-color", "MiniMax"],
-    [/minimax|abab/, "minimax-color", "MiniMax"],
+    [/minimax|abab|^speech-|^voice-(?:design|clone)$/, "minimax-color", "MiniMax"],
     [/qwen|z-image|tongyi|qwq/, "qwen-color", "通义"],
-    [/^wan|wanx|wan\d/, "alibabacloud-color", "通义万相"],
+    [/^wan|wanx|wan\d|^aliyun-/, "alibabacloud-color", "通义万相"],
     [/kling|kolors/, "kling-color", "可灵"],
     [/seedance|seedream|doubao|jimeng/, "doubao-color", "字节跳动"],
     [/vidu/, "vidu-color", "Vidu"],
@@ -153,10 +155,15 @@ const MODEL_ICON_RULES: Array<[RegExp, string, string]> = [
     [/kimi|moonshot/, "kimi-color", "月之暗面"],
     [/midjourney|^mj/, "midjourney", "Midjourney"],
     [/flux/, "flux", "Black Forest Labs"],
+    [/pixverse/, "pixverse-color", "PixVerse"],
+    [/happyhorse/, "happyhorse", "HappyHorse"],
+    [/^music$|suno/, "suno", "Suno"],
+    [/^omni-flash/, "gemini-color", "Google"],
+    [/^face-repaint$/, "", "人像工具"],
     [/stable|sdxl|^sd\d|stability/, "stability-color", "Stability"],
 ];
 
-function resolveModelIcon(model: string) {
+export function resolveModelIcon(model: string) {
     const name = model.toLowerCase();
     return MODEL_ICON_RULES.find(([pattern]) => pattern.test(name))?.[1] || "";
 }
