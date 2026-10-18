@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { BetweenHorizontalStart, Check, ClipboardPaste, GalleryHorizontalEnd, GalleryHorizontal, Group, ListEnd, Maximize, Music2, Play, Plus, Scissors, Settings2, TemplateFlow, Trash2, Type, Ungroup, Upload, Video, Image as ImageIcon } from "@/components/icons";
+import { BetweenHorizontalStart, Check, ClipboardPaste, Terminal, GalleryHorizontalEnd, GalleryHorizontal, Group, ListEnd, Maximize, Music2, Play, Plus, Scissors, Settings2, TemplateFlow, Trash2, Type, Ungroup, Upload, Video, Image as ImageIcon } from "@/components/icons";
 import { CodexLogo } from "@/components/codex-logo";
 import { useTranslation } from "react-i18next";
 
@@ -25,6 +25,7 @@ export function CanvasNodeContextMenu({
     onRunSelection,
     onContinueFromLastFrame,
     onSplitText,
+    onViewLogs,
     onSetConnectionRole,
     onDelete,
 }: {
@@ -45,6 +46,8 @@ export function CanvasNodeContextMenu({
     onRunSelection?: () => void;
     onContinueFromLastFrame?: () => void;
     onSplitText?: () => void;
+    /** Opens the API call log filtered to this node (in a new tab, so a running generation is not interrupted). */
+    onViewLogs?: () => void;
     onSetConnectionRole?: (role: CanvasConnectionRole | undefined) => void;
     onDelete: () => void;
 }) {
@@ -85,6 +88,7 @@ export function CanvasNodeContextMenu({
             {menu.type === "node" && canGroup ? <MenuButton icon={<Group className="size-4" />} label={t("canvas.nodeToolbar.group")} shortcut={`${MOD_KEY}G`} onClick={onGroup} /> : null}
             {menu.type === "node" && canUngroup ? <MenuButton icon={<Ungroup className="size-4" />} label={t("canvas.nodeToolbar.ungroup")} shortcut={`${MOD_KEY}⇧G`} onClick={onUngroup} /> : null}
             {menu.type === "node" ? <MenuButton icon={<Plus className="size-4" />} label={t("canvas.controls.duplicate")} onClick={onDuplicate} /> : null}
+            {menu.type === "node" && onViewLogs ? <MenuButton icon={<Terminal className="size-4" />} label={t("logs.viewNode")} onClick={onViewLogs} /> : null}
             <MenuButton icon={<Trash2 className="size-4" />} label={t("canvas.controls.delete")} shortcut="Del" onClick={onDelete} danger />
         </MenuShell>
     );

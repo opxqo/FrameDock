@@ -4209,6 +4209,14 @@ function InfiniteCanvasPage() {
                                 ? () => void captureVideoNodeFrame(contextMenu.nodeId, "last", true)
                                 : undefined
                         }
+                        onViewLogs={
+                            contextMenu.type === "node"
+                                ? () => {
+                                      window.open(`/logs?node=${encodeURIComponent(contextMenu.nodeId)}`, "_blank", "noopener");
+                                      setContextMenu(null);
+                                  }
+                                : undefined
+                        }
                         onSplitText={
                             contextMenu.type === "node" && contextMenuNode?.type === CanvasNodeType.Text && (contextMenuNode.metadata?.content || "").trim()
                                 ? () => {

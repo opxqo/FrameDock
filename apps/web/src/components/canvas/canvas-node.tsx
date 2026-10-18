@@ -637,6 +637,17 @@ function ErrorContent({ node, theme, onRetry }: Pick<NodeContentRendererProps, "
                 <RefreshCw className="size-3.5" />
                 {t("canvas.node.retry")}
             </button>
+            <a
+                href={`/logs?node=${encodeURIComponent(node.id)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[11px] underline-offset-2 opacity-70 hover:underline hover:opacity-100"
+                style={{ color: "var(--tally-fail)" }}
+                onClick={(event) => event.stopPropagation()}
+                onMouseDown={(event) => event.stopPropagation()}
+            >
+                {t("logs.viewFailed")}
+            </a>
         </div>
     );
 }
