@@ -111,7 +111,9 @@ export async function prepareYfaiParams(config: AiConfig, references: ReferenceI
     return { model, params: resolveYfaiAutoParams(model, buildYfaiParams(config, model, { images, videos, audios, roles: ordered.map((image) => image.role) }), config) };
 }
 /** The runtime invoke envelope for a prepared request. Shared by the browser path and server-side jobs. */
-export function buildYfaiInvoke(config: Pick<AiConfig, "yfaiParams">, model: YfaiModel, prompt: string, params: Record<string, YfaiValue>, clientRequestId: string = `framedock-${nanoid()}`) {
+export function buildYfaiInvoke(config: Pick<AiConfig, "yfaiParams"> & Partial<Pick<AiConfig, "size">>, model: YfaiModel, prompt: string, requested: Record<string, YfaiValue>, clientRequestId: string = `framedock-${nanoid()}`) {
+    // "自动" ratio is filled here for every request path (browser, server job, settings test).
+    const params = resolveYfaiAutoParams(model, requested, config);
     // max_prompt_chars is the catalog's hint, not a limit the YFAI gateway enforces (its dry-run accepts 7000 characters for MJ), so it is
     // only reported as a warning before a run (lib/yfai-preflight.ts). Sending is free if the vendor refuses: failed tasks are refunded.
     validateYfaiParams(model, { ...params, prompt });
