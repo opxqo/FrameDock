@@ -9,8 +9,9 @@ import logsApi from "./logs";
 import mockApi from "./mock";
 import mokeApi from "./moke";
 import proxy from "./proxy";
+import { registerWebApp } from "./web-app";
 
-const app = Fastify({ logger: true });
+const app = Fastify({ logger: true, forceCloseConnections: "idle" });
 const { db, sqlite } = openDatabase();
 initCallLog(sqlite, (error, message) => app.log.warn({ err: error }, message));
 const stopRetention = startRetentionJob();
@@ -30,6 +31,8 @@ if (config.moke) {
 if (config.mockApi) {
   await app.register(mockApi, { prefix: "/v1" });
 }
+
+await registerWebApp(app);
 
 app.addHook("onClose", async () => {
   stopRetention();
@@ -51,8 +54,16 @@ app.get("/api/health", async (_request, reply) => {
   }
 });
 
+// A stuck request must not keep a stopping service alive forever (launchd would eventually SIGKILL it).
+const SHUTDOWN_TIMEOUT_MS = 10_000;
+
 for (const signal of ["SIGINT", "SIGTERM"] as const) {
   process.once(signal, () => {
+    app.log.info(`${signal} received, shutting down`);
+    setTimeout(() => {
+      app.log.error("Graceful shutdown timed out, exiting");
+      process.exit(1);
+    }, SHUTDOWN_TIMEOUT_MS).unref();
     app.close().catch((error: unknown) => {
       app.log.error(error);
       process.exitCode = 1;
@@ -61,7 +72,7 @@ for (const signal of ["SIGINT", "SIGTERM"] as const) {
 }
 
 try {
-  await app.listen({ port: config.port, host: "127.0.0.1" });
+  await app.listen({ port: config.port, host: config.host });
 } catch (error) {
   app.log.error(error);
   await app.close();

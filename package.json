@@ -11,6 +11,7 @@
   "scripts": {
     "dev": "concurrently --kill-others --names server,web \"pnpm --filter @framedock/server dev\" \"pnpm --filter @framedock/web dev\"",
     "build": "pnpm -r --if-present build",
+    "start": "node scripts/start.mjs",
     "typecheck": "pnpm -r typecheck",
     "lint": "biome check .",
     "format": "biome format --write ."

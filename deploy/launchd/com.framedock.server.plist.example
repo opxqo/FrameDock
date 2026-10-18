@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Copy to ~/Library/LaunchAgents/com.framedock.server.plist and replace every /path/to and USERNAME. -->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.framedock.server</string>
+
+  <!-- Run the built server directly (no pnpm), so launchd supervises the node process itself. -->
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/local/bin/node</string>
+    <string>--env-file-if-exists=/path/to/FrameDock/.env</string>
+    <string>dist/index.js</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>/path/to/FrameDock/apps/server</string>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin</string>
+    <!-- Optional outbound proxy for provider requests:
+    <key>HTTPS_PROXY</key>
+    <string>http://127.0.0.1:7890</string>
+    <key>NO_PROXY</key>
+    <string>localhost,127.0.0.1</string>
+    -->
+  </dict>
+
+  <key>RunAtLoad</key>
+  <true/>
+  <!-- Restart after a crash, but not after a clean exit (e.g. launchctl stop). -->
+  <key>KeepAlive</key>
+  <dict>
+    <key>SuccessfulExit</key>
+    <false/>
+  </dict>
+  <key>ThrottleInterval</key>
+  <integer>10</integer>
+  <!-- The server exits within 10 s of SIGTERM; give it a little more before launchd sends SIGKILL. -->
+  <key>ExitTimeOut</key>
+  <integer>15</integer>
+
+  <key>StandardOutPath</key>
+  <string>/Users/USERNAME/Library/Logs/framedock/server.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/USERNAME/Library/Logs/framedock/server.err.log</string>
+</dict>
+</plist>
