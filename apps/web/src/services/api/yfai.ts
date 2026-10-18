@@ -5,6 +5,7 @@ import i18n from "@/i18n";
 import { findYfaiModel, isYfaiUrl, parseYfaiParams, validateYfaiParams, yfaiDefaults, yfaiParamVisible, YFAI_BASE_URL, type YfaiModel, type YfaiValue, resolveYfaiAutoParams } from "@/lib/yfai-catalog";
 import { withLocalProxy, type AiConfig } from "@/stores/use-config-store";
 import { parseYfaiAvailableCredits } from "@/lib/yfai-balance";
+import { compileReferenceSyntax } from "@/lib/reference-syntax";
 import { ackJob, createJob, fetchJobBlob, type Job, watchJob } from "@/services/api/jobs";
 import { imageToDataUrl } from "@/services/image-storage";
 import { getMediaBlob, resolveMediaUrl } from "@/services/file-storage";
@@ -118,6 +119,9 @@ export function buildYfaiInvoke(config: Pick<AiConfig, "yfaiParams"> & Partial<P
     // only reported as a warning before a run (lib/yfai-preflight.ts). Sending is free if the vendor refuses: failed tasks are refunded.
     validateYfaiParams(model, { ...params, prompt });
     const { operation, ...rest } = params;
+    // "图片2" in the prompt becomes the model's own way of pointing at the second reference (e.g. Seedance "@图片2").
+    const count = (value: YfaiValue | undefined) => (Array.isArray(value) ? value.length : value ? 1 : 0);
+    prompt = compileReferenceSyntax(prompt, model.id, { images: count(rest.images) || count(rest.url), videos: count(rest.videos), audios: count(rest.audios) });
     const imageSources = model.category === "image"
         ? (Array.isArray(rest.images) ? rest.images : typeof rest.images === "string" ? [rest.images] : typeof rest.url === "string" ? [rest.url] : []).filter((source) => source.trim())
         : [];

@@ -9,6 +9,7 @@ import { canvasThemes } from "@/lib/canvas-theme";
 import { isImeComposing, isPlainEnterKey } from "@/lib/keyboard-event";
 import { useThemeStore } from "@/stores/use-theme-store";
 import type { CanvasResourceReference } from "@/lib/canvas/canvas-resource-references";
+import { nodeReferenceToken, parsePromptTokens } from "@/lib/canvas/prompt-reference-tokens";
 
 type Props = {
     value: string;
@@ -18,6 +19,11 @@ type Props = {
     className?: string;
     style?: CSSProperties;
     placeholder?: string;
+    /**
+     * "label" (default) writes chips back as their label text ("图片1"). "id" writes `@[node:<id>]`, so a
+     * reference keeps pointing at the same node when connections change; the label is only for display.
+     */
+    tokenMode?: "label" | "id";
 };
 
 type MentionState = {
@@ -27,11 +33,12 @@ type MentionState = {
 
 type Token =
     | { type: "text"; value: string }
-    | { type: "reference"; label: string };
+    | { type: "reference"; label: string }
+    | { type: "node"; nodeId: string };
 
 // Prompt-panel contentEditable input: @ references embed thumbnail chips instead of plain label text.
 // Serialization converts chips back to reference labels so the generated value matches the former textarea semantics.
-export function CanvasPromptChipInput({ value, references, onChange, onSubmit, className, style, placeholder }: Props) {
+export function CanvasPromptChipInput({ value, references, onChange, onSubmit, className, style, placeholder, tokenMode = "label" }: Props) {
     const theme = canvasThemes[useThemeStore((state) => state.theme)];
     const editorRef = useRef<HTMLDivElement>(null);
     const composingRef = useRef(false);
@@ -46,7 +53,9 @@ export function CanvasPromptChipInput({ value, references, onChange, onSubmit, c
     const referenceByLabel = useMemo(() => new Map(activeReferences.map((item) => [item.label, item])), [activeReferences]);
     // Match longer labels first so a shorter label cannot split a longer one.
     const activeLabels = useMemo(() => Array.from(new Set(activeReferences.map((item) => item.label))).sort((a, b) => b.length - a.length), [activeReferences]);
-    const tokens = useMemo(() => parseTokens(value, activeLabels), [value, activeLabels]);
+    const referenceByNodeId = useMemo(() => new Map(activeReferences.map((item) => [item.nodeId, item])), [activeReferences]);
+    // In id mode, plain labels from prompts written before ids existed still become chips (and are saved as ids on the next edit).
+    const tokens = useMemo<Token[]>(() => (tokenMode === "id" ? parsePromptTokens(value, activeLabels).map((token) => (token.type === "label" ? { type: "reference", label: token.label } : token)) : parseTokens(value, activeLabels)), [value, activeLabels, tokenMode]);
 
     const candidates = useMemo(() => {
         if (!mention) return [];
@@ -66,12 +75,17 @@ export function CanvasPromptChipInput({ value, references, onChange, onSubmit, c
                 editor.append(document.createTextNode(token.value));
                 return;
             }
+            if (token.type === "node") {
+                const reference = referenceByNodeId.get(token.nodeId);
+                editor.append(reference ? createReferenceChip(reference, theme, setImagePreview, tokenMode) : createMissingChip(token.nodeId, theme));
+                return;
+            }
             const reference = referenceByLabel.get(token.label);
-            if (reference) editor.append(createReferenceChip(reference, theme, setImagePreview));
+            if (reference) editor.append(createReferenceChip(reference, theme, setImagePreview, tokenMode));
             else editor.append(document.createTextNode(token.label));
         });
         lastEmittedRef.current = value;
-    }, [tokens, referenceByLabel, theme, value]);
+    }, [tokens, referenceByLabel, referenceByNodeId, theme, value, tokenMode]);
 
     const emit = (next: string) => {
         lastEmittedRef.current = next;
@@ -105,7 +119,7 @@ export function CanvasPromptChipInput({ value, references, onChange, onSubmit, c
         const editor = editorRef.current;
         if (!editor) return;
         removeActiveMention();
-        const chip = createReferenceChip(reference, theme, setImagePreview);
+        const chip = createReferenceChip(reference, theme, setImagePreview, tokenMode);
         const space = document.createTextNode(" ");
         const selection = window.getSelection();
         const range = selection?.rangeCount ? selection.getRangeAt(0) : null;
@@ -272,17 +286,25 @@ function ReferencePreview({ reference }: { reference: CanvasResourceReference })
     );
 }
 
-function createReferenceChip(reference: CanvasResourceReference, theme: (typeof canvasThemes)[keyof typeof canvasThemes], onImagePreview: (url: string) => void) {
+function createReferenceChip(reference: CanvasResourceReference, theme: (typeof canvasThemes)[keyof typeof canvasThemes], onImagePreview: (url: string) => void, tokenMode: "label" | "id" = "label") {
     const wrapper = document.createElement("span");
     wrapper.contentEditable = "false";
     wrapper.dataset.refLabel = reference.label;
+    if (tokenMode === "id") wrapper.dataset.refNode = reference.nodeId;
     if (reference.kind === "image" && reference.previewUrl) {
         const image = document.createElement("img");
         image.src = reference.previewUrl;
         image.alt = reference.title;
         image.className = "size-6 rounded object-cover";
-        wrapper.className = "mx-px inline-flex size-6 items-center justify-center overflow-hidden rounded align-middle";
+        wrapper.className = "relative mx-px inline-flex size-6 items-center justify-center overflow-hidden rounded align-middle";
+        wrapper.title = reference.label;
         wrapper.appendChild(image);
+        // The number this picture is sent as, so what the prompt says and what the model gets visibly match.
+        const badge = document.createElement("span");
+        badge.className = "absolute bottom-0 right-0 rounded-tl px-0.5 text-[9px] font-semibold leading-3";
+        Object.assign(badge.style, { background: "rgba(0,0,0,0.72)", color: "#fff" } as CSSProperties);
+        badge.textContent = reference.label.match(/\d+/)?.[0] ?? "";
+        wrapper.appendChild(badge);
         wrapper.addEventListener("click", (event) => {
             event.preventDefault();
             event.stopPropagation();
@@ -300,6 +322,18 @@ function createReferenceChip(reference: CanvasResourceReference, theme: (typeof 
     return wrapper;
 }
 
+/** A reference whose node is no longer an input: kept in the text (so nothing is silently lost) but shown as broken. */
+function createMissingChip(nodeId: string, theme: (typeof canvasThemes)[keyof typeof canvasThemes]) {
+    const wrapper = document.createElement("span");
+    wrapper.contentEditable = "false";
+    wrapper.dataset.refNode = nodeId;
+    wrapper.className = "mx-px inline-flex h-6 items-center rounded-md border px-1 text-xs leading-none align-middle";
+    Object.assign(wrapper.style, { borderColor: "#e5484d", color: "#e5484d", background: theme.toolbar.panel } as CSSProperties);
+    wrapper.textContent = i18n.t("canvas.references.missingChip");
+    wrapper.title = i18n.t("canvas.references.missingChipHint");
+    return wrapper;
+}
+
 function serializeEditor(editor: HTMLElement) {
     return serializeNodes(editor.childNodes).replace(/﻿/g, "");
 }
@@ -309,8 +343,10 @@ function serializeNodes(nodes: NodeListOf<ChildNode>) {
     nodes.forEach((node) => {
         if (node.nodeType === Node.TEXT_NODE) result += node.textContent || "";
         if (!(node instanceof HTMLElement)) return;
+        const nodeId = node.dataset.refNode;
         const label = node.dataset.refLabel;
-        if (label) result += label;
+        if (nodeId) result += nodeReferenceToken(nodeId);
+        else if (label) result += label;
         else if (node.tagName === "BR") result += "\n";
         else result += serializeNodes(node.childNodes);
     });
@@ -360,7 +396,7 @@ function adjacentReferenceNode(range: Range, key: string) {
 function findReferenceSibling(node: Node, previous: boolean, includeSelf = false): HTMLElement | null {
     let current: Node | null = includeSelf ? node : previous ? node.previousSibling : node.nextSibling;
     while (current && current.nodeType === Node.TEXT_NODE && !(current.textContent || "").trim()) current = previous ? current.previousSibling : current.nextSibling;
-    return current instanceof HTMLElement && current.dataset.refLabel ? current : null;
+    return current instanceof HTMLElement && (current.dataset.refLabel || current.dataset.refNode) ? current : null;
 }
 
 function textBeforeCaret() {

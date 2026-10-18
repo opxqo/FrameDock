@@ -93,8 +93,9 @@ export function CanvasNodePromptPanel({ node, nodes, isRunning, onPromptChange, 
         >
             {/* FrameDock: estimated cost sits in the top-right corner, level with the references heading. */}
             <CostEstimate model={config.model} params={generationCostParams(config, mode === "video" && connectedNodes.some((item) => item.type === CanvasNodeType.Image), connectedNodes.some((item) => item.type === CanvasNodeType.Video))} className="absolute right-4 top-3.5" />
-            <CanvasNodeReferenceBar nodeId={node.id} nodes={nodes} connectedNodes={connectedNodes} onDisconnect={onDisconnectReference} onStartSelection={onStartReferenceSelection} />
+            <CanvasNodeReferenceBar nodeId={node.id} nodes={nodes} connectedNodes={connectedNodes} references={mentionReferences} onDisconnect={onDisconnectReference} onStartSelection={onStartReferenceSelection} />
             <CanvasPromptChipInput
+                tokenMode="id"
                 value={prompt}
                 references={mentionReferences}
                 onChange={updatePrompt}
@@ -152,8 +153,9 @@ export function CanvasNodePromptPanel({ node, nodes, isRunning, onPromptChange, 
             </div>
             <Modal title={t("canvas.promptPanel.editorTitle")} open={expanded} centered width={760} footer={null} onCancel={() => setExpanded(false)} destroyOnHidden>
                 <div data-canvas-no-zoom className="pt-2" onWheelCapture={(event) => event.stopPropagation()}>
-                    <CanvasNodeReferenceBar nodeId={node.id} nodes={nodes} connectedNodes={connectedNodes} onDisconnect={onDisconnectReference} onStartSelection={(nodeId) => { setExpanded(false); onStartReferenceSelection?.(nodeId); }} />
+                    <CanvasNodeReferenceBar nodeId={node.id} nodes={nodes} connectedNodes={connectedNodes} references={mentionReferences} onDisconnect={onDisconnectReference} onStartSelection={(nodeId) => { setExpanded(false); onStartReferenceSelection?.(nodeId); }} />
                     <CanvasPromptChipInput
+                tokenMode="id"
                         value={prompt}
                         references={mentionReferences}
                         onChange={updatePrompt}

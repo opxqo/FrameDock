@@ -1,5 +1,6 @@
 import i18n from "@/i18n";
 import type { YfaiModel } from "@/lib/yfai-catalog";
+import { imageLabelPattern } from "@/lib/reference-syntax";
 
 // FrameDock: checks that cost nothing and catch, before any task is submitted, the problems that used to show up
 // only as a failed node: a prompt over the model's limit, and a balance that cannot cover what a run will hold back.
@@ -19,4 +20,15 @@ export function yfaiBalanceIssue(availableCredits: number | undefined, neededCre
     if (availableCredits === undefined || neededCredits <= availableCredits) return undefined;
     const format = (value: number) => Number(value.toFixed(value < 10 ? 3 : 2)).toString();
     return i18n.t("yfai.balanceShort", { available: format(availableCredits), needed: format(neededCredits), short: format(neededCredits - availableCredits) });
+}
+
+/**
+ * A prompt that names a picture number higher than the pictures actually sent (e.g. "图片4" with three
+ * references) — typed by hand, or left over after a connection was removed. Numbers come from the current
+ * locale's label ("图片{{index}}" / "Image {{index}}").
+ */
+export function referenceOverflowIssue(prompt: string, imageCount: number) {
+    const missing = [...new Set([...prompt.matchAll(imageLabelPattern())].map((match) => Number(match[1])).filter((index) => index > imageCount))];
+    if (!missing.length) return undefined;
+    return i18n.t("canvas.references.overflow", { labels: missing.map((index) => i18n.t("imageReferences.label", { index })).join("、"), count: imageCount });
 }

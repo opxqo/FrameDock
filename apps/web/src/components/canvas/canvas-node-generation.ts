@@ -5,7 +5,8 @@ import { imageReferenceLabel } from "@/lib/image-reference-prompt";
 import type { ReferenceImage } from "@/types/image";
 import type { ReferenceAudio, ReferenceVideo } from "@/types/media";
 import { CanvasNodeType, type CanvasConnection, type CanvasConnectionRole, type CanvasNodeData } from "@/types/canvas";
-import { getGenerationResourceNodes, getGroupResourceNodes } from "@/lib/canvas/canvas-resource-references";
+import { getGenerationResourceNodes, getGroupResourceNodes, hasOwnImage, inputRoles, sortByConnectionRole } from "@/lib/canvas/canvas-resource-references";
+import { referencedNodeIds, resolvePromptReferences } from "@/lib/canvas/prompt-reference-tokens";
 import { getNodeDefinition } from "@/lib/canvas/node-registry";
 
 export type NodeGenerationContext = {
@@ -38,7 +39,12 @@ type NodeGenerationGroupInput = {
 
 export type NodeGenerationInput = NodeGenerationResourceInput | NodeGenerationGroupInput;
 
-export function buildNodeGenerationContext(nodeId: string, nodes: CanvasNodeData[], connections: CanvasConnection[], prompt: string): NodeGenerationContext {
+export type NodeGenerationOptions = {
+    /** Send the node's own picture first (generating from an image node that already has one). */
+    includeOwnImage?: boolean;
+};
+
+export function buildNodeGenerationContext(nodeId: string, nodes: CanvasNodeData[], connections: CanvasConnection[], prompt: string, options: NodeGenerationOptions = {}): NodeGenerationContext {
     const inputs = buildNodeGenerationInputs(nodeId, nodes, connections);
     const sourceNode = nodes.find((node) => node.id === nodeId);
     // Composer mode picks inputs by @mention; without any mention it falls back to using every input
@@ -48,6 +54,23 @@ export function buildNodeGenerationContext(nodeId: string, nodes: CanvasNodeData
     }
 
     const resourceInputs = flattenGenerationInputs(inputs);
+    // FrameDock: an explicit reference to the node's own picture also sends it, even when the caller would not have.
+    const ownImage = sourceNode && hasOwnImage(sourceNode) && (options.includeOwnImage || referencedNodeIds(prompt).includes(nodeId)) ? readReferenceImage(sourceNode) : null;
+    if (ownImage && !resourceInputs.some((input) => input.nodeId === nodeId)) resourceInputs.unshift({ nodeId, type: "image", title: sourceNode?.title || "", image: ownImage });
+
+    // Number every resource in send order, then turn the prompt's @[node:id] tokens into those numbers.
+    const counts = { image: 0, video: 0, audio: 0, text: 0 };
+    const labelByNodeId = new Map<string, string>();
+    for (const input of resourceInputs) {
+        const label = generationLabel(input.type, counts[input.type]++);
+        if (!labelByNodeId.has(input.nodeId)) labelByNodeId.set(input.nodeId, input.type === "text" ? `【${label}】` : label);
+    }
+    const resolved = resolvePromptReferences(prompt, labelByNodeId);
+    if (resolved.unresolved.length) {
+        const names = resolved.unresolved.map((id) => nodes.find((node) => node.id === id)?.title || i18n.t("canvas.references.deletedNode"));
+        throw new Error(i18n.t("canvas.references.unresolved", { names: names.map((name) => `「${name}」`).join("、") }));
+    }
+
     let textIndex = 0;
     const upstreamText = resourceInputs.flatMap((input) => (input.text ? [textBlock(generationLabel("text", textIndex++), input.text)] : [])).join("\n\n");
     const referenceImages = resourceInputs.map((input) => input.image).filter((image): image is ReferenceImage => Boolean(image));
@@ -55,7 +78,7 @@ export function buildNodeGenerationContext(nodeId: string, nodes: CanvasNodeData
     const referenceAudios = resourceInputs.map((input) => input.audio).filter((audio): audio is ReferenceAudio => Boolean(audio));
 
     return {
-        prompt: upstreamText ? `${prompt}\n\n${upstreamText}` : prompt,
+        prompt: upstreamText ? `${resolved.text}\n\n${upstreamText}` : resolved.text,
         referenceImages,
         referenceVideos,
         referenceAudios,
@@ -128,24 +151,13 @@ function buildComposerGenerationContext(inputs: NodeGenerationInput[], prompt: s
     };
 }
 
-const ROLE_RANK = { first: 0, last: 1, reference: 2 } as const;
-
 export function buildNodeGenerationInputs(nodeId: string, nodes: CanvasNodeData[], connections: CanvasConnection[]): NodeGenerationInput[] {
-    // FrameDock: connection roles (first/last frame, reference) travel with the images and order the inputs.
+    // FrameDock: connection roles (first/last frame, reference) travel with the images and order the inputs —
+    // the same ordering the prompt's reference labels use (canvas-resource-references.ts).
     const resourceNodes = getGenerationResourceNodes(nodeId, nodes, connections);
-    // Roles live on the connections into the node whose inputs these are: this node, or — when it borrowed a
-    // config node's inputs — that config node.
-    const ownInputs = connections.some((connection) => connection.toNodeId === nodeId && resourceNodes.some((node) => node.id === connection.fromNodeId));
-    const inputsOf = ownInputs ? nodeId : connections.find((connection) => connection.fromNodeId === nodeId && nodes.find((node) => node.id === connection.toNodeId)?.type === CanvasNodeType.Config)?.toNodeId;
-    const roleOf = new Map<string, CanvasConnectionRole>();
-    for (const connection of connections) if (connection.role && connection.toNodeId === inputsOf) roleOf.set(connection.fromNodeId, connection.role);
-    const rank = (id: string) => {
-        const role = roleOf.get(id);
-        return role ? ROLE_RANK[role] : 3;
-    };
+    const roleOf = inputRoles(nodeId, resourceNodes, nodes, connections);
     const withRole = (input: NodeGenerationResourceInput, role: CanvasConnectionRole | undefined): NodeGenerationResourceInput => (role && input.image ? { ...input, image: { ...input.image, role } } : input);
-    return [...resourceNodes]
-        .sort((a, b) => rank(a.id) - rank(b.id))
+    return sortByConnectionRole(resourceNodes, roleOf)
         .flatMap((node): NodeGenerationInput[] => {
             const role = roleOf.get(node.id);
             if (node.type === CanvasNodeType.Group) {

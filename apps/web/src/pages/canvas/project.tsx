@@ -11,7 +11,8 @@ import { useTranslation } from "react-i18next";
 
 import { requestEdit, requestGeneration, requestImageQuestion } from "@/services/api/image";
 import { requestAudioGeneration, storeGeneratedAudio } from "@/services/api/audio";
-import { yfaiBalanceIssue, yfaiPromptIssue, type PreflightIssue } from "@/lib/yfai-preflight";
+import { readablePrompt } from "@/lib/canvas/prompt-reference-tokens";
+import { referenceOverflowIssue, yfaiBalanceIssue, yfaiPromptIssue, type PreflightIssue } from "@/lib/yfai-preflight";
 import { findYfaiModel, isYfaiUrl } from "@/lib/yfai-catalog";
 import { getYfaiQuote } from "@/lib/yfai-pricing";
 import { fetchYfaiAvailableCredits } from "@/services/api/yfai";
@@ -2284,7 +2285,7 @@ function InfiniteCanvasPage() {
             if (node.type === CanvasNodeType.Text) {
                 const content = node.metadata?.content?.trim();
                 if (!content) return message.error(t("canvas.projectPage.noTextToSave"));
-                addAsset({ kind: "text", title: node.metadata?.prompt?.slice(0, 24) || t("canvas.projectPage.canvasText"), coverUrl: "", tags: [], source: "Canvas", data: { content }, metadata: { source: "canvas", nodeId: node.id } });
+                addAsset({ kind: "text", title: readablePrompt(node.metadata?.prompt ?? "", nodesRef.current).slice(0, 24) || t("canvas.projectPage.canvasText"), coverUrl: "", tags: [], source: "Canvas", data: { content }, metadata: { source: "canvas", nodeId: node.id } });
                 message.success(t("common.addedToAssets"));
                 return;
             }
@@ -2292,7 +2293,7 @@ function InfiniteCanvasPage() {
                 if (!node.metadata?.content) return message.error(t("canvas.projectPage.noVideoToSave"));
                 addAsset({
                     kind: "video",
-                    title: node.metadata?.prompt?.slice(0, 24) || t("canvas.projectPage.canvasVideo"),
+                    title: readablePrompt(node.metadata?.prompt ?? "", nodesRef.current).slice(0, 24) || t("canvas.projectPage.canvasVideo"),
                     coverUrl: "",
                     tags: [],
                     source: "Canvas",
@@ -2306,7 +2307,7 @@ function InfiniteCanvasPage() {
             const dataUrl = node.metadata.storageKey ? "" : node.metadata.content;
             addAsset({
                 kind: "image",
-                title: node.metadata?.prompt?.slice(0, 24) || t("canvas.projectPage.canvasImage"),
+                title: readablePrompt(node.metadata?.prompt ?? "", nodesRef.current).slice(0, 24) || t("canvas.projectPage.canvasImage"),
                 coverUrl: node.metadata.content,
                 tags: [],
                 source: "Canvas",
@@ -2899,7 +2900,10 @@ function InfiniteCanvasPage() {
             let generationContext: Awaited<ReturnType<typeof hydrateNodeGenerationContext>>;
             try {
                 generationContext = await hydrateNodeGenerationContext(
-                    buildNodeGenerationContext(nodeId, nodesRef.current, connectionsRef.current, editingTextNode ? t("canvas.projectPage.editTextPrompt", { source: sourceTextContent, prompt }) : prompt),
+                    buildNodeGenerationContext(nodeId, nodesRef.current, connectionsRef.current, editingTextNode ? t("canvas.projectPage.editTextPrompt", { source: sourceTextContent, prompt }) : prompt, {
+                        // Same rule as the image branch below, so the prompt's numbers count the node's own picture when it is sent first.
+                        includeOwnImage: mode === "image" && (!(options.overwrite ?? effectiveConfig.nodeRegenerateBehavior === "overwrite") || Boolean(options.includeCurrentImageAsReference)),
+                    }),
                 );
             } catch (error) {
                 failBeforeStart(t("canvas.projectPage.inputReadFailed", { error: error instanceof Error ? error.message : String(error) }));
@@ -3400,14 +3404,24 @@ function InfiniteCanvasPage() {
             let apiKeyForBalance = "";
             for (const step of plan.steps) {
                 const node = nodesRef.current.find((item) => item.id === step.nodeId);
+                const title = node?.title || step.nodeId;
+                // Every step: a prompt that references an image no longer connected would send the wrong pictures.
+                let stepContext: ReturnType<typeof buildNodeGenerationContext> | undefined;
+                try {
+                    stepContext = buildNodeGenerationContext(step.nodeId, nodesRef.current, connectionsRef.current, step.prompt, { includeOwnImage: step.mode === "image" });
+                } catch (error) {
+                    issues.push({ nodeId: step.nodeId, title, reason: error instanceof Error ? error.message : String(error), severity: "blocker" });
+                }
+                const overflow = stepContext ? referenceOverflowIssue(stepContext.prompt, stepContext.imageCount) : undefined;
+                if (overflow) issues.push({ nodeId: step.nodeId, title, reason: overflow, severity: "blocker" });
                 const stepConfig = buildGenerationConfig(effectiveConfig, node, step.mode);
                 const yfaiModel = isYfaiUrl(stepConfig.baseUrl) ? findYfaiModel(stepConfig.model, stepConfig.yfaiModels) : undefined;
                 if (!yfaiModel) continue;
                 apiKeyForBalance = stepConfig.apiKey;
                 const quote = getYfaiQuote(yfaiModel.id);
                 reservation += quote?.freeze ?? quote?.price ?? 0;
-                const promptIssue = yfaiPromptIssue(yfaiModel, buildNodeGenerationContext(step.nodeId, nodesRef.current, connectionsRef.current, step.prompt).prompt);
-                if (promptIssue) issues.push({ nodeId: step.nodeId, title: node?.title || step.nodeId, reason: promptIssue, severity: "warning" });
+                const promptIssue = stepContext ? yfaiPromptIssue(yfaiModel, stepContext.prompt) : undefined;
+                if (promptIssue) issues.push({ nodeId: step.nodeId, title, reason: promptIssue, severity: "warning" });
             }
             if (apiKeyForBalance && reservation > 0) {
                 const balanceIssue = yfaiBalanceIssue(await fetchYfaiAvailableCredits(apiKeyForBalance), reservation);

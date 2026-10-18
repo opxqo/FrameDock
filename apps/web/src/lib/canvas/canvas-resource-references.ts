@@ -4,7 +4,7 @@ import i18n from "@/i18n";
 import { getNodeDefinition } from "@/lib/canvas/node-registry";
 import { getDataUrlByteSize, readImageMeta } from "@/lib/image-utils";
 import { imageToDataUrl } from "@/services/image-storage";
-import { CanvasNodeType, type CanvasConnection, type CanvasNodeData } from "@/types/canvas";
+import { CanvasNodeType, type CanvasConnection, type CanvasConnectionRole, type CanvasNodeData } from "@/types/canvas";
 
 export type CanvasResourceKind = "image" | "video" | "audio" | "text";
 
@@ -19,8 +19,44 @@ export type CanvasResourceReference = {
     active: boolean;
 };
 
-export function buildNodeMentionReferences(node: CanvasNodeData, nodes: CanvasNodeData[], connections: CanvasConnection[]) {
-    return labelResourceNodes(getMentionResourceNodes(node.id, nodes, connections), true);
+/**
+ * The resources a node's prompt can reference, numbered in the order they will be sent: inputs sorted by
+ * connection role (first frame, last frame, reference, then the rest), groups expanded in place, and — for an
+ * image node that already has a picture — that picture first, because generating from it sends it first.
+ */
+export function buildNodeMentionReferences(node: CanvasNodeData, nodes: CanvasNodeData[], connections: CanvasConnection[], options: { includeOwnImage?: boolean } = {}) {
+    const inputs = getGenerationResourceNodes(node.id, nodes, connections);
+    const ordered = expandGroupResourceNodes(sortByConnectionRole(inputs, inputRoles(node.id, inputs, nodes, connections)), nodes);
+    const resources = ordered.length ? ordered : getMentionResourceNodes(node.id, nodes, connections);
+    const includeOwnImage = options.includeOwnImage ?? hasOwnImage(node);
+    return labelResourceNodes(includeOwnImage && hasOwnImage(node) && !resources.some((item) => item.id === node.id) ? [node, ...resources] : resources, true);
+}
+
+export function hasOwnImage(node: CanvasNodeData | undefined) {
+    return node?.type === CanvasNodeType.Image && Boolean(node.metadata?.content);
+}
+
+const ROLE_RANK: Record<CanvasConnectionRole, number> = { first: 0, last: 1, reference: 2 };
+
+/**
+ * Roles of the connections into the node whose inputs these are: this node itself or — when it borrowed a
+ * config node's inputs — that config node.
+ */
+export function inputRoles(nodeId: string, inputNodes: CanvasNodeData[], nodes: CanvasNodeData[], connections: CanvasConnection[]) {
+    const ownInputs = connections.some((connection) => connection.toNodeId === nodeId && inputNodes.some((node) => node.id === connection.fromNodeId));
+    const inputsOf = ownInputs ? nodeId : connections.find((connection) => connection.fromNodeId === nodeId && nodes.find((node) => node.id === connection.toNodeId)?.type === CanvasNodeType.Config)?.toNodeId;
+    const roleOf = new Map<string, CanvasConnectionRole>();
+    for (const connection of connections) if (connection.role && connection.toNodeId === inputsOf) roleOf.set(connection.fromNodeId, connection.role);
+    return roleOf;
+}
+
+/** Stable sort by connection role; the single ordering both the prompt labels and the request use. */
+export function sortByConnectionRole<T extends { id: string }>(items: T[], roleOf: Map<string, CanvasConnectionRole>) {
+    const rank = (id: string) => {
+        const role = roleOf.get(id);
+        return role ? ROLE_RANK[role] : 3;
+    };
+    return [...items].sort((a, b) => rank(a.id) - rank(b.id));
 }
 
 export function buildCanvasResourceReferences(nodes: CanvasNodeData[]) {

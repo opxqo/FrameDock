@@ -1,3 +1,4 @@
+import { readablePrompt } from "@/lib/canvas/prompt-reference-tokens";
 import { useEffect, useState } from "react";
 import { Button, Empty, Modal } from "antd";
 import { useTranslation } from "react-i18next";
@@ -41,7 +42,7 @@ function VersionCard({ version, onRestore, onDelete }: { version: CanvasNodeVers
                     <span>{when}</span>
                     {version.model ? <span className="truncate">{version.model.split("::").pop()}</span> : null}
                 </div>
-                {version.prompt ? <p className="line-clamp-2 text-xs leading-5">{version.prompt}</p> : null}
+                {version.prompt ? <p className="line-clamp-2 text-xs leading-5">{readablePrompt(version.prompt, [])}</p> : null}
                 <div className="mt-auto flex items-center justify-between pt-1.5">
                     <Button size="small" type="text" danger icon={<Trash2 className="size-3.5" />} onClick={onDelete} aria-label={t("common.delete")} />
                     <Button size="small" icon={<RotateCcw className="size-3.5" />} onClick={onRestore}>
