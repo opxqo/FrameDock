@@ -74,6 +74,7 @@ export class AdapterError extends Error {
 
 export type AdapterContext = {
   jobId: string;
+  kind: JobKind;
   model: string;
   request: unknown;
   credentials: Credentials;

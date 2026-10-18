@@ -328,6 +328,7 @@ export class JobEngine {
   private context(row: JobRow, signal: AbortSignal): AdapterContext {
     return {
       jobId: row.id,
+      kind: row.kind,
       model: row.model,
       request: row.request,
       credentials: (row.credentials as AdapterContext["credentials"]) ?? {

@@ -1,34 +1,22 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, rmSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
 import { afterEach, describe, it } from "node:test";
-import Database from "better-sqlite3";
-import { drizzle } from "drizzle-orm/better-sqlite3";
-import { migrate } from "drizzle-orm/better-sqlite3/migrator";
-import { config } from "../config";
-import * as schema from "../schema";
-import { JobEngine } from "./engine";
+import type { JobEngine } from "./engine";
 import { jobs } from "./schema";
+import {
+  closeAll,
+  makeEngine,
+  openDb,
+  stateOf,
+  track,
+  untilState,
+  waitFor,
+} from "./testing";
 import {
   AdapterError,
   type JobAdapter,
   type JobInput,
   type PollOutcome,
 } from "./types";
-
-const directory = mkdtempSync(join(tmpdir(), "framedock-jobs-"));
-let counter = 0;
-const opened: Array<{ engine?: JobEngine; sqlite: Database.Database }> = [];
-
-function openDb(file = join(directory, `db-${++counter}.sqlite`)) {
-  const sqlite = new Database(file);
-  const db = drizzle(sqlite, { schema });
-  migrate(db, { migrationsFolder: config.migrationsDir });
-  const entry: (typeof opened)[number] = { sqlite };
-  opened.push(entry);
-  return { db, sqlite, file, entry };
-}
 
 type Script = {
   submit?: () => Promise<{ remoteTaskId: string }>;
@@ -62,25 +50,6 @@ function fakeAdapter(script: Script = {}) {
   return { adapter, calls };
 }
 
-function makeEngine(
-  db: ReturnType<typeof openDb>["db"],
-  adapter: JobAdapter,
-  overrides: Partial<ConstructorParameters<typeof JobEngine>[0]> = {},
-) {
-  return new JobEngine({
-    db,
-    adapters: [adapter],
-    saveResult: async (_kind, id, fetched) => ({
-      store: "media_files",
-      key: `video:${id}`,
-      mime: fetched.mime,
-      size: fetched.bytes.length,
-    }),
-    retryDelayMs: () => 5,
-    ...overrides,
-  });
-}
-
 const input = (extra: Partial<JobInput> = {}): JobInput => ({
   kind: "video",
   adapter: "fake",
@@ -90,31 +59,7 @@ const input = (extra: Partial<JobInput> = {}): JobInput => ({
   ...extra,
 });
 
-async function waitFor<T>(read: () => T | undefined | false, ms = 2000) {
-  const end = Date.now() + ms;
-  for (;;) {
-    const value = read();
-    if (value) return value;
-    if (Date.now() > end) throw new Error("waitFor timed out");
-    await new Promise((resolve) => setTimeout(resolve, 5));
-  }
-}
-
-function track(entry: (typeof opened)[number], engine: JobEngine) {
-  entry.engine = engine;
-  return engine;
-}
-
-const stateOf = (engine: JobEngine, id: string) => engine.get(id)?.state;
-const untilState = (engine: JobEngine, id: string, state: string) =>
-  waitFor(() => stateOf(engine, id) === state && engine.get(id));
-
-afterEach(() => {
-  for (const { engine, sqlite } of opened.splice(0)) {
-    engine?.close();
-    sqlite.close();
-  }
-});
+afterEach(closeAll);
 
 describe("JobEngine", () => {
   it("runs a job to success, stores the task id, result and clears the api key", async () => {
@@ -384,5 +329,3 @@ describe("JobEngine", () => {
     );
   });
 });
-
-process.on("exit", () => rmSync(directory, { recursive: true, force: true }));
