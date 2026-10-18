@@ -1,6 +1,6 @@
-import { ImagePlus, Images, LayoutGrid, Video } from "@/components/icons";
+import { BookOpen, ImagePlus, Images, LayoutGrid, Video } from "@/components/icons";
 
-// FrameDock: four primary destinations. Prompts, settings and the rest live in the "more" menu and ⌘K.
+// FrameDock: primary destinations. Settings and the rest live in the "more" menu and ⌘K.
 export const navigationTools = [
     {
         slug: "canvas",
@@ -13,6 +13,10 @@ export const navigationTools = [
     {
         slug: "video",
         icon: Video,
+    },
+    {
+        slug: "prompts",
+        icon: BookOpen,
     },
     {
         slug: "assets",

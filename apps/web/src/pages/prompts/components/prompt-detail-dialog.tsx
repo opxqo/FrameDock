@@ -1,10 +1,10 @@
-import { Copy, FileText, FolderPlus } from "@/components/icons";
+import { BookOpen, Copy, FileText, FolderPlus } from "@/components/icons";
 import { Button, Modal, Space, Tag } from "antd";
 import { useTranslation } from "react-i18next";
 
 import { formatPromptDate, type Prompt } from "@/services/api/prompts";
 
-export function PromptDetailDialog({ prompt, onClose, onCopy, onSaveAsset }: { prompt: Prompt | null; onClose: () => void; onCopy: (prompt: string) => void; onSaveAsset?: (prompt: Prompt) => void }) {
+export function PromptDetailDialog({ prompt, onClose, onCopy, onSaveAsset, onSaveMine }: { prompt: Prompt | null; onClose: () => void; onCopy: (prompt: string) => void; onSaveAsset?: (prompt: Prompt) => void; onSaveMine?: (prompt: Prompt) => void }) {
     const { i18n, t } = useTranslation();
 
     return (
@@ -33,6 +33,11 @@ export function PromptDetailDialog({ prompt, onClose, onCopy, onSaveAsset }: { p
                             <Button type="primary" icon={<Copy className="size-4" />} onClick={() => onCopy(prompt.prompt)}>
                                 {t("common.copyPrompt")}
                             </Button>
+                            {onSaveMine ? (
+                                <Button icon={<BookOpen className="size-4" />} onClick={() => onSaveMine(prompt)}>
+                                    {t("prompts.mine.saveToMine")}
+                                </Button>
+                            ) : null}
                             {onSaveAsset ? (
                                 <Button icon={<FolderPlus className="size-4" />} onClick={() => onSaveAsset(prompt)}>
                                     {t("common.addToAssets")}

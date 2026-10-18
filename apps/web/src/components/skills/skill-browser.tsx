@@ -1,19 +1,22 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { Button, Checkbox, Empty, Input, Spin } from "antd";
+import { App, Button, Checkbox, Empty, Input, Spin, Tooltip } from "antd";
 import { useTranslation } from "react-i18next";
 import { Streamdown } from "streamdown";
 
-import { ArrowRight, ExternalLink, Search, SkillBook } from "@/components/icons";
+import { ArrowRight, ExternalLink, Pencil, Plus, Search, SkillBook, Trash2 } from "@/components/icons";
+import { SkillEditorModal } from "@/components/skills/skill-editor-modal";
 import { BUILTIN_SKILLS, buildSkillInstructions, mokeSourceUrl, type CanvasSkill } from "@/lib/skills/skills";
 import { cn } from "@/lib/utils";
 import { getMokeSkill, readableSkillFiles, readMokeSkillFile, searchMokeSkills, type MokeSkillSummary } from "@/services/api/moke";
 import { usePromptSourceStore } from "@/stores/use-prompt-source-store";
+import { useSkillLibraryStore, type LocalSkill } from "@/stores/use-skill-library-store";
 
-const CATEGORIES = ["all", "builtin", "image", "video", "text", "creative-media"] as const;
-type Category = (typeof CATEGORIES)[number];
+const CATEGORIES = ["all", "mine", "builtin", "image", "video", "text", "creative-media"] as const;
+export type SkillCategory = (typeof CATEGORIES)[number];
+type Category = SkillCategory;
 
-type ListItem = { key: string; source: "builtin"; skill: CanvasSkill } | { key: string; source: "moke"; summary: MokeSkillSummary };
+type ListItem = { key: string; source: "local"; skill: LocalSkill } | { key: string; source: "builtin"; skill: CanvasSkill } | { key: string; source: "moke"; summary: MokeSkillSummary };
 
 function useDebounced<T>(value: T, delay: number) {
     const [debounced, setDebounced] = useState(value);
@@ -28,16 +31,19 @@ function stripFrontmatter(text: string) {
     return text.replace(/^---\n[\s\S]*?\n---\n?/, "").trim();
 }
 
-// FrameDock: browse built-in and MOKE skills (list on the left, details on the right). `renderAction`
-// receives a resolver that assembles the selected skill (fetching MOKE files when needed).
-export function SkillBrowser({ renderAction, className }: { renderAction: (resolve: () => Promise<CanvasSkill>, ready: boolean) => ReactNode; className?: string }) {
+// FrameDock: browse the user's own, built-in and MOKE skills (list on the left, details on the right).
+// `renderAction` receives a resolver that assembles the selected skill (fetching MOKE files when needed).
+// The user's own skills can be created, edited and deleted right here.
+export function SkillBrowser({ renderAction, className, initialCategory = "all", startCreating = false }: { renderAction: (resolve: () => Promise<CanvasSkill>, ready: boolean) => ReactNode; className?: string; initialCategory?: Category; startCreating?: boolean }) {
     const { t } = useTranslation();
     const mokeEnabled = usePromptSourceStore((state) => state.mokeEnabled);
+    const localSkills = useSkillLibraryStore((state) => state.items);
     const [keyword, setKeyword] = useState("");
-    const [category, setCategory] = useState<Category>("all");
-    const [selectedKey, setSelectedKey] = useState<string>(BUILTIN_SKILLS[0].id);
+    const [category, setCategory] = useState<Category>(initialCategory);
+    const [selectedKey, setSelectedKey] = useState<string>("");
+    const [editing, setEditing] = useState<LocalSkill | null | undefined>(startCreating ? null : undefined);
     const query = useDebounced(keyword.trim(), 300);
-    const showMoke = mokeEnabled && category !== "builtin";
+    const showMoke = mokeEnabled && category !== "builtin" && category !== "mine";
 
     const moke = useInfiniteQuery({
         queryKey: ["moke-skills", query, category],
@@ -51,6 +57,12 @@ export function SkillBrowser({ renderAction, className }: { renderAction: (resol
 
     const items = useMemo<ListItem[]>(() => {
         const needle = query.toLowerCase();
+        const matches = (skill: CanvasSkill) => !needle || `${skill.title}${skill.summary}`.toLowerCase().includes(needle);
+        const local =
+            category === "builtin"
+                ? []
+                : localSkills.filter((skill) => (category === "all" || category === "mine" || skill.category === category) && matches(skill)).map((skill) => ({ key: skill.id, source: "local" as const, skill }));
+        if (category === "mine") return local;
         const builtin =
             category === "all" || category === "builtin" || BUILTIN_SKILLS.some((skill) => skill.category === category)
                 ? BUILTIN_SKILLS.filter((skill) => (category === "all" || category === "builtin" || skill.category === category) && (!needle || `${skill.title}${skill.summary}`.toLowerCase().includes(needle))).map((skill) => ({
@@ -60,15 +72,20 @@ export function SkillBrowser({ renderAction, className }: { renderAction: (resol
                   }))
                 : [];
         const online = showMoke ? (moke.data?.pages.flatMap((page) => page.items) || []).map((summary) => ({ key: summary.id, source: "moke" as const, summary })) : [];
-        return [...builtin, ...online];
-    }, [category, moke.data, query, showMoke]);
+        return [...local, ...builtin, ...online];
+    }, [category, localSkills, moke.data, query, showMoke]);
 
     const selected = items.find((item) => item.key === selectedKey) || items[0];
 
     return (
         <div className={cn("grid min-h-0 gap-5 md:grid-cols-[minmax(0,340px)_minmax(0,1fr)]", className)} data-canvas-no-zoom onWheelCapture={(event) => event.stopPropagation()}>
             <section className="flex min-h-0 flex-col">
-                <Input className="!rounded-full" prefix={<Search className="size-4 text-muted-foreground" />} placeholder={t("skills.searchPlaceholder")} value={keyword} onChange={(event) => setKeyword(event.target.value)} allowClear />
+                <div className="flex items-center gap-2">
+                    <Input className="!rounded-full" prefix={<Search className="size-4 text-muted-foreground" />} placeholder={t("skills.searchPlaceholder")} value={keyword} onChange={(event) => setKeyword(event.target.value)} allowClear />
+                    <Tooltip title={t("skills.mine.create")}>
+                        <Button shape="circle" icon={<Plus className="size-4" />} onClick={() => setEditing(null)} aria-label={t("skills.mine.create")} />
+                    </Tooltip>
+                </div>
                 <div className="mt-3 flex flex-wrap gap-1.5">
                     {CATEGORIES.map((item) => (
                         <button
@@ -89,8 +106,8 @@ export function SkillBrowser({ renderAction, className }: { renderAction: (resol
                 ) : null}
                 <div className="thin-scrollbar mt-3 min-h-0 flex-1 space-y-1 overflow-y-auto pr-1">
                     {items.map((item) => {
-                        const title = item.source === "builtin" ? item.skill.title : item.summary.title;
-                        const summary = item.source === "builtin" ? item.skill.summary : item.summary.summary;
+                        const title = item.source === "moke" ? item.summary.title : item.skill.title;
+                        const summary = item.source === "moke" ? item.summary.summary : item.skill.summary;
                         const active = selected?.key === item.key;
                         return (
                             <button
@@ -101,7 +118,7 @@ export function SkillBrowser({ renderAction, className }: { renderAction: (resol
                             >
                                 <span className="flex items-center gap-2">
                                     <span className="min-w-0 flex-1 truncate text-sm font-medium">{title}</span>
-                                    <span className="shrink-0 rounded-full border border-border px-1.5 text-[11px] leading-4 text-muted-foreground">{item.source === "builtin" ? t("skills.sourceBuiltin") : t("skills.sourceMoke")}</span>
+                                    <span className="shrink-0 rounded-full border border-border px-1.5 text-[11px] leading-4 text-muted-foreground">{t(item.source === "local" ? "skills.sourceLocal" : item.source === "builtin" ? "skills.sourceBuiltin" : "skills.sourceMoke")}</span>
                                 </span>
                                 <span className="mt-1 line-clamp-2 block text-xs leading-5 text-muted-foreground">{summary}</span>
                                 {item.source === "moke" && item.summary.author?.name ? <span className="mt-1 block text-[11px] text-muted-foreground/80">{item.summary.author.name}</span> : null}
@@ -113,7 +130,15 @@ export function SkillBrowser({ renderAction, className }: { renderAction: (resol
                             <Spin size="small" />
                         </div>
                     ) : null}
-                    {!items.length && !moke.isLoading ? <Empty className="!py-8" image={Empty.PRESENTED_IMAGE_SIMPLE} description={t("skills.empty")} /> : null}
+                    {!items.length && !(showMoke && moke.isLoading) ? (
+                        <Empty className="!py-8" image={Empty.PRESENTED_IMAGE_SIMPLE} description={t(category === "mine" && !query ? "skills.mine.empty" : "skills.empty")}>
+                            {category === "mine" && !query ? (
+                                <Button className="!rounded-full" icon={<Plus className="size-4" />} onClick={() => setEditing(null)}>
+                                    {t("skills.mine.create")}
+                                </Button>
+                            ) : null}
+                        </Empty>
+                    ) : null}
                     {showMoke && moke.hasNextPage ? (
                         <Button block type="text" className="!rounded-full" loading={moke.isFetchingNextPage} onClick={() => void moke.fetchNextPage()}>
                             {t("skills.loadMore")}
@@ -123,7 +148,9 @@ export function SkillBrowser({ renderAction, className }: { renderAction: (resol
             </section>
             <section className="flex min-h-0 flex-col rounded-[20px] border border-border p-4">
                 {selected ? (
-                    selected.source === "builtin" ? (
+                    selected.source === "local" ? (
+                        <LocalDetail skill={selected.skill} renderAction={renderAction} onEdit={() => setEditing(selected.skill)} />
+                    ) : selected.source === "builtin" ? (
                         <BuiltinDetail skill={selected.skill} renderAction={renderAction} />
                     ) : (
                         <MokeDetail summary={selected.summary} renderAction={renderAction} />
@@ -132,6 +159,7 @@ export function SkillBrowser({ renderAction, className }: { renderAction: (resol
                     <p className="m-auto text-sm text-muted-foreground">{t("skills.selectHint")}</p>
                 )}
             </section>
+            <SkillEditorModal skill={editing} onClose={() => setEditing(undefined)} onSaved={(id) => setSelectedKey(id)} />
         </div>
     );
 }
@@ -156,6 +184,40 @@ function BuiltinDetail({ skill, renderAction }: { skill: CanvasSkill; renderActi
             <DetailHeader title={skill.title} summary={skill.summary} meta={t("skills.builtinRights")} />
             <pre className="thin-scrollbar mt-4 min-h-0 flex-1 overflow-y-auto whitespace-pre-wrap rounded-xl bg-muted px-3 py-2.5 font-sans text-[13px] leading-6">{skill.instructions}</pre>
             <footer className="mt-4 flex shrink-0 justify-end gap-2">{renderAction(async () => skill, true)}</footer>
+        </>
+    );
+}
+
+function LocalDetail({ skill, renderAction, onEdit }: { skill: LocalSkill; renderAction: (resolve: () => Promise<CanvasSkill>, ready: boolean) => ReactNode; onEdit: () => void }) {
+    const { t } = useTranslation();
+    const { message, modal } = App.useApp();
+    const remove = useSkillLibraryStore((state) => state.remove);
+    const confirmRemove = () =>
+        modal.confirm({
+            title: t("skills.mine.deleteTitle", { name: skill.title }),
+            content: t("skills.mine.deleteDescription"),
+            okText: t("common.delete"),
+            okType: "danger",
+            cancelText: t("common.cancel"),
+            onOk: () => {
+                remove(skill.id);
+                message.success(t("skills.mine.deleted"));
+            },
+        });
+    return (
+        <>
+            <DetailHeader title={skill.title} summary={skill.summary} meta={t("skills.mine.rights")} />
+            <pre className="thin-scrollbar mt-4 min-h-0 flex-1 overflow-y-auto whitespace-pre-wrap rounded-xl bg-muted px-3 py-2.5 font-sans text-[13px] leading-6">{skill.instructions}</pre>
+            <footer className="mt-4 flex shrink-0 items-center gap-2">
+                <Button type="text" danger className="!rounded-full" icon={<Trash2 className="size-4" />} onClick={confirmRemove}>
+                    {t("common.delete")}
+                </Button>
+                <Button className="!rounded-full" icon={<Pencil className="size-4" />} onClick={onEdit}>
+                    {t("common.edit")}
+                </Button>
+                <span className="flex-1" />
+                {renderAction(async () => skill, true)}
+            </footer>
         </>
     );
 }

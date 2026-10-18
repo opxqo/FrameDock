@@ -1,8 +1,9 @@
-import { Copy, FileText } from "@/components/icons";
+import { Copy, FileText, Star, StarFilled } from "@/components/icons";
 import type { ReactNode } from "react";
 import { Button, Card, Tag } from "antd";
 import { useTranslation } from "react-i18next";
 
+import { cn } from "@/lib/utils";
 import { formatPromptDate, type Prompt } from "@/services/api/prompts";
 
 export function PromptCard({
@@ -14,6 +15,8 @@ export function PromptCard({
     actionType = "text",
     extraAction,
     compact = false,
+    favorite,
+    onToggleFavorite,
 }: {
     item: Prompt;
     onOpen: () => void;
@@ -23,6 +26,9 @@ export function PromptCard({
     actionType?: "text" | "primary";
     extraAction?: ReactNode;
     compact?: boolean;
+    /** When set, a star toggle sits on the cover (the user's own prompts). */
+    favorite?: boolean;
+    onToggleFavorite?: () => void;
 }) {
     const { i18n, t } = useTranslation();
     return (
@@ -31,9 +37,23 @@ export function PromptCard({
             className={compact ? "group cursor-pointer overflow-hidden transition-transform duration-200 hover:-translate-y-1" : "flex h-full flex-col overflow-hidden"}
             styles={{ body: compact ? { padding: 0 } : { display: "flex", flex: 1, flexDirection: "column", padding: 0 } }}
             cover={
+                <div className="relative">
                 <button type="button" className="block w-full cursor-pointer text-left" onClick={onOpen}>
                     {item.coverUrl ? <img src={item.coverUrl} alt={item.title} className={compact ? "aspect-square w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" : "aspect-[4/3] w-full object-cover"} loading="lazy" /> : <span className={compact ? "grid aspect-square w-full place-items-center bg-stone-100 text-stone-400 dark:bg-stone-900 dark:text-stone-600" : "grid aspect-[4/3] w-full place-items-center bg-stone-100 text-stone-400 dark:bg-stone-900 dark:text-stone-600"}><FileText className="size-8" /></span>}
                 </button>
+                {onToggleFavorite ? (
+                    <button
+                        type="button"
+                        aria-pressed={Boolean(favorite)}
+                        aria-label={t(favorite ? "prompts.mine.unfavorite" : "prompts.mine.favorite")}
+                        title={t(favorite ? "prompts.mine.unfavorite" : "prompts.mine.favorite")}
+                        onClick={onToggleFavorite}
+                        className={cn("absolute right-2 top-2 grid size-8 place-items-center rounded-full bg-background/80 backdrop-blur transition-colors hover:bg-background", favorite ? "text-amber-500" : "text-muted-foreground")}
+                    >
+                        {favorite ? <StarFilled className="size-4" /> : <Star className="size-4" />}
+                    </button>
+                ) : null}
+                </div>
             }
         >
             <button type="button" className={compact ? "block w-full cursor-pointer text-left" : "block w-full flex-1 cursor-pointer text-left"} onClick={onOpen}>

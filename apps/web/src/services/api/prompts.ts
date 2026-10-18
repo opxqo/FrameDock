@@ -2,6 +2,7 @@ import localforage from "localforage";
 
 import { runPromptSource, type RawPrompt } from "./prompt-source-runtime";
 import { usePromptSourceStore } from "@/stores/use-prompt-source-store";
+import { sortLibraryPrompts, usePromptLibraryStore } from "@/stores/use-prompt-library-store";
 import i18n from "@/i18n";
 import type { PromptSource } from "./prompt-source-presets";
 
@@ -12,6 +13,31 @@ export type Prompt = RawPrompt & {
 };
 
 export const ALL_PROMPTS_OPTION = "all";
+export const LOCAL_PROMPT_SOURCE_ID = "local";
+
+export function localPromptCategory() {
+    return i18n.t("prompts.mine.category");
+}
+
+/** The user's own prompts (stores/use-prompt-library-store.ts) as a synthetic source, favourites first. */
+export function getLocalPrompts(): Prompt[] {
+    const category = localPromptCategory();
+    return sortLibraryPrompts(usePromptLibraryStore.getState().items).map((item) => ({
+        id: item.id,
+        title: item.title,
+        prompt: item.prompt,
+        description: item.description,
+        coverUrl: item.coverUrl,
+        referenceImageUrls: [],
+        tags: item.tags,
+        preview: "",
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt,
+        sourceId: LOCAL_PROMPT_SOURCE_ID,
+        category,
+        githubUrl: "",
+    }));
+}
 
 export type PromptListResponse = {
     items: Prompt[];
@@ -123,7 +149,7 @@ async function getSourcePrompts(source: PromptSource): Promise<Prompt[]> {
     return (await readSourceCache(source.id))?.items || [];
 }
 
-async function getAllPrompts(): Promise<Prompt[]> {
+async function getAllPrompts(includeLocal = true): Promise<Prompt[]> {
     const settled = await Promise.all(
         enabledSources().map(async (source) => {
             try {
@@ -133,17 +159,25 @@ async function getAllPrompts(): Promise<Prompt[]> {
             }
         }),
     );
-    return settled.flat();
+    return [...(includeLocal ? getLocalPrompts() : []), ...settled.flat()];
 }
 
-export async function fetchPrompts({ keyword = "", tag = [], category = ALL_PROMPTS_OPTION, page = 1, pageSize = 20 }: { keyword?: string; tag?: string[]; category?: string; page?: number; pageSize?: number } = {}) {
-    const items = await getAllPrompts();
+export async function fetchPrompts({
+    keyword = "",
+    tag = [],
+    category = ALL_PROMPTS_OPTION,
+    page = 1,
+    pageSize = 20,
+    includeLocal = true,
+}: { keyword?: string; tag?: string[]; category?: string; page?: number; pageSize?: number; includeLocal?: boolean } = {}) {
+    const items = await getAllPrompts(includeLocal);
     const normalizedKeyword = keyword.trim().toLowerCase();
     const normalizedPage = Math.max(1, page);
     const normalizedPageSize = Math.max(1, Math.min(100, pageSize));
     const withoutTagFilter = filterPrompts(items, { keyword: normalizedKeyword, category, tags: [] });
     const filtered = filterPrompts(items, { keyword: normalizedKeyword, category, tags: tag });
-    const categories = enabledSources().map((source) => source.name);
+    const hasLocal = includeLocal && usePromptLibraryStore.getState().items.length > 0;
+    const categories = [...(hasLocal ? [localPromptCategory()] : []), ...enabledSources().map((source) => source.name)];
 
     return {
         items: filtered.slice((normalizedPage - 1) * normalizedPageSize, normalizedPage * normalizedPageSize),
@@ -154,6 +188,7 @@ export async function fetchPrompts({ keyword = "", tag = [], category = ALL_PROM
 }
 
 export async function fetchSourcePrompts(sourceId: string): Promise<Prompt[]> {
+    if (sourceId === LOCAL_PROMPT_SOURCE_ID) return getLocalPrompts();
     const source = usePromptSourceStore.getState().sources.find((item) => item.id === sourceId);
     if (!source) throw new Error(i18n.t("prompts.sourceMissing"));
     return getSourcePrompts(source);

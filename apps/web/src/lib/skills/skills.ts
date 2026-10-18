@@ -1,9 +1,10 @@
 // FrameDock: skills are writing instructions for the chat model. A text node with a skill attached sends
 // the skill as its system prompt, so one line of intent comes back as a production-ready prompt.
 // Built-in skills are FrameDock's own; MOKE skills are fetched on demand through /api/moke and stored on
-// the node as a snapshot (runs stay reproducible and work offline).
+// the node as a snapshot (runs stay reproducible and work offline). Local skills are the user's own,
+// edited by hand (stores/use-skill-library-store.ts).
 
-export type CanvasSkillSource = "builtin" | "moke";
+export type CanvasSkillSource = "builtin" | "moke" | "local";
 
 export type CanvasSkill = {
     id: string;

@@ -55,6 +55,8 @@ export function CommandPalette() {
             { id: "go-image", group: go, label: t("navigation.image"), icon: <ImagePlus className={ICON} />, keywords: ["image", "workbench"], run: () => navigate("/image") },
             { id: "go-video", group: go, label: t("navigation.video"), icon: <Video className={ICON} />, keywords: ["video", "workbench"], run: () => navigate("/video") },
             { id: "go-assets", group: go, label: t("navigation.assets"), icon: <Images className={ICON} />, keywords: ["assets", "library"], run: () => navigate("/assets") },
+            { id: "new-prompt", group: create, label: t("prompts.mine.create"), icon: <FileText className={ICON} />, keywords: ["prompt", "new", "tishici"], run: () => navigate("/prompts?new=1") },
+            { id: "new-skill", group: create, label: t("skills.mine.create"), icon: <FileText className={ICON} />, keywords: ["skill", "new"], run: () => navigate("/prompts?tab=mySkills&new=1") },
             { id: "go-prompts", group: go, label: t("navigation.prompts"), icon: <FileText className={ICON} />, keywords: ["prompts"], run: () => navigate("/prompts") },
             { id: "go-config", group: go, label: t("palette.openSettings"), icon: <Settings2 className={ICON} />, keywords: ["settings", "config", "api key", "autodl", "model"], run: () => openConfigDialog(false) },
             { id: "toggle-theme", group: prefs, label: t(theme === "dark" ? "topNav.lightTheme" : "topNav.darkTheme"), icon: theme === "dark" ? <Sun className={ICON} /> : <Moon className={ICON} />, keywords: ["theme", "dark", "light"], run: () => setTheme(theme === "dark" ? "light" : "dark") },

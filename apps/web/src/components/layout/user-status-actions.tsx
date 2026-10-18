@@ -42,7 +42,7 @@ export function UserStatusActions({ showConfig = true, variant = "default", onOp
     const items: MenuProps["items"] = [
         ...(onOpenPlugins ? [{ key: "plugins", icon: <Puzzle className="size-4" />, label: t("topNav.plugins"), onClick: onOpenPlugins }] : []),
         ...(onOpenShortcuts ? [{ key: "shortcuts", icon: <Keyboard className="size-4" />, label: t("topNav.shortcuts"), extra: <kbd className="font-mono text-xs opacity-60">?</kbd>, onClick: onOpenShortcuts }] : []),
-        ...(variant === "canvas" ? [] : [{ key: "prompts", icon: <FileText className="size-4" />, label: t("navigation.prompts"), onClick: () => navigate("/prompts") }]),
+        { key: "prompts", icon: <FileText className="size-4" />, label: t("navigation.prompts"), onClick: () => navigate("/prompts") },
         { key: "agent", icon: <Bot className="size-4" />, label: t(agentOpen ? "topNav.closeAgent" : "topNav.openAgent"), onClick: toggleAgent },
         { type: "divider" },
         { key: "theme", icon: theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />, label: t(theme === "dark" ? "topNav.lightTheme" : "topNav.darkTheme"), onClick: () => setTheme(theme === "dark" ? "light" : "dark") },

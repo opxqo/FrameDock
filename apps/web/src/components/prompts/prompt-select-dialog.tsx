@@ -1,6 +1,7 @@
 import { Search } from "@/components/icons";
 import { type UIEvent, useEffect, useState } from "react";
 import { App, Empty, Input, Modal, Spin, Tag } from "antd";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import { ALL_PROMPTS_OPTION } from "@/services/api/prompts";
@@ -34,7 +35,16 @@ export function PromptSelectDialog({ open, onOpenChange, onSelect }: { open: boo
     };
 
     return (
-        <Modal title={t("prompts.library")} open={open} onCancel={() => onOpenChange(false)} footer={null} width={880} centered>
+        <Modal
+            title={
+                <span className="flex items-center gap-3 pr-8">
+                    {t("prompts.library")}
+                    <Link to="/prompts" onClick={() => onOpenChange(false)} className="text-xs font-normal !text-muted-foreground hover:!text-foreground">
+                        {t("prompts.mine.manage")}
+                    </Link>
+                </span>
+            }
+            open={open} onCancel={() => onOpenChange(false)} footer={null} width={880} centered>
             <div className="grid h-[62dvh] min-h-0 gap-5 sm:grid-cols-[200px_minmax(0,1fr)]" data-canvas-no-zoom onWheelCapture={(event) => event.stopPropagation()}>
                 <aside className="thin-scrollbar min-h-0 overflow-y-auto border-r border-stone-200 pr-4 dark:border-stone-800">
                     <div className="mb-2 text-xs font-semibold uppercase tracking-widest text-stone-400 dark:text-stone-500">{t("prompts.category")}</div>
