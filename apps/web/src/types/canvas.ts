@@ -99,6 +99,10 @@ export type CanvasNodeMetadata = {
     codexSourceId?: string;
     /** FrameDock: signature of the inputs this result was generated from (lib/canvas/canvas-staleness.ts). */
     inputHash?: string;
+    /** FrameDock: when the current result finished generating (ISO). */
+    generatedAt?: string;
+    /** FrameDock: earlier results of this node, newest first (lib/canvas/canvas-history.ts). */
+    history?: CanvasNodeVersion[];
     interactive?: boolean; // Plugin node interaction/move state; see CanvasNodeDefinition.interactionToggle.
 };
 
@@ -110,6 +114,22 @@ export type CanvasNodeData = {
     width: number;
     height: number;
     metadata?: CanvasNodeMetadata;
+};
+
+/** FrameDock: an earlier result of a node. Media are referenced by storageKey; text is kept inline. */
+export type CanvasNodeVersion = {
+    id: string;
+    kind: "image" | "video" | "text";
+    createdAt: string;
+    storageKey?: string;
+    content?: string;
+    naturalWidth?: number;
+    naturalHeight?: number;
+    bytes?: number;
+    mimeType?: string;
+    prompt?: string;
+    model?: string;
+    inputHash?: string;
 };
 
 /** FrameDock: what an input means to a video generation (unset = by connection order). */

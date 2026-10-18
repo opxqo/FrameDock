@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { ReactNode } from "react";
-import { ChevronRight, Copy, Download, Group, Image as ImageIcon, Music2, Puzzle, RefreshCw, SkillBook, Star, Trash2, Video } from "@/components/icons";
+import { ChevronRight, Copy, Download, Group, History, Image as ImageIcon, Music2, Puzzle, RefreshCw, SkillBook, Star, Trash2, Video } from "@/components/icons";
 import { CodexLogo } from "@/components/codex-logo";
 
 import { canvasThemes } from "@/lib/canvas-theme";
@@ -65,6 +65,8 @@ type CanvasNodeProps = {
     onTitleChange: (nodeId: string, title: string) => void;
     onToggleBatch?: (nodeId: string) => void;
     onSetBatchPrimary?: (nodeId: string, itemId: string) => void;
+    /** Opens the node's version history (shown as a small badge when it has earlier results). */
+    onOpenHistory?: (nodeId: string) => void;
     onDuplicateBatchImage?: (node: CanvasNodeData, imageId: string) => void;
     onDownloadBatchImage?: (node: CanvasNodeData, imageId: string) => void;
     onRetryBatchImage?: (node: CanvasNodeData, imageId: string) => void;
@@ -131,6 +133,7 @@ export const CanvasNode = React.memo(function CanvasNode({
     onTitleChange,
     onToggleBatch,
     onSetBatchPrimary,
+    onOpenHistory,
     onDuplicateBatchImage,
     onDownloadBatchImage,
     onRetryBatchImage,
@@ -403,6 +406,21 @@ export const CanvasNode = React.memo(function CanvasNode({
                             {data.title || t("canvas.node.untitled")}
                         </button>
                     )}
+                    {!isGroup && !isEditingTitle && onOpenHistory && data.metadata?.history?.length ? (
+                        <button
+                            type="button"
+                            className="inline-flex h-5 shrink-0 items-center gap-1 rounded-full border px-1.5 text-[11px] leading-none transition-colors hover:bg-accent"
+                            style={{ color: theme.node.muted, borderColor: theme.node.stroke }}
+                            title={t("canvas.history.badgeTitle", { count: data.metadata.history.length })}
+                            onClick={(event) => {
+                                event.stopPropagation();
+                                onOpenHistory(data.id);
+                            }}
+                        >
+                            <History className="size-3" />
+                            <span className="tnum">{data.metadata.history.length}</span>
+                        </button>
+                    ) : null}
                 </div>
             )}
 

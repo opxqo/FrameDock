@@ -13,8 +13,10 @@ import { requestEdit, requestGeneration, requestImageQuestion } from "@/services
 import { requestAudioGeneration, storeGeneratedAudio } from "@/services/api/audio";
 import { createVideoGenerationTask, isVideoTaskFailed, storeGeneratedVideo, waitForVideoGenerationTask } from "@/services/api/video";
 import { defaultConfig, useConfigStore, useEffectiveConfig } from "@/stores/use-config-store";
-import { ensureImagePreview, uploadImage } from "@/services/image-storage";
-import { uploadMediaFile, type UploadedFile } from "@/services/file-storage";
+import { ensureImagePreview, resolveImageUrl, uploadImage } from "@/services/image-storage";
+import { resolveMediaUrl, uploadMediaFile, type UploadedFile } from "@/services/file-storage";
+import { outputKey, snapshotNodeOutput, versionKey, withVersion } from "@/lib/canvas/canvas-history";
+import { CanvasNodeHistoryDialog } from "@/components/canvas/canvas-node-history-dialog";
 import { nanoid } from "nanoid";
 import { getDataUrlByteSize, readImageMeta } from "@/lib/image-utils";
 import { imageReferenceLabel } from "@/lib/image-reference-prompt";
@@ -95,6 +97,7 @@ import {
     type CanvasConnection,
     type CanvasConnectionRole,
     type CanvasNodeData,
+    type CanvasNodeVersion,
     type CanvasNodeImage,
     type CanvasNodeText,
     type CanvasNodeMetadata,
@@ -820,21 +823,95 @@ function InfiniteCanvasPage() {
 
     const nodeById = useMemo(() => new Map(nodes.map((node) => [node.id, node])), [nodes]);
 
-    // FrameDock: remember what each result was generated from, and flag results whose inputs changed since.
+    // FrameDock: when a node finishes generating, remember what the result was generated from (so it can be flagged
+    // "out of date" later); when it starts generating again, keep the result it is about to lose as a history version.
     const previousStatusRef = useRef(new Map<string, string | undefined>());
+    const lastOutputRef = useRef(new Map<string, CanvasNodeVersion>());
     useEffect(() => {
         if (!projectLoaded) return;
         const previous = previousStatusRef.current;
+        const lastOutputs = lastOutputRef.current;
         const next = new Map<string, string | undefined>();
         const finished = new Map<string, string>();
+        const archived = new Map<string, CanvasNodeVersion>();
         for (const node of nodes) {
             const status = node.metadata?.status;
             next.set(node.id, status);
-            if (previous.get(node.id) === "loading" && status === "success") finished.set(node.id, nodeInputSignature(node, nodes, connections));
+            const before = previous.get(node.id);
+            if (before === "loading" && status === "success") finished.set(node.id, nodeInputSignature(node, nodes, connections));
+            if (status === "loading" && before !== "loading") {
+                const last = lastOutputs.get(node.id);
+                if (last) archived.set(node.id, last);
+            }
+            if (status !== "loading") {
+                const last = lastOutputs.get(node.id);
+                const key = outputKey(node);
+                // Re-snapshot only when the output or its bookkeeping changed (this runs on every drag frame).
+                if (!key) lastOutputs.delete(node.id);
+                else if (!last || versionKey(last) !== key || last.inputHash !== node.metadata?.inputHash || last.createdAt !== (node.metadata?.generatedAt || "")) {
+                    const snapshot = snapshotNodeOutput(node);
+                    if (snapshot) lastOutputs.set(node.id, snapshot);
+                }
+            }
         }
+        for (const id of [...lastOutputs.keys()]) if (!next.has(id)) lastOutputs.delete(id);
         previousStatusRef.current = next;
-        if (finished.size) setNodes((prev) => prev.map((node) => (finished.has(node.id) ? { ...node, metadata: { ...node.metadata, inputHash: finished.get(node.id) } } : node)));
+        if (finished.size || archived.size) {
+            const finishedAt = new Date().toISOString();
+            setNodes((prev) =>
+                prev.map((node) => {
+                    const signature = finished.get(node.id);
+                    const version = archived.get(node.id);
+                    if (!signature && !version) return node;
+                    return { ...node, metadata: { ...node.metadata, ...(signature ? { inputHash: signature, generatedAt: finishedAt } : {}), ...(version ? { history: withVersion(node.metadata?.history, version) } : {}) } };
+                }),
+            );
+        }
     }, [connections, nodes, projectLoaded]);
+
+    // FrameDock: version history dialog (restore swaps with the current result).
+    const [historyNodeId, setHistoryNodeId] = useState<string | null>(null);
+    const restoreNodeVersion = useCallback(
+        async (nodeId: string, versionId: string) => {
+            const version = nodesRef.current.find((node) => node.id === nodeId)?.metadata?.history?.find((item) => item.id === versionId);
+            if (!version) return;
+            const url = version.kind === "image" ? await resolveImageUrl(version.storageKey, "") : version.kind === "video" ? await resolveMediaUrl(version.storageKey, "") : "";
+            if (version.kind !== "text" && !url) {
+                message.error(t("canvas.history.missing"));
+                return;
+            }
+            setNodes((prev) =>
+                prev.map((node) => {
+                    if (node.id !== nodeId) return node;
+                    const current = snapshotNodeOutput(node);
+                    const rest = (node.metadata?.history || []).filter((item) => item.id !== versionId);
+                    const history = current && versionKey(current) !== versionKey(version) ? withVersion(rest, current) : rest;
+                    const media = { storageKey: version.storageKey, naturalWidth: version.naturalWidth, naturalHeight: version.naturalHeight, bytes: version.bytes, mimeType: version.mimeType };
+                    return {
+                        ...node,
+                        metadata: {
+                            ...node.metadata,
+                            ...(version.kind === "text" ? { content: version.content } : { content: url, ...media, images: undefined, primaryImageId: undefined }),
+                            history,
+                            inputHash: version.inputHash,
+                            generatedAt: version.createdAt || undefined,
+                            status: NODE_STATUS_SUCCESS,
+                            errorDetails: undefined,
+                        },
+                    };
+                }),
+            );
+            message.success(t("canvas.history.restored"));
+        },
+        [message, t],
+    );
+    const deleteNodeVersion = useCallback(
+        (nodeId: string, versionId: string) => {
+            setNodes((prev) => prev.map((node) => (node.id === nodeId ? { ...node, metadata: { ...node.metadata, history: (node.metadata?.history || []).filter((item) => item.id !== versionId) } } : node)));
+            cleanupCanvasFiles();
+        },
+        [cleanupCanvasFiles],
+    );
     const staleNodeIds = useMemo(() => computeStaleNodeIds(nodes, connections), [connections, nodes]);
 
     // Connections are culled like nodes; a cubic curve stays inside its control-point hull, so endpoint bounds widened by the curvature is a safe test.
@@ -3912,6 +3989,7 @@ function InfiniteCanvasPage() {
                             onTitleChange={handleNodeTitleChange}
                             onToggleBatch={toggleBatchExpanded}
                             onSetBatchPrimary={setBatchPrimary}
+                            onOpenHistory={setHistoryNodeId}
                             onDuplicateBatchImage={duplicateBatchImage}
                             onDownloadBatchImage={downloadBatchImage}
                             onRetryBatchImage={retryBatchImage}
@@ -4026,6 +4104,13 @@ function InfiniteCanvasPage() {
                         onArrange={arrangeableNodes(selectedNodes).length >= 2 ? arrangeSelection : undefined}
                     />
                 ) : null}
+
+                <CanvasNodeHistoryDialog
+                    node={(historyNodeId && nodeById.get(historyNodeId)) || null}
+                    onClose={() => setHistoryNodeId(null)}
+                    onRestore={(versionId) => historyNodeId && void restoreNodeVersion(historyNodeId, versionId)}
+                    onDelete={(versionId) => historyNodeId && deleteNodeVersion(historyNodeId, versionId)}
+                />
 
                 <CanvasTextSplitDialog
                     open={Boolean(textSplitNodeId)}

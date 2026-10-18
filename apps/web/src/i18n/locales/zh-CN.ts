@@ -246,6 +246,7 @@ export default {
         empty: "还没有生成视频",
     },
     canvas: {
+        history: { title: "{{name}} 的历史版本", badgeTitle: "{{count}} 个历史版本", restore: "恢复此版本", restored: "已恢复，原来的结果已存入历史", empty: "还没有更早的版本。重新生成后，上一次的结果会留在这里。", earlier: "更早", missing: "这个版本的文件已找不到，无法恢复" },
         jumpTo: "跳转到节点：",
         paneMenu: { paste: "粘贴" },
         arrange: { title: "排列", row: "横向排成一行", column: "纵向排成一列", grid: "排成网格", tooFew: "至少选中两个单独的节点才能排列（组内节点不参与）", done: "已排列 {{count}} 个节点" },

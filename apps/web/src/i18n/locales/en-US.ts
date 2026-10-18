@@ -246,6 +246,7 @@ export default {
         empty: "No video generated yet",
     },
     canvas: {
+        history: { title: "History of {{name}}", badgeTitle: "{{count}} earlier versions", restore: "Restore", restored: "Restored; the previous result was kept in history", empty: "No earlier versions yet. After you regenerate, the previous result stays here.", earlier: "Earlier", missing: "This version's file is gone and cannot be restored" },
         jumpTo: "Go to node: ",
         paneMenu: { paste: "Paste" },
         arrange: { title: "Arrange", row: "Row", column: "Column", grid: "Grid", tooFew: "Select at least two free-standing nodes to arrange (nodes inside groups are skipped)", done: "Arranged {{count}} nodes" },
