@@ -246,6 +246,7 @@ export default {
         empty: "No video generated yet",
     },
     canvas: {
+        saveFailed: "Saving the canvas failed. Check that the server is running (your changes stay on this page; the next edit retries the save).", loadFailed: "Could not load canvases: {{error}}. To protect existing data nothing is saved on this page; start the server and reload.", externalUpdate: "This canvas was changed in another window; the latest version is loaded.",
         emptyHint: { title: "Empty canvas", description: "Double-click empty space to add a node, or drop images and videos here.", upload: "Upload", keys: "Press {{palette}} for commands, ? for all shortcuts" },
         zoomIn: "Zoom in", zoomOut: "Zoom out",
         shortcutGroups: { run: "Run", view: "View", edit: "Edit", fit: "Fit all nodes" },

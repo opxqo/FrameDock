@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { nanoid } from "nanoid";
 
+import { guardWrites } from "@/lib/guarded-storage";
 import { localForageStorage } from "@/lib/localforage-storage";
 import { MAX_SKILL_INSTRUCTIONS, type CanvasSkill } from "@/lib/skills/skills";
 
@@ -51,6 +52,8 @@ export function normalizeLocalSkill(value: unknown): LocalSkill | null {
     };
 }
 
+const libraryStorage = guardWrites<{ items: LocalSkill[] }>(createJSONStorage(() => localForageStorage)!);
+
 export const useSkillLibraryStore = create<SkillLibraryStore>()(
     persist(
         (set) => ({
@@ -78,9 +81,13 @@ export const useSkillLibraryStore = create<SkillLibraryStore>()(
         }),
         {
             name: SKILL_LIBRARY_KEY,
-            storage: createJSONStorage(() => localForageStorage),
+            storage: libraryStorage.storage,
             partialize: (state) => ({ items: state.items }),
-            onRehydrateStorage: () => () => useSkillLibraryStore.setState({ hydrated: true }),
+            onRehydrateStorage: () => (_state, error) => {
+                if (error) return console.error("FrameDock: library failed to load; edits are not saved until reload", error);
+                useSkillLibraryStore.setState({ hydrated: true });
+                libraryStorage.allowWrites();
+            },
         },
     ),
 );

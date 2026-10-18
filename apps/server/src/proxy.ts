@@ -2,6 +2,7 @@
 // https://github.com/basketikun/infinite-canvas/blob/3a6b64b/canvas-proxy/index.js
 // Forwards /proxy/<full-target-url> so the browser can reach providers and media hosts without CORS limits.
 import { Readable } from "node:stream";
+import { pipeline } from "node:stream/promises";
 import type { FastifyPluginAsync, FastifyReply, FastifyRequest } from "fastify";
 import { Agent, fetch, type Response } from "undici";
 import packageJson from "../package.json" with { type: "json" };
@@ -15,8 +16,28 @@ const dispatcher = new Agent({
   connectTimeout: 30_000,
 });
 
-const CORS_HEADERS = {
-  "access-control-allow-origin": "*",
+// FrameDock: the proxy can reach any URL, so only pages served from this machine may read its responses
+// (a website the user happens to visit must not be able to use it to reach the local network).
+const LOCAL_ORIGIN =
+  /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\]|[a-z0-9-]+\.localhost)(:\d+)?$/i;
+
+function corsHeaders(request: FastifyRequest) {
+  const origin = request.headers.origin;
+  return {
+    ...CORS_BASE,
+    ...(typeof origin === "string" && LOCAL_ORIGIN.test(origin)
+      ? { "access-control-allow-origin": origin, vary: "Origin" }
+      : {}),
+  };
+}
+
+/** Logged targets drop query strings, which often carry API keys (`?key=…`). */
+function redact(target: string) {
+  const index = target.indexOf("?");
+  return index === -1 ? target : `${target.slice(0, index)}?…`;
+}
+
+const CORS_BASE = {
   "access-control-allow-methods": "*",
   "access-control-allow-headers": "*",
   "access-control-expose-headers": "*",
@@ -66,8 +87,8 @@ function requestHeaders(request: FastifyRequest) {
   return headers;
 }
 
-function responseHeaders(upstream: Response) {
-  const headers: Record<string, string> = { ...CORS_HEADERS };
+function responseHeaders(request: FastifyRequest, upstream: Response) {
+  const headers: Record<string, string> = { ...corsHeaders(request) };
   upstream.headers.forEach((value, key) => {
     if (SKIP_RESPONSE_HEADERS.has(key) || key.startsWith("access-control-"))
       return;
@@ -91,7 +112,7 @@ async function forward(
   });
   reply.hijack();
   const res = reply.raw;
-  res.writeHead(upstream.status, responseHeaders(upstream));
+  res.writeHead(upstream.status, responseHeaders(request, upstream));
   if (!upstream.body) {
     res.end();
     return upstream.status;
@@ -100,8 +121,9 @@ async function forward(
   const stream = Readable.fromWeb(
     upstream.body as import("node:stream/web").ReadableStream,
   );
-  res.on("close", () => stream.destroy());
-  stream.pipe(res);
+  // pipeline() propagates upstream resets/timeouts as a rejection instead of an uncaught stream error
+  // (which would crash the server); the caller logs it and drops the half-sent response.
+  await pipeline(stream, res);
   return upstream.status;
 }
 
@@ -126,16 +148,16 @@ const proxy: FastifyPluginAsync = async (app) => {
     url: "/*",
     handler: async (request, reply) => {
       if (request.method === "OPTIONS") {
-        return reply.code(204).headers(CORS_HEADERS).send();
+        return reply.code(204).headers(corsHeaders(request)).send();
       }
       const rawPath = request.url.replace(/^\/proxy\/?/, "");
       const target = readTarget(rawPath);
-      if (!target) return reply.headers(CORS_HEADERS).send(info);
+      if (!target) return reply.headers(corsHeaders(request)).send(info);
       const startedAt = Date.now();
       try {
         const status = await forward(request, reply, target);
         request.log.info(
-          { target, status, ms: Date.now() - startedAt },
+          { target: redact(target), status, ms: Date.now() - startedAt },
           "Proxy forward",
         );
       } catch (error) {
@@ -145,13 +167,19 @@ const proxy: FastifyPluginAsync = async (app) => {
             ? `: ${error.cause.message}`
             : "";
         const reason = `${error instanceof Error ? error.message : String(error)}${cause}`;
-        request.log.warn({ target, reason }, "Proxy forward failed");
+        request.log.warn(
+          { target: redact(target), reason },
+          "Proxy forward failed",
+        );
         if (reply.raw.headersSent) {
           reply.raw.destroy();
           return;
         }
         if (reply.sent) return;
-        return reply.code(502).headers(CORS_HEADERS).send({ error: reason });
+        return reply
+          .code(502)
+          .headers(corsHeaders(request))
+          .send({ error: reason });
       }
     },
   });

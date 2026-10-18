@@ -204,6 +204,7 @@ function InfiniteCanvasPage() {
     const viewportSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const applyingHistoryRef = useRef(false);
     const historyPausedRef = useRef(false);
+    const skipNextProjectSaveRef = useRef(false);
     const rafRef = useRef<number | null>(null);
     const nodeDraggingRef = useRef(false);
     const dragRef = useRef<{
@@ -235,6 +236,8 @@ function InfiniteCanvasPage() {
     const addAsset = useAssetStore((state) => state.addAsset);
     const cleanupAssetImages = useAssetStore((state) => state.cleanupImages);
     const hydrated = useCanvasStore((state) => state.hydrated);
+    const hydrationError = useCanvasStore((state) => state.hydrationError);
+    const externalRevision = useCanvasStore((state) => state.externalRevision);
     const createProject = useCanvasStore((state) => state.createProject);
     const openProject = useCanvasStore((state) => state.openProject);
     const updateProject = useCanvasStore((state) => state.updateProject);
@@ -543,8 +546,54 @@ function InfiniteCanvasPage() {
 
     useEffect(() => {
         if (!projectLoaded || historyPausedRef.current) return;
+        // The state was just replaced by another tab's newer copy: the store already holds it, so writing it back
+        // (with this tab's object URLs) would only bounce the same canvas between tabs.
+        if (skipNextProjectSaveRef.current) {
+            skipNextProjectSaveRef.current = false;
+            return;
+        }
         updateProject(projectId, { nodes, connections, chatSessions, activeChatId, backgroundMode, showImageInfo });
     }, [activeChatId, backgroundMode, chatSessions, connections, nodes, projectId, projectLoaded, showImageInfo, updateProject]);
+
+    // FrameDock: another tab saved a newer version of this canvas (merged in by the canvas store) → load it.
+    useEffect(() => {
+        if (!projectLoaded || externalRevision === 0) return;
+        const project = useCanvasStore.getState().projects.find((item) => item.id === projectId);
+        if (!project) {
+            navigate("/canvas", { replace: true });
+            return;
+        }
+        if (project.nodes === nodesRef.current && project.connections === connectionsRef.current) return;
+        let cancelled = false;
+        void (async () => {
+            const restoredNodes = await hydrateCanvasImages(project.nodes);
+            const restoredSessions = await hydrateAssistantImages(project.chatSessions || []);
+            if (cancelled) return;
+            skipNextProjectSaveRef.current = true;
+            setNodes(restoredNodes);
+            setConnections(project.connections);
+            setChatSessions(restoredSessions);
+            setActiveChatId(project.activeChatId || null);
+            setBackgroundMode(project.backgroundMode);
+            setShowImageInfo(project.showImageInfo || false);
+            historyRef.current = { past: [], future: [] };
+            lastHistoryRef.current = {
+                nodes: restoredNodes,
+                connections: project.connections,
+                chatSessions: restoredSessions,
+                activeChatId: project.activeChatId || null,
+                backgroundMode: project.backgroundMode,
+                showImageInfo: project.showImageInfo || false,
+            };
+            setHistoryState({ canUndo: false, canRedo: false });
+            message.info(t("canvas.externalUpdate"));
+        })();
+        return () => {
+            cancelled = true;
+        };
+        // Only external merges trigger this; the refs hold the live canvas.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [externalRevision]);
 
     useEffect(() => {
         if (!dialogNodeId) setNodeImageSettingsOpen(false);
@@ -3493,6 +3542,7 @@ function InfiniteCanvasPage() {
     }
     const retainedPreview = retainedPreviewRef.current;
 
+    if (hydrationError) return <main className="flex h-full items-center justify-center bg-background p-6 text-center text-sm text-destructive">{t("canvas.loadFailed", { error: hydrationError })}</main>;
     if (!projectLoaded) return <CanvasRefreshShell />;
 
     return (

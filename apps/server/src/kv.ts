@@ -87,10 +87,24 @@ const kvApi: FastifyPluginAsync<{
         .where(where(params.store, params.key))
         .get();
       if (!row) return reply.code(404).send({ error: "Key not found" });
+      reply.header("x-kv-updated-at", String(row.updated_at));
       if (row.kind === "json") {
-        return { kind: "json", value: JSON.parse(row.value ?? "null") };
+        return {
+          kind: "json",
+          value: JSON.parse(row.value ?? "null"),
+          updatedAt: row.updated_at,
+        };
       }
-      const bytes = await readFile(filename(params.store, params.key));
+      let bytes: Buffer;
+      try {
+        bytes = await readFile(filename(params.store, params.key));
+      } catch (error) {
+        // Metadata without its file (e.g. deleted by hand): report it as missing, not as a server error.
+        if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+          return reply.code(404).send({ error: "Blob file missing" });
+        }
+        throw error;
+      }
       return reply
         .header("x-kv-kind", "blob")
         .type(row.mime || "application/octet-stream")
@@ -111,8 +125,19 @@ const kvApi: FastifyPluginAsync<{
       ) {
         return reply.code(400).send({ error: "Expected JSON { value }" });
       }
+      // Optional optimistic concurrency: `If-Match: <updatedAt>` (0 = must not exist yet) → 409 on mismatch.
+      const ifMatch = request.headers["if-match"];
       return locked(store, async () => {
         const previous = db.select().from(kv).where(where(store, key)).get();
+        if (typeof ifMatch === "string" && ifMatch !== "*") {
+          const current = previous?.updated_at ?? 0;
+          if (Number(ifMatch) !== current) {
+            return reply
+              .code(409)
+              .header("x-kv-updated-at", String(current))
+              .send({ error: "Version conflict", updatedAt: current });
+          }
+        }
         const bytes = blob ? (body as Buffer) : null;
         const row = {
           store,
@@ -125,7 +150,8 @@ const kvApi: FastifyPluginAsync<{
             ? (request.headers["content-type"] ?? "application/octet-stream")
             : null,
           size: bytes?.length ?? null,
-          updated_at: Date.now(),
+          // Strictly increasing per key, so two writes in the same millisecond still get distinct versions.
+          updated_at: Math.max(Date.now(), (previous?.updated_at ?? 0) + 1),
         };
         if (bytes) {
           await mkdir(directory(store), { recursive: true });
@@ -147,7 +173,10 @@ const kvApi: FastifyPluginAsync<{
         if (!blob && previous?.kind === "blob") {
           await rm(filename(store, key), { force: true });
         }
-        return reply.code(204).send();
+        return reply
+          .header("x-kv-updated-at", String(row.updated_at))
+          .code(204)
+          .send();
       });
     },
   );

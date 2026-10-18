@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { nanoid } from "nanoid";
 
+import { guardWrites } from "@/lib/guarded-storage";
 import { localForageStorage } from "@/lib/localforage-storage";
 
 // FrameDock: the user's own prompts, edited by hand on /prompts. Kept under its own key in the shared
@@ -58,6 +59,8 @@ export function normalizeLibraryPrompt(value: unknown): LibraryPrompt | null {
     };
 }
 
+const libraryStorage = guardWrites<{ items: LibraryPrompt[] }>(createJSONStorage(() => localForageStorage)!);
+
 export const usePromptLibraryStore = create<PromptLibraryStore>()(
     persist(
         (set) => ({
@@ -86,9 +89,13 @@ export const usePromptLibraryStore = create<PromptLibraryStore>()(
         }),
         {
             name: PROMPT_LIBRARY_KEY,
-            storage: createJSONStorage(() => localForageStorage),
+            storage: libraryStorage.storage,
             partialize: (state) => ({ items: state.items }),
-            onRehydrateStorage: () => () => usePromptLibraryStore.setState({ hydrated: true }),
+            onRehydrateStorage: () => (_state, error) => {
+                if (error) return console.error("FrameDock: library failed to load; edits are not saved until reload", error);
+                usePromptLibraryStore.setState({ hydrated: true });
+                libraryStorage.allowWrites();
+            },
         },
     ),
 );

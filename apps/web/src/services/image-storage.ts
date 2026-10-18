@@ -1,5 +1,5 @@
 import localforage from "localforage";
-import { createSharedStore } from "@/lib/server-storage";
+import { createSharedStore, listServerEntries } from "@/lib/server-storage";
 
 import { nanoid } from "nanoid";
 import i18n from "@/i18n";
@@ -241,7 +241,8 @@ export async function deleteStoredImages(keys: Iterable<string>) {
     );
 }
 
-export async function cleanupUnusedImages(usedData: unknown) {
+/** Deletes stored images nothing references. Files newer than `minAgeMs` are kept (they may not be saved anywhere yet). */
+export async function cleanupUnusedImages(usedData: unknown, minAgeMs = 0) {
     const usedKeys = collectImageStorageKeys(usedData);
     await Promise.all([
         imageLogStore.iterate((value) => {
@@ -251,10 +252,8 @@ export async function cleanupUnusedImages(usedData: unknown) {
             collectImageStorageKeys(value, usedKeys);
         }),
     ]);
-    const unused: string[] = [];
-    await store.iterate((_value, key) => {
-        if (!usedKeys.has(key)) unused.push(key);
-    });
+    const cutoff = Date.now() - minAgeMs;
+    const unused = (await listServerEntries("image_files")).filter((entry) => !usedKeys.has(entry.key) && entry.updatedAt < cutoff).map((entry) => entry.key);
     const orphanPreviews: string[] = [];
     await previewStore.iterate((_value, key) => {
         if (!usedKeys.has(key)) orphanPreviews.push(key);

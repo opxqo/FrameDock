@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { App, Button, Dropdown, Input, Space } from "antd";
+import { Alert, App, Button, Dropdown, Input, Space } from "antd";
 import { ChevronDown, Download, FileUp, Plus, Search, TemplateFlow } from "@/components/icons";
 import { CANVAS_TEMPLATES, type CanvasTemplateId } from "@/lib/canvas/canvas-templates";
 import { createProjectFromTemplate } from "@/lib/canvas/create-from-template";
@@ -26,6 +26,7 @@ export default function CanvasPage() {
     const inputRef = useRef<HTMLInputElement>(null);
     const autoOpenRef = useRef(false);
     const hydrated = useCanvasStore((state) => state.hydrated);
+    const hydrationError = useCanvasStore((state) => state.hydrationError);
     const projects = useCanvasStore((state) => state.projects);
     const createProject = useCanvasStore((state) => state.createProject);
     const importProject = useCanvasStore((state) => state.importProject);
@@ -132,7 +133,9 @@ export default function CanvasPage() {
 
                 <SetupBanner />
 
-                {!hydrated ? (
+                {hydrationError ? (
+                    <Alert type="error" showIcon message={t("canvas.loadFailed", { error: hydrationError })} />
+                ) : !hydrated ? (
                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 min-[1900px]:grid-cols-5" aria-busy>
                         {Array.from({ length: 4 }, (_, index) => (
                             <div key={index} className="overflow-hidden rounded-[20px] border border-border bg-card">

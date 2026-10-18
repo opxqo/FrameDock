@@ -246,6 +246,7 @@ export default {
         empty: "还没有生成视频",
     },
     canvas: {
+        saveFailed: "画布保存失败，请检查服务是否在运行（改动仍在本页，下次修改时会再次尝试保存）", loadFailed: "读取画布数据失败：{{error}}。为保护已有数据，本页不会保存任何改动，请确认服务已启动后刷新。", externalUpdate: "其他窗口修改了这个画布，已同步最新内容",
         emptyHint: { title: "空白画布", description: "双击空白处添加节点，或把图片、视频直接拖进来。", upload: "上传", keys: "按 {{palette}} 打开命令面板，按 ? 查看全部快捷键" },
         zoomIn: "放大", zoomOut: "缩小",
         shortcutGroups: { run: "运行", view: "视图", edit: "编辑", fit: "适应全部节点" },

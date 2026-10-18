@@ -1,4 +1,4 @@
-import { createSharedStore } from "@/lib/server-storage";
+import { createSharedStore, listServerEntries } from "@/lib/server-storage";
 import { nanoid } from "nanoid";
 
 import { withLocalProxy } from "@/stores/use-config-store";
@@ -51,13 +51,12 @@ export async function deleteStoredMedia(keys: Iterable<string>) {
     );
 }
 
-export async function cleanupUnusedMedia(usedData: unknown) {
+/** Deletes stored videos/audio nothing references. Files newer than `minAgeMs` are kept (they may not be saved anywhere yet). */
+export async function cleanupUnusedMedia(usedData: unknown, minAgeMs = 0) {
     const usedKeys = collectMediaStorageKeys(usedData);
-    const unused: string[] = [];
-    await store.iterate((_value, key) => {
-        if (!usedKeys.has(key)) unused.push(key);
-    });
-    await Promise.all(unused.map((key) => store.removeItem(key)));
+    const cutoff = Date.now() - minAgeMs;
+    const unused = (await listServerEntries("media_files")).filter((entry) => !usedKeys.has(entry.key) && entry.updatedAt < cutoff).map((entry) => entry.key);
+    await deleteStoredMedia(unused);
 }
 
 export function collectMediaStorageKeys(value: unknown, keys = new Set<string>()) {

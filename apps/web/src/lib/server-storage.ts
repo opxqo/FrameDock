@@ -46,6 +46,33 @@ async function getServerValue<T>(store: string, key: string): Promise<T | null> 
     return (await response.json()).value as T;
 }
 
+/** A JSON value together with its server version (`updatedAt`, 0 when the key does not exist). */
+export async function getVersionedServerValue<T>(store: string, key: string): Promise<{ value: T | null; version: number }> {
+    const response = await fetch(endpoint(store, key), { cache: "no-store" });
+    if (response.status === 404) return { value: null, version: 0 };
+    if (!response.ok) throw new Error(`FrameDock storage ${response.status}: ${store}`);
+    const body = (await response.json()) as { value: T; updatedAt?: number };
+    return { value: body.value, version: Number(body.updatedAt ?? response.headers.get("x-kv-updated-at") ?? 0) };
+}
+
+/**
+ * Writes only if the server still holds `expectedVersion` (optimistic concurrency between tabs).
+ * Resolves `{ ok: true, version }` on success, `{ ok: false, version }` with the server's version on conflict.
+ */
+export async function putVersionedServerValue(store: string, key: string, value: unknown, expectedVersion: number, options?: { keepalive?: boolean }) {
+    const response = await fetch(endpoint(store, key), {
+        method: "PUT",
+        cache: "no-store",
+        keepalive: options?.keepalive,
+        headers: { "Content-Type": "application/json", "If-Match": String(expectedVersion) },
+        body: JSON.stringify({ value: value === undefined ? null : value }),
+    });
+    const version = Number(response.headers.get("x-kv-updated-at") ?? 0);
+    if (response.status === 409) return { ok: false as const, version };
+    if (!response.ok) throw new Error(`FrameDock storage ${response.status}: ${store}`);
+    return { ok: true as const, version };
+}
+
 function withCallback<T>(promise: Promise<T>, callback?: Callback<T>): Promise<T> {
     if (callback) promise.then((value) => callback(null, value), (error) => callback(error, undefined as T));
     return promise;

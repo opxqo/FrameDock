@@ -2,9 +2,11 @@ import { create } from "zustand";
 import { persist, type PersistStorage, type StorageValue } from "zustand/middleware";
 
 import { nanoid } from "nanoid";
+import { guardWrites, hydrationErrorMessage } from "@/lib/guarded-storage";
 import { localForageStorage } from "@/lib/localforage-storage";
-import { cleanupUnusedImages, ensureImagePreview, previewUrlFor, resolveImageUrl, uploadImage } from "@/services/image-storage";
-import { cleanupUnusedMedia, resolveMediaUrl } from "@/services/file-storage";
+import { ensureImagePreview, previewUrlFor, resolveImageUrl, uploadImage } from "@/services/image-storage";
+import { resolveMediaUrl } from "@/services/file-storage";
+import { cleanupUnusedStorage } from "@/services/storage-cleanup";
 
 export type AssetKind = "text" | "image" | "video";
 export type TextAsset = AssetBase<"text"> & { data: { content: string } };
@@ -27,6 +29,7 @@ type AssetBase<T extends AssetKind> = {
 
 type AssetStore = {
     hydrated: boolean;
+    hydrationError: string;
     assets: Asset[];
     addAsset: (asset: Omit<Asset, "id" | "createdAt" | "updatedAt">) => string;
     updateAsset: (id: string, patch: Partial<Omit<Asset, "id" | "createdAt">>) => void;
@@ -49,7 +52,8 @@ const assetStorage: PersistStorage<AssetStore> = {
         const value = await localForageStorage.getItem(name);
         if (!value) return null;
         const parsed = JSON.parse(value) as StorageValue<AssetStore>;
-        parsed.state.assets = await Promise.all(
+        // allSettled: one unreadable media file must not fail the whole hydration (which would block saving).
+        const settled = await Promise.allSettled(
             parsed.state.assets.map(async (asset) => {
                 if (asset.kind === "video" && asset.data.storageKey) return { ...asset, data: { ...asset.data, url: await resolveMediaUrl(asset.data.storageKey, asset.data.url) } };
                 if (asset.kind !== "image") return asset;
@@ -66,16 +70,20 @@ const assetStorage: PersistStorage<AssetStore> = {
                 return { ...asset, coverUrl: asset.coverUrl.startsWith("data:image/") ? image.url : asset.coverUrl, data: { ...asset.data, dataUrl: image.url, storageKey: image.storageKey, bytes: image.bytes, mimeType: image.mimeType } };
             }),
         );
+        parsed.state.assets = settled.map((result, index) => (result.status === "fulfilled" ? result.value : parsed.state.assets[index]));
         return parsed;
     },
     setItem: (name, value) => localForageStorage.setItem(name, JSON.stringify(value)),
     removeItem: (name) => localForageStorage.removeItem(name),
 };
 
+const guardedAssetStorage = guardWrites(assetStorage);
+
 export const useAssetStore = create<AssetStore>()(
     persist(
         (set, get) => ({
             hydrated: false,
+            hydrationError: "",
             assets: [],
             addAsset: (asset) => {
                 const now = new Date().toISOString();
@@ -97,17 +105,21 @@ export const useAssetStore = create<AssetStore>()(
             cleanupImages: (extra) => {
                 window.setTimeout(async () => {
                     const { useCanvasStore } = await import("@/stores/canvas/use-canvas-store");
-                    await cleanupUnusedImages({ assets: get().assets, projects: useCanvasStore.getState().projects, extra });
-                    await cleanupUnusedMedia({ assets: get().assets, projects: useCanvasStore.getState().projects, extra });
+                    await cleanupUnusedStorage({ assets: get().assets, projects: useCanvasStore.getState().projects, extra });
                 }, 0);
             },
         }),
         {
             name: ASSET_STORE_KEY,
-            storage: assetStorage,
+            storage: guardedAssetStorage.storage,
             partialize: (state) => ({ assets: state.assets }) as StorageValue<AssetStore>["state"],
-            onRehydrateStorage: () => () => {
+            onRehydrateStorage: () => (_state, error) => {
+                if (error) {
+                    useAssetStore.setState({ hydrationError: hydrationErrorMessage(error) });
+                    return;
+                }
                 useAssetStore.setState({ hydrated: true });
+                guardedAssetStorage.allowWrites();
             },
         },
     ),

@@ -15,7 +15,8 @@ import { VideoSettingsPanel, normalizeVideoResolutionValue, normalizeVideoSizeVa
 import { canvasThemes } from "@/lib/canvas-theme";
 import { clampVideoSeconds } from "@/lib/media-size";
 import { formatBytes, formatDuration } from "@/lib/image-utils";
-import { deleteStoredMedia, resolveMediaUrl } from "@/services/file-storage";
+import { collectMediaStorageKeys, deleteStoredMedia, resolveMediaUrl } from "@/services/file-storage";
+import { useCanvasStore } from "@/stores/canvas/use-canvas-store";
 import { resolveImageUrl, ensureImagePreview, getImagePreviewRevision, previewUrlFor, subscribeImagePreviews, uploadImage } from "@/services/image-storage";
 import { createVideoGenerationTask, pollVideoGenerationTask, storeGeneratedVideo, type VideoGenerationTask } from "@/services/api/video";
 import { useAssetStore } from "@/stores/use-asset-store";
@@ -278,10 +279,12 @@ export default function VideoPage() {
     };
 
     const deleteSelectedLogs = () => {
+        // "Save to assets" (and canvas inserts) reuse the log's file, so keep files that are still referenced there.
+        const stillUsed = collectMediaStorageKeys({ assets: useAssetStore.getState().assets, projects: useCanvasStore.getState().projects });
         const mediaKeys = logs
             .filter((log) => selectedLogIds.includes(log.id))
             .map((log) => log.video?.storageKey)
-            .filter((key): key is string => Boolean(key));
+            .filter((key): key is string => Boolean(key) && !stillUsed.has(key as string));
         void Promise.all([deleteStoredMedia(mediaKeys), ...selectedLogIds.map((id) => logStore.removeItem(id))]).then(() => refreshLogs());
         if (previewLog && selectedLogIds.includes(previewLog.id)) {
             setPreviewLog(null);

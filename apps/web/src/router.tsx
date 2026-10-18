@@ -1,4 +1,4 @@
-import { createBrowserRouter, Outlet } from "react-router-dom";
+import { createBrowserRouter, Outlet, useParams } from "react-router-dom";
 
 import { AnalyticsTracker } from "@/components/layout/analytics-tracker";
 import UserLayout from "@/layouts/user-layout";
@@ -10,6 +10,13 @@ import ImagePage from "@/pages/image";
 import NotFound from "@/pages/not-found";
 import PromptsPage from "@/pages/prompts";
 import VideoPage from "@/pages/video";
+
+// FrameDock: one page instance per project. Reusing the instance across /canvas/A → /canvas/B let A's still-loaded
+// nodes be saved into B (and carried A's clipboard, requests and workflow runs over).
+function CanvasProjectRoute() {
+    const { id } = useParams();
+    return <CanvasProjectPage key={id} />;
+}
 
 export const router = createBrowserRouter([
     {
@@ -26,7 +33,7 @@ export const router = createBrowserRouter([
             { path: "/assets", element: <AssetsPage /> },
             { path: "/prompts", element: <PromptsPage /> },
             { path: "/canvas", element: <CanvasPage /> },
-            { path: "/canvas/:id", element: <CanvasProjectPage /> },
+            { path: "/canvas/:id", element: <CanvasProjectRoute /> },
             { path: "/config", element: <ConfigPage /> },
         ],
     },
