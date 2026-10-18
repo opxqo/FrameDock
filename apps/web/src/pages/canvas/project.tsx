@@ -15,6 +15,7 @@ import { createVideoGenerationTask, isVideoTaskFailed, storeGeneratedVideo, wait
 import { defaultConfig, useConfigStore, useEffectiveConfig } from "@/stores/use-config-store";
 import { ensureImagePreview, resolveImageUrl, uploadImage } from "@/services/image-storage";
 import { resolveMediaUrl, uploadMediaFile, type UploadedFile } from "@/services/file-storage";
+import { attachLogContext } from "@/services/api/log-context";
 import { outputKey, snapshotNodeOutput, versionKey, withVersion } from "@/lib/canvas/canvas-history";
 import { CanvasNodeHistoryDialog } from "@/components/canvas/canvas-node-history-dialog";
 import { nanoid } from "nanoid";
@@ -334,12 +335,19 @@ function InfiniteCanvasPage() {
         [cleanupAssetImages],
     );
 
-    const startGenerationRequest = useCallback((targetNodeId: string, originNodeId: string, runningId = originNodeId, controller = new AbortController()) => {
-        const previous = generationRequestsRef.current.get(targetNodeId);
-        if (previous?.controller !== controller) previous?.controller.abort();
-        generationRequestsRef.current.set(targetNodeId, { targetNodeId, originNodeId, runningNodeId: runningId, controller });
-        return controller;
-    }, []);
+    // Id of the chain run in progress (set by runWorkflow); calls made by its steps are grouped under it in the API log.
+    const workflowRunIdRef = useRef<string | undefined>(undefined);
+    const startGenerationRequest = useCallback(
+        (targetNodeId: string, originNodeId: string, runningId = originNodeId, controller = new AbortController()) => {
+            const previous = generationRequestsRef.current.get(targetNodeId);
+            if (previous?.controller !== controller) previous?.controller.abort();
+            generationRequestsRef.current.set(targetNodeId, { targetNodeId, originNodeId, runningNodeId: runningId, controller });
+            // Every request made with this signal is tagged with where it came from (see services/api/log-context.ts).
+            attachLogContext(controller.signal, { projectId, nodeId: originNodeId, runId: workflowRunIdRef.current });
+            return controller;
+        },
+        [projectId],
+    );
 
     const finishGenerationRequest = useCallback((targetNodeId: string, controller: AbortController) => {
         const request = generationRequestsRef.current.get(targetNodeId);
@@ -2709,6 +2717,7 @@ function InfiniteCanvasPage() {
                 const patchNode = (patch: Partial<CanvasNodeData["metadata"]>) => setNodes((prev) => prev.map((node) => (node.id === nodeId ? { ...node, metadata: { ...node.metadata, ...patch } } : node)));
                 setRunningNodeId(nodeId);
                 const controller = startGenerationRequest(nodeId, nodeId, nodeId);
+                attachLogContext(controller.signal, { mode: `codex-${codexMode}`, model: sourceNode.metadata?.codexModel });
                 patchNode({ prompt: request, status: NODE_STATUS_LOADING, errorDetails: undefined, codexActivity: "正在启动 Codex…" });
                 try {
                     const context = await hydrateNodeGenerationContext(buildNodeGenerationContext(nodeId, nodesRef.current, connectionsRef.current, request));
@@ -2813,6 +2822,7 @@ function InfiniteCanvasPage() {
             setRunningNodeId(nodeId);
             const overwriteExisting = options.overwrite ?? effectiveConfig.nodeRegenerateBehavior === "overwrite";
             const runController = startGenerationRequest(nodeId, nodeId, nodeId);
+            attachLogContext(runController.signal, { mode, model: generationConfig.model });
             const sourceTextContent = sourceNode?.type === CanvasNodeType.Text ? sourceNode.metadata?.content?.trim() || "" : "";
             const editingTextNode = mode === "text" && Boolean(sourceTextContent);
             const failBeforeStart = (errorDetails: string) => {
@@ -3333,6 +3343,7 @@ function InfiniteCanvasPage() {
             }
             const run = { canceled: false };
             workflowRunRef.current = run;
+            workflowRunIdRef.current = nanoid(10);
             setWorkflowRunning(true);
             const runStore = useWorkflowRunStore.getState();
             runStore.start(plan.steps, plan.nodeIds);
@@ -3362,6 +3373,7 @@ function InfiniteCanvasPage() {
                 else message.open({ key: messageKey, type: "success", content: t("canvas.workflow.finished", { total: outcomes.length }) });
             } finally {
                 workflowRunRef.current = null;
+                workflowRunIdRef.current = undefined;
                 setWorkflowRunning(false);
                 runStore.finish();
             }

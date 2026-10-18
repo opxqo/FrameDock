@@ -1,6 +1,7 @@
 import localforage from "localforage";
 
 import { framedockServerDriver, listServerEntries, mirrorSharedLocalStorage, SHARED_LOCAL_STORAGE_KEYS } from "@/lib/server-storage";
+import { installApiLogging } from "@/services/api/log-context";
 import { migrateLegacyStorage } from "@/lib/server-storage-migration";
 
 function showError(message: string) {
@@ -39,6 +40,8 @@ async function boot() {
         else localStorage.removeItem(key);
     }
     mirrorSharedLocalStorage();
+    // Every API call is recorded (server log page); this tags calls with node/run context and reports direct ones.
+    installApiLogging();
     await import("./app-entry");
 }
 
