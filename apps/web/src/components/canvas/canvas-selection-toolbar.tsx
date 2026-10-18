@@ -1,10 +1,11 @@
 import type { ReactNode } from "react";
-import { Group, Ungroup } from "@/components/icons";
-import { Tooltip } from "antd";
+import { Grid2x2, Group, Play, Ungroup } from "@/components/icons";
+import { Dropdown, Tooltip } from "antd";
 import { useTranslation } from "react-i18next";
 
 import { canvasThemes } from "@/lib/canvas-theme";
 import { nodeBounds } from "@/lib/canvas/canvas-node-geometry";
+import type { ArrangeMode } from "@/lib/canvas/canvas-arrange";
 import { useThemeStore } from "@/stores/use-theme-store";
 import type { CanvasNodeData, ViewportTransform } from "@/types/canvas";
 
@@ -18,6 +19,8 @@ export function CanvasSelectionToolbar({
     canUngroup,
     onGroup,
     onUngroup,
+    onRun,
+    onArrange,
 }: {
     nodes: CanvasNodeData[];
     viewport: ViewportTransform;
@@ -26,6 +29,10 @@ export function CanvasSelectionToolbar({
     canUngroup: boolean;
     onGroup: () => void;
     onUngroup: () => void;
+    /** Run the selected nodes in dependency order. */
+    onRun?: () => void;
+    /** Present when at least two free-standing nodes can be tidied. */
+    onArrange?: (mode: ArrangeMode) => void;
 }) {
     const { t } = useTranslation();
     const theme = canvasThemes[useThemeStore((state) => state.theme)];
@@ -36,7 +43,7 @@ export function CanvasSelectionToolbar({
     const top = viewport.y + bounds.top * viewport.k - SELECTION_PAD;
     const width = (bounds.right - bounds.left) * viewport.k + SELECTION_PAD * 2;
     const height = (bounds.bottom - bounds.top) * viewport.k + SELECTION_PAD * 2;
-    const showActions = showToolbar && (canGroup || canUngroup);
+    const showActions = showToolbar && (canGroup || canUngroup || Boolean(onRun) || Boolean(onArrange));
 
     return (
         <>
@@ -65,6 +72,22 @@ export function CanvasSelectionToolbar({
                 >
                     {canGroup ? <SelectionAction title={t("canvas.nodeToolbar.groupTitle")} label={t("canvas.nodeToolbar.group")} icon={<Group className="size-4" />} onClick={onGroup} /> : null}
                     {canUngroup ? <SelectionAction title={t("canvas.nodeToolbar.ungroupTitle")} label={t("canvas.nodeToolbar.ungroup")} icon={<Ungroup className="size-4" />} onClick={onUngroup} /> : null}
+                    {onArrange ? (
+                        <Dropdown
+                            trigger={["click"]}
+                            menu={{
+                                items: (["row", "column", "grid"] as const).map((mode) => ({ key: mode, label: t(`canvas.arrange.${mode}`), onClick: () => onArrange(mode) })),
+                            }}
+                        >
+                            <button type="button" className="group relative flex h-10 items-center whitespace-nowrap px-0.5" aria-label={t("canvas.arrange.title")}>
+                                <span className="flex h-8 items-center gap-1.5 rounded-full px-2.5 transition-colors duration-150 group-hover:bg-accent">
+                                    <Grid2x2 className="size-4" />
+                                    <span>{t("canvas.arrange.title")}</span>
+                                </span>
+                            </button>
+                        </Dropdown>
+                    ) : null}
+                    {onRun ? <SelectionAction title={t("canvas.workflow.runSelectionTitle")} label={t("canvas.workflow.runSelectionShort")} icon={<Play className="size-4" />} onClick={onRun} /> : null}
                 </div>
             ) : null}
         </>

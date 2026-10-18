@@ -117,6 +117,28 @@ export function planWorkflow(startId: string, nodes: CanvasNodeData[], connectio
     return { steps, nodeIds: order };
 }
 
+/**
+ * Plan for running exactly the selected nodes (a selected group stands for the nodes inside it), in
+ * dependency order. Upstream/downstream nodes outside the selection are left alone.
+ */
+export function planSelection(selectedIds: Iterable<string>, nodes: CanvasNodeData[], connections: CanvasConnection[]): WorkflowPlan {
+    const ids = new Set<string>();
+    for (const id of selectedIds) {
+        const node = nodes.find((item) => item.id === id);
+        if (!node) continue;
+        if (node.type === CanvasNodeType.Group) nodes.filter((child) => child.metadata?.groupId === id).forEach((child) => ids.add(child.id));
+        else ids.add(id);
+    }
+    const order = topologicalOrder(ids, connections);
+    if (!order) return { error: "cycle" };
+    const steps = order.flatMap((id) => {
+        const node = nodes.find((item) => item.id === id);
+        const step = node ? workflowStepForNode(node, nodes, connections) : null;
+        return step ? [step] : [];
+    });
+    return { steps, nodeIds: order };
+}
+
 export type WorkflowRunHooks = {
     generate: (step: WorkflowStep) => Promise<void>;
     // Reads the node's settled status after generate resolved ("success" | "error" | other).

@@ -182,4 +182,11 @@ export type ContextMenuState =
           x: number;
           y: number;
           connectionId: string;
+      }
+    | {
+          /** Empty canvas; `position` is the canvas-space point that was clicked. */
+          type: "canvas";
+          x: number;
+          y: number;
+          position: Position;
       };

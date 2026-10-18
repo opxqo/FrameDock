@@ -30,7 +30,7 @@ import { computeStaleNodeIds, nodeInputSignature } from "@/lib/canvas/canvas-sta
 import { ActiveConnectionPath, ConnectionPath, isVideoFrameInput } from "@/components/canvas/canvas-connections";
 import { CanvasConfigComposer } from "@/components/canvas/canvas-config-composer";
 import { CanvasConfigNodePanel } from "@/components/canvas/canvas-config-node-panel";
-import { CanvasNodeContextMenu } from "@/components/canvas/canvas-context-menu";
+import { CanvasNodeContextMenu, CanvasPaneContextMenu } from "@/components/canvas/canvas-context-menu";
 import { CanvasNodeAngleDialog, type CanvasImageAngleParams } from "@/components/canvas/canvas-node-angle-dialog";
 import { CanvasNodeCropDialog, type CanvasImageCropRect } from "@/components/canvas/canvas-node-crop-dialog";
 import { CanvasNodeMaskEditDialog, type CanvasImageMaskEditPayload } from "@/components/canvas/canvas-node-mask-edit-dialog";
@@ -75,7 +75,9 @@ import {
     resolveMetadataReferences,
     sourceNodeReferenceImages,
 } from "@/lib/canvas/canvas-generation-helpers";
-import { configResultTarget, planWorkflow, runWorkflowPlan, type WorkflowScope } from "@/lib/canvas/workflow-runner";
+import { configResultTarget, planSelection, planWorkflow, runWorkflowPlan, type WorkflowScope } from "@/lib/canvas/workflow-runner";
+import { arrangeableNodes, arrangeNodes, type ArrangeMode } from "@/lib/canvas/canvas-arrange";
+import { CanvasTextSplitDialog, type TextSplitResult } from "@/components/canvas/canvas-text-split-dialog";
 import { useWorkflowRunStore } from "@/stores/canvas/use-workflow-run-store";
 import { CanvasProgrammeBar } from "@/components/canvas/canvas-programme-bar";
 import { CanvasEmptyHint } from "@/components/canvas/canvas-empty-hint";
@@ -2071,7 +2073,7 @@ function InfiniteCanvasPage() {
     }, []);
 
     const captureVideoNodeFrame = useCallback(
-        async (nodeId: string, position: VideoFramePosition) => {
+        async (nodeId: string, position: VideoFramePosition, continueVideo = false) => {
             setContextMenu(null);
             const node = nodesRef.current.find((item) => item.id === nodeId);
             const video = Array.from(containerRef.current!.querySelectorAll<HTMLVideoElement>("video[data-canvas-video]")).find((item) => item.dataset.canvasVideo === nodeId);
@@ -2096,12 +2098,36 @@ function InfiniteCanvasPage() {
                 setSelectedNodeIds(new Set([id]));
                 setSelectedConnectionId(null);
                 setDialogNodeId(id);
+                if (continueVideo) {
+                    // FrameDock: "continue from last frame" — a video generator whose first frame is this still, ready for the next shot's action.
+                    const meta = node.metadata;
+                    const next = createCanvasNode(CanvasNodeType.Config, { x: x + size.width + 96, y }, {
+                        generationMode: "video",
+                        model: meta.model || effectiveConfig.videoModel || effectiveConfig.model,
+                        size: meta.size || effectiveConfig.size,
+                        count: 1,
+                        seconds: meta.seconds,
+                        vquality: meta.vquality,
+                        generateAudio: meta.generateAudio,
+                        watermark: meta.watermark,
+                        videoMode: "frames",
+                        prompt: "",
+                        status: NODE_STATUS_IDLE,
+                    });
+                    next.title = t("canvas.videoFrames.nextShotTitle", { name: node.title || t("assets.kinds.video") });
+                    setNodes((prev) => [...prev, next]);
+                    setConnections((prev) => [...prev, { id: nanoid(), fromNodeId: id, toNodeId: next.id, role: "first" }]);
+                    setSelectedNodeIds(new Set([next.id]));
+                    setDialogNodeId(next.id);
+                    message.success(t("canvas.videoFrames.continued"));
+                    return;
+                }
                 message.success(t("canvas.videoFrames.captured"));
             } catch {
                 message.error(t("canvas.videoFrames.failed"));
             }
         },
-        [message, t],
+        [effectiveConfig.model, effectiveConfig.size, effectiveConfig.videoModel, message, t],
     );
 
     const saveNodeAsset = useCallback(
@@ -2578,11 +2604,22 @@ function InfiniteCanvasPage() {
         setTitleEditing(false);
     }, [projectId, renameProject, titleDraft]);
 
-    const preventCanvasContextMenu = useCallback((event: ReactMouseEvent) => {
-        if ((event.target as HTMLElement).closest("[data-node-id]")) return;
-        event.preventDefault();
-        setContextMenu(null);
-    }, []);
+    const preventCanvasContextMenu = useCallback(
+        (event: ReactMouseEvent) => {
+            const target = event.target as HTMLElement;
+            if (target.closest("[data-node-id]")) return;
+            // Text fields keep the browser's own menu (copy / paste).
+            if (target.closest("textarea,input,[contenteditable='true']")) return;
+            event.preventDefault();
+            if (target.closest("button,a,[data-canvas-no-zoom],[role='dialog']")) {
+                setContextMenu(null);
+                return;
+            }
+            setNodeCreatePosition(null);
+            setContextMenu({ type: "canvas", x: event.clientX, y: event.clientY, position: screenToCanvas(event.clientX, event.clientY) });
+        },
+        [screenToCanvas],
+    );
 
     const handleGenerateNode = useCallback(
         async (nodeId: string, mode: CanvasNodeGenerationMode, prompt: string, options: GenerateNodeOptions = {}) => {
@@ -3183,12 +3220,12 @@ function InfiniteCanvasPage() {
     const workflowRunRef = useRef<{ canceled: boolean } | null>(null);
     const [workflowRunning, setWorkflowRunning] = useState(false);
     const runWorkflow = useCallback(
-        async (startNodeId: string, scope: WorkflowScope) => {
+        async (startNodeId: string, scope: WorkflowScope | "selection") => {
             if (workflowRunRef.current) {
                 message.warning(t("canvas.workflow.alreadyRunning"));
                 return;
             }
-            const plan = planWorkflow(startNodeId, nodesRef.current, connectionsRef.current, scope);
+            const plan = scope === "selection" ? planSelection(selectedNodeIdsRef.current, nodesRef.current, connectionsRef.current) : planWorkflow(startNodeId, nodesRef.current, connectionsRef.current, scope);
             if ("error" in plan) {
                 message.error(t("canvas.workflow.cycle"));
                 return;
@@ -3268,17 +3305,87 @@ function InfiniteCanvasPage() {
         message.success(t("canvas.workflowTemplates.inserted"));
     }, [effectiveConfig.imageModel, effectiveConfig.model, getCanvasCenter, message, t]);
 
+    // FrameDock: tidy the selected free-standing nodes into a row, column or grid (undo restores them).
+    const arrangeSelection = useCallback(
+        (mode: ArrangeMode) => {
+            const units = arrangeableNodes(nodesRef.current.filter((node) => selectedNodeIdsRef.current.has(node.id)));
+            if (units.length < 2) {
+                message.info(t("canvas.arrange.tooFew"));
+                return;
+            }
+            const positions = arrangeNodes(units, mode);
+            setNodes((prev) => prev.map((node) => (positions.has(node.id) ? { ...node, position: positions.get(node.id)! } : node)));
+            message.success(t("canvas.arrange.done", { count: units.length }));
+        },
+        [message, t],
+    );
+
+    // FrameDock: split a text node into one text node per shot (column to its right), optionally each wired to a generator.
+    const [textSplitNodeId, setTextSplitNodeId] = useState<string | null>(null);
+    const splitTextNode = useCallback(
+        (sourceId: string, result: TextSplitResult) => {
+            const source = nodesRef.current.find((node) => node.id === sourceId);
+            if (!source || result.parts.length < 2) return;
+            const textSpec = NODE_DEFAULT_SIZE[CanvasNodeType.Text];
+            const configSpec = NODE_DEFAULT_SIZE[CanvasNodeType.Config];
+            const rowHeight = Math.max(textSpec.height, result.generate ? configSpec.height : 0) + 24;
+            const startX = source.position.x + source.width + 96;
+            const created: CanvasNodeData[] = [];
+            const links: CanvasConnection[] = [];
+            result.parts.forEach((part, index) => {
+                const y = source.position.y + index * rowHeight;
+                const textNode = createCanvasNode(CanvasNodeType.Text, { x: startX, y }, { content: part, status: NODE_STATUS_IDLE, fontSize: 14 });
+                textNode.title = t("canvas.textSplit.partTitle", { index: index + 1 });
+                created.push(textNode);
+                links.push({ id: nanoid(), fromNodeId: source.id, toNodeId: textNode.id });
+                if (!result.generate) return;
+                const generator = createCanvasNode(CanvasNodeType.Config, { x: startX + textSpec.width + 96, y }, {
+                    generationMode: result.generate,
+                    model: result.generate === "video" ? effectiveConfig.videoModel || effectiveConfig.model : effectiveConfig.imageModel || effectiveConfig.model,
+                    size: effectiveConfig.size,
+                    count: 1,
+                    prompt: "",
+                    status: NODE_STATUS_IDLE,
+                });
+                generator.title = t("canvas.textSplit.partTitle", { index: index + 1 });
+                created.push(generator);
+                links.push({ id: nanoid(), fromNodeId: textNode.id, toNodeId: generator.id });
+            });
+            setNodes((prev) => [...prev, ...created]);
+            setConnections((prev) => [...prev, ...links]);
+            setSelectedNodeIds(new Set(created.filter((node) => node.type === CanvasNodeType.Text).map((node) => node.id)));
+            setSelectedConnectionId(null);
+            message.success(t("canvas.textSplit.done", { count: result.parts.length }));
+        },
+        [effectiveConfig.imageModel, effectiveConfig.model, effectiveConfig.size, effectiveConfig.videoModel, message, t],
+    );
+
     // FrameDock: canvas commands in the ⌘K palette.
     const registerCommands = useCommandStore((state) => state.register);
     const unregisterCommands = useCommandStore((state) => state.unregister);
+    // "Go to node…" entries are rebuilt only when a node is added, removed or renamed, not on every drag.
+    const nodeIndexKey = nodes.map((node) => `${node.id}\u0001${node.title}`).join("\u0002");
+    const jumpTargets = useMemo(
+        () => nodesRef.current.filter((node) => node.type !== CanvasNodeType.Group || node.title).slice(0, 80).map((node) => ({ id: node.id, title: node.title || node.id, type: node.type })),
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [nodeIndexKey],
+    );
     useEffect(() => {
         const group = t("palette.groups.canvas");
         const add = (type: CanvasNodeType, label: string) => ({ id: `canvas-add-${type}`, group, label: `${t("canvas.toolbar.add")}${label}`, keywords: ["add", "node", type], run: () => createNode(type) });
+        const jumpLabel = t("canvas.jumpTo");
         registerCommands("canvas", [
             add(CanvasNodeType.Text, t("canvas.nodeTypes.text")),
             add(CanvasNodeType.Image, t("canvas.nodeTypes.image")),
             add(CanvasNodeType.Video, t("canvas.nodeTypes.video")),
+            add(CanvasNodeType.Audio, t("canvas.nodeTypes.audio")),
             add(CanvasNodeType.Config, t("canvas.nodeTypes.config")),
+            add(CanvasNodeType.Codex, t("canvas.nodeTypes.codex")),
+            { id: "canvas-run-selection", group, label: t("canvas.workflow.runSelection"), keywords: ["run", "selection", "workflow", "运行", "选中", "工作流"], run: () => void runWorkflow("", "selection") },
+            { id: "canvas-group", group, label: t("canvas.nodeToolbar.group"), shortcut: `${MOD_KEY}G`, keywords: ["group", "成组"], run: () => groupSelection() },
+            { id: "canvas-ungroup", group, label: t("canvas.nodeToolbar.ungroup"), shortcut: `${MOD_KEY}⇧G`, keywords: ["ungroup", "取消成组"], run: () => ungroupSelection() },
+            ...(["row", "column", "grid"] as const).map((mode) => ({ id: `canvas-arrange-${mode}`, group, label: `${t("canvas.arrange.title")} · ${t(`canvas.arrange.${mode}`)}`, keywords: ["arrange", "align", "layout", "排列", "对齐", "整理"], run: () => arrangeSelection(mode) })),
+            ...jumpTargets.map((target) => ({ id: `canvas-goto-${target.id}`, group, label: `${jumpLabel}${target.title}`, keywords: ["goto", "jump", "node", "跳转", "节点", target.type], run: () => focusNode(target.id) })),
             { id: "canvas-workflow-three-view", group, label: t("canvas.workflowTemplates.threeView"), keywords: ["workflow", "template", "character", "三视图", "角色", "工作流", "模板"], run: insertThreeViewWorkflow },
             { id: "canvas-fit", group, label: t("canvas.shortcutGroups.fit"), shortcut: "⇧1", keywords: ["fit", "zoom"], run: fitAllNodes },
             { id: "canvas-reset", group, label: t("canvas.resetView"), shortcut: `${MOD_KEY}0`, keywords: ["reset", "100%"], run: resetViewport },
@@ -3286,7 +3393,7 @@ function InfiniteCanvasPage() {
             { id: "canvas-shortcuts", group, label: t("canvas.shortcuts"), shortcut: "?", keywords: ["shortcuts", "keyboard"], run: () => useShortcutSheetStore.getState().setOpen(true) },
         ]);
         return () => unregisterCommands("canvas");
-    }, [createNode, fitAllNodes, handleUploadRequest, insertThreeViewWorkflow, registerCommands, resetViewport, t, unregisterCommands]);
+    }, [arrangeSelection, createNode, fitAllNodes, focusNode, groupSelection, handleUploadRequest, insertThreeViewWorkflow, jumpTargets, registerCommands, resetViewport, runWorkflow, t, ungroupSelection, unregisterCommands]);
     const stopWorkflow = useCallback(() => {
         if (!workflowRunRef.current) return;
         workflowRunRef.current.canceled = true;
@@ -3915,8 +4022,20 @@ function InfiniteCanvasPage() {
                         canUngroup={canUngroupSelection}
                         onGroup={groupSelection}
                         onUngroup={ungroupSelection}
+                        onRun={() => void runWorkflow("", "selection")}
+                        onArrange={arrangeableNodes(selectedNodes).length >= 2 ? arrangeSelection : undefined}
                     />
                 ) : null}
+
+                <CanvasTextSplitDialog
+                    open={Boolean(textSplitNodeId)}
+                    text={(textSplitNodeId && nodeById.get(textSplitNodeId)?.metadata?.content) || ""}
+                    onCancel={() => setTextSplitNodeId(null)}
+                    onConfirm={(result) => {
+                        if (textSplitNodeId) splitTextNode(textSplitNodeId, result);
+                        setTextSplitNodeId(null);
+                    }}
+                />
 
                 {nodes.length === 0 && !nodeCreatePosition ? <CanvasEmptyHint onAddText={() => createNode(CanvasNodeType.Text)} onAddImage={() => createNode(CanvasNodeType.Image)} onAddVideo={() => createNode(CanvasNodeType.Video)} onUpload={() => handleUploadRequest()} /> : null}
 
@@ -3950,7 +4069,20 @@ function InfiniteCanvasPage() {
 
                 <CanvasZoomControls scale={viewport.k} onScaleChange={setZoomScale} onReset={resetViewport} onFit={fitAllNodes} isMiniMapOpen={isMiniMapOpen} onToggleMiniMap={() => setIsMiniMapOpen((value) => !value)} canUndo={historyState.canUndo} canRedo={historyState.canRedo} onUndo={undoCanvas} onRedo={redoCanvas} canvasTool={canvasTool} onCanvasToolChange={setCanvasTool} />
 
-                {contextMenu ? (
+                {contextMenu?.type === "canvas" ? (
+                    <CanvasPaneContextMenu
+                        menu={contextMenu}
+                        onClose={() => setContextMenu(null)}
+                        onCreate={(type, position) => createNode(type, position)}
+                        onPaste={() => {
+                            if (!pasteCopiedNodes()) void pasteSystemClipboard();
+                        }}
+                        onUpload={() => handleUploadRequest()}
+                        onFit={fitAllNodes}
+                        onInsertTemplate={insertThreeViewWorkflow}
+                    />
+                ) : null}
+                {contextMenu && contextMenu.type !== "canvas" ? (
                     <CanvasNodeContextMenu
                         menu={contextMenu}
                         canCaptureVideoFrame={contextMenuNode?.type === CanvasNodeType.Video && Boolean(contextMenuNode.metadata?.content)}
@@ -3963,6 +4095,31 @@ function InfiniteCanvasPage() {
                             const to = connection && nodeById.get(connection.toNodeId);
                             return connection && from && to && isVideoFrameInput(from, to) ? connection.role ?? null : undefined;
                         })()}
+                        onRunSelection={
+                            contextMenu.type === "node" && (hasMultipleSelectedNodes || contextMenuNode?.type === CanvasNodeType.Group)
+                                ? () => {
+                                      if (!selectedNodeIdsRef.current.has(contextMenu.nodeId)) {
+                                          selectedNodeIdsRef.current = new Set([contextMenu.nodeId]);
+                                          setSelectedNodeIds(new Set([contextMenu.nodeId]));
+                                      }
+                                      void runWorkflow(contextMenu.nodeId, "selection");
+                                      setContextMenu(null);
+                                  }
+                                : undefined
+                        }
+                        onContinueFromLastFrame={
+                            contextMenu.type === "node" && contextMenuNode?.type === CanvasNodeType.Video && contextMenuNode.metadata?.content
+                                ? () => void captureVideoNodeFrame(contextMenu.nodeId, "last", true)
+                                : undefined
+                        }
+                        onSplitText={
+                            contextMenu.type === "node" && contextMenuNode?.type === CanvasNodeType.Text && (contextMenuNode.metadata?.content || "").trim()
+                                ? () => {
+                                      setTextSplitNodeId(contextMenu.nodeId);
+                                      setContextMenu(null);
+                                  }
+                                : undefined
+                        }
                         onSetConnectionRole={(role) => {
                             if (contextMenu.type === "connection") setConnectionRole(contextMenu.connectionId, role);
                             setContextMenu(null);

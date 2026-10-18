@@ -97,13 +97,37 @@ const TEXT_INSTRUCTION =
 const IMAGE_INSTRUCTION =
   "你是画布里的图片生成节点。请调用图片生成工具生成图片，不要只回复文字，不要修改任何项目文件。若附带了参考图，请据此生成或修改。\n\n";
 
+/** Codex prints housekeeping warnings (e.g. PATH aliases) around its real output; keep only the real lines. */
+function withoutWarnings(text: string) {
+  return text
+    .split("\n")
+    .filter((line) => !/^WARNING:/i.test(line.trim()))
+    .join("\n")
+    .trim();
+}
+
+/**
+ * "Operation not permitted" while starting Codex means this server itself runs in a restricted environment
+ * (a sandboxed terminal), where the Codex CLI cannot create its app-server. Say so instead of the raw error.
+ */
+function explainFailure(message: string) {
+  if (/operation not permitted|os error 1\b/i.test(message))
+    return `Codex 无法启动：服务运行在受限环境里，Codex 没有权限初始化。请在普通终端（不是沙箱）里重新运行 pnpm dev。原始错误：${message}`;
+  if (/not logged in|log in|unauthorized|401/i.test(message))
+    return `Codex 还没有登录或登录已过期，请在终端运行 codex login。原始错误：${message}`;
+  return message;
+}
+
 function run(
   file: string,
   args: string[],
 ): Promise<{ ok: boolean; output: string }> {
   return new Promise((resolve) => {
     execFile(file, args, { timeout: 10_000 }, (error, stdout, stderr) =>
-      resolve({ ok: !error, output: `${stdout}${stderr}`.trim() }),
+      resolve({
+        ok: !error,
+        output: withoutWarnings(`${stdout}${stderr}`),
+      }),
     );
   });
 }
@@ -294,7 +318,8 @@ const codexApi: FastifyPluginAsync = async (app) => {
           }
           if (code !== 0 && !failure)
             failure = stderr.trim().split("\n").pop() || `Codex 退出码 ${code}`;
-          if (failure) send({ type: "error", message: failure });
+          if (failure)
+            send({ type: "error", message: explainFailure(failure) });
           else send({ type: "done", text: cleanText(finalText) });
         } finally {
           res.end();
