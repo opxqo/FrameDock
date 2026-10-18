@@ -37,6 +37,8 @@ export type EngineOptions = {
     fetched: FetchedResult,
   ) => Promise<JobResult>;
   onError?: (error: unknown, message: string) => void;
+  /** Called once when a job reaches a final state (succeeded, failed or canceled). */
+  onFinal?: (job: JobRow) => void;
   /** Consecutive failed polls before a job is parked as `unknown`. */
   maxPollErrors?: number;
   /** Simultaneous result downloads across all adapters. */
@@ -312,7 +314,14 @@ export class JobEngine {
       next_poll_at: null,
       finished_at: Date.now(),
     });
-    if (row) this.stopWork(id);
+    if (row) {
+      this.stopWork(id);
+      try {
+        this.options.onFinal?.(row);
+      } catch (error) {
+        this.options.onError?.(error, `onFinal failed for job ${id}`);
+      }
+    }
     return row;
   }
 

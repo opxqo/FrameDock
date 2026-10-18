@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import { afterEach, describe, it } from "node:test";
+import { kv } from "../schema";
+import { releaseJobReferences } from "./blobs";
 import type { JobEngine } from "./engine";
 import { jobs } from "./schema";
 import {
@@ -327,5 +329,75 @@ describe("JobEngine", () => {
       () => engine.create(input({ adapter: "nope" })),
       /Unknown adapter/,
     );
+  });
+  it("reports each final state once through onFinal, but not unknown", async () => {
+    const { db, entry } = openDb();
+    const finals: string[] = [];
+    const { adapter } = fakeAdapter();
+    const engine = track(
+      entry,
+      makeEngine(db, adapter, {
+        onFinal: (job) => finals.push(`${job.id}:${job.state}`),
+      }),
+    );
+    const { job } = engine.create(input());
+    await untilState(engine, job.id, "succeeded");
+    assert.deepEqual(finals, [`${job.id}:succeeded`]);
+
+    const flaky = fakeAdapter({
+      submit: async () => {
+        throw new AdapterError("timed out", "unknown");
+      },
+    });
+    const second = openDb();
+    const parked = track(
+      second.entry,
+      makeEngine(second.db, flaky.adapter, {
+        onFinal: (row) => finals.push(row.state),
+      }),
+    );
+    const created = parked.create(input());
+    await untilState(parked, created.job.id, "unknown");
+    assert.equal(
+      finals.length,
+      1,
+      "an unknown job may still be resubmitted, so it keeps its files",
+    );
+    parked.cancel(created.job.id);
+    assert.equal(finals.at(-1), "canceled");
+  });
+
+  it("releases only reference files from the job_refs store", async () => {
+    const { db } = openDb();
+    const now = Date.now();
+    for (const [store, key] of [
+      ["job_refs", "ref-a"],
+      ["media_files", "keep-me"],
+    ] as const) {
+      db.insert(kv)
+        .values({
+          store,
+          key,
+          kind: "blob",
+          value: null,
+          mime: "image/png",
+          size: 1,
+          updated_at: now,
+        })
+        .run();
+    }
+    await releaseJobReferences(db, {
+      files: [
+        { store: "job_refs", key: "ref-a" },
+        { store: "media_files", key: "keep-me" },
+        { dataUrl: "data:image/png;base64,AA==" },
+      ],
+    });
+    const keys = db
+      .select()
+      .from(kv)
+      .all()
+      .map((row) => `${row.store}/${row.key}`);
+    assert.deepEqual(keys, ["media_files/keep-me"]);
   });
 });

@@ -66,3 +66,29 @@ export async function saveJobBlob(
     ...(fetched.durationMs ? { durationMs: fetched.durationMs } : {}),
   };
 }
+
+/** Where the browser puts reference files for a job (see apps/web/src/services/api/jobs.ts). */
+export const JOB_REFERENCE_STORE = "job_refs";
+
+/** Deletes the reference files a finished job's request pointed at. Anything outside job_refs is left alone. */
+export async function releaseJobReferences(db: Database, request: unknown) {
+  const files = (
+    request as { files?: Array<{ store?: string; key?: string }> } | null
+  )?.files;
+  if (!Array.isArray(files)) return;
+  for (const file of files) {
+    if (file.store !== JOB_REFERENCE_STORE || !file.key) continue;
+    await rm(
+      join(
+        config.dataDir,
+        "blobs",
+        JOB_REFERENCE_STORE,
+        encodeURIComponent(file.key),
+      ),
+      { force: true },
+    );
+    db.delete(kv)
+      .where(and(eq(kv.store, JOB_REFERENCE_STORE), eq(kv.key, file.key)))
+      .run();
+  }
+}

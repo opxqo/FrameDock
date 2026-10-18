@@ -3,7 +3,7 @@ import type { openDatabase } from "../db";
 import { mockVideoAdapter } from "./adapters/mock";
 import { openaiVideoAdapter } from "./adapters/openai-video";
 import { yfaiAdapter } from "./adapters/yfai";
-import { saveJobBlob } from "./blobs";
+import { releaseJobReferences, saveJobBlob } from "./blobs";
 import { JobEngine } from "./engine";
 import jobsApi from "./routes";
 
@@ -15,6 +15,15 @@ export async function registerJobs(
     db,
     adapters: [mockVideoAdapter, yfaiAdapter, openaiVideoAdapter],
     saveResult: (kind, jobId, fetched) => saveJobBlob(db, kind, jobId, fetched),
+    // Reference files uploaded for a job are only needed until it ends.
+    onFinal: (job) => {
+      releaseJobReferences(db, job.request).catch((error) =>
+        app.log.warn(
+          { err: error },
+          `Could not remove reference files of job ${job.id}`,
+        ),
+      );
+    },
     onError: (error, message) => app.log.error({ err: error }, message),
   });
   await app.register(jobsApi, { prefix: "/api/jobs", engine });
