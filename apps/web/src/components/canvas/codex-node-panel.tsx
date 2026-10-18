@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowUp, LoaderCircle, Maximize2, Sparkles, Square } from "@/components/icons";
+import { Maximize2, Sparkles } from "@/components/icons";
 import { Button, Modal, Segmented, Select, Tooltip } from "antd";
 import { useTranslation } from "react-i18next";
 
@@ -10,6 +10,7 @@ import { CodexLogo } from "@/components/codex-logo";
 import { useThemeStore } from "@/stores/use-theme-store";
 import type { CanvasNodeData } from "@/types/canvas";
 import { CanvasNodeReferenceBar } from "./canvas-node-reference-bar";
+import { CanvasRunButton } from "./canvas-run-button";
 import { CanvasPromptChipInput } from "./canvas-prompt-chip-input";
 import { CanvasPromptLibrary } from "./canvas-prompt-library";
 
@@ -129,26 +130,7 @@ export function CodexNodePanel({ node, nodes, connectedNodes = [], mentionRefere
                         <Select size="middle" className="w-[84px]" value={effort} disabled={isRunning} popupMatchSelectWidth={false} onChange={(value) => onConfigChange(node.id, { codexEffort: value })} options={effortOptions} />
                     </Tooltip>
                 </div>
-                <Button
-                    type="primary"
-                    className="!h-8 !min-w-8 shrink-0 !rounded-full !px-2.5"
-                    danger={isRunning}
-                    disabled={!isRunning && (!prompt.trim() || !ready)}
-                    onClick={() => (isRunning ? onStop(node.id) : submit())}
-                    aria-label={t(isRunning ? "canvas.codexNode.stop" : "canvas.codexNode.run")}
-                >
-                    <span className="flex items-center gap-1.5">
-                        {isRunning ? (
-                            <>
-                                <LoaderCircle className="size-4 animate-spin" />
-                                <Square className="size-3.5 fill-current" />
-                                <span className="text-xs font-medium">{t("canvas.codexNode.stop")}</span>
-                            </>
-                        ) : (
-                            <ArrowUp className="size-4" />
-                        )}
-                    </span>
-                </Button>
+                <CanvasRunButton state={isRunning ? "running" : "idle"} disabled={!prompt.trim() || !ready} onRun={submit} onStop={() => onStop(node.id)} label={t(isRunning ? "canvas.codexNode.stop" : "canvas.codexNode.run")} />
             </div>
             <Modal title={t("canvas.promptPanel.editorTitle")} open={expanded} centered width={760} footer={null} onCancel={() => setExpanded(false)} destroyOnHidden>
                 <div data-canvas-no-zoom className="pt-2" onWheelCapture={(event) => event.stopPropagation()}>

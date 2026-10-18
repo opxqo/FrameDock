@@ -1,13 +1,14 @@
 import type { ReactNode } from "react";
 import { CostEstimate } from "@/components/autodl-price";
 import { generationCostParams } from "@/lib/autodl-pricing";
-import { Image as ImageIcon, LoaderCircle, MessageSquare, Music2, Play, Settings2, Square, Video } from "@/components/icons";
+import { Image as ImageIcon, MessageSquare, Music2, Play, Settings2, Video } from "@/components/icons";
 import { Button, Segmented } from "antd";
 import { useTranslation } from "react-i18next";
 
 import { ModelPicker } from "@/components/model-picker";
 import { videoFrameImageLimit } from "@/services/api/video";
 import { CanvasSkillPicker } from "./canvas-skill-picker";
+import { RunningRing } from "./canvas-run-button";
 import { defaultConfig, resolveModelForCapability, useConfigStore, useEffectiveConfig, type AiConfig } from "@/stores/use-config-store";
 import { canvasThemes } from "@/lib/canvas-theme";
 import { useThemeStore } from "@/stores/use-theme-store";
@@ -112,29 +113,27 @@ export function CanvasConfigNodePanel({ node, isRunning, inputSummary, onConfigC
 
             <CostEstimate model={config.model} params={generationCostParams(config, mode === "video" ? inputSummary.imageCount > 0 : false, inputSummary.videoCount > 0)} className="-mt-0.5 text-xs" />
 
-            <Button
-                type="primary"
-                className="mt-auto !h-9 !w-full !cursor-pointer !rounded-full"
-                danger={isRunning}
-                disabled={!isRunning && !canGenerate}
-                onMouseDown={(event) => event.stopPropagation()}
-                onClick={() => (isRunning ? onStop(node.id) : onGenerate(node.id))}
-            >
-                <span className="inline-flex items-center gap-1.5">
-                    {isRunning ? (
-                        <>
-                            <LoaderCircle className="size-4 animate-spin" />
-                            <Square className="size-3.5 fill-current" />
-                            <span>{t("canvas.configNode.stop")}</span>
-                        </>
-                    ) : (
-                        <>
-                            <Play className="size-4" />
-                            <span>{t("canvas.configNode.generate")}</span>
-                        </>
-                    )}
-                </span>
-            </Button>
+            {isRunning ? (
+                <button
+                    type="button"
+                    className="relative mt-auto flex h-9 w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-foreground/10 text-sm font-medium transition-colors hover:bg-foreground/15"
+                    onMouseDown={(event) => event.stopPropagation()}
+                    onClick={() => onStop(node.id)}
+                >
+                    <span className="relative grid size-5 place-items-center">
+                        <RunningRing />
+                        <span className="size-2 rounded-[1.5px] bg-current" />
+                    </span>
+                    {t("canvas.configNode.stop")}
+                </button>
+            ) : (
+                <Button type="primary" className="mt-auto !h-9 !w-full !cursor-pointer !rounded-full" disabled={!canGenerate} onMouseDown={(event) => event.stopPropagation()} onClick={() => onGenerate(node.id)}>
+                    <span className="inline-flex items-center gap-1.5">
+                        <Play className="size-4" />
+                        <span>{t("canvas.configNode.generate")}</span>
+                    </span>
+                </Button>
+            )}
         </div>
     );
 }

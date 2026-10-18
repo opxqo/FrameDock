@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowUp, LoaderCircle, Maximize2, RefreshCw, Square } from "@/components/icons";
+import { Maximize2 } from "@/components/icons";
 import { Button, Modal, Tooltip } from "antd";
 import { useTranslation } from "react-i18next";
 
@@ -12,6 +12,7 @@ import { useThemeStore } from "@/stores/use-theme-store";
 import { CanvasImageSettingsPopover } from "./canvas-image-settings-popover";
 import { CanvasPromptRecipes } from "./canvas-prompt-recipes";
 import { CanvasSkillPicker } from "./canvas-skill-picker";
+import { CanvasRunButton } from "./canvas-run-button";
 import { CanvasPromptLibrary } from "./canvas-prompt-library";
 import { CanvasAudioSettingsPopover, type CanvasAudioSettingKey } from "./canvas-audio-settings-popover";
 import { CanvasPromptChipInput } from "./canvas-prompt-chip-input";
@@ -141,18 +142,13 @@ export function CanvasNodePromptPanel({ node, nodes, isRunning, onPromptChange, 
                         </>
                     )}
                 </div>
-                <Tooltip title={t(isRunning ? "canvas.promptPanel.stop" : isRegeneratingContent ? "canvas.promptPanel.regenerate" : "canvas.promptPanel.generate")}>
-                    <Button
-                        type="primary"
-                        shape="circle"
-                        className="!size-8 !min-w-8 shrink-0 !p-0"
-                        danger={isRunning}
-                        disabled={!isRunning && !prompt.trim()}
-                        onClick={() => (isRunning ? onStop(node.id) : submit())}
-                        aria-label={t(isRunning ? "canvas.promptPanel.stopGeneration" : isRegeneratingContent ? "canvas.promptPanel.regenerate" : "canvas.promptPanel.generate")}
-                        icon={isRunning ? <Square className="size-3 fill-current" /> : isRegeneratingContent ? <RefreshCw className="size-4" /> : <ArrowUp className="size-4" />}
-                    />
-                </Tooltip>
+                <CanvasRunButton
+                    state={isRunning ? "running" : isRegeneratingContent ? "regenerate" : "idle"}
+                    disabled={!prompt.trim()}
+                    onRun={submit}
+                    onStop={() => onStop(node.id)}
+                    label={t(isRunning ? "canvas.promptPanel.stopGeneration" : isRegeneratingContent ? "canvas.promptPanel.regenerate" : "canvas.promptPanel.generate")}
+                />
             </div>
             <Modal title={t("canvas.promptPanel.editorTitle")} open={expanded} centered width={760} footer={null} onCancel={() => setExpanded(false)} destroyOnHidden>
                 <div data-canvas-no-zoom className="pt-2" onWheelCapture={(event) => event.stopPropagation()}>
