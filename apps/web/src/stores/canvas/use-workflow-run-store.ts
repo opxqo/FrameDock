@@ -29,7 +29,7 @@ export const useWorkflowRunStore = create<WorkflowRunStore>()((set) => ({
     finish: () => set({ run: null }),
 }));
 
-export type TallyState = "idle" | "queued" | "live" | "ok" | "fail" | "skipped";
+export type TallyState = "idle" | "queued" | "live" | "ok" | "fail" | "skipped" | "stale";
 
 /** Tally for a node inside the current run, or undefined when the node is not part of it. */
 export function runTallyFor(run: WorkflowRunState | null, nodeId: string): TallyState | undefined {

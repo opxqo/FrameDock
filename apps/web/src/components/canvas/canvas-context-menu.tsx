@@ -1,14 +1,45 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { BetweenHorizontalStart, GalleryHorizontalEnd, GalleryHorizontal, Group, ListEnd, Play, Plus, Trash2, Ungroup } from "@/components/icons";
+import { BetweenHorizontalStart, Check, GalleryHorizontalEnd, GalleryHorizontal, Group, ListEnd, Play, Plus, Trash2, Ungroup } from "@/components/icons";
 import { useTranslation } from "react-i18next";
 
 import { cn } from "@/lib/utils";
 import { MOD_KEY } from "@/stores/use-command-store";
-import type { ContextMenuState } from "@/types/canvas";
+import type { CanvasConnectionRole, ContextMenuState } from "@/types/canvas";
 import type { VideoFramePosition } from "@/lib/canvas/canvas-video-frame";
 
-export function CanvasNodeContextMenu({ menu, canCaptureVideoFrame, canGroup, canUngroup, onClose, onCaptureVideoFrame, onDuplicate, onGroup, onUngroup, onRunUpstream, onRunDownstream, onDelete }: { menu: ContextMenuState; canCaptureVideoFrame: boolean; canGroup?: boolean; canUngroup?: boolean; onClose: () => void; onCaptureVideoFrame: (position: VideoFramePosition) => void; onDuplicate: () => void; onGroup?: () => void; onUngroup?: () => void; onRunUpstream?: () => void; onRunDownstream?: () => void; onDelete: () => void }) {
+export function CanvasNodeContextMenu({
+    menu,
+    canCaptureVideoFrame,
+    canGroup,
+    canUngroup,
+    connectionRole,
+    onClose,
+    onCaptureVideoFrame,
+    onDuplicate,
+    onGroup,
+    onUngroup,
+    onRunUpstream,
+    onRunDownstream,
+    onSetConnectionRole,
+    onDelete,
+}: {
+    menu: ContextMenuState;
+    canCaptureVideoFrame: boolean;
+    canGroup?: boolean;
+    canUngroup?: boolean;
+    /** Set for wires into a video generation: the current role (null = automatic). */
+    connectionRole?: CanvasConnectionRole | null;
+    onClose: () => void;
+    onCaptureVideoFrame: (position: VideoFramePosition) => void;
+    onDuplicate: () => void;
+    onGroup?: () => void;
+    onUngroup?: () => void;
+    onRunUpstream?: () => void;
+    onRunDownstream?: () => void;
+    onSetConnectionRole?: (role: CanvasConnectionRole | undefined) => void;
+    onDelete: () => void;
+}) {
     const { t } = useTranslation();
     const ref = useRef<HTMLDivElement>(null);
     // Keep the whole menu on screen: flip left/up when it would overflow the viewport.
@@ -53,6 +84,14 @@ export function CanvasNodeContextMenu({ menu, canCaptureVideoFrame, canGroup, ca
                 <>
                     <MenuButton icon={<ListEnd className="size-4" />} label={t("canvas.workflow.runUpstream")} shortcut={`${MOD_KEY}↵`} onClick={onRunUpstream} />
                     <MenuButton icon={<Play className="size-4" />} label={t("canvas.workflow.runDownstream")} shortcut={`${MOD_KEY}⇧↵`} onClick={onRunDownstream} />
+                    <div className="mx-1 my-1 h-px bg-border" />
+                </>
+            ) : null}
+            {menu.type === "connection" && connectionRole !== undefined && onSetConnectionRole ? (
+                <>
+                    {([undefined, "first", "last", "reference"] as const).map((role) => (
+                        <MenuButton key={role || "auto"} icon={<Check className={cn("size-4", (connectionRole ?? undefined) === role ? "opacity-100" : "opacity-0")} />} label={t(`canvas.connectionRoles.${role || "auto"}Long`)} onClick={() => onSetConnectionRole(role)} />
+                    ))}
                     <div className="mx-1 my-1 h-px bg-border" />
                 </>
             ) : null}

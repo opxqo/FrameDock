@@ -29,6 +29,7 @@ const TALLY_CLASS: Record<TallyState, string> = {
     ok: "bg-tally-ok",
     fail: "bg-tally-fail",
     skipped: "border border-dashed border-tally-stale bg-transparent",
+    stale: "bg-tally-stale",
 };
 
 type CanvasNodeProps = {
@@ -37,6 +38,8 @@ type CanvasNodeProps = {
     isSelected: boolean;
     isRelated: boolean;
     isFocusRelated: boolean;
+    /** Generated result whose inputs changed since it was made. */
+    isStale?: boolean;
     isConnectionTarget: boolean;
     isConnecting: boolean;
     referenceSelectionState?: "target" | "disabled" | "available";
@@ -103,6 +106,7 @@ export const CanvasNode = React.memo(function CanvasNode({
     isSelected,
     isRelated,
     isFocusRelated,
+    isStale = false,
     isConnectionTarget,
     isConnecting,
     referenceSelectionState,
@@ -164,7 +168,7 @@ export const CanvasNode = React.memo(function CanvasNode({
     // Tally lamp: a chain run owns the lamp while it lasts; otherwise it mirrors the node's own status.
     const runTally = useWorkflowRunStore((state) => runTallyFor(state.run, data.id));
     const status = data.metadata?.status;
-    const tally: TallyState = runTally || (status === "loading" ? "live" : status === "error" ? "fail" : status === "success" ? "ok" : "idle");
+    const tally: TallyState = runTally || (status === "loading" ? "live" : status === "error" ? "fail" : status === "success" ? (isStale ? "stale" : "ok") : "idle");
     const tallyLabel = t(`canvas.tally.${tally}`);
     const imageBorderColor = isActive ? selectionBlue : isRelated ? theme.node.muted : "transparent";
     const textareaRef = useRef<HTMLTextAreaElement>(null);

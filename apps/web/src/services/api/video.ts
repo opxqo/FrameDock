@@ -145,13 +145,26 @@ function autodlUrl(config: AiConfig, path: string) {
     return withLocalProxy(`${config.baseUrl.trim().replace(/\/+$/, "")}${path}`);
 }
 
+/**
+ * First/last frame by connection role. Images without any role keep the old order (1st = first, 2nd = last);
+ * once roles are set, only images marked (or left unmarked for) first/last become frames.
+ */
+async function frameDataUrls(references: ReferenceImage[], limit = 2) {
+    const hasRoles = references.some((image) => image.role);
+    const first = hasRoles ? references.find((image) => image.role === "first") || references.find((image) => !image.role) : references[0];
+    const last = limit < 2 ? undefined : hasRoles ? references.find((image) => image.role === "last") : references[1];
+    // A last frame alone is not supported by these APIs; use it as the only (first) frame then.
+    const frames = first ? [first, last] : [last, undefined];
+    return Promise.all(frames.map((image) => (image ? imageToDataUrl(image) : Promise.resolve("")))).then((urls) => urls.filter(Boolean));
+}
+
 function stripDataUrl(dataUrl: string) {
     return dataUrl.replace(/^data:[^;]+;base64,/, "");
 }
 
 // Kling: POST /kling/v1/videos/{text2video|image2video}; the endpoint kind is kept in the task id for polling.
 async function createKlingVideoTask(config: AiConfig, model: string, prompt: string, references: ReferenceImage[], options?: VideoMediaOptions): Promise<VideoGenerationTask> {
-    const frames = await Promise.all(references.slice(0, 2).map((image) => imageToDataUrl(image)));
+    const frames = await frameDataUrls(references);
     const kind = frames.length ? "image2video" : "text2video";
     const body = {
         model_name: modelOptionName(model),
@@ -186,7 +199,7 @@ async function pollKlingVideoTask(config: AiConfig, task: VideoGenerationTask, o
 
 // Volcengine Ark (Seedance): POST /ark/v3/contents/generations/tasks, GET .../tasks/{id}.
 async function createArkVideoTask(config: AiConfig, model: string, prompt: string, references: ReferenceImage[], options?: VideoMediaOptions): Promise<VideoGenerationTask> {
-    const frames = await Promise.all(references.slice(0, 2).map((image) => imageToDataUrl(image)));
+    const frames = await frameDataUrls(references);
     const body = {
         model: modelOptionName(model),
         content: [
@@ -224,7 +237,7 @@ async function pollArkVideoTask(config: AiConfig, task: VideoGenerationTask, opt
 
 // Alibaba DashScope (Wan): async POST .../video-synthesis with X-DashScope-Async, GET /ali/api/v1/tasks/{id}.
 async function createWanVideoTask(config: AiConfig, model: string, prompt: string, references: ReferenceImage[], options?: VideoMediaOptions): Promise<VideoGenerationTask> {
-    const frame = references[0] ? await imageToDataUrl(references[0]) : "";
+    const [frame = ""] = await frameDataUrls(references, 1);
     const body = {
         model: modelOptionName(model),
         input: { prompt, ...(frame ? { img_url: frame } : {}) },
@@ -266,7 +279,7 @@ function miniMaxResolution(vquality: string, hasFirstFrame: boolean) {
 }
 
 async function createMiniMaxVideoTask(config: AiConfig, model: string, prompt: string, references: ReferenceImage[], options?: VideoMediaOptions): Promise<VideoGenerationTask> {
-    const frames = await Promise.all(references.slice(0, 2).map((image) => imageToDataUrl(image)));
+    const frames = await frameDataUrls(references);
     const resolution = miniMaxResolution(String(autodlResolution(config, model)), frames.length > 0);
     const duration = resolution === "1080P" ? 6 : autodlDuration(config, model, [6, 10]);
     const body = {
@@ -322,7 +335,7 @@ async function createPluginVideoTask(config: AiConfig, model: string, script: st
                 ratio: videoAspectRatio(config.size),
                 generateAudio: boolConfig(config.videoGenerateAudio, true),
                 watermark: boolConfig(config.videoWatermark, false),
-                mode: resolveVideoMode(config.videoMode, refs.length),
+                mode: resolveVideoMode(config.videoMode, references),
             },
             signal: options?.signal,
         }),
@@ -360,7 +373,7 @@ async function createOpenAIVideoTask(config: AiConfig, model: string, prompt: st
     const images = await Promise.all(references.map(async (image) => dataUrlToFile({ ...image, dataUrl: await imageToDataUrl(image) })));
     const videos = await Promise.all((options?.videos || []).map((video) => referenceMediaToFile(video, "ref.mp4", "invalidReferenceVideo", options)));
     const audios = await Promise.all((options?.audios || []).map((audio) => referenceMediaToFile(audio, "ref.mp3", "invalidReferenceAudio", options)));
-    const mode = resolveVideoMode(config.videoMode, images.length);
+    const mode = resolveVideoMode(config.videoMode, references);
     const ratio = inferVideoRatio(config.size || "16:9");
     const body = new FormData();
     body.append("model", modelOptionName(model));
@@ -432,7 +445,7 @@ async function createGeminiVideoTask(config: AiConfig, model: string, prompt: st
     const images = await Promise.all(references.map((image) => imageToDataUrl(image)));
     const videos = await Promise.all((options?.videos || []).map((video) => referenceMediaToFile(video, "ref.mp4", "invalidReferenceVideo", options)));
     const audios = await Promise.all((options?.audios || []).map((audio) => referenceMediaToFile(audio, "ref.mp3", "invalidReferenceAudio", options)));
-    const mode = resolveVideoMode(config.videoMode, images.length);
+    const mode = resolveVideoMode(config.videoMode, references);
     const instance: Record<string, unknown> = { prompt };
     if (mode === "frames") {
         if (images[0]) instance.image = parseDataUrlInline(images[0]);
@@ -532,8 +545,11 @@ function normalizeVideoSeconds(value: string) {
     return clampVideoSeconds(value);
 }
 
-function resolveVideoMode(mode: string | undefined, imageCount: number) {
-    if (mode === "reference" || imageCount > 2) return "reference";
+function resolveVideoMode(mode: string | undefined, references: ReferenceImage[]) {
+    // Connection roles decide when present: reference images without a first frame → reference mode.
+    if (references.some((image) => image.role === "reference") && !references.some((image) => image.role === "first")) return "reference";
+    if (references.some((image) => image.role === "first" || image.role === "last")) return "frames";
+    if (mode === "reference" || references.length > 2) return "reference";
     return "frames";
 }
 

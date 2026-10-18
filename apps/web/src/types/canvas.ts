@@ -97,6 +97,8 @@ export type CanvasNodeMetadata = {
     codexModel?: string;
     /** Set on image nodes produced by a Codex node, so re-runs write back into the same image node. */
     codexSourceId?: string;
+    /** FrameDock: signature of the inputs this result was generated from (lib/canvas/canvas-staleness.ts). */
+    inputHash?: string;
     interactive?: boolean; // Plugin node interaction/move state; see CanvasNodeDefinition.interactionToggle.
 };
 
@@ -110,10 +112,14 @@ export type CanvasNodeData = {
     metadata?: CanvasNodeMetadata;
 };
 
+/** FrameDock: what an input means to a video generation (unset = by connection order). */
+export type CanvasConnectionRole = "first" | "last" | "reference";
+
 export type CanvasConnection = {
     id: string;
     fromNodeId: string;
     toNodeId: string;
+    role?: CanvasConnectionRole;
 };
 
 export type CanvasAssistantReference = {

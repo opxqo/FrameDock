@@ -1,9 +1,30 @@
 import { type MouseEvent as ReactMouseEvent, useEffect, useId, useRef } from "react";
+import { useTranslation } from "react-i18next";
 
 import { canvasThemes } from "@/lib/canvas-theme";
 import { runTallyFor, useWorkflowRunStore } from "@/stores/canvas/use-workflow-run-store";
 import { useThemeStore } from "@/stores/use-theme-store";
-import type { CanvasConnection, CanvasNodeData, ConnectionHandle, Position } from "@/types/canvas";
+import { CanvasNodeType, type CanvasConnection, type CanvasConnectionRole, type CanvasNodeData, type ConnectionHandle, type Position } from "@/types/canvas";
+
+/** Wires whose role matters: images (or groups of them) feeding a video-mode config node. */
+export function isVideoFrameInput(from: CanvasNodeData, to: CanvasNodeData) {
+    return to.type === CanvasNodeType.Config && to.metadata?.generationMode === "video" && (from.type === CanvasNodeType.Image || from.type === CanvasNodeType.Group);
+}
+
+export const CONNECTION_ROLES: CanvasConnectionRole[] = ["first", "last", "reference"];
+
+/** Click order on the wire label: auto → first → last → reference → auto. */
+export function nextConnectionRole(role: CanvasConnectionRole | undefined) {
+    const index = role ? CONNECTION_ROLES.indexOf(role) : -1;
+    return index === CONNECTION_ROLES.length - 1 ? undefined : CONNECTION_ROLES[index + 1];
+}
+
+/** Midpoint of the wire's cubic bezier (t = 0.5). */
+function wireMidpoint(startX: number, startY: number, endX: number, endY: number) {
+    const dx = endX - startX;
+    const handle = dx >= 0 ? dx / 2 : Math.max(-dx / 2, 80);
+    return { x: (startX + 3 * (startX + handle) + 3 * (endX - handle) + endX) / 8, y: (startY + endY) / 2 };
+}
 
 type WireRunState = "none" | "path" | "flow" | "ok" | "fail";
 
@@ -115,16 +136,22 @@ export function ConnectionPath({
     from,
     to,
     active,
+    showRole = false,
     onSelect,
     onContextMenu,
+    onRoleChange,
 }: {
     connection: CanvasConnection;
     from: CanvasNodeData;
     to: CanvasNodeData;
     active: boolean;
+    /** Video inputs: show the first/last/reference label on the wire. */
+    showRole?: boolean;
     onSelect: () => void;
     onContextMenu?: (event: ReactMouseEvent<SVGPathElement>) => void;
+    onRoleChange?: (role: CanvasConnectionRole | undefined) => void;
 }) {
+    const { t } = useTranslation();
     const theme = canvasThemes[useThemeStore((state) => state.theme)];
     const startX = from.position.x + from.width;
     const startY = from.position.y + from.height / 2;
@@ -165,6 +192,29 @@ export function ConnectionPath({
                 style={{ pointerEvents: "none", transition: "stroke 150ms ease-out" }}
             />
             {pulsing ? <WirePulse d={pathD} color={theme.node.text} running={running} /> : null}
+            {showRole ? <RoleLabel role={connection.role} at={wireMidpoint(startX, startY, endX, endY)} label={t(`canvas.connectionRoles.${connection.role || "auto"}`)} hint={t("canvas.connectionRoles.hint")} onClick={() => onRoleChange?.(nextConnectionRole(connection.role))} /> : null}
+        </g>
+    );
+}
+
+function RoleLabel({ role, at, label, hint, onClick }: { role?: CanvasConnectionRole; at: Position; label: string; hint: string; onClick: () => void }) {
+    const theme = canvasThemes[useThemeStore((state) => state.theme)];
+    const width = Math.max(36, label.length * 12 + 16);
+    return (
+        <g
+            transform={`translate(${at.x - width / 2} ${at.y - 11})`}
+            style={{ cursor: "pointer", pointerEvents: "all" }}
+            onPointerDown={(event) => event.stopPropagation()}
+            onClick={(event) => {
+                event.stopPropagation();
+                onClick();
+            }}
+        >
+            <title>{hint}</title>
+            <rect width={width} height={22} rx={11} fill={theme.node.panel} stroke={role ? theme.edge.selected : theme.edge.stroke} strokeWidth={1} />
+            <text x={width / 2} y={15} textAnchor="middle" fontSize={12} fill={role ? theme.node.text : theme.node.muted} style={{ userSelect: "none" }}>
+                {label}
+            </text>
         </g>
     );
 }

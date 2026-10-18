@@ -4,7 +4,7 @@ import i18n from "@/i18n";
 import { imageReferenceLabel } from "@/lib/image-reference-prompt";
 import type { ReferenceImage } from "@/types/image";
 import type { ReferenceAudio, ReferenceVideo } from "@/types/media";
-import { CanvasNodeType, type CanvasConnection, type CanvasNodeData } from "@/types/canvas";
+import { CanvasNodeType, type CanvasConnection, type CanvasConnectionRole, type CanvasNodeData } from "@/types/canvas";
 import { getGenerationResourceNodes, getGroupResourceNodes } from "@/lib/canvas/canvas-resource-references";
 import { getNodeDefinition } from "@/lib/canvas/node-registry";
 
@@ -128,14 +128,34 @@ function buildComposerGenerationContext(inputs: NodeGenerationInput[], prompt: s
     };
 }
 
+const ROLE_RANK = { first: 0, last: 1, reference: 2 } as const;
+
 export function buildNodeGenerationInputs(nodeId: string, nodes: CanvasNodeData[], connections: CanvasConnection[]): NodeGenerationInput[] {
-    return getGenerationResourceNodes(nodeId, nodes, connections).flatMap((node): NodeGenerationInput[] => {
-        if (node.type === CanvasNodeType.Group) {
-            const children = getGroupResourceNodes(node.id, nodes).flatMap(readNodeGenerationResource);
-            return children.length ? [{ nodeId: node.id, type: "group", title: node.title, children }] : [];
-        }
-        return readNodeGenerationResource(node);
-    });
+    // FrameDock: connection roles (first/last frame, reference) travel with the images and order the inputs.
+    const resourceNodes = getGenerationResourceNodes(nodeId, nodes, connections);
+    // Roles live on the connections into the node whose inputs these are: this node, or — when it borrowed a
+    // config node's inputs — that config node.
+    const ownInputs = connections.some((connection) => connection.toNodeId === nodeId && resourceNodes.some((node) => node.id === connection.fromNodeId));
+    const inputsOf = ownInputs ? nodeId : connections.find((connection) => connection.fromNodeId === nodeId && nodes.find((node) => node.id === connection.toNodeId)?.type === CanvasNodeType.Config)?.toNodeId;
+    const roleOf = new Map<string, CanvasConnectionRole>();
+    for (const connection of connections) if (connection.role && connection.toNodeId === inputsOf) roleOf.set(connection.fromNodeId, connection.role);
+    const rank = (id: string) => {
+        const role = roleOf.get(id);
+        return role ? ROLE_RANK[role] : 3;
+    };
+    const withRole = (input: NodeGenerationResourceInput, role: CanvasConnectionRole | undefined): NodeGenerationResourceInput => (role && input.image ? { ...input, image: { ...input.image, role } } : input);
+    return [...resourceNodes]
+        .sort((a, b) => rank(a.id) - rank(b.id))
+        .flatMap((node): NodeGenerationInput[] => {
+            const role = roleOf.get(node.id);
+            if (node.type === CanvasNodeType.Group) {
+                const children = getGroupResourceNodes(node.id, nodes)
+                    .flatMap(readNodeGenerationResource)
+                    .map((input) => withRole(input, role));
+                return children.length ? [{ nodeId: node.id, type: "group", title: node.title, children }] : [];
+            }
+            return readNodeGenerationResource(node).map((input) => withRole(input, role));
+        });
 }
 
 function flattenGenerationInputs(inputs: NodeGenerationInput[]) {
