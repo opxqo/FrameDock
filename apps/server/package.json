@@ -8,10 +8,12 @@
     "build": "tsup",
     "start": "node --env-file-if-exists=../../.env dist/index.js",
     "typecheck": "tsc --noEmit",
-    "db:generate": "drizzle-kit generate"
+    "db:generate": "drizzle-kit generate",
+    "test": "tsx --test src/**/*.test.ts"
   },
   "dependencies": {
     "@fastify/multipart": "10.1.4",
+    "@fastify/static": "10.1.6",
     "@framedock/shared": "workspace:*",
     "better-sqlite3": "13.0.3",
     "drizzle-orm": "0.45.4",

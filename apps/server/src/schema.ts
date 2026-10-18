@@ -1,6 +1,7 @@
 import type { NodeStatus, NodeType, RunStatus } from "@framedock/shared";
 import {
   type AnySQLiteColumn,
+  index,
   integer,
   primaryKey,
   real,
@@ -102,3 +103,54 @@ export const runs = sqliteTable("runs", {
   created_at: integer("created_at").notNull(),
   finished_at: integer("finished_at"),
 });
+
+// FrameDock: one row per API call (provider calls through /proxy, Codex, MOKE, and browser-side calls that
+// bypass the proxy). Bodies and headers are stored already redacted and truncated (see logging/redact.ts).
+export const apiLogs = sqliteTable(
+  "api_logs",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    ts: integer("ts").notNull(),
+    state: text("state", {
+      enum: ["pending", "done", "error", "interrupted"],
+    }).notNull(),
+    source: text("source", {
+      enum: ["proxy", "browser", "codex", "moke"],
+    }).notNull(),
+    method: text("method").notNull(),
+    url: text("url").notNull(),
+    url_hash: text("url_hash").notNull(),
+    host: text("host").notNull(),
+    path: text("path").notNull(),
+    provider: text("provider").notNull(),
+    model: text("model"),
+    status: integer("status"),
+    error: text("error"),
+    duration_ms: integer("duration_ms"),
+    total_ms: integer("total_ms"),
+    req_headers: text("req_headers"),
+    req_body: text("req_body"),
+    req_size: integer("req_size"),
+    req_truncated: integer("req_truncated").notNull().default(0),
+    res_headers: text("res_headers"),
+    res_body: text("res_body"),
+    res_size: integer("res_size"),
+    res_truncated: integer("res_truncated").notNull().default(0),
+    res_type: text("res_type"),
+    project_id: text("project_id"),
+    node_id: text("node_id"),
+    mode: text("mode"),
+    run_id: text("run_id"),
+    page: text("page"),
+    req_uid: text("req_uid"),
+    poll: integer("poll").notNull().default(0),
+    extra: text("extra"),
+  },
+  (table) => [
+    index("api_logs_ts").on(table.ts),
+    index("api_logs_node").on(table.node_id),
+    index("api_logs_run").on(table.run_id),
+    index("api_logs_state_status").on(table.state, table.status),
+    index("api_logs_poll").on(table.method, table.url_hash, table.ts),
+  ],
+);

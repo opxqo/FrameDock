@@ -4,14 +4,20 @@ import codexApi from "./codex";
 import { config } from "./config";
 import { openDatabase } from "./db";
 import kvApi from "./kv";
+import { initCallLog, startRetentionJob } from "./logging/logger";
+import logsApi from "./logs";
 import mockApi from "./mock";
 import mokeApi from "./moke";
 import proxy from "./proxy";
 
 const app = Fastify({ logger: true });
 const { db, sqlite } = openDatabase();
+initCallLog(sqlite, (error, message) => app.log.warn({ err: error }, message));
+const stopRetention = startRetentionJob();
 
 await app.register(kvApi, { prefix: "/api/kv", db });
+
+await app.register(logsApi, { prefix: "/api/logs", sqlite });
 
 await app.register(proxy, { prefix: "/proxy" });
 
@@ -26,6 +32,7 @@ if (config.mockApi) {
 }
 
 app.addHook("onClose", async () => {
+  stopRetention();
   sqlite.close();
 });
 

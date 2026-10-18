@@ -9,6 +9,14 @@ import { extname, join } from "node:path";
 import { createInterface } from "node:readline";
 import type { FastifyPluginAsync } from "fastify";
 import { config } from "./config";
+import {
+  bodyLimits,
+  type CallHandle,
+  finishCall,
+  parseContext,
+  startCall,
+} from "./logging/logger";
+import { captureBody } from "./logging/redact";
 
 const CODEX_BIN = process.env.CODEX_BIN || "codex";
 const CODEX_HOME = process.env.CODEX_HOME || join(homedir(), ".codex");
@@ -160,20 +168,63 @@ function activityFor(event: CodexEvent): string | undefined {
   return undefined;
 }
 
-const codexApi: FastifyPluginAsync = async (app) => {
-  app.get("/models", async () => ({ models: await listModels() }));
-
-  app.get("/status", async () => {
-    const version = await run(CODEX_BIN, ["--version"]);
-    if (!version.ok) return { available: false, loggedIn: false, version: "" };
-    const login = await run(CODEX_BIN, ["login", "status"]);
-    return {
-      available: true,
-      version: version.output,
-      loggedIn: login.ok && /logged in/i.test(login.output),
-      login: login.output,
-    };
+/** Records a small Codex route call (status/models) and its result in the API log. */
+async function logged<T>(
+  request: {
+    method: string;
+    url: string;
+    headers: Record<string, string | string[] | undefined>;
+  },
+  action: () => Promise<T>,
+): Promise<T> {
+  const handle = startCall({
+    source: "codex",
+    method: request.method,
+    url: `codex:${request.url.split("?")[0]}`,
+    provider: "codex",
+    context: parseContext(request.headers["x-framedock-ctx"]),
   });
+  try {
+    const result = await action();
+    finishCall(handle, {
+      state: "done",
+      status: 200,
+      resType: "application/json",
+      body: captureBody(
+        JSON.stringify(result),
+        "application/json",
+        bodyLimits(),
+      ),
+    });
+    return result;
+  } catch (error) {
+    finishCall(handle, {
+      state: "error",
+      error: error instanceof Error ? error.message : String(error),
+    });
+    throw error;
+  }
+}
+
+const codexApi: FastifyPluginAsync = async (app) => {
+  app.get("/models", async (request) =>
+    logged(request, async () => ({ models: await listModels() })),
+  );
+
+  app.get("/status", async (request) =>
+    logged(request, async () => {
+      const version = await run(CODEX_BIN, ["--version"]);
+      if (!version.ok)
+        return { available: false, loggedIn: false, version: "" };
+      const login = await run(CODEX_BIN, ["login", "status"]);
+      return {
+        available: true,
+        version: version.output,
+        loggedIn: login.ok && /logged in/i.test(login.output),
+        login: login.output,
+      };
+    }),
+  );
 
   app.post<{ Body: RunBody }>(
     "/run",
@@ -236,9 +287,35 @@ const codexApi: FastifyPluginAsync = async (app) => {
         "Cache-Control": "no-store",
         "X-Accel-Buffering": "no",
       });
+      // What the run did, kept for the API log (statuses, image sizes — never the image bytes).
+      const trail: string[] = [];
+      const imageSizes: number[] = [];
       const send = (event: Record<string, unknown>) => {
+        if (event.type === "status" && trail.length < 60)
+          trail.push(String(event.text));
+        if (event.type === "image")
+          imageSizes.push(String(event.dataUrl ?? "").length);
         if (!res.writableEnded) res.write(`${JSON.stringify(event)}\n`);
       };
+      const logHandle: CallHandle | null = startCall({
+        source: "codex",
+        method: "POST",
+        url: "codex:/api/codex/run",
+        provider: "codex",
+        contentType: "application/json",
+        context: parseContext(request.headers["x-framedock-ctx"]),
+        body: JSON.stringify({
+          mode,
+          model: selected?.slug ?? null,
+          effort: safeEffort,
+          prompt,
+          images: images.map((image) => `${image.length} chars`),
+        }),
+        extra: {
+          args: args.slice(0, -1).filter((arg) => arg !== runDir),
+          timeoutMs: RUN_TIMEOUT_MS,
+        },
+      });
 
       const child = spawn(CODEX_BIN, args, {
         cwd: runDir,
@@ -292,6 +369,7 @@ const codexApi: FastifyPluginAsync = async (app) => {
 
       child.on("close", async (code) => {
         clearTimeout(timer);
+        const clientGone = res.destroyed;
         try {
           if (mode === "image" && threadId) {
             const dir = join(CODEX_HOME, "generated_images", threadId);
@@ -322,6 +400,28 @@ const codexApi: FastifyPluginAsync = async (app) => {
             send({ type: "error", message: explainFailure(failure) });
           else send({ type: "done", text: cleanText(finalText) });
         } finally {
+          finishCall(logHandle, {
+            state: failure || clientGone ? "error" : "done",
+            status: failure ? 500 : 200,
+            error: failure
+              ? explainFailure(failure)
+              : clientGone
+                ? "客户端取消"
+                : undefined,
+            resType: "application/x-ndjson",
+            body: captureBody(
+              JSON.stringify({
+                exitCode: code,
+                threadId: threadId || undefined,
+                activity: trail,
+                images: imageSizes.map((chars) => `${chars} chars of data URL`),
+                text: cleanText(finalText),
+                stderrTail: stderr.trim().split("\n").slice(-6).join("\n"),
+              }),
+              "application/json",
+              bodyLimits(),
+            ),
+          });
           res.end();
           await rm(runDir, { recursive: true, force: true });
         }

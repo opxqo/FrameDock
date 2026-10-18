@@ -5,6 +5,8 @@ import { and, eq } from "drizzle-orm";
 import type { FastifyPluginAsync } from "fastify";
 import { EnvHttpProxyAgent, fetch } from "undici";
 import type { openDatabase } from "./db";
+import { bodyLimits, finishCall, startCall } from "./logging/logger";
+import { captureBody } from "./logging/redact";
 import { kv } from "./schema";
 
 const MOKE_MCP_URL = process.env.MOKE_MCP_URL || "https://www.mokeaigc.ai/mcp";
@@ -31,8 +33,44 @@ const dispatcher =
     ? new EnvHttpProxyAgent()
     : undefined;
 
-/** Calls one MCP tool and returns its JSON payload (the server puts it in content[0].text). */
+/** Calls one MCP tool and returns its JSON payload (the server puts it in content[0].text). Every call is logged. */
 async function callTool(name: string, args: Record<string, unknown>) {
+  const handle = startCall({
+    source: "moke",
+    method: "POST",
+    url: MOKE_MCP_URL,
+    provider: "moke",
+    contentType: "application/json",
+    body: JSON.stringify({
+      jsonrpc: "2.0",
+      method: "tools/call",
+      params: { name, arguments: args },
+    }),
+  });
+  try {
+    const payload = await callToolUpstream(name, args);
+    finishCall(handle, {
+      state: "done",
+      status: 200,
+      resType: "application/json",
+      body: captureBody(
+        JSON.stringify(payload),
+        "application/json",
+        bodyLimits(),
+      ),
+    });
+    return payload;
+  } catch (error) {
+    finishCall(handle, {
+      state: "error",
+      status: error instanceof MokeError ? error.status : undefined,
+      error: error instanceof Error ? error.message : String(error),
+    });
+    throw error;
+  }
+}
+
+async function callToolUpstream(name: string, args: Record<string, unknown>) {
   let response: Awaited<ReturnType<typeof fetch>>;
   try {
     response = await fetch(MOKE_MCP_URL, {
