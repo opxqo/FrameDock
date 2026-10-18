@@ -8,6 +8,8 @@ import { useTranslation } from "react-i18next";
 
 import { ImageSettingsPanel, imageQualityLabel, imageSizeLabel } from "@/components/image-settings-panel";
 import { canvasThemes } from "@/lib/canvas-theme";
+import { findYfaiModel } from "@/lib/yfai-catalog";
+import { buildYfaiParams } from "@/services/api/yfai";
 import { useThemeStore } from "@/stores/use-theme-store";
 import type { AiConfig } from "@/stores/use-config-store";
 
@@ -67,7 +69,7 @@ export function CanvasImageSettingsPopover({ config, onConfigChange, onOpenChang
             <span ref={buttonRef} className="inline-flex min-w-0">
                 <Button size="small" type="text" className={buttonClassName || "!h-8 !max-w-[180px] !justify-start !rounded-full !px-2.5"} style={{ background: theme.node.fill, color: theme.node.text }} icon={<Settings2 className="size-3.5" />} onClick={() => updateOpen(!open)}>
                     <span className="truncate">
-                        {config.model.startsWith("yfai::") ? t("yfai.modelParameters") : <>{imageQualityLabel(quality)} · {imageSizeLabel(activeSize)} · {t("canvas.controls.images", { count })}</>}
+                        {config.model.startsWith("yfai::") ? yfaiChipLabel(config, t) : <>{imageQualityLabel(quality)} · {imageSizeLabel(activeSize)} · {t("canvas.controls.images", { count })}</>}
                     </span>
                 </Button>
             </span>
@@ -103,9 +105,7 @@ function ImageSettingsPortal({
         width,
         left: Math.max(margin, Math.min(window.innerWidth - width - margin, left)),
         ...canvasSettingsVerticalPosition(buttonRect, window.innerHeight, Boolean(topPlacement)),
-        background: theme.toolbar.panel,
-        borderRadius: 18,
-        boxShadow: "0 18px 54px rgba(28, 25, 23, 0.16)",
+        borderRadius: 16,
         overflow: "visible",
         color: theme.node.text,
     } as const;
@@ -114,7 +114,7 @@ function ImageSettingsPortal({
         <div
             ref={panelRef}
             data-canvas-settings-popover
-            className="canvas-image-settings-popover"
+            className="glass canvas-image-settings-popover"
             style={style}
             onPointerDown={(event) => event.stopPropagation()}
             onMouseDown={(event) => event.stopPropagation()}
@@ -126,4 +126,12 @@ function ImageSettingsPortal({
         </div>,
         document.body,
     );
+}
+
+// FrameDock: a short summary for YFAI models (ratio · count) instead of the long "YFAI 模型参数" label.
+function yfaiChipLabel(config: AiConfig, t: (key: string, options?: Record<string, unknown>) => string) {
+    const model = findYfaiModel(config.model, config.yfaiModels);
+    const params = model ? buildYfaiParams(config, model) : {};
+    const ratio = typeof params.aspect_ratio === "string" ? params.aspect_ratio : t("settingsPanels.common.auto");
+    return `${ratio} · ${t("canvas.controls.images", { count: Number(config.count) || 1 })}`;
 }

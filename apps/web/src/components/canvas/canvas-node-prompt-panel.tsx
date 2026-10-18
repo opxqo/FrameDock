@@ -103,8 +103,9 @@ export function CanvasNodePromptPanel({ node, nodes, isRunning, onPromptChange, 
                 placeholder={mode === "text" && skill ? t("skills.promptPlaceholder", { name: skill.title }) : t(`canvas.promptPanel.${mode === "image" && hasImageContent ? "editImage" : mode === "text" && hasTextContent ? "editText" : mode}`)}
             />
 
-            <div className="mt-2 flex min-w-0 items-center justify-between gap-2">
-                <div className="flex min-w-0 items-center gap-2">
+            {/* Parameter capsules on the left can shrink; the round primary button keeps its own column. */}
+            <div className="mt-2 grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+                <div className="flex min-w-0 items-center gap-2 overflow-hidden">
                     <Tooltip title={t("canvas.promptPanel.expandEditor")}>
                         <Button type="text" className="!h-8 !w-8 !min-w-8 shrink-0 !rounded-full !bg-transparent !p-0" style={{ color: theme.node.text }} icon={<Maximize2 className="size-3.5" />} onClick={openExpandedEditor} aria-label={t("canvas.promptPanel.expandEditor")} />
                     </Tooltip>
@@ -140,31 +141,18 @@ export function CanvasNodePromptPanel({ node, nodes, isRunning, onPromptChange, 
                         </>
                     )}
                 </div>
-                <Button
-                    type="primary"
-                    className={isRunning || isRegeneratingContent ? "!h-8 shrink-0 !rounded-full !px-3" : "!size-8 !min-w-8 shrink-0 !rounded-full !p-0"}
-                    danger={isRunning}
-                    disabled={!isRunning && !prompt.trim()}
-                    onClick={() => (isRunning ? onStop(node.id) : submit())}
-                    aria-label={t(isRunning ? "canvas.promptPanel.stopGeneration" : isRegeneratingContent ? "canvas.promptPanel.regenerate" : "canvas.promptPanel.generate")}
-                >
-                    <span className="flex items-center gap-1.5">
-                        {isRunning ? (
-                            <>
-                                <LoaderCircle className="size-4 animate-spin" />
-                                <Square className="size-3.5 fill-current" />
-                                <span className="text-xs font-medium">{t("canvas.promptPanel.stop")}</span>
-                            </>
-                        ) : isRegeneratingContent ? (
-                            <>
-                                <RefreshCw className="size-4" />
-                                <span className="text-xs font-medium">{t("canvas.promptPanel.regenerate")}</span>
-                            </>
-                        ) : (
-                            <ArrowUp className="size-4" />
-                        )}
-                    </span>
-                </Button>
+                <Tooltip title={t(isRunning ? "canvas.promptPanel.stop" : isRegeneratingContent ? "canvas.promptPanel.regenerate" : "canvas.promptPanel.generate")}>
+                    <Button
+                        type="primary"
+                        shape="circle"
+                        className="!size-8 !min-w-8 shrink-0 !p-0"
+                        danger={isRunning}
+                        disabled={!isRunning && !prompt.trim()}
+                        onClick={() => (isRunning ? onStop(node.id) : submit())}
+                        aria-label={t(isRunning ? "canvas.promptPanel.stopGeneration" : isRegeneratingContent ? "canvas.promptPanel.regenerate" : "canvas.promptPanel.generate")}
+                        icon={isRunning ? <Square className="size-3 fill-current" /> : isRegeneratingContent ? <RefreshCw className="size-4" /> : <ArrowUp className="size-4" />}
+                    />
+                </Tooltip>
             </div>
             <Modal title={t("canvas.promptPanel.editorTitle")} open={expanded} centered width={760} footer={null} onCancel={() => setExpanded(false)} destroyOnHidden>
                 <div data-canvas-no-zoom className="pt-2" onWheelCapture={(event) => event.stopPropagation()}>

@@ -35,8 +35,10 @@ export function yfaiToolOnly(model: YfaiModel) { return ["voice-clone", "voice-d
 export function parseYfaiParams(serialized = "", model: string): Record<string, YfaiValue> {
     try { const parsed = JSON.parse(serialized); const values = parsed[model.replace(/^yfai::/, "")]; return values && typeof values === "object" && !Array.isArray(values) ? values : {}; } catch { return {}; }
 }
+// FrameDock: aspect ratio defaults to "auto" — not sent unless the user picks one, so the provider decides.
+const AUTO_DEFAULT_PARAMS = new Set(["aspect_ratio", "ratio"]);
 export function yfaiDefaults(model: YfaiModel) {
-    return Object.fromEntries(Object.entries(model.param_schema).flatMap(([key, spec]) => spec.default !== undefined && spec.type !== "upload" ? [[key, spec.default]] : [])) as Record<string, YfaiValue>;
+    return Object.fromEntries(Object.entries(model.param_schema).flatMap(([key, spec]) => spec.default !== undefined && spec.type !== "upload" && !(AUTO_DEFAULT_PARAMS.has(key) && !spec.required) ? [[key, spec.default]] : [])) as Record<string, YfaiValue>;
 }
 export function yfaiParamVisible(spec: YfaiParam, params: Record<string, YfaiValue>) {
     return !spec.available_when || Object.entries(spec.available_when).every(([key, values]) => values.some((value) => String(value) === String(params[key])));

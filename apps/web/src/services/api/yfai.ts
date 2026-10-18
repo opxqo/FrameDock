@@ -11,7 +11,7 @@ import { getMediaBlob, resolveMediaUrl } from "@/services/file-storage";
 import type { ReferenceImage } from "@/types/image";
 import type { ReferenceAudio, ReferenceVideo } from "@/types/media";
 
-type Options = { signal?: AbortSignal };
+type Options = { signal?: AbortSignal; onJob?: (jobId: string) => void };
 type MediaOptions = Options & { videos?: ReferenceVideo[]; audios?: ReferenceAudio[] };
 export type YfaiTask = { task_id?: string; id?: string; status?: string; is_final?: boolean; output_url?: string; result_url?: string; url?: string; result?: Record<string, unknown>; data?: unknown; error?: unknown; [key: string]: unknown };
 const headers = (key: string) => (key ? { Authorization: `Bearer ${key}` } : {});
@@ -229,6 +229,7 @@ async function requestYfaiImagesViaJob(config: AiConfig, model: YfaiModel, promp
         if (options?.signal?.aborted || (status !== undefined && status !== 404 && status !== 405)) throw error;
         return undefined;
     }
+    options?.onJob?.(submitted.id);
     const job = await watchJob(submitted.id, options?.signal);
     if (job.state === "succeeded" && job.result) {
         const count = job.result.files?.length ?? 1;

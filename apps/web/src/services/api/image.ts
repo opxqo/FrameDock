@@ -98,7 +98,8 @@ type GeminiPayload = {
     promptFeedback?: { blockReason?: string };
 };
 type GeminiStreamState = { buffer: string; text: string; toolCalls: ResponseToolCall[]; error?: string };
-type RequestOptions = { signal?: AbortSignal };
+// FrameDock: onJob reports the server job id as soon as it exists, so the caller can store it for reload recovery.
+type RequestOptions = { signal?: AbortSignal; onJob?: (jobId: string) => void };
 
 const IMAGE_QUALITY_VALUES = ["low", "medium", "high", "xhigh", "max"];
 const DEFAULT_IMAGE_SHORT_SIDE = 1024;

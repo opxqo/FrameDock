@@ -3028,16 +3028,22 @@ function InfiniteCanvasPage() {
                     await Promise.all(
                         imageIds.map(async (imageId) => {
                             try {
-                                const image = referenceImages.length
-                                    ? await requestEdit({ ...generationConfig, count: "1" }, effectivePrompt, referenceImages, { signal: controller.signal }).then((items) => items[0])
-                                    : await requestGeneration({ ...generationConfig, count: "1" }, effectivePrompt, { signal: controller.signal }).then((items) => items[0]);
-                                const uploaded = await uploadImage(image.dataUrl, { signal: controller.signal });
+                                // FrameDock: store the server job id on the placeholder at once, so a reload can pick the result up.
+                                const onJob = (jobId: string) => setNodes((prev) => prev.map((node) => (node.id === rootId ? { ...node, metadata: { ...node.metadata, images: node.metadata?.images?.map((image) => (image.id === imageId ? { ...image, jobId } : image)) } } : node)));
+                                const results = referenceImages.length
+                                    ? await requestEdit({ ...generationConfig, count: "1" }, effectivePrompt, referenceImages, { signal: controller.signal, onJob })
+                                    : await requestGeneration({ ...generationConfig, count: "1" }, effectivePrompt, { signal: controller.signal, onJob });
+                                // Show every image the provider returned (e.g. Midjourney's four), not just the first.
+                                const uploads = await Promise.all(results.map((result) => uploadImage(result.dataUrl, { signal: controller.signal })));
+                                const uploaded = uploads[0];
                                 const imageSize = fitNodeSize(uploaded.width, uploaded.height, imageConfig.width, imageConfig.height);
-                                const item: CanvasNodeImage = { id: imageId, status: NODE_STATUS_SUCCESS, content: uploaded.url, storageKey: uploaded.storageKey, naturalWidth: uploaded.width, naturalHeight: uploaded.height, bytes: uploaded.bytes, mimeType: uploaded.mimeType };
+                                const toItem = (upload: typeof uploaded, id: string): CanvasNodeImage => ({ id, status: NODE_STATUS_SUCCESS, content: upload.url, storageKey: upload.storageKey, naturalWidth: upload.width, naturalHeight: upload.height, bytes: upload.bytes, mimeType: upload.mimeType });
+                                const item = toItem(uploaded, imageId);
+                                const extras = uploads.slice(1).map((upload) => toItem(upload, nanoid()));
                                 setNodes((prev) =>
                                     prev.map((node) => {
                                         if (node.id !== rootId) return node;
-                                        const images = node.metadata?.images?.map((image) => (image.id === imageId ? item : image)) || [];
+                                        const images = node.metadata?.images?.flatMap((image) => (image.id === imageId ? [item, ...extras] : [image])) || [];
                                         if (node.metadata?.primaryImageId) return { ...node, metadata: { ...node.metadata, images } };
                                         const center = { x: node.position.x + node.width / 2, y: node.position.y + node.height / 2 };
                                         return {
