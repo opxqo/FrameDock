@@ -130,23 +130,29 @@ export function hasResumableVideoTask(node: CanvasNodeData) {
     return node.type === CanvasNodeType.Video && Boolean(node.metadata?.videoTaskId) && !node.metadata?.content;
 }
 
+/** Loading work that a server job is still producing; it survives a reload and is reconciled by resume-jobs.ts. */
+export function hasPendingJob(node: CanvasNodeData) {
+    return Boolean(node.metadata?.jobId) || Boolean(node.metadata?.images?.some((image) => image.status === "loading" && image.jobId));
+}
+
 export function resetInterruptedGeneration(nodes: CanvasNodeData[]) {
-    return nodes.map((node) =>
-        node.metadata?.status === "loading"
-            ? hasResumableVideoTask(node)
-                ? node
-                : {
-                      ...node,
-                      metadata: {
-                          ...node.metadata,
-                          status: "error" as const,
-                          errorDetails: i18n.t("canvas.generation.interrupted"),
-                          images: node.metadata.images?.map((image) => (image.status === "loading" ? { ...image, status: "error" as const, errorDetails: i18n.t("canvas.generation.interrupted") } : image)),
-                          texts: node.metadata.texts?.map((text) => (text.status === "loading" ? { ...text, status: "error" as const, errorDetails: i18n.t("canvas.generation.interrupted") } : text)),
-                      },
-                  }
-            : node,
-    );
+    const interrupted = i18n.t("canvas.generation.interrupted");
+    return nodes.map((node) => {
+        if (node.metadata?.status !== "loading" || hasResumableVideoTask(node)) return node;
+        // Only browser-side requests are really lost on reload; server jobs keep running and are picked up again.
+        if (node.metadata.jobId) return node;
+        const images = node.metadata.images?.map((image) => (image.status === "loading" && !image.jobId ? { ...image, status: "error" as const, errorDetails: interrupted } : image));
+        const stillRunning = images?.some((image) => image.status === "loading");
+        return {
+            ...node,
+            metadata: {
+                ...node.metadata,
+                ...(stillRunning ? {} : { status: "error" as const, errorDetails: interrupted }),
+                images,
+                texts: node.metadata.texts?.map((text) => (text.status === "loading" ? { ...text, status: "error" as const, errorDetails: interrupted } : text)),
+            },
+        };
+    });
 }
 
 export function isGenerationCanceled(error: unknown) {

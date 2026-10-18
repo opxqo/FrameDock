@@ -16,7 +16,7 @@ import { defaultConfig, useConfigStore, useEffectiveConfig } from "@/stores/use-
 import { ensureImagePreview, resolveImageUrl, uploadImage } from "@/services/image-storage";
 import { resolveMediaUrl, uploadMediaFile, type UploadedFile } from "@/services/file-storage";
 import { attachLogContext } from "@/services/api/log-context";
-import { outputKey, snapshotNodeOutput, versionKey, withVersion } from "@/lib/canvas/canvas-history";
+import { outputKey, snapshotNodeOutput, versionKey, withVersion, textContentPatch } from "@/lib/canvas/canvas-history";
 import { CanvasNodeHistoryDialog } from "@/components/canvas/canvas-node-history-dialog";
 import { nanoid } from "nanoid";
 import { getDataUrlByteSize, readImageMeta } from "@/lib/image-utils";
@@ -78,6 +78,7 @@ import {
     resolveMetadataReferences,
     sourceNodeReferenceImages,
 } from "@/lib/canvas/canvas-generation-helpers";
+import { applyJobResult, watchPendingJobs } from "@/lib/canvas/resume-jobs";
 import { configResultTarget, planSelection, planWorkflow, runWorkflowPlan, type WorkflowScope } from "@/lib/canvas/workflow-runner";
 import { arrangeableNodes, arrangeNodes, type ArrangeMode } from "@/lib/canvas/canvas-arrange";
 import { CanvasTextSplitDialog, type TextSplitResult } from "@/components/canvas/canvas-text-split-dialog";
@@ -495,6 +496,8 @@ function InfiniteCanvasPage() {
         [modal, stopGenerationByRunningId, t],
     );
 
+    const stopJobWatchRef = useRef<(() => void) | null>(null);
+    useEffect(() => () => stopJobWatchRef.current?.(), []);
     useEffect(() => {
         if (!hydrated) return;
         setProjectLoaded(false);
@@ -508,6 +511,9 @@ function InfiniteCanvasPage() {
             const restoredNodes = await hydrateCanvasImages(resetInterruptedGeneration(project.nodes));
             const restoredSessions = await hydrateAssistantImages(project.chatSessions || []);
             setNodes(restoredNodes);
+            // FrameDock: generations a server job was still producing come back into their nodes when it finishes.
+            stopJobWatchRef.current?.();
+            stopJobWatchRef.current = watchPendingJobs(restoredNodes, (nodeId, job, urls) => setNodes((prev) => prev.map((node) => (node.id === nodeId ? { ...node, metadata: applyJobResult(node.metadata || {}, job, urls, nanoid) } : node))));
             setConnections(project.connections);
             setChatSessions(restoredSessions);
             setActiveChatId(project.activeChatId || null);
@@ -899,7 +905,7 @@ function InfiniteCanvasPage() {
                         ...node,
                         metadata: {
                             ...node.metadata,
-                            ...(version.kind === "text" ? { content: version.content } : { content: url, ...media, images: undefined, primaryImageId: undefined }),
+                            ...(version.kind === "text" ? textContentPatch(node.metadata, version.content) : { content: url, ...media, images: undefined, primaryImageId: undefined }),
                             history,
                             inputHash: version.inputHash,
                             generatedAt: version.createdAt || undefined,

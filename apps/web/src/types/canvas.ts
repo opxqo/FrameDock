@@ -39,6 +39,8 @@ export type CanvasNodeImage = {
     naturalHeight: number;
     bytes: number;
     mimeType: string;
+    /** FrameDock: server job producing this image; lets a reload pick the result up (lib/canvas/resume-jobs.ts). */
+    jobId?: string;
 };
 
 export type CanvasNodeText = {
@@ -51,6 +53,8 @@ export type CanvasNodeText = {
 export type CanvasNodeMetadata = {
     /** FrameDock: skill snapshot used as the system prompt when this node generates text. */
     skill?: CanvasSkill;
+    /** FrameDock: server job producing this node's (single) output; see lib/canvas/resume-jobs.ts. */
+    jobId?: string;
     content?: string;
     composerContent?: string;
     prompt?: string;

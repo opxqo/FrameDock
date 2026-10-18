@@ -22,7 +22,22 @@ export function snapshotNodeOutput(node: CanvasNodeData): CanvasNodeVersion | nu
     const base = { id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`, createdAt: metadata?.generatedAt || "", prompt: metadata?.composerContent ?? metadata?.prompt, model: metadata?.model, inputHash: metadata?.inputHash };
     if (node.type === CanvasNodeType.Image) return { ...base, kind: "image", storageKey: metadata?.storageKey, naturalWidth: metadata?.naturalWidth, naturalHeight: metadata?.naturalHeight, bytes: metadata?.bytes, mimeType: metadata?.mimeType };
     if (node.type === CanvasNodeType.Video) return { ...base, kind: "video", storageKey: metadata?.storageKey, naturalWidth: metadata?.naturalWidth, naturalHeight: metadata?.naturalHeight, bytes: metadata?.bytes, mimeType: metadata?.mimeType };
-    return { ...base, kind: "text", content: metadata?.content };
+    return { ...base, kind: "text", content: primaryTextContent(metadata) };
+}
+
+/** The text a node shows: the primary entry of a generated batch, else `content`. */
+export function primaryTextContent(metadata: CanvasNodeData["metadata"]) {
+    const texts = metadata?.texts || [];
+    const primary = texts.find((text) => text.id === (metadata?.primaryTextId || texts[0]?.id));
+    return primary?.content || metadata?.content;
+}
+
+/** Metadata patch that makes a text node show `content` (TextContent reads the primary batch entry first). */
+export function textContentPatch(metadata: CanvasNodeData["metadata"], content: string | undefined) {
+    const texts = metadata?.texts;
+    if (!texts?.length) return { content };
+    const primaryId = metadata?.primaryTextId || texts[0].id;
+    return { content, texts: texts.map((text) => (text.id === primaryId ? { ...text, content: content || "", status: "success" as const, errorDetails: undefined } : text)) };
 }
 
 export function versionKey(version: CanvasNodeVersion) {
