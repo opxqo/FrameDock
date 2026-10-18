@@ -14,7 +14,8 @@
     "start": "node scripts/start.mjs",
     "typecheck": "pnpm -r typecheck",
     "lint": "biome check .",
-    "format": "biome format --write ."
+    "format": "biome format --write .",
+    "verify:yfai": "bun scripts/verify-yfai.ts --from-app"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",

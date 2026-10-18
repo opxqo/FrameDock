@@ -5,28 +5,23 @@ import { and, eq } from "drizzle-orm";
 import { config } from "../config";
 import type { openDatabase } from "../db";
 import { kv } from "../schema";
-import type { FetchedResult, JobKind, JobResult } from "./types";
+import type { FetchedResult, JobFile, JobKind, JobResult } from "./types";
 
 type Database = ReturnType<typeof openDatabase>["db"];
 
 // Same on-disk layout and kv rows as kv.ts, so the browser reads job output through /api/kv like any media
-// file. Keys follow the web app's `<prefix>:<id>` convention (services/file-storage.ts). The image prefix is
-// provisional until the web integration (T013/T014) confirms how image_files keys are read.
+// file. Keys follow the web app's `<prefix>:<id>` convention (services/file-storage.ts, image-storage.ts).
 const TARGETS: Partial<Record<JobKind, { store: string; prefix: string }>> = {
   video: { store: "media_files", prefix: "video" },
   audio: { store: "media_files", prefix: "audio" },
   image: { store: "image_files", prefix: "image" },
 };
 
-export async function saveJobBlob(
+async function writeBlob(
   db: Database,
-  kind: JobKind,
-  jobId: string,
+  target: { store: string; key: string },
   fetched: FetchedResult,
-): Promise<JobResult> {
-  const target = TARGETS[kind];
-  if (!target) throw new Error(`Job kind "${kind}" has no blob storage`);
-  const key = `${target.prefix}:${jobId}`;
+): Promise<JobFile> {
   const directory = join(config.dataDir, "blobs", target.store);
   const tempDir = join(config.dataDir, "blobs", ".tmp");
   await mkdir(directory, { recursive: true });
@@ -34,18 +29,18 @@ export async function saveJobBlob(
   const temp = join(tempDir, randomUUID());
   try {
     await writeFile(temp, fetched.bytes);
-    await rename(temp, join(directory, encodeURIComponent(key)));
+    await rename(temp, join(directory, encodeURIComponent(target.key)));
   } finally {
     await rm(temp, { force: true });
   }
   const previous = db
     .select()
     .from(kv)
-    .where(and(eq(kv.store, target.store), eq(kv.key, key)))
+    .where(and(eq(kv.store, target.store), eq(kv.key, target.key)))
     .get();
   const row = {
     store: target.store,
-    key,
+    key: target.key,
     kind: "blob" as const,
     value: null,
     mime: fetched.mime,
@@ -58,13 +53,35 @@ export async function saveJobBlob(
     .run();
   return {
     store: target.store,
-    key,
+    key: target.key,
     mime: fetched.mime,
     size: fetched.bytes.length,
     ...(fetched.width ? { width: fetched.width } : {}),
     ...(fetched.height ? { height: fetched.height } : {}),
     ...(fetched.durationMs ? { durationMs: fetched.durationMs } : {}),
   };
+}
+
+/**
+ * Stores every output of a job. The first keeps the plain `<prefix>:<jobId>` key; further outputs get
+ * `<prefix>:<jobId>-2`, `-3`, ... The result describes the first at the top level and lists all in `files`.
+ */
+export async function saveJobBlobs(
+  db: Database,
+  kind: JobKind,
+  jobId: string,
+  outputs: FetchedResult[],
+): Promise<JobResult> {
+  const target = TARGETS[kind];
+  if (!target) throw new Error(`Job kind "${kind}" has no blob storage`);
+  if (!outputs.length) throw new Error("Job produced no output");
+  const files: JobFile[] = [];
+  for (const [index, fetched] of outputs.entries()) {
+    const key = `${target.prefix}:${jobId}${index ? `-${index + 1}` : ""}`;
+    files.push(await writeBlob(db, { store: target.store, key }, fetched));
+  }
+  const [first] = files as [JobFile];
+  return { ...first, files };
 }
 
 /** Where the browser puts reference files for a job (see apps/web/src/services/api/jobs.ts). */

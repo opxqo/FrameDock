@@ -7,6 +7,7 @@ import {
 } from "node:http";
 import type { AddressInfo } from "node:net";
 import { after, afterEach, before, describe, it } from "node:test";
+import sharp from "sharp";
 import { closeAll, makeEngine, openDb, track, untilState } from "../testing";
 import type { FetchedResult, JobInput } from "../types";
 import { openaiVideoAdapter } from "./openai-video";
@@ -70,8 +71,9 @@ function setup(adapter: ReturnType<typeof fast<typeof yfaiAdapter>>) {
   const engine = track(
     entry,
     makeEngine(db, adapter, {
-      saveResult: async (_kind, id, fetched) => {
-        saved.push(fetched);
+      saveResult: async (_kind, id, outputs) => {
+        saved.push(...outputs);
+        const [fetched] = outputs as [FetchedResult];
         return {
           store: "media_files",
           key: `video:${id}`,
@@ -100,6 +102,7 @@ describe("yfai adapter", () => {
     let polls = 0;
     handler = (request, response) => {
       if (request.url === "/api/v1/model-runtime/invoke") {
+        response.setHeader("x-request-id", "req_test");
         return json(response, 200, { code: 200, data: { task_id: "t1" } });
       }
       if (request.url === "/v1/tasks/t1") {
@@ -123,7 +126,8 @@ describe("yfai adapter", () => {
           },
         });
       }
-      if (request.url === "/files/v.mp4") return media(response);
+      if (request.url === "/files/v.mp4" || request.url === "/files/other.mp4")
+        return media(response);
       response.writeHead(404).end();
     };
     const { engine, saved } = setup(fast(yfaiAdapter));
@@ -132,15 +136,25 @@ describe("yfai adapter", () => {
 
     assert.equal(done.remote_task_id, "t1");
     assert.equal(polls, 3);
+    assert.equal(saved.length, 2, "every output of the task is kept");
     assert.deepEqual(saved[0]?.bytes, MP4);
     assert.equal(saved[0]?.mime, "video/mp4");
     const invoke = seen.find(
       (entry) => entry.url === "/api/v1/model-runtime/invoke",
     );
     assert.equal(invoke?.headers.authorization, "Bearer yf-key");
-    assert.deepEqual(JSON.parse(invoke?.body.toString() ?? "{}").params, {
-      prompt: "a cat",
-    });
+    const sent = JSON.parse(invoke?.body.toString() ?? "{}");
+    assert.deepEqual(sent.params, { prompt: "a cat" });
+    assert.equal(
+      sent.client_request_id,
+      job.id,
+      "the job id is the idempotency key, whatever the browser sent",
+    );
+    assert.equal(
+      done.request_id,
+      "req_test",
+      "the provider's request id is kept",
+    );
     const download = seen.find((entry) => entry.url === "/files/v.mp4");
     assert.equal(
       download?.headers.authorization,
@@ -165,7 +179,7 @@ describe("yfai adapter", () => {
     assert.match(failed.error ?? "", /t2/);
   });
 
-  it("classifies submit errors: 4xx and error envelopes fail, 5xx is unknown and never resent", async () => {
+  it("classifies submit errors: 4xx and error envelopes fail; a 5xx is repeated with the same id, then parked as unknown", async () => {
     handler = (_request, response) =>
       json(response, 422, { error: { message: "bad params" } });
     const rejected = setup(fast(yfaiAdapter));
@@ -190,8 +204,92 @@ describe("yfai adapter", () => {
     const flaky = setup(fast(yfaiAdapter));
     const third = flaky.engine.create(yfaiJob());
     await untilState(flaky.engine, third.job.id, "unknown");
-    await new Promise((resolve) => setTimeout(resolve, 50));
-    assert.equal(seen.length, 1, "a 5xx submit must not be retried");
+    assert.equal(
+      seen.length,
+      5,
+      "an unclear submit is repeated a bounded number of times",
+    );
+    const ids = new Set(
+      seen.map((entry) => JSON.parse(entry.body.toString()).client_request_id),
+    );
+    assert.deepEqual(
+      [...ids],
+      [third.job.id],
+      "every repeat carries the same id, so the provider cannot bill twice",
+    );
+  });
+
+  it("recovers from a submit that failed once: same id, one task", async () => {
+    let calls = 0;
+    handler = (request, response) => {
+      if (request.url === "/api/v1/model-runtime/invoke") {
+        calls += 1;
+        if (calls === 1) return response.destroy(); // connection reset after the request was sent
+        return json(response, 200, { task_id: "t-retry" });
+      }
+      if (request.url === "/v1/tasks/t-retry") {
+        return json(response, 200, {
+          is_final: true,
+          status: "completed",
+          result: { videos: [{ url: `${base}/files/v.mp4` }] },
+        });
+      }
+      if (request.url === "/files/v.mp4") return media(response);
+      response.writeHead(404).end();
+    };
+    const { engine } = setup(fast(yfaiAdapter));
+    const { job } = engine.create(yfaiJob());
+    const done = await untilState(engine, job.id, "succeeded");
+    assert.equal(done.remote_task_id, "t-retry");
+    assert.equal(calls, 2);
+  });
+
+  it("explains a 402 as a balance problem", async () => {
+    handler = (_request, response) =>
+      json(response, 402, {
+        error: { message: "wallet balance insufficient for image mj_imagine" },
+      });
+    const { engine } = setup(fast(yfaiAdapter));
+    const { job } = engine.create(yfaiJob());
+    const failed = await untilState(engine, job.id, "failed");
+    assert.match(
+      failed.error ?? "",
+      /Not enough available balance: wallet balance insufficient/,
+    );
+  });
+
+  it("keeps every image of a batch with its pixel size", async () => {
+    const png = await sharp({
+      create: { width: 8, height: 4, channels: 3, background: "#fff" },
+    })
+      .png()
+      .toBuffer();
+    handler = (request, response) => {
+      if (request.url === "/api/v1/model-runtime/invoke")
+        return json(response, 200, { task_id: "img-1" });
+      if (request.url === "/v1/tasks/img-1") {
+        return json(response, 200, {
+          is_final: true,
+          status: "completed",
+          result: {
+            images: [
+              { original_url: `${base}/i/1.png` },
+              { url: `${base}/i/2.png` },
+            ],
+          },
+        });
+      }
+      if (request.url?.startsWith("/i/"))
+        return response
+          .writeHead(200, { "content-type": "image/png" })
+          .end(png);
+      response.writeHead(404).end();
+    };
+    const { engine, saved } = setup(fast(yfaiAdapter));
+    const { job } = engine.create(yfaiJob({ kind: "image" }));
+    await untilState(engine, job.id, "succeeded");
+    assert.equal(saved.length, 2);
+    assert.deepEqual([saved[0]?.width, saved[0]?.height], [8, 4]);
   });
 
   it("stops on an expired task (410)", async () => {

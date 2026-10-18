@@ -7,7 +7,7 @@ import { migrate } from "drizzle-orm/better-sqlite3/migrator";
 import { config } from "../config";
 import * as schema from "../schema";
 import { JobEngine } from "./engine";
-import type { JobAdapter } from "./types";
+import type { FetchedResult, JobAdapter } from "./types";
 
 // Shared by the jobs tests: throwaway SQLite databases and engines that are closed after each test.
 const directory = mkdtempSync(join(tmpdir(), "framedock-jobs-"));
@@ -32,12 +32,16 @@ export function makeEngine(
   return new JobEngine({
     db,
     adapters: [adapter],
-    saveResult: async (_kind, id, fetched) => ({
-      store: "media_files",
-      key: `video:${id}`,
-      mime: fetched.mime,
-      size: fetched.bytes.length,
-    }),
+    saveResult: async (_kind, id, outputs) => {
+      const fetched = outputs[0] as FetchedResult;
+      return {
+        store: "media_files",
+        key: `video:${id}`,
+        mime: fetched.mime,
+        size: fetched.bytes.length,
+      };
+    },
+    submitRetryDelayMs: () => 5,
     retryDelayMs: () => 5,
     ...overrides,
   });

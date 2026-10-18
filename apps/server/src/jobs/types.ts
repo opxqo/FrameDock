@@ -14,7 +14,7 @@ export const FINAL_STATES: readonly JobState[] = [
 export type Credentials = { baseUrl: string; apiKey: string };
 
 /** Where a finished job's output lives: a kv blob, read through the existing /api/kv interface. */
-export type JobResult = {
+export type JobFile = {
   store: string;
   key: string;
   mime: string;
@@ -23,6 +23,9 @@ export type JobResult = {
   height?: number;
   durationMs?: number;
 };
+
+/** The first output's fields at the top level (older clients read only these); `files` lists every output. */
+export type JobResult = JobFile & { files?: JobFile[] };
 
 export type JobInput = {
   kind: JobKind;
@@ -44,6 +47,7 @@ export type PublicJob = {
   model: string;
   state: JobState;
   remoteTaskId: string | null;
+  requestId: string | null;
   result: JobResult | null;
   error: string | null;
   projectId: string | null;
@@ -53,6 +57,7 @@ export type PublicJob = {
   createdAt: number;
   updatedAt: number;
   finishedAt: number | null;
+  deliveredAt: number | null;
   request?: unknown;
 };
 
@@ -98,16 +103,23 @@ export interface JobAdapter {
   id: string;
   /** Simultaneous submits for this adapter. */
   concurrency: number;
+  /**
+   * True when the provider deduplicates a submit by a client-chosen id (YFAI `client_request_id`), so repeating
+   * an unclear submit cannot bill twice. The engine then retries it by itself instead of parking the job.
+   */
+  idempotentSubmit?: boolean;
   pollIntervalMs: number;
   /** Polls before the job is parked as `unknown` (the provider may still finish it). */
   maxPolls: number;
-  submit(context: AdapterContext): Promise<{ remoteTaskId: string }>;
+  submit(
+    context: AdapterContext,
+  ): Promise<{ remoteTaskId: string; requestId?: string }>;
   poll(context: AdapterContext, remoteTaskId: string): Promise<PollOutcome>;
   fetchResult(
     context: AdapterContext,
     remoteTaskId: string,
     payload: unknown,
-  ): Promise<FetchedResult>;
+  ): Promise<FetchedResult | FetchedResult[]>;
   /** Best effort; failures are ignored. */
   cancel?(context: AdapterContext, remoteTaskId: string): Promise<void>;
 }

@@ -31,6 +31,8 @@ export const jobs = sqliteTable(
     credentials: text("credentials", { mode: "json" }),
     idempotency_key: text("idempotency_key"),
     remote_task_id: text("remote_task_id"),
+    // The provider's own request id (e.g. YFAI X-Request-Id): what its call log is searched by.
+    request_id: text("request_id"),
     result: text("result", { mode: "json" }),
     error: text("error"),
     project_id: text("project_id"),
@@ -42,6 +44,8 @@ export const jobs = sqliteTable(
     created_at: integer("created_at").notNull(),
     updated_at: integer("updated_at").notNull(),
     finished_at: integer("finished_at"),
+    // Set when a client has taken the result (acknowledged it). A finished job without it is "undelivered".
+    delivered_at: integer("delivered_at"),
   },
   (table) => [
     uniqueIndex("jobs_idempotency").on(table.idempotency_key),

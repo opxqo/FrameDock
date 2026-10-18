@@ -141,3 +141,7 @@ API Key 落库的说明：单用户自部署，API Key 本来就明文存在 kv 
 | [T014](../tasks/T014-jobs-sync-kinds.md) | P3 同步型任务 | Codex |
 
 P4 的卡片等 P2 验收后再写。编号从 T010 起，给日志系统留出 T008–T009。
+
+## 11. 后续：YFAI 可靠性加固（T015）
+
+图片任务也走服务端任务引擎，并补上幂等重提、未交付找回、任务核查、运行前预检和 `pnpm verify:yfai`，详见 [T015](../tasks/T015-yfai-reliability.md)。

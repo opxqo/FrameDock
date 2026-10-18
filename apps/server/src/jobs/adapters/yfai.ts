@@ -1,4 +1,10 @@
-import { AdapterError, type JobAdapter, type JobKind } from "../types";
+import sharp from "sharp";
+import {
+  AdapterError,
+  type FetchedResult,
+  type JobAdapter,
+  type JobKind,
+} from "../types";
 import { bodyMessage, download, errorMessage, readBody, send } from "./http";
 
 // Server-side port of apps/web/src/services/api/yfai.ts (submit, poll, result urls). The browser still
@@ -35,6 +41,9 @@ const FALLBACK_MIME: Partial<Record<JobKind, string>> = {
   video: "video/mp4",
   audio: "audio/mpeg",
 };
+
+/** A task can return several files (image batches, MJ grids); a job stores at most this many. */
+const MAX_OUTPUTS = 9;
 
 const origin = (baseUrl: string) =>
   baseUrl.trim().replace(/\/+$/, "").replace(/\/v1$/i, "");
@@ -89,13 +98,17 @@ export function yfaiTaskUrls(
 
 const auth = (apiKey: string) => ({ Authorization: `Bearer ${apiKey}` });
 
+// Images take 1–3 minutes (up to an hour at peak) and videos up to ~75 minutes, so a job keeps asking for
+// 80 minutes. Stopping early does not stop the task, it only loses the result.
 export const yfaiAdapter: JobAdapter = {
   id: "yfai",
   concurrency: 3,
-  pollIntervalMs: 5000,
-  maxPolls: 720,
+  // `client_request_id` is the job id, so repeating an unclear submit returns the same task, never a second one.
+  idempotentSubmit: true,
+  pollIntervalMs: 4000,
+  maxPolls: 1200,
 
-  async submit({ request, credentials, signal }) {
+  async submit({ jobId, request, credentials, signal }) {
     const invoke = (request as { invoke?: unknown } | null)?.invoke;
     if (!invoke || typeof invoke !== "object") {
       throw new AdapterError(
@@ -111,21 +124,28 @@ export const yfaiAdapter: JobAdapter = {
           ...auth(credentials.apiKey),
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(invoke),
+        body: JSON.stringify({ ...invoke, client_request_id: jobId }),
       },
       signal,
       "unknown",
     );
     const body = await readBody(response);
     // A 5xx may come after the provider already accepted (and billed) the task: unknown, not failed.
-    if (response.status >= 500) {
+    if (response.status >= 500 || response.status === 429) {
       throw new AdapterError(
         `Provider error (${response.status}): ${bodyMessage(body, response.status)}`,
         "unknown",
       );
     }
-    if (!response.ok)
-      throw new AdapterError(bodyMessage(body, response.status), "fatal");
+    if (!response.ok) {
+      const message = bodyMessage(body, response.status);
+      throw new AdapterError(
+        response.status === 402
+          ? `Not enough available balance: ${message}`
+          : message,
+        "fatal",
+      );
+    }
     const task = unwrap(body.json);
     const id = task.task_id || task.id;
     if (!id)
@@ -133,7 +153,10 @@ export const yfaiAdapter: JobAdapter = {
         "Provider accepted the request but returned no task id",
         "unknown",
       );
-    return { remoteTaskId: id };
+    return {
+      remoteTaskId: id,
+      requestId: response.headers.get("x-request-id") ?? undefined,
+    };
   },
 
   async poll({ credentials, signal }, remoteTaskId) {
@@ -170,16 +193,28 @@ export const yfaiAdapter: JobAdapter = {
 
   async fetchResult({ kind, signal }, _remoteTaskId, payload) {
     const key = URL_KEYS[kind];
-    const urls = key ? yfaiTaskUrls(payload as YfaiTask, key) : [];
-    const [first] = urls;
-    if (!first)
-      throw new AdapterError("Task finished without a result url", "fatal");
-    // The first output only: a job stores one blob. Multi-image batches are handled with the image kind (T014).
-    return download(
-      first,
-      {},
-      signal,
-      FALLBACK_MIME[kind] ?? "application/octet-stream",
+    const urls = (key ? yfaiTaskUrls(payload as YfaiTask, key) : []).slice(
+      0,
+      MAX_OUTPUTS,
     );
+    if (!urls.length)
+      throw new AdapterError("Task finished without a result url", "fatal");
+    const fallback = FALLBACK_MIME[kind] ?? "application/octet-stream";
+    const outputs: FetchedResult[] = [];
+    for (const url of urls) {
+      const file: FetchedResult = await download(url, {}, signal, fallback);
+      if (kind === "image") {
+        // Pixel size lets the canvas lay the image out without decoding it first.
+        const meta = await sharp(file.bytes)
+          .metadata()
+          .catch(() => undefined);
+        if (meta?.width && meta.height) {
+          file.width = meta.width;
+          file.height = meta.height;
+        }
+      }
+      outputs.push(file);
+    }
+    return outputs;
   },
 };

@@ -400,4 +400,46 @@ describe("JobEngine", () => {
       .map((row) => `${row.store}/${row.key}`);
     assert.deepEqual(keys, ["media_files/keep-me"]);
   });
+  it("after a restart, a job stuck in submitting is submitted again when the adapter is idempotent", async () => {
+    const first = openDb();
+    first.db
+      .insert(jobs)
+      .values({
+        id: "stuck",
+        kind: "video",
+        adapter: "fake",
+        model: "m",
+        state: "submitting",
+        request: {},
+        credentials: { baseUrl: "http://upstream", apiKey: "k" },
+        created_at: Date.now(),
+        updated_at: Date.now(),
+      })
+      .run();
+    first.sqlite.close();
+
+    const second = openDb(first.file);
+    const { adapter, calls } = fakeAdapter();
+    adapter.idempotentSubmit = true;
+    const engine = track(second.entry, makeEngine(second.db, adapter));
+    engine.recover();
+    await untilState(engine, "stuck", "succeeded");
+    assert.equal(calls.submit, 1);
+  });
+  it("lists finished-but-untaken results until a client acknowledges them", async () => {
+    const { db, entry } = openDb();
+    const { adapter } = fakeAdapter();
+    const engine = track(entry, makeEngine(db, adapter));
+    const { job } = engine.create(input({ nodeId: "n1" }));
+    await untilState(engine, job.id, "succeeded");
+
+    assert.deepEqual(
+      engine.list({ undelivered: true, node: "n1" }).map((row) => row.id),
+      [job.id],
+    );
+    assert.equal(engine.acknowledge(job.id)?.state, "succeeded");
+    assert.ok(engine.get(job.id)?.delivered_at);
+    assert.deepEqual(engine.list({ undelivered: true }), []);
+    assert.ok(engine.acknowledge(job.id), "acknowledging twice is harmless");
+  });
 });

@@ -8,6 +8,7 @@ import kvApi from "./kv";
 import { initCallLog, startRetentionJob } from "./logging/logger";
 import logsApi from "./logs";
 import mockApi from "./mock";
+import mockYfai from "./mock/yfai";
 import mokeApi from "./moke";
 import proxy from "./proxy";
 import { registerWebApp } from "./web-app";
@@ -33,6 +34,7 @@ if (config.moke) {
 
 if (config.mockApi) {
   await app.register(mockApi, { prefix: "/v1" });
+  await app.register(mockYfai, { prefix: "/mock-yfai" });
 }
 
 await registerWebApp(app);

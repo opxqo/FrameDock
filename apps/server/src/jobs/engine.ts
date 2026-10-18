@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { EventEmitter } from "node:events";
-import { and, desc, eq, inArray } from "drizzle-orm";
+import { and, desc, eq, inArray, isNull } from "drizzle-orm";
 import PQueue from "p-queue";
 import type { openDatabase } from "../db";
 import { jobs } from "./schema";
@@ -24,6 +24,9 @@ export type JobFilter = {
   node?: string;
   project?: string;
   state?: JobState;
+  kind?: JobKind;
+  /** Only succeeded jobs whose result no client has taken yet. */
+  undelivered?: boolean;
   limit?: number;
 };
 
@@ -34,7 +37,7 @@ export type EngineOptions = {
   saveResult: (
     kind: JobKind,
     jobId: string,
-    fetched: FetchedResult,
+    outputs: FetchedResult[],
   ) => Promise<JobResult>;
   onError?: (error: unknown, message: string) => void;
   /** Called once when a job reaches a final state (succeeded, failed or canceled). */
@@ -45,7 +48,27 @@ export type EngineOptions = {
   downloadConcurrency?: number;
   /** Delay before retrying a failed poll; the default backs off up to a minute. */
   retryDelayMs?: (consecutiveErrors: number, adapter: JobAdapter) => number;
+  /** Delay before repeating an unclear submit (idempotent adapters only); default 2 s, doubling. */
+  submitRetryDelayMs?: (attempt: number) => number;
 };
+
+/** Unclear submits of an idempotent adapter are repeated this many times before the job is parked as unknown. */
+const IDEMPOTENT_SUBMIT_TRIES = 5;
+
+function sleep(ms: number, signal: AbortSignal) {
+  return new Promise<void>((resolve) => {
+    if (signal.aborted) return resolve();
+    const timer = setTimeout(resolve, ms);
+    signal.addEventListener(
+      "abort",
+      () => {
+        clearTimeout(timer);
+        resolve();
+      },
+      { once: true },
+    );
+  });
+}
 
 export function toPublicJob(row: JobRow, withRequest = false): PublicJob {
   return {
@@ -55,6 +78,7 @@ export function toPublicJob(row: JobRow, withRequest = false): PublicJob {
     model: row.model,
     state: row.state,
     remoteTaskId: row.remote_task_id,
+    requestId: row.request_id,
     result: (row.result as JobResult | null) ?? null,
     error: row.error,
     projectId: row.project_id,
@@ -64,6 +88,7 @@ export function toPublicJob(row: JobRow, withRequest = false): PublicJob {
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     finishedAt: row.finished_at,
+    deliveredAt: row.delivered_at,
     ...(withRequest ? { request: row.request } : {}),
   };
 }
@@ -132,10 +157,16 @@ export class JobEngine {
       .where(inArray(jobs.state, ["submitting", "queued", "running"]))
       .all()) {
       if (row.state === "submitting") {
-        this.update(row.id, ["submitting"], {
-          state: "unknown",
-          error: SUBMIT_ERROR,
-        });
+        if (this.adapters.get(row.adapter)?.idempotentSubmit) {
+          // The provider dedupes by the job id, so asking again cannot bill twice.
+          this.update(row.id, ["submitting"], { state: "queued" });
+          this.enqueueSubmit(row.id);
+        } else {
+          this.update(row.id, ["submitting"], {
+            state: "unknown",
+            error: SUBMIT_ERROR,
+          });
+        }
       } else if (row.state === "queued") {
         this.enqueueSubmit(row.id);
       } else if (!row.remote_task_id) {
@@ -180,6 +211,10 @@ export class JobEngine {
       filter.node ? eq(jobs.node_id, filter.node) : undefined,
       filter.project ? eq(jobs.project_id, filter.project) : undefined,
       filter.state ? eq(jobs.state, filter.state) : undefined,
+      filter.kind ? eq(jobs.kind, filter.kind) : undefined,
+      filter.undelivered
+        ? and(eq(jobs.state, "succeeded"), isNull(jobs.delivered_at))
+        : undefined,
     ].filter((condition) => condition !== undefined);
     return this.db
       .select()
@@ -226,6 +261,34 @@ export class JobEngine {
     this.publish(job);
     this.enqueueSubmit(job.id);
     return { job, existed: false };
+  }
+
+  /**
+   * Asks the provider about an open job without changing anything (a read-only poll). Used by the audit to tell
+   * "still running" from "already finished there".
+   */
+  async checkProvider(
+    id: string,
+  ): Promise<"running" | "succeeded" | "failed" | "unreachable"> {
+    const row = this.get(id);
+    const adapter = row && this.adapters.get(row.adapter);
+    if (!row || !adapter || !row.remote_task_id) return "unreachable";
+    try {
+      const outcome = await adapter.poll(
+        this.context(row, AbortSignal.timeout(10_000)),
+        row.remote_task_id,
+      );
+      return outcome.status;
+    } catch {
+      return "unreachable";
+    }
+  }
+
+  /** Marks a result as taken by a client. Idempotent. */
+  acknowledge(id: string): JobRow | undefined {
+    const row = this.get(id);
+    if (!row || row.delivered_at) return row;
+    return this.update(id, [row.state], { delivered_at: Date.now() }) ?? row;
   }
 
   cancel(id: string): JobRow | undefined {
@@ -381,25 +444,46 @@ export class JobEngine {
     this.aborts.set(id, controller);
 
     let remoteTaskId: string;
-    try {
-      ({ remoteTaskId } = await adapter.submit(
-        this.context(claimed, controller.signal),
-      ));
-    } catch (error) {
-      this.aborts.delete(id);
-      const failure = asAdapterError(error);
-      if (this.get(id)?.cancel_requested) {
-        this.finish(id, ["submitting"], "canceled");
-      } else if (failure.kind === "fatal") {
-        this.finish(id, ["submitting"], "failed", { error: failure.message });
-      } else {
-        // Do not resubmit: the provider may have accepted the request before the error.
-        this.update(id, ["submitting"], {
-          state: "unknown",
-          error: failure.message,
-        });
+    let requestId: string | undefined;
+    const tries = adapter.idempotentSubmit ? IDEMPOTENT_SUBMIT_TRIES : 1;
+    for (let attempt = 1; ; attempt += 1) {
+      try {
+        ({ remoteTaskId, requestId } = await adapter.submit(
+          this.context(claimed, controller.signal),
+        ));
+        break;
+      } catch (error) {
+        const failure = asAdapterError(error);
+        const canceled = Boolean(this.get(id)?.cancel_requested);
+        if (
+          !canceled &&
+          !this.closed &&
+          failure.kind !== "fatal" &&
+          attempt < tries
+        ) {
+          // Same job id, so the provider returns the task it already has instead of creating another.
+          await sleep(
+            (this.options.submitRetryDelayMs ?? ((n) => 2000 * 2 ** (n - 1)))(
+              attempt,
+            ),
+            controller.signal,
+          );
+          continue;
+        }
+        this.aborts.delete(id);
+        if (canceled) {
+          this.finish(id, ["submitting"], "canceled");
+        } else if (failure.kind === "fatal") {
+          this.finish(id, ["submitting"], "failed", { error: failure.message });
+        } else {
+          // Do not resubmit: the provider may have accepted the request before the error.
+          this.update(id, ["submitting"], {
+            state: "unknown",
+            error: failure.message,
+          });
+        }
+        return;
       }
-      return;
     }
 
     this.aborts.delete(id);
@@ -415,6 +499,7 @@ export class JobEngine {
     this.update(id, ["submitting"], {
       state: "running",
       remote_task_id: remoteTaskId,
+      request_id: requestId ?? null,
       next_poll_at: Date.now() + adapter.pollIntervalMs,
     });
     this.schedulePoll(id, adapter.pollIntervalMs);
@@ -473,7 +558,11 @@ export class JobEngine {
         );
         if (!fetched || this.get(id)?.state !== "running" || this.closed)
           return;
-        const result = await this.options.saveResult(row.kind, id, fetched);
+        const result = await this.options.saveResult(
+          row.kind,
+          id,
+          Array.isArray(fetched) ? fetched : [fetched],
+        );
         this.finish(id, ["running"], "succeeded", { result, error: null });
       }
     } catch (error) {

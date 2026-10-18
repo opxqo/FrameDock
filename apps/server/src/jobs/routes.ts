@@ -1,9 +1,13 @@
 import type { ServerResponse } from "node:http";
 import type { FastifyPluginAsync } from "fastify";
 import { z } from "zod";
+import type { openDatabase } from "../db";
+import { auditJobs } from "./audit";
 import type { JobEngine } from "./engine";
 import { toPublicJob } from "./engine";
 import { JOB_KINDS, JOB_STATES } from "./schema";
+
+type Database = ReturnType<typeof openDatabase>["db"];
 
 const createBody = z.object({
   kind: z.enum(JOB_KINDS),
@@ -21,14 +25,19 @@ const listQuery = z.object({
   node: z.string().optional(),
   project: z.string().optional(),
   state: z.enum(JOB_STATES).optional(),
+  kind: z.enum(JOB_KINDS).optional(),
+  undelivered: z
+    .enum(["1", "true"])
+    .optional()
+    .transform((value) => value !== undefined),
   limit: z.coerce.number().int().min(1).max(500).optional(),
 });
 
 const HEARTBEAT_MS = 25_000;
 
-const jobsApi: FastifyPluginAsync<{ engine: JobEngine }> = async (
+const jobsApi: FastifyPluginAsync<{ engine: JobEngine; db: Database }> = async (
   app,
-  { engine },
+  { engine, db },
 ) => {
   app.addHook("onRequest", async (_request, reply) => {
     reply.header("Cache-Control", "no-store");
@@ -93,10 +102,21 @@ const jobsApi: FastifyPluginAsync<{ engine: JobEngine }> = async (
     streams.clear();
   });
 
+  app.get<{ Querystring: { days?: string } }>("/audit", async (request) => {
+    const days = Math.min(Math.max(Number(request.query.days) || 7, 1), 90);
+    return auditJobs(db, engine, days);
+  });
+
   app.get<{ Params: { id: string } }>("/:id", async (request, reply) => {
     const row = engine.get(request.params.id);
     if (!row) return reply.code(404).send({ error: "Job not found" });
     return { job: toPublicJob(row, true) };
+  });
+
+  app.post<{ Params: { id: string } }>("/:id/ack", async (request, reply) => {
+    const row = engine.acknowledge(request.params.id);
+    if (!row) return reply.code(404).send({ error: "Job not found" });
+    return { job: toPublicJob(row) };
   });
 
   app.post<{ Params: { id: string } }>(
