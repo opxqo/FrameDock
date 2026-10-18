@@ -154,3 +154,5 @@ export const apiLogs = sqliteTable(
     index("api_logs_poll").on(table.method, table.url_hash, table.ts),
   ],
 );
+
+export * from "./jobs/schema";

@@ -3,6 +3,7 @@ import packageJson from "../package.json" with { type: "json" };
 import codexApi from "./codex";
 import { config } from "./config";
 import { openDatabase } from "./db";
+import { registerJobs } from "./jobs";
 import kvApi from "./kv";
 import { initCallLog, startRetentionJob } from "./logging/logger";
 import logsApi from "./logs";
@@ -17,6 +18,8 @@ initCallLog(sqlite, (error, message) => app.log.warn({ err: error }, message));
 const stopRetention = startRetentionJob();
 
 await app.register(kvApi, { prefix: "/api/kv", db });
+
+await registerJobs(app, db);
 
 await app.register(logsApi, { prefix: "/api/logs", sqlite });
 
