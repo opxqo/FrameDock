@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { buildThreeViewWorkflow } from "@/lib/canvas/workflow-templates";
 import { CodexNodePanel } from "@/components/canvas/codex-node-panel";
 import { runCodex } from "@/services/api/codex";
 import { estimateAutodlCost, generationCostParams } from "@/lib/autodl-pricing";
@@ -3059,6 +3060,16 @@ function InfiniteCanvasPage() {
         runWorkflowRef.current = (nodeId, scope) => void runWorkflow(nodeId, scope);
     }, [runWorkflow]);
 
+    // FrameDock: insert a ready-made node group (see lib/canvas/workflow-templates.ts) around the viewport center.
+    const insertThreeViewWorkflow = useCallback(() => {
+        const template = buildThreeViewWorkflow(getCanvasCenter(), { model: effectiveConfig.imageModel || effectiveConfig.model });
+        setNodes((prev) => [...prev, ...template.nodes]);
+        setConnections((prev) => [...prev, ...template.connections]);
+        setSelectedNodeIds(new Set([template.focusNodeId]));
+        setSelectedConnectionId(null);
+        message.success(t("canvas.workflowTemplates.inserted"));
+    }, [effectiveConfig.imageModel, effectiveConfig.model, getCanvasCenter, message, t]);
+
     // FrameDock: canvas commands in the ⌘K palette.
     const registerCommands = useCommandStore((state) => state.register);
     const unregisterCommands = useCommandStore((state) => state.unregister);
@@ -3070,13 +3081,14 @@ function InfiniteCanvasPage() {
             add(CanvasNodeType.Image, t("canvas.nodeTypes.image")),
             add(CanvasNodeType.Video, t("canvas.nodeTypes.video")),
             add(CanvasNodeType.Config, t("canvas.nodeTypes.config")),
+            { id: "canvas-workflow-three-view", group, label: t("canvas.workflowTemplates.threeView"), keywords: ["workflow", "template", "character", "三视图", "角色", "工作流", "模板"], run: insertThreeViewWorkflow },
             { id: "canvas-fit", group, label: t("canvas.shortcutGroups.fit"), shortcut: "⇧1", keywords: ["fit", "zoom"], run: fitAllNodes },
             { id: "canvas-reset", group, label: t("canvas.resetView"), shortcut: `${MOD_KEY}0`, keywords: ["reset", "100%"], run: resetViewport },
             { id: "canvas-upload", group, label: t("canvas.toolbar.upload"), keywords: ["upload", "import"], run: () => handleUploadRequest() },
             { id: "canvas-shortcuts", group, label: t("canvas.shortcuts"), shortcut: "?", keywords: ["shortcuts", "keyboard"], run: () => useShortcutSheetStore.getState().setOpen(true) },
         ]);
         return () => unregisterCommands("canvas");
-    }, [createNode, fitAllNodes, handleUploadRequest, registerCommands, resetViewport, t, unregisterCommands]);
+    }, [createNode, fitAllNodes, handleUploadRequest, insertThreeViewWorkflow, registerCommands, resetViewport, t, unregisterCommands]);
     const stopWorkflow = useCallback(() => {
         if (workflowRunRef.current) workflowRunRef.current.canceled = true;
     }, []);

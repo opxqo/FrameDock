@@ -62,21 +62,22 @@ export function CanvasConfigNodePanel({ node, isRunning, inputSummary, onConfigC
                 />
             </div>
 
-            {/* Connected inputs, read at a glance; zero counts stay quiet. */}
+            {/* Connected inputs, read at a glance; zero counts stay quiet. Counts get their own row so a long
+                Skill title or the compose button can no longer squeeze them into a four-line stack. */}
+            <div className="tnum flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-0.5 text-xs">
+                {inputs.map((input) => (
+                    <span key={input.label} className="whitespace-nowrap" style={{ color: input.count ? theme.node.text : theme.node.faint }}>
+                        {input.label} {input.count}
+                    </span>
+                ))}
+            </div>
             <div className="flex min-w-0 items-center gap-2">
-                <div className="tnum flex min-w-0 flex-1 flex-wrap gap-x-2.5 gap-y-0.5 text-xs">
-                    {inputs.map((input) => (
-                        <span key={input.label} style={{ color: input.count ? theme.node.text : theme.node.faint }}>
-                            {input.label} {input.count}
-                        </span>
-                    ))}
-                </div>
                 {mode === "text" ? (
-                    <div className="shrink-0" onMouseDown={(event) => event.stopPropagation()}>
+                    <div className="min-w-0" onMouseDown={(event) => event.stopPropagation()}>
                         <CanvasSkillPicker compact skill={node.metadata?.skill} onChange={(skill) => onConfigChange(node.id, { skill })} />
                     </div>
                 ) : null}
-                <button type="button" className="inline-flex h-6 shrink-0 cursor-pointer items-center gap-1 rounded-md px-1.5 text-xs transition-colors hover:bg-accent" style={{ color: theme.node.muted }} onMouseDown={(event) => event.stopPropagation()} onClick={onComposerToggle}>
+                <button type="button" className="ml-auto inline-flex h-6 shrink-0 cursor-pointer items-center gap-1 rounded-md px-1.5 text-xs transition-colors hover:bg-accent" style={{ color: theme.node.muted }} onMouseDown={(event) => event.stopPropagation()} onClick={onComposerToggle}>
                     <Settings2 className="size-3.5" />
                     {t("canvas.configNode.compose")}
                 </button>
