@@ -5,7 +5,7 @@ import { ChevronDown, ChevronRight, ExternalLink, RefreshCw, Search } from "@/co
 import { ModelIcon, resolveModelVendor } from "@/components/model-picker";
 import { ModelPrice } from "@/components/autodl-price";
 import { YfaiParameters } from "@/components/yfai-parameters";
-import { YFAI_DOCS_URL, YFAI_SNAPSHOT_AT, yfaiCapability, yfaiModels, yfaiToolOnly, parseYfaiParams, type YfaiModel } from "@/lib/yfai-catalog";
+import { YFAI_DOCS_URL, YFAI_SNAPSHOT_AT, yfaiCapability, yfaiModels, yfaiToolOnly, parseYfaiParams, type YfaiModel, resolveYfaiAutoParams } from "@/lib/yfai-catalog";
 import { buildYfaiParams, fetchYfaiPrices, fetchYfaiCatalog, submitYfaiTask, waitYfaiTask, yfaiRouting, yfaiRequest, yfaiTaskUrls, type YfaiTask } from "@/services/api/yfai";
 import { useConfigStore, withYfaiConfig, withLocalProxy, type AiConfig } from "@/stores/use-config-store";
 
@@ -164,7 +164,7 @@ function YfaiTool({ model, config }: { model: YfaiModel; config: AiConfig }) {
                 if (values.preview_text) form.append("preview_text", String(values.preview_text));
                 created = await yfaiRequest("/v1/audio/voices", selected.apiKey, form, { signal: abort.signal });
                 created.voice_id = created.id; setResult(created);
-            } else created = await submitYfaiTask(selected, model, prompt, buildYfaiParams(selected, model), { signal: abort.signal });
+            } else created = await submitYfaiTask(selected, model, prompt, resolveYfaiAutoParams(model, buildYfaiParams(selected, model), selected), { signal: abort.signal });
             if (created.task_id) setTaskId(created.task_id);
             const finished = await waitYfaiTask(selected.apiKey, created, { signal: abort.signal });
             setResult((previous) => ({ ...previous, ...finished })); setTaskId("");

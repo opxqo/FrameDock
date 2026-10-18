@@ -35,10 +35,26 @@ export function yfaiToolOnly(model: YfaiModel) { return ["voice-clone", "voice-d
 export function parseYfaiParams(serialized = "", model: string): Record<string, YfaiValue> {
     try { const parsed = JSON.parse(serialized); const values = parsed[model.replace(/^yfai::/, "")]; return values && typeof values === "object" && !Array.isArray(values) ? values : {}; } catch { return {}; }
 }
-// FrameDock: aspect ratio defaults to "auto" — not sent unless the user picks one, so the provider decides.
-const AUTO_DEFAULT_PARAMS = new Set(["aspect_ratio", "ratio"]);
+// FrameDock: aspect ratio defaults to "自动" — never pre-filled, so the panel shows "自动" until the user picks one.
+const AUTO_DEFAULT_PARAMS = ["aspect_ratio", "ratio"];
 export function yfaiDefaults(model: YfaiModel) {
-    return Object.fromEntries(Object.entries(model.param_schema).flatMap(([key, spec]) => spec.default !== undefined && spec.type !== "upload" && !(AUTO_DEFAULT_PARAMS.has(key) && !spec.required) ? [[key, spec.default]] : [])) as Record<string, YfaiValue>;
+    return Object.fromEntries(Object.entries(model.param_schema).flatMap(([key, spec]) => spec.default !== undefined && spec.type !== "upload" && !AUTO_DEFAULT_PARAMS.includes(key) ? [[key, spec.default]] : [])) as Record<string, YfaiValue>;
+}
+/**
+ * Request-time meaning of "自动" for ratio params: optional ones are left out (the provider decides); required
+ * ones follow the canvas size when it is one of the model's ratios, else the model default.
+ */
+export function resolveYfaiAutoParams(model: YfaiModel, params: Record<string, YfaiValue>, config: { size?: string }) {
+    const next = { ...params };
+    for (const key of AUTO_DEFAULT_PARAMS) {
+        const spec = model.param_schema[key];
+        if (!spec?.required || (next[key] !== undefined && next[key] !== "")) continue;
+        const allowed = (spec.options?.map((option) => String(option.value)) || spec.enum?.map(String) || []);
+        const fromSize = config.size && allowed.includes(config.size) ? config.size : undefined;
+        const fallback = fromSize ?? spec.default;
+        if (fallback !== undefined) next[key] = fallback as YfaiValue;
+    }
+    return next;
 }
 export function yfaiParamVisible(spec: YfaiParam, params: Record<string, YfaiValue>) {
     return !spec.available_when || Object.entries(spec.available_when).every(([key, values]) => values.some((value) => String(value) === String(params[key])));

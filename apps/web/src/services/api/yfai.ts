@@ -2,7 +2,7 @@ import type { YfaiPrice } from "@/lib/yfai-pricing";
 import axios from "axios";
 import { nanoid } from "nanoid";
 import i18n from "@/i18n";
-import { findYfaiModel, isYfaiUrl, parseYfaiParams, validateYfaiParams, yfaiDefaults, yfaiParamVisible, YFAI_BASE_URL, type YfaiModel, type YfaiValue } from "@/lib/yfai-catalog";
+import { findYfaiModel, isYfaiUrl, parseYfaiParams, validateYfaiParams, yfaiDefaults, yfaiParamVisible, YFAI_BASE_URL, type YfaiModel, type YfaiValue, resolveYfaiAutoParams } from "@/lib/yfai-catalog";
 import { withLocalProxy, type AiConfig } from "@/stores/use-config-store";
 import { parseYfaiAvailableCredits } from "@/lib/yfai-balance";
 import { ackJob, createJob, fetchJobBlob, type Job, watchJob } from "@/services/api/jobs";
@@ -89,7 +89,7 @@ export async function prepareYfaiParams(config: AiConfig, references: ReferenceI
     if (!model) throw new Error(i18n.t("yfai.unknownModel"));
     const ordered = [...references].sort((a, b) => (a.role === "first" ? -1 : a.role === "last" ? 1 : 0) - (b.role === "first" ? -1 : b.role === "last" ? 1 : 0));
     // Validate counts/modes before uploading any media.
-    const placeholders = buildYfaiParams(config, model, { images: ordered.map((_, i) => `image-${i}`), videos: options?.videos?.map((_, i) => `video-${i}`), audios: options?.audios?.map((_, i) => `audio-${i}`), roles: ordered.map((image) => image.role) });
+    const placeholders = resolveYfaiAutoParams(model, buildYfaiParams(config, model, { images: ordered.map((_, i) => `image-${i}`), videos: options?.videos?.map((_, i) => `video-${i}`), audios: options?.audios?.map((_, i) => `audio-${i}`), roles: ordered.map((image) => image.role) }), config);
     validateYfaiParams(model, { ...placeholders, prompt: "validation" });
     const upload = async (source: string, name: string, maxBytes?: number) => {
         const response = await fetch(withLocalProxy(source), { signal: options?.signal });
@@ -108,7 +108,7 @@ export async function prepareYfaiParams(config: AiConfig, references: ReferenceI
         Promise.all((options?.videos || []).map((item) => uploadMedia(item, "videos"))),
         Promise.all((options?.audios || []).map((item) => uploadMedia(item, "audios"))),
     ]);
-    return { model, params: buildYfaiParams(config, model, { images, videos, audios, roles: ordered.map((image) => image.role) }) };
+    return { model, params: resolveYfaiAutoParams(model, buildYfaiParams(config, model, { images, videos, audios, roles: ordered.map((image) => image.role) }), config) };
 }
 /** The runtime invoke envelope for a prepared request. Shared by the browser path and server-side jobs. */
 export function buildYfaiInvoke(config: Pick<AiConfig, "yfaiParams">, model: YfaiModel, prompt: string, params: Record<string, YfaiValue>, clientRequestId: string = `framedock-${nanoid()}`) {
@@ -277,7 +277,7 @@ export async function fetchYfaiPrices(apiKey: string, models: YfaiModel[]): Prom
     const media = models.filter((model) => !model.deprecated && model.available !== false && model.category !== "chat");
     const prices: Record<string, YfaiPrice> = {};
     for (let offset = 0; offset < media.length; offset += 100) {
-        const payload = await yfaiRequest("/v1/pricing-estimate/batch", apiKey, { items: media.slice(offset, offset + 100).map((model) => ({ model: model.id, params: buildYfaiParams({ model: model.id, yfaiParams: "" }, model) })) });
+        const payload = await yfaiRequest("/v1/pricing-estimate/batch", apiKey, { items: media.slice(offset, offset + 100).map((model) => ({ model: model.id, params: resolveYfaiAutoParams(model, buildYfaiParams({ model: model.id, yfaiParams: "" }, model), {}) })) });
         if (!Array.isArray(payload.results)) continue;
         for (const result of payload.results as Array<{ model?: string; estimate?: { effective_total_rmb?: number; max_effective_total_rmb?: number; required_freeze_rmb?: number } }>) {
             const quote = result.estimate;
