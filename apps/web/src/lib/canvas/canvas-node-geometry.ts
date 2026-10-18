@@ -142,12 +142,33 @@ export function normalizeConnection(firstNodeId: string, secondNodeId: string, n
     const first = nodes.find((node) => node.id === firstNodeId);
     const second = nodes.find((node) => node.id === secondNodeId);
     if (!first || !second || first.id === second.id) return null;
-    if (second.type === CanvasNodeType.Group) return null;
     if (first.type === CanvasNodeType.Config && second.type === CanvasNodeType.Config) return null;
-    if (second.type === CanvasNodeType.Config) return { fromNodeId: first.id, toNodeId: second.id };
-    if (first.type === CanvasNodeType.Config && firstHandleType === "target") return { fromNodeId: second.id, toNodeId: first.id };
-    if (first.type === CanvasNodeType.Config) return { fromNodeId: first.id, toNodeId: second.id };
-    return { fromNodeId: first.id, toNodeId: second.id };
+    // Config nodes only take inputs, so they are always the target.
+    const [from, to] =
+        second.type === CanvasNodeType.Config
+            ? [first, second]
+            : first.type === CanvasNodeType.Config
+              ? [second, first]
+              : // Dragging out of an input (left) handle connects the other node into this one.
+                firstHandleType === "target"
+                ? [second, first]
+                : [first, second];
+    if (to.type === CanvasNodeType.Group) return null;
+    return { fromNodeId: from.id, toNodeId: to.id };
+}
+
+/** True when adding from → to would close a loop (to already reaches from). */
+export function createsCycle(fromNodeId: string, toNodeId: string, connections: { fromNodeId: string; toNodeId: string }[]) {
+    const seen = new Set<string>();
+    const queue = [toNodeId];
+    while (queue.length) {
+        const id = queue.shift()!;
+        if (id === fromNodeId) return true;
+        if (seen.has(id)) continue;
+        seen.add(id);
+        for (const connection of connections) if (connection.fromNodeId === id) queue.push(connection.toNodeId);
+    }
+    return false;
 }
 
 export type FocusFrame = {

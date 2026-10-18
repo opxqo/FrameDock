@@ -115,6 +115,13 @@ function isAutodlVideoProvider(provider: VideoGenerationTask["provider"]): provi
     return provider === "minimax" || provider === "kling" || provider === "ark" || provider === "wan";
 }
 
+/** How many input images a native AutoDL video adapter uses (first/last frame); undefined when not limited. */
+export function videoFrameImageLimit(model: string) {
+    const provider = autodlVideoProvider(model);
+    if (!provider) return undefined;
+    return provider === "wan" ? 1 : 2;
+}
+
 /** Native adapters for AutoDL video families; MiniMax Hailuo names also work on the official MiniMax API. */
 function autodlVideoProvider(model: string, baseUrl = ""): AutodlVideoProvider | undefined {
     const name = modelOptionName(model);

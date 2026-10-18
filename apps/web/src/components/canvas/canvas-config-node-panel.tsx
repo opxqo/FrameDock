@@ -6,6 +6,7 @@ import { Button, Segmented } from "antd";
 import { useTranslation } from "react-i18next";
 
 import { ModelPicker } from "@/components/model-picker";
+import { videoFrameImageLimit } from "@/services/api/video";
 import { CanvasSkillPicker } from "./canvas-skill-picker";
 import { defaultConfig, resolveModelForCapability, useConfigStore, useEffectiveConfig, type AiConfig } from "@/stores/use-config-store";
 import { canvasThemes } from "@/lib/canvas-theme";
@@ -36,6 +37,14 @@ export function CanvasConfigNodePanel({ node, isRunning, inputSummary, onConfigC
     const hasAnyInput = Boolean(inputSummary.textCount || inputSummary.imageCount || inputSummary.videoCount || inputSummary.audioCount);
     const hasComposerContent = Boolean((node.metadata?.composerContent ?? node.metadata?.prompt ?? "").trim());
     const canGenerate = hasComposerContent || (mode === "audio" ? inputSummary.textCount > 0 : hasAnyInput);
+
+    // Inputs the current mode/model will not use, so nothing is dropped silently.
+    const frameLimit = mode === "video" ? videoFrameImageLimit(config.model) : undefined;
+    const warnings = [
+        mode === "image" && inputSummary.videoCount ? t("canvas.projectPage.droppedVideo") : "",
+        (mode === "image" || mode === "text" || mode === "audio") && inputSummary.audioCount ? t("canvas.projectPage.droppedAudio") : "",
+        frameLimit !== undefined && inputSummary.imageCount > frameLimit ? t("canvas.projectPage.droppedFrames", { count: frameLimit }) : "",
+    ].filter(Boolean);
 
     const inputs = [
         { label: t("canvas.configNode.prompt"), count: inputSummary.textCount },
@@ -71,6 +80,11 @@ export function CanvasConfigNodePanel({ node, isRunning, inputSummary, onConfigC
                     </span>
                 ))}
             </div>
+            {warnings.map((warning) => (
+                <p key={warning} className="text-xs leading-4 text-amber-500">
+                    {warning}
+                </p>
+            ))}
             <div className="flex min-w-0 items-center gap-2">
                 {mode === "text" ? (
                     <div className="min-w-0" onMouseDown={(event) => event.stopPropagation()}>

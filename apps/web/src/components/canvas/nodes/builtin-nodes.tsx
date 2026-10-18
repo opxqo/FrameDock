@@ -1,4 +1,5 @@
 import { FileText, Group, Image as ImageIcon, Music2, Settings2, Video } from "@/components/icons";
+import { textNodeOutput } from "@/lib/canvas/text-output";
 import { CodexLogo } from "@/components/codex-logo";
 
 import i18n from "@/i18n";
@@ -14,7 +15,10 @@ function builtinResource(node: CanvasNodeData): CanvasNodeResource | null {
     if (node.type === CanvasNodeType.Image && node.metadata?.content) return { kind: "image", url: node.metadata.content };
     if (node.type === CanvasNodeType.Video && node.metadata?.content) return { kind: "video", url: node.metadata.content };
     if (node.type === CanvasNodeType.Audio && node.metadata?.content) return { kind: "audio", url: node.metadata.content };
-    if (node.type === CanvasNodeType.Text && (node.metadata?.content || node.metadata?.prompt)) return { kind: "text", text: node.metadata.content || node.metadata.prompt };
+    if (node.type === CanvasNodeType.Text) {
+        const text = textNodeOutput(node);
+        return text ? { kind: "text", text } : null;
+    }
     // Codex nodes act as a text node or an image node depending on their output mode.
     // Codex text output feeds downstream as text; image output lives in its own image node.
     if (node.type === CanvasNodeType.Codex && node.metadata?.content && node.metadata.codexMode !== "image") return { kind: "text", text: node.metadata.content };

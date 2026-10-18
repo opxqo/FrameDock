@@ -1,4 +1,5 @@
 import { imageReferenceLabel } from "@/lib/image-reference-prompt";
+import { textNodeOutput } from "@/lib/canvas/text-output";
 import i18n from "@/i18n";
 import { getNodeDefinition } from "@/lib/canvas/node-registry";
 import { getDataUrlByteSize, readImageMeta } from "@/lib/image-utils";
@@ -50,21 +51,21 @@ export async function resolveCanvasReferenceImages(references: CanvasResourceRef
     }));
 }
 
+// FrameDock: a node's own upstream always comes first. Only a node without inputs of its own that feeds a config
+// node (e.g. a result node regenerated in place) borrows that config node's other inputs.
 export function getMentionResourceNodes(nodeId: string, nodes: CanvasNodeData[], connections: CanvasConnection[]) {
-    const configInputs = expandGroupResourceNodes(getConnectedConfigInputNodes(nodeId, nodes, connections), nodes);
-    if (configInputs.length) return configInputs;
     const ownInputs = expandGroupResourceNodes(getContextInputNodes(nodeId, nodes, connections), nodes);
     if (ownInputs.length) return ownInputs;
+    const configInputs = expandGroupResourceNodes(getConnectedConfigInputNodes(nodeId, nodes, connections), nodes);
+    if (configInputs.length) return configInputs;
     const node = nodes.find((item) => item.id === nodeId);
     return node && isResourceNode(node) ? [node] : [];
 }
 
 export function getGenerationResourceNodes(nodeId: string, nodes: CanvasNodeData[], connections: CanvasConnection[]) {
-    const configInputs = getConnectedConfigInputNodes(nodeId, nodes, connections);
-    if (configInputs.length) return configInputs;
     const ownInputs = getContextInputNodes(nodeId, nodes, connections);
     if (ownInputs.length) return ownInputs;
-    return [];
+    return getConnectedConfigInputNodes(nodeId, nodes, connections);
 }
 
 function getContextInputNodes(nodeId: string, nodes: CanvasNodeData[], connections: CanvasConnection[]) {
@@ -132,7 +133,7 @@ function isResourceNode(node: CanvasNodeData) {
 }
 
 function resourceText(node: CanvasNodeData): string | undefined {
-    if (node.type === CanvasNodeType.Text) return node.metadata?.content || node.metadata?.prompt;
+    if (node.type === CanvasNodeType.Text) return textNodeOutput(node) || undefined;
     const resource = getNodeDefinition(node.type)?.resource?.(node);
     return resource?.kind === "text" ? resource.text : undefined;
 }
@@ -141,7 +142,7 @@ function resourceKind(node: CanvasNodeData): CanvasResourceKind | null {
     if (node.type === CanvasNodeType.Image && node.metadata?.content) return "image";
     if (node.type === CanvasNodeType.Video && node.metadata?.content) return "video";
     if (node.type === CanvasNodeType.Audio && node.metadata?.content) return "audio";
-    if (node.type === CanvasNodeType.Text && (node.metadata?.content || node.metadata?.prompt)) return "text";
+    if (node.type === CanvasNodeType.Text) return textNodeOutput(node) ? "text" : null;
     // Plugin nodes declare their input eligibility through definition.resource.
     return getNodeDefinition(node.type)?.resource?.(node)?.kind || null;
 }

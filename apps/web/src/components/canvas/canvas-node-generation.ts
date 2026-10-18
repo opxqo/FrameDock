@@ -1,4 +1,5 @@
 import type { AiTextMessage } from "@/services/api/image";
+import { textNodeOutput } from "@/lib/canvas/text-output";
 import i18n from "@/i18n";
 import { imageReferenceLabel } from "@/lib/image-reference-prompt";
 import type { ReferenceImage } from "@/types/image";
@@ -40,7 +41,9 @@ export type NodeGenerationInput = NodeGenerationResourceInput | NodeGenerationGr
 export function buildNodeGenerationContext(nodeId: string, nodes: CanvasNodeData[], connections: CanvasConnection[], prompt: string): NodeGenerationContext {
     const inputs = buildNodeGenerationInputs(nodeId, nodes, connections);
     const sourceNode = nodes.find((node) => node.id === nodeId);
-    if (sourceNode?.type === CanvasNodeType.Config && Boolean(sourceNode.metadata?.composerContent?.trim())) {
+    // Composer mode picks inputs by @mention; without any mention it falls back to using every input
+    // (the panel counts all connected inputs, so silently dropping them was surprising).
+    if (sourceNode?.type === CanvasNodeType.Config && Boolean(sourceNode.metadata?.composerContent?.trim()) && /@\[node:[^\]]+\]/.test(prompt)) {
         return buildComposerGenerationContext(inputs, prompt);
     }
 
@@ -175,7 +178,7 @@ export async function hydrateNodeGenerationContext(context: NodeGenerationContex
 }
 
 function readNodeTextInput(node: CanvasNodeData) {
-    if (node.type === CanvasNodeType.Text) return node.metadata?.content || node.metadata?.prompt || "";
+    if (node.type === CanvasNodeType.Text) return textNodeOutput(node);
     return node.metadata?.prompt || "";
 }
 
