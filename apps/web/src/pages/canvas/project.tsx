@@ -31,7 +31,8 @@ import { imageReferenceLabel } from "@/lib/image-reference-prompt";
 import { canvasThemes, type CanvasBackgroundMode } from "@/lib/canvas-theme";
 import { useAssetStore } from "@/stores/use-asset-store";
 import { useThemeStore } from "@/stores/use-theme-store";
-import { cropDataUrl, splitDataUrl, upscaleDataUrl } from "@/lib/canvas/canvas-image-data";
+import { colorMatchDataUrl, cropDataUrl, splitDataUrl, upscaleDataUrl } from "@/lib/canvas/canvas-image-data";
+import { CanvasNodeColorMatchDialog, type CanvasColorMatchParams } from "@/components/canvas/canvas-node-color-match-dialog";
 import { fitNodeSize, nodeSizeFromRatio } from "@/lib/canvas/canvas-node-size";
 import { captureVideoFrame, type VideoFramePosition } from "@/lib/canvas/canvas-video-frame";
 import { App, Button, Modal } from "antd";
@@ -296,6 +297,7 @@ function InfiniteCanvasPage() {
     const [upscaleNodeId, setUpscaleNodeId] = useState<string | null>(null);
     const [superResolveNodeId, setSuperResolveNodeId] = useState<string | null>(null);
     const [angleNodeId, setAngleNodeId] = useState<string | null>(null);
+    const [colorMatchNodeId, setColorMatchNodeId] = useState<string | null>(null);
     const [previewNodeId, setPreviewNodeId] = useState<string | null>(null);
     const [hoverPreviewNodeId, setHoverPreviewNodeId] = useState<string | null>(null);
     const [previewImageId, setPreviewImageId] = useState<string | null>(null);
@@ -1014,6 +1016,17 @@ function InfiniteCanvasPage() {
     const upscaleNode = upscaleNodeId ? nodeById.get(upscaleNodeId) || null : null;
     const superResolveNode = superResolveNodeId ? nodeById.get(superResolveNodeId) || null : null;
     const angleNode = angleNodeId ? nodeById.get(angleNodeId) || null : null;
+    const colorMatchNode = colorMatchNodeId ? nodeById.get(colorMatchNodeId) || null : null;
+    // Master candidates: every other image with a picture. Default master: an image connected in as reference or first frame.
+    const colorMatchCandidates = useMemo(
+        () => (colorMatchNode ? nodes.filter((item) => item.id !== colorMatchNode.id && item.type === CanvasNodeType.Image && item.metadata?.content).map((item) => ({ id: item.id, title: item.title, url: item.metadata!.content! })) : []),
+        [colorMatchNode, nodes],
+    );
+    const colorMatchDefaultMaster = useMemo(() => {
+        if (!colorMatchNode) return undefined;
+        const incoming = connections.filter((connection) => connection.toNodeId === colorMatchNode.id && colorMatchCandidates.some((item) => item.id === connection.fromNodeId));
+        return (incoming.find((connection) => connection.role === "reference" || connection.role === "first") ?? incoming[0])?.fromNodeId;
+    }, [colorMatchCandidates, colorMatchNode, connections]);
     const contextMenuNode = contextMenu?.type === "node" ? nodeById.get(contextMenu.nodeId) || null : null;
     const previewNode = previewNodeId ? nodeById.get(previewNodeId) || null : null;
     const previewContent = previewImageId ? previewNode?.metadata?.images?.find((image) => image.id === previewImageId)?.content : previewNode?.metadata?.content;
@@ -2363,6 +2376,42 @@ function InfiniteCanvasPage() {
             setContextMenu(null);
         },
         [effectiveConfig.model, effectiveConfig.textModel, message, t],
+    );
+
+    /** Re-grades each target towards the master; each result is a new node next to its original, which stays untouched. */
+    const colorMatchImageNodes = useCallback(
+        async (params: CanvasColorMatchParams) => {
+            setColorMatchNodeId(null);
+            const master = nodesRef.current.find((item) => item.id === params.masterId);
+            const targets = params.targetIds.map((id) => nodesRef.current.find((item) => item.id === id)).filter((item): item is CanvasNodeData => Boolean(item?.metadata?.content));
+            if (!master?.metadata?.content || !targets.length) return;
+            const hide = message.loading(t("canvas.colorMatch.working", { count: targets.length }), 0);
+            try {
+                const children: CanvasNodeData[] = [];
+                for (const node of targets) {
+                    const image = await uploadImage(await colorMatchDataUrl(node.metadata!.content!, master.metadata.content, { strength: params.strength, scope: params.scope }));
+                    const width = Math.min(node.width, Math.max(220, image.width));
+                    children.push({
+                        id: nanoid(),
+                        type: CanvasNodeType.Image,
+                        title: `${node.title || t("assets.kinds.image")} · ${t("canvas.colorMatch.suffix")}`,
+                        position: { x: node.position.x + node.width + 96, y: node.position.y },
+                        width,
+                        height: width * (image.height / image.width),
+                        metadata: { ...imageMetadata(image), prompt: node.metadata?.prompt, colorMatch: { masterId: master.id, strength: params.strength, scope: params.scope } },
+                    });
+                }
+                setNodes((prev) => [...prev, ...children]);
+                setConnections((prev) => [...prev, ...children.map((child, index) => ({ id: nanoid(), fromNodeId: targets[index]!.id, toNodeId: child.id }))]);
+                setSelectedNodeIds(new Set(children.map((child) => child.id)));
+                message.success(t("canvas.colorMatch.done", { count: children.length }));
+            } catch (error) {
+                message.error(error instanceof Error ? error.message : t("canvas.colorMatch.failed"));
+            } finally {
+                hide();
+            }
+        },
+        [message, t],
     );
 
     const cropImageNode = useCallback(async (node: CanvasNodeData, crop: CanvasImageCropRect) => {
@@ -4222,6 +4271,7 @@ function InfiniteCanvasPage() {
                     onUpscale={(node) => setUpscaleNodeId(node.id)}
                     onSuperResolve={(node) => setSuperResolveNodeId(node.id)}
                     onAngle={(node) => setAngleNodeId(node.id)}
+                    onColorMatch={(node) => setColorMatchNodeId(node.id)}
                     onViewImage={handleNodeViewImage}
                     onReversePrompt={createImageReversePromptNodes}
                     onRetry={(node) => void handleRetryNode(node)}
@@ -4398,6 +4448,18 @@ function InfiniteCanvasPage() {
 
                 {maskEditNode?.metadata?.content ? (
                     <CanvasNodeMaskEditDialog dataUrl={maskEditNode.metadata.content} open={Boolean(maskEditNode)} onClose={() => setMaskEditNodeId(null)} onConfirm={(payload) => void maskEditImageNode(maskEditNode!, payload)} />
+                ) : null}
+
+                {colorMatchNode?.metadata?.content ? (
+                    <CanvasNodeColorMatchDialog
+                        node={{ id: colorMatchNode.id, title: colorMatchNode.title, url: colorMatchNode.metadata.content }}
+                        candidates={colorMatchCandidates}
+                        defaultMasterId={colorMatchDefaultMaster}
+                        selectedIds={[...selectedNodeIds].filter((id) => id !== colorMatchNode.id && colorMatchCandidates.some((item) => item.id === id))}
+                        open={Boolean(colorMatchNode)}
+                        onClose={() => setColorMatchNodeId(null)}
+                        onConfirm={(params) => void colorMatchImageNodes(params)}
+                    />
                 ) : null}
 
                 {splitNode?.metadata?.content ? <CanvasNodeSplitDialog dataUrl={splitNode.metadata.content} open={Boolean(splitNode)} onClose={() => setSplitNodeId(null)} onConfirm={(params) => void splitImageNode(splitNode!, params)} /> : null}

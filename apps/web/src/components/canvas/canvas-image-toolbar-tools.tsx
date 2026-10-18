@@ -1,10 +1,10 @@
 import type { ReactNode } from "react";
-import { Brush, Camera, Copy, FileText, Grid2x2, Lock, LockOpen, Maximize2, Scissors, Sparkles, Upload, ZoomIn } from "@/components/icons";
+import { Brush, Camera, Copy, FileText, Grid2x2, Lock, LockOpen, Maximize2, Palette, Scissors, Sparkles, Upload, ZoomIn } from "@/components/icons";
 
 import type { CanvasNodeData } from "@/types/canvas";
 import i18n from "@/i18n";
 
-export type ImageNodeActionToolId = "copyPrompt" | "reversePrompt" | "replace" | "resize" | "maskEdit" | "crop" | "split" | "upscale" | "superResolve" | "angle" | "view";
+export type ImageNodeActionToolId = "copyPrompt" | "reversePrompt" | "replace" | "resize" | "maskEdit" | "crop" | "split" | "upscale" | "superResolve" | "angle" | "colorMatch" | "view";
 export type ImageQuickToolId = "info" | "delete" | "saveAsset" | "download" | ImageNodeActionToolId;
 
 export type ImageToolHandlers = {
@@ -16,6 +16,7 @@ export type ImageToolHandlers = {
     onUpscale: (node: CanvasNodeData) => void;
     onSuperResolve: (node: CanvasNodeData) => void;
     onAngle: (node: CanvasNodeData) => void;
+    onColorMatch: (node: CanvasNodeData) => void;
     onViewImage: (node: CanvasNodeData) => void;
     onCopyPrompt: (node: CanvasNodeData) => void;
     onReversePrompt: (node: CanvasNodeData) => void;
@@ -34,7 +35,12 @@ export type ImageToolDefinition = {
 export type ImageQuickToolsConfig = {
     ids: ImageQuickToolId[];
     showLabels: boolean;
+    /** Tools that existed when this config was saved; a tool added later is switched on once, then left to the user. */
+    known?: ImageQuickToolId[];
 };
+
+/** FrameDock: tools added after quick-tool settings were already saved by users. */
+const ADDED_LATER: ImageQuickToolId[] = ["colorMatch"];
 
 export const IMAGE_QUICK_TOOLS_STORAGE_KEY = "canvas-image-quick-tools-v7";
 
@@ -123,6 +129,14 @@ export const imageToolDefinitions: ImageToolDefinition[] = [
         run: (node, handlers) => handlers.onAngle(node),
     },
     {
+        id: "colorMatch",
+        defaultVisible: true,
+        label: () => i18n.t("canvas.imageTools.colorMatch"),
+        title: () => i18n.t("canvas.imageTools.colorMatchTitle"),
+        icon: () => <Palette className="size-4" />,
+        run: (node, handlers) => handlers.onColorMatch(node),
+    },
+    {
         id: "view",
         defaultVisible: true,
         label: () => i18n.t("canvas.imageTools.view"),
@@ -155,9 +169,14 @@ export function readImageQuickToolsConfig(value: unknown): ImageQuickToolsConfig
     if (Array.isArray(value)) return { ids: normalizeImageQuickToolIds(value), showLabels: false };
     if (!value || typeof value !== "object") return { ids: defaultImageQuickToolIds, showLabels: false };
     const data = value as Partial<ImageQuickToolsConfig>;
+    const allIds: ImageQuickToolId[] = [...defaultBaseToolIds, ...imageToolDefinitions.map((tool) => tool.id)];
+    // Settings saved before a tool existed never listed it; show such a tool once (if it is on by default).
+    const known = Array.isArray(data.known) ? data.known : allIds.filter((id) => !ADDED_LATER.includes(id));
+    const fresh = defaultImageQuickToolIds.filter((id) => ADDED_LATER.includes(id) && !known.includes(id));
     return {
-        ids: Array.isArray(data.ids) ? normalizeImageQuickToolIds(data.ids) : defaultImageQuickToolIds,
+        ids: Array.isArray(data.ids) ? normalizeImageQuickToolIds([...data.ids, ...fresh]) : defaultImageQuickToolIds,
         showLabels: data.showLabels === true,
+        known: allIds,
     };
 }
 

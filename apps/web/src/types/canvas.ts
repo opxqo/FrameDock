@@ -86,6 +86,8 @@ export type CanvasNodeMetadata = {
     naturalWidth?: number;
     naturalHeight?: number;
     freeResize?: boolean;
+    /** FrameDock: this picture was re-graded towards another image node ("调色对齐"). */
+    colorMatch?: { masterId: string; strength: number; scope: "all" | "tone" };
     images?: CanvasNodeImage[];
     primaryImageId?: string;
     storageKey?: string;

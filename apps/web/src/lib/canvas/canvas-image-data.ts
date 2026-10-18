@@ -1,3 +1,5 @@
+import { labStats, matchColors, type ColorMatchOptions, type Pixels } from "@/lib/color-match";
+
 export type ImageCropRect = {
     x: number;
     y: number;
@@ -120,6 +122,36 @@ export function resolveUpscaleSize(width: number, height: number, targetLongEdge
     const target = Math.min(MAX_UPSCALE_LONG_EDGE, Math.max(1, Math.round(targetLongEdge)));
     const scale = target / longEdge;
     return { width: Math.max(1, Math.round(width * scale)), height: Math.max(1, Math.round(height * scale)) };
+}
+
+/** Pixels of an image, optionally scaled down so its long edge is at most `maxEdge` (for previews and statistics). */
+export async function readImagePixels(dataUrl: string, maxEdge?: number): Promise<Pixels> {
+    const image = await loadImage(dataUrl);
+    const scale = maxEdge ? Math.min(1, maxEdge / Math.max(image.width, image.height)) : 1;
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(image.width * scale));
+    canvas.height = Math.max(1, Math.round(image.height * scale));
+    const context = canvas.getContext("2d", { willReadFrequently: true });
+    if (!context) throw new Error("Canvas is not available");
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    const { data, width, height } = context.getImageData(0, 0, canvas.width, canvas.height);
+    return { data, width, height };
+}
+
+export function pixelsToDataUrl(pixels: Pixels) {
+    const canvas = document.createElement("canvas");
+    canvas.width = pixels.width;
+    canvas.height = pixels.height;
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("Canvas is not available");
+    context.putImageData(new ImageData(new Uint8ClampedArray(pixels.data), pixels.width, pixels.height), 0, 0);
+    return canvas.toDataURL("image/png");
+}
+
+/** FrameDock: the full-size image re-graded towards the master (see lib/color-match.ts). */
+export async function colorMatchDataUrl(targetUrl: string, masterUrl: string, options: ColorMatchOptions) {
+    const master = labStats(await readImagePixels(masterUrl, 512));
+    return pixelsToDataUrl(matchColors(await readImagePixels(targetUrl), master, options));
 }
 
 function drawCrop(image: HTMLImageElement, sx: number, sy: number, sw: number, sh: number) {
