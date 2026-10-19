@@ -78,6 +78,7 @@ import SolarMoon from "~icons/solar/moon-linear";
 import SolarMusicNote2 from "~icons/solar/music-note-2-linear";
 import SolarPaintBrush from "~icons/solar/paint-brush-linear";
 import SolarPalette from "~icons/solar/palette-linear";
+import SolarMasks from "~icons/solar/masks-linear";
 import SolarPanelLeftClose from "~icons/solar/panel-left-close-linear";
 import SolarPanelLeftOpen from "~icons/solar/panel-left-open-linear";
 import SolarPanelRightClose from "~icons/solar/panel-right-close-linear";
@@ -235,6 +236,8 @@ export const MousePointer2 = solar(SolarCursor, "MousePointer2");
 export const Music2 = solar(SolarMusicNote2, "Music2");
 export const Network = solar(SolarStructure, "Network");
 export const Palette = solar(SolarPalette, "Palette");
+// FrameDock: 美术资产 preset node (Palette is already the appearance button and the colour-match tool).
+export const ArtAsset = solar(SolarMasks, "ArtAsset");
 export const PanelLeftClose = solar(SolarPanelLeftClose, "PanelLeftClose");
 export const PanelLeftOpen = solar(SolarPanelLeftOpen, "PanelLeftOpen");
 export const PanelRightClose = solar(SolarPanelRightClose, "PanelRightClose");

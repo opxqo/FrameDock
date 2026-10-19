@@ -1,4 +1,4 @@
-import { Palette } from "@/components/icons";
+import { ArtAsset } from "@/components/icons";
 import { useTranslation } from "react-i18next";
 
 import i18n from "@/i18n";
@@ -30,7 +30,7 @@ function ArtAssetContent({ ctx }: { ctx: CanvasNodeContext }) {
     return (
         <div className="flex h-full w-full flex-col gap-3 p-3.5 text-left" style={{ color: theme.node.text }}>
             <div className="flex items-center gap-2 text-sm font-semibold">
-                <Palette className="size-4" style={{ color: theme.node.activeStroke }} />
+                <ArtAsset className="size-4" style={{ color: theme.node.activeStroke }} />
                 {t("artAsset.title")}
                 <span className="ml-auto text-[11px] font-normal" style={{ color: theme.node.muted }}>
                     {t("artAsset.references", { count: references })}
@@ -103,7 +103,7 @@ export const artAssetNodeDefinition: CanvasNodeDefinition = {
     type: ART_ASSET_NODE_TYPE,
     title: i18n.t("artAsset.title"),
     description: i18n.t("artAsset.description"),
-    icon: <Palette className="size-4" />,
+    icon: <ArtAsset className="size-4" />,
     defaultSize: { width: 320, height: 340 },
     defaultMetadata: { artAsset: { category: "character", templateId: ART_ASSET_DEFAULT_TEMPLATE }, size: findArtAssetTemplate(ART_ASSET_DEFAULT_TEMPLATE)?.size, status: "idle" },
     minimapColor: "#e879f9",
