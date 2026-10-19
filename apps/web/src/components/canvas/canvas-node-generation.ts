@@ -66,13 +66,21 @@ export function buildNodeGenerationContext(nodeId: string, nodes: CanvasNodeData
         if (!labelByNodeId.has(input.nodeId)) labelByNodeId.set(input.nodeId, input.type === "text" ? `【${label}】` : label);
     }
     const resolved = resolvePromptReferences(prompt, labelByNodeId);
-    if (resolved.unresolved.length) {
-        const names = resolved.unresolved.map((id) => nodes.find((node) => node.id === id)?.title || i18n.t("canvas.references.deletedNode"));
+    // FrameDock: upstream text can hold references too (a 动作戏导演 result names its images as tokens); they get this node's numbers.
+    const unresolved = [...resolved.unresolved];
+    let textIndex = 0;
+    const upstreamText = resourceInputs
+        .flatMap((input) => {
+            if (!input.text) return [];
+            const text = resolvePromptReferences(input.text, labelByNodeId);
+            for (const id of text.unresolved) if (!unresolved.includes(id)) unresolved.push(id);
+            return [textBlock(generationLabel("text", textIndex++), text.text)];
+        })
+        .join("\n\n");
+    if (unresolved.length) {
+        const names = unresolved.map((id) => nodes.find((node) => node.id === id)?.title || i18n.t("canvas.references.deletedNode"));
         throw new Error(i18n.t("canvas.references.unresolved", { names: names.map((name) => `「${name}」`).join("、") }));
     }
-
-    let textIndex = 0;
-    const upstreamText = resourceInputs.flatMap((input) => (input.text ? [textBlock(generationLabel("text", textIndex++), input.text)] : [])).join("\n\n");
     const referenceImages = resourceInputs.map((input) => input.image).filter((image): image is ReferenceImage => Boolean(image));
     const referenceVideos = resourceInputs.map((input) => input.video).filter((video): video is ReferenceVideo => Boolean(video));
     const referenceAudios = resourceInputs.map((input) => input.audio).filter((audio): audio is ReferenceAudio => Boolean(audio));

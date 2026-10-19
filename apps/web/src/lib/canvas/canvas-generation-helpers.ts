@@ -103,7 +103,8 @@ export function getInputSummary(inputs: NodeGenerationInput[]) {
     };
 }
 
-export function buildGenerationConfig(config: AiConfig, node: CanvasNodeData | undefined, mode: CanvasNodeGenerationMode): AiConfig {
+/** `presetSystemPrompt`: a text preset's own instructions (useBuiltinPanel.systemPrompt), placed after its skill and before the global prompt. */
+export function buildGenerationConfig(config: AiConfig, node: CanvasNodeData | undefined, mode: CanvasNodeGenerationMode, presetSystemPrompt?: string): AiConfig {
     return {
         ...config,
         model: resolveModelForCapability(config, node?.metadata?.model, mode),
@@ -123,7 +124,7 @@ export function buildGenerationConfig(config: AiConfig, node: CanvasNodeData | u
         audioInstructions: node?.metadata?.audioInstructions || config.audioInstructions || defaultConfig.audioInstructions,
         count: String(node?.metadata?.count || (mode === "image" ? config.canvasImageCount || config.count : config.count) || defaultConfig.count),
         // A skill only steers text generation (it writes prompts for the nodes downstream).
-        systemPrompt: mode === "text" ? skillSystemPrompt(node?.metadata?.skill, config.systemPrompt) : config.systemPrompt,
+        systemPrompt: mode === "text" ? skillSystemPrompt(node?.metadata?.skill, [presetSystemPrompt, config.systemPrompt].filter(Boolean).join("\n\n")) : config.systemPrompt,
     };
 }
 

@@ -2,7 +2,7 @@ import { expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { ART_ASSET_PACKS, ART_ASSET_TIERS, artAssetNodeType } from "../src/lib/art-assets/packs";
 import { ART_ASSET_DERIVE_FOR } from "../src/lib/art-assets/node-types";
-import { composeArtAssetPrompt, type ArtAssetTemplate } from "../src/lib/art-assets/templates";
+import { artAssetSystemPrompt, composeArtAssetPrompt, type ArtAssetTemplate } from "../src/lib/art-assets/templates";
 import { mediaRatioOptions } from "../src/lib/media-size";
 
 // Guards every 美术资产 pack (docs/design/preset-nodes.md). New packs and templates are checked here automatically.
@@ -10,7 +10,10 @@ import { mediaRatioOptions } from "../src/lib/media-size";
 const ratios = new Set<string>(mediaRatioOptions.map((item) => item.value));
 const all = ART_ASSET_PACKS.flatMap((pack) => ART_ASSET_TIERS.flatMap((tier) => (pack[tier]?.templates ?? []).map((template) => ({ pack, tier, template }))));
 const readMoke = (name: string) => (JSON.parse(readFileSync(new URL(`../../../docs/research/${name}`, import.meta.url), "utf8")) as { items: Array<{ prompt: string }> }).items;
-const moke = [...readMoke("moke-art-assets.json"), ...readMoke("moke-storyboard.json")];
+type Previz = Record<"animatic" | "loop", Array<{ prompt: string }>> & { camera: Array<{ group: string; prompt: string }> };
+const previz = JSON.parse(readFileSync(new URL("../../../docs/research/moke-previz.json", import.meta.url), "utf8")) as Previz;
+// MOKE writes the subject of its animation prompts as [Subject]; the packs use [主体] like every other MOKE section.
+const moke = [...readMoke("moke-art-assets.json"), ...readMoke("moke-storyboard.json"), ...[...previz.animatic, ...previz.loop].map((item) => ({ prompt: item.prompt.replaceAll("[Subject]", "[主体]") }))];
 const filled = (template: ArtAssetTemplate) => composeArtAssetPrompt(template, { description: "测试主体", referenceCount: 1 });
 
 test("template ids are unique across all packs", () => {
@@ -76,4 +79,47 @@ test("MOKE templates are MOKE's text: with the default options filled in, the pr
         const squash = (value: string) => value.replace(/\s*\n\s*/g, "\n").trim();
         expect([template.id, moke.some((item) => squash(item.prompt) === squash(text))]).toEqual([template.id, true]);
     }
+});
+
+test("运镜 templates are MOKE's 48 camera moves, and their options are MOKE's pacing and rig phrases", () => {
+    const pack = ART_ASSET_PACKS.find((item) => item.category === "camera")!;
+    const phrases = (group: string) => new Set(previz.camera.filter((item) => item.group === group).map((item) => item.prompt));
+    const moves = phrases("运镜动作");
+    const templates = pack.master!.templates;
+    expect(templates.map((template) => template.summary!.zh).sort()).toEqual([...moves].sort());
+    for (const template of templates) expect([template.id, template.prompt.includes(`运镜：${template.summary!.zh}。`)]).toEqual([template.id, true]);
+    const [speed, feel] = templates[0]!.options!;
+    for (const choice of speed!.choices) expect([choice, phrases("节奏速度").has(choice)]).toEqual([choice, true]);
+    for (const choice of feel!.choices) expect([choice, phrases("稳定质感").has(choice)]).toEqual([choice, true]);
+});
+
+test("镜头预演 video packs make videos and sit in the 镜头预演 group", () => {
+    for (const category of ["camera", "animatic", "loop"]) {
+        const pack = ART_ASSET_PACKS.find((item) => item.category === category)!;
+        expect([category, pack.output, pack.group.zh]).toEqual([category, "video", "镜头预演"]);
+    }
+});
+
+test("动作戏导演 is a text pack: the template is the system prompt, options are filled, and its skills are MOKE's two fight skills", () => {
+    const pack = ART_ASSET_PACKS.find((item) => item.category === "fight")!;
+    expect([pack.output, pack.group.zh, pack.mokeSkills?.length]).toEqual(["text", "镜头预演", 2]);
+    expect(pack.mokeSkills!.every((id) => /^skill\/[^/]+\/[^/]+\/[^/]+$/.test(id))).toBe(true);
+    const sword = pack.master!.templates[0]!;
+    const heavy = artAssetSystemPrompt(sword, { impact: sword.options![1]!.choices[2]!, duration: "8秒" });
+    expect(heavy).toContain("时长：8秒");
+    expect(heavy).toContain("震镜");
+    expect(heavy).not.toMatch(/\{\{|\[主体\]/);
+    // Without a choice the first one is used (15 seconds, medium impact).
+    expect(artAssetSystemPrompt(sword)).toContain("时长：15秒");
+    // Every skill the pack names is a real MOKE page the notices file mentions.
+    for (const template of pack.master!.templates) expect([template.id, template.prompt.includes("图片1")]).toEqual([template.id, true]);
+});
+
+test("a Skill pack names who wrote each skill, one entry per skill id, and says what it writes", () => {
+    const pack = ART_ASSET_PACKS.find((item) => item.category === "fight")!;
+    expect(pack.skillInfo?.length).toBe(pack.mokeSkills!.length);
+    for (const [index, id] of pack.mokeSkills!.entries()) expect([id, id.endsWith(`/${pack.skillInfo![index]!.name}`), Boolean(pack.skillInfo![index]!.author)]).toEqual([id, true, true]);
+    expect(Boolean(pack.outputLabel?.zh && pack.outputLabel.en && pack.templateLabel?.zh && pack.templateLabel.en)).toBe(true);
+    // The fight types sit in a Segmented control on the card, so their titles stay short.
+    for (const template of pack.master!.templates) expect([template.id, template.title!.zh.length <= 4]).toEqual([template.id, true]);
 });

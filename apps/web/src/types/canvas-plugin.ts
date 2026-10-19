@@ -102,6 +102,10 @@ export type CanvasBuiltinPanelConfig = {
     promptPlaceholder?: (node: CanvasNodeData) => string;
     /** Builds the prompt sent to the model from the user's text (with upstream text) and the number of reference images. */
     composePrompt?: (node: CanvasNodeData, text: string, referenceCount: number) => { prompt: string } | { error: string };
+    /** Text presets: instructions added to the system prompt, built from the node's settings (after the MOKE skills). */
+    systemPrompt?: (node: CanvasNodeData) => string;
+    /** Text presets: MOKE skill ids (`skill/<owner>/<namespace>/<slug>`) read through the server proxy and used as the system prompt. */
+    mokeSkills?: string[];
     /** Title of the result node. */
     resultTitle?: (node: CanvasNodeData) => string;
     /** Images sent as references before the connected ones (美术资产 定稿: the node's own 母版). */
@@ -118,6 +122,10 @@ export type CanvasNodeDefinition = {
     group?: string;
     /** FrameDock: heading inside the group (e.g. 人物 / 场景 under 美术资产). */
     subgroup?: string;
+    /** FrameDock: "skill" for nodes built on MOKE skills (动作戏导演), "prompt" (default) for prompt-template nodes. The menus and the card tell them apart. */
+    kind?: "prompt" | "skill";
+    /** FrameDock: the skills a "skill" node is built on, shown on its card and in the menus. */
+    skills?: Array<{ name: string; author: string }>;
     defaultSize: { width: number; height: number };
     defaultMetadata?: CanvasNodeMetadata;
     minimapColor?: string;

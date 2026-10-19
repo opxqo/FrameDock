@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { CanvasNodeType, type CanvasConnection, type CanvasNodeData } from "../src/types/canvas";
 
-const { parsePromptTokens, readablePrompt, resolvePromptReferences, nodeReferenceToken } = await import("../src/lib/canvas/prompt-reference-tokens");
+const { parsePromptTokens, readablePrompt, resolvePromptReferences, nodeReferenceToken, referenceLabelAliases, labelsToNodeTokens, promptSegments } = await import("../src/lib/canvas/prompt-reference-tokens");
 const { buildNodeMentionReferences } = await import("../src/lib/canvas/canvas-resource-references");
 const { buildNodeGenerationContext } = await import("../src/components/canvas/canvas-node-generation");
 const { compileReferenceSyntax } = await import("../src/lib/reference-syntax");
@@ -87,4 +87,38 @@ test("a Seedance request carries @图片N for the pictures it sends", () => {
     const model = findYfaiModel("yfai::seedance-2-0-official")!;
     const body = buildYfaiInvoke({ yfaiParams: "" }, model, "让 图片2 的人走进 图片1", { ...yfaiDefaults(model), mode: "reference", images: ["https://example.com/a.png", "https://example.com/b.png"] });
     expect((body.params as { prompt: string }).prompt).toBe("让 @图片2 的人走进 @图片1");
+});
+
+test("图N is another spelling of 图片N, and never splits a longer number", () => {
+    expect(referenceLabelAliases("图片2")).toEqual(["图2"]);
+    expect(referenceLabelAliases("视频1")).toEqual([]);
+    expect(parsePromptTokens("图1（黑衣）与图10", ["图片1", "图1"])).toEqual([
+        { type: "label", label: "图1" },
+        { type: "text", value: "（黑衣）与图10" },
+    ]);
+});
+
+test("图片N written by a model becomes the reference token of the Nth image sent", () => {
+    expect(labelsToNodeTokens("图片1（黑衣剑客）对图片2；@图片3 是场景；图片4 不存在；图片10", ["a", "b", "c"])).toBe("@[node:a]（黑衣剑客）对@[node:b]；@[node:c] 是场景；图片4 不存在；图片10");
+    expect(labelsToNodeTokens("{{Image 1}}（黑衣）与{{Image 2}}{{Image 3}}，{{Image 9}}", ["a", "b", "c"])).toBe("@[node:a]（黑衣）与@[node:b]@[node:c]，{{Image 9}}");
+});
+
+test("references inside an upstream text get the receiving node's numbers, and a missing one stops the run", () => {
+    const text = (content: string): CanvasNodeData => ({ id: "t", type: CanvasNodeType.Text, title: "提示词", position: { x: 0, y: 0 }, width: 100, height: 100, metadata: { content } });
+    const nodes = [target(), image("a"), image("b"), text(`${tok("a")} 对 ${tok("b")}`)];
+    const context = buildNodeGenerationContext("target", nodes, [link("b"), link("a"), link("t")], "按下文生成");
+    expect(context.prompt).toContain("图片2 对 图片1");
+    expect(context.referenceImages.map((item) => item.id)).toEqual(["b", "a"]);
+    expect(() => buildNodeGenerationContext("target", nodes, [link("a"), link("t")], "按下文生成")).toThrow();
+});
+
+test("a text with references is split for reading: chips for live references, a broken one for a gone node, 图片N for the old handle", () => {
+    const refs = [{ nodeId: "a", label: "图片1", kind: "image", previewUrl: "blob:a", title: "黑衣", active: true }, { nodeId: "b", label: "图片2", kind: "image", title: "白衣", active: false }];
+    expect(promptSegments(`${tok("a")}（黑衣）对 ${tok("b")}，{{Image 3}} 与 ${tok("gone")}`, refs)).toEqual([
+        { type: "reference", nodeId: "a", label: "图片1", kind: "image", previewUrl: "blob:a", title: "黑衣" },
+        { type: "text", value: "（黑衣）对 " },
+        { type: "missing", nodeId: "b" },
+        { type: "text", value: "，图片3 与 " },
+        { type: "missing", nodeId: "gone" },
+    ]);
 });

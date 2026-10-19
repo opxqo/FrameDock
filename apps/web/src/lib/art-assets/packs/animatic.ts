@@ -1,0 +1,106 @@
+// FrameDock: 动态分镜 video pack. MOKE AIGC prompt library, section 动画 › 动态分镜 (docs/research/moke-previz.json,
+// animatic 1–8), used verbatim except that MOKE's [Subject] placeholder is written [主体] like the other packs.
+// The node generates a video: the built-in video panel supplies model, ratio and duration (MOKE plans 10 seconds).
+
+import { GROUP_PREVIZ } from "@/lib/art-assets/groups";
+import type { ArtAssetPack } from "@/lib/art-assets/packs";
+import type { ArtAssetTemplate } from "@/lib/art-assets/templates";
+
+const TEMPLATES: ArtAssetTemplate[] = [
+    {
+        id: "moke-animatic-establishing-animatic",
+        title: { zh: "空间建立动态分镜", en: "Establishing Animatic" },
+        summary: { zh: "先交代角色、地标与目标的位置，再用镜头进入具体行动。", en: "Establish characters, landmarks and objectives before moving into specific actions." },
+        category: "animatic",
+        tier: "master",
+        input: "either",
+        size: "16:9",
+        source: "moke",
+        prompt: "为 [主体] 制作10秒动态分镜。全景建立空间，中景展示角色行动，末镜交代目标；保留连续走位与方向。\n按动作节点安排镜头与停留时间，使用简化角色和布景先检验空间、时序及剪辑。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+    },
+    {
+        id: "moke-animatic-dialogue-animatic",
+        title: { zh: "对话动态分镜", en: "Dialogue Animatic" },
+        summary: { zh: "通过双人空间、视线与反应镜头组织对话节奏。", en: "Organize dialogue through shared space, eye lines and response shots." },
+        category: "animatic",
+        tier: "master",
+        input: "either",
+        size: "16:9",
+        source: "moke",
+        prompt: "为 [主体] 制作10秒动态分镜。先双人镜头，再正反打与反应，保持轴线、视线高度和角色左右关系。\n按动作节点安排镜头与停留时间，使用简化角色和布景先检验空间、时序及剪辑。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+    },
+    {
+        id: "moke-animatic-chase-animatic",
+        title: { zh: "追逐动态分镜", en: "Chase Animatic" },
+        summary: { zh: "通过距离变化、障碍与节奏递增传达追逐中的压力。", en: "Convey chase pressure through distance changes, obstacles and increasing pace." },
+        category: "animatic",
+        tier: "master",
+        input: "either",
+        size: "16:9",
+        source: "moke",
+        prompt: "为 [主体] 制作10秒动态分镜。建立追逐方向，展示一次障碍跨越，再交代距离变化；不同镜头保持场景地图一致。\n按动作节点安排镜头与停留时间，使用简化角色和布景先检验空间、时序及剪辑。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+    },
+    {
+        id: "moke-animatic-reveal-animatic",
+        title: { zh: "揭示动态分镜", en: "Reveal Animatic" },
+        summary: { zh: "先限制信息，再用遮挡解除或镜头变化让观众发现关键对象。", en: "Withhold information, then reveal a key object through framing or removal of occlusion." },
+        category: "animatic",
+        tier: "master",
+        input: "either",
+        size: "16:9",
+        source: "moke",
+        prompt: "为 [主体] 制作10秒动态分镜。先表现角色察觉，再改变构图揭示目标，保留反应停顿，避免提前露出关键对象。\n按动作节点安排镜头与停留时间，使用简化角色和布景先检验空间、时序及剪辑。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+    },
+    {
+        id: "moke-animatic-action-breakdown-animatic",
+        title: { zh: "动作分解动态分镜", en: "Action Breakdown Animatic" },
+        summary: { zh: "把复杂动作拆成可理解的节点，再检验镜头和时长是否支持动作。", en: "Break complex action into readable beats and test whether framing and duration support them." },
+        category: "animatic",
+        tier: "master",
+        input: "either",
+        size: "16:9",
+        source: "moke",
+        prompt: "为 [主体] 制作10秒动态分镜。准备、发力、接触、结果四节点清楚，镜头不在关键接触前遮挡动作。\n按动作节点安排镜头与停留时间，使用简化角色和布景先检验空间、时序及剪辑。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+    },
+    {
+        id: "moke-animatic-emotional-turn-animatic",
+        title: { zh: "情绪转折动态分镜", en: "Emotional Turn Animatic" },
+        summary: { zh: "通过动作与停顿展示角色认知改变，镜头强度服务情绪。", en: "Show a change in understanding through behavior and pauses, with framing supporting emotion." },
+        category: "animatic",
+        tier: "master",
+        input: "either",
+        size: "16:9",
+        source: "moke",
+        prompt: "为 [主体] 制作10秒动态分镜。从环境中景进入表情近景，再回到决定性动作；推近由情绪触发而非无目的移动。\n按动作节点安排镜头与停留时间，使用简化角色和布景先检验空间、时序及剪辑。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+    },
+    {
+        id: "moke-animatic-musical-phrase-animatic",
+        title: { zh: "音乐段落动态分镜", en: "Musical Phrase Animatic" },
+        summary: { zh: "镜头、动作与音乐短句共同构成段落，需要节拍参考来校准。", en: "Camera, movement and a musical phrase form a sequence requiring a beat reference for alignment." },
+        category: "animatic",
+        tier: "master",
+        input: "either",
+        size: "16:9",
+        source: "moke",
+        prompt: "为 [主体] 制作10秒动态分镜。先给节拍或音频参考，按重音安排姿态与切点，保留动作完成时间。\n按动作节点安排镜头与停留时间，使用简化角色和布景先检验空间、时序及剪辑。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+    },
+    {
+        id: "moke-animatic-scene-transition-animatic",
+        title: { zh: "场景转场动态分镜", en: "Scene Transition Animatic" },
+        summary: { zh: "用形状、动作或视线关系连接两个场景，检验衔接是否可理解。", en: "Connect scenes through shape, movement or eye-line relationships and test continuity." },
+        category: "animatic",
+        tier: "master",
+        input: "either",
+        size: "16:9",
+        source: "moke",
+        prompt: "为 [主体] 制作10秒动态分镜。用相同运动方向衔接两个地点，明确转场前后角色状态与时间关系。\n按动作节点安排镜头与停留时间，使用简化角色和布景先检验空间、时序及剪辑。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+    },
+];
+
+export const ANIMATIC_PACK: ArtAssetPack = {
+    category: "animatic",
+    group: GROUP_PREVIZ,
+    output: "video",
+    label: { zh: "动态分镜", en: "Animatic" },
+    master: { title: { zh: "动态分镜", en: "Animatic" }, description: { zh: "建立、对话、追逐、揭示", en: "Establish, dialogue, chase" }, templates: TEMPLATES },
+};

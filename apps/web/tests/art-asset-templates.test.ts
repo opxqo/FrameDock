@@ -54,7 +54,10 @@ test("MOKE prompts are sent as written: [主体] takes the description or is dro
     const CHARACTER_DERIVE_TEMPLATES = CHARACTER_PACK.derive!.templates;
     const turnaround = CHARACTER_MASTER_TEMPLATES[0];
     const fromText = composeArtAssetPrompt(turnaround, { description: "白色猫族探险家", referenceCount: 0 });
-    expect("prompt" in fromText && fromText.prompt.startsWith("以参考角色或 白色猫族探险家 为主体")).toBe(true);
+    // Text only: "参考角色或 [主体]" becomes the description; with an image connected both stay.
+    expect("prompt" in fromText && fromText.prompt.startsWith("以白色猫族探险家 为主体")).toBe(true);
+    const fromBoth = composeArtAssetPrompt(turnaround, { description: "白色猫族探险家", referenceCount: 1 });
+    expect("prompt" in fromBoth && fromBoth.prompt.startsWith("以参考角色或 白色猫族探险家 为主体")).toBe(true);
     const fromImage = composeArtAssetPrompt(turnaround, { description: "", referenceCount: 1 });
     expect("prompt" in fromImage && fromImage.prompt.startsWith("以参考角色为主体")).toBe(true);
     expect("prompt" in fromImage && fromImage.prompt).not.toContain("[主体]");

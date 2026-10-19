@@ -2,7 +2,7 @@
 // into production assets for video (characters, scenes, costumes, props). Written for FrameDock; the category
 // layout follows common art-asset prompt libraries. Pure data and functions, no DOM.
 
-export type ArtAssetCategory = "character" | "scene" | "costume" | "prop" | "storyboard" | "tool";
+export type ArtAssetCategory = "character" | "scene" | "costume" | "prop" | "storyboard" | "camera" | "animatic" | "loop" | "fight" | "tool";
 /** Text shown in the UI, in both app languages (pack data carries its own wording; see lib/art-assets/packs). */
 export type LocalText = { zh: string; en: string };
 /** "image": needs a connected reference image. "either": an image or a description is enough. */
@@ -131,13 +131,20 @@ export function composeArtAssetPrompt(template: ArtAssetTemplate | undefined, in
     if (template.input === "image" && input.referenceCount < 1) return { error: "needsImage" };
     if (!description && input.referenceCount < 1) return { error: "noInput" };
     // Pack templates (MOKE's and our own) are complete prompts: fill [主体] and options, add nothing else.
-    if (template.source === "moke" || template.tier) return { prompt: fillMokePrompt(template, description, input.options) };
+    if (template.source === "moke" || template.tier) return { prompt: fillMokePrompt(template, description, input.options, input.referenceCount) };
     const parts = [template.prompt];
     if (input.referenceCount > 0) parts.push(`一致性：严格以参考图为准，保持其中对象的外观、比例、配色和细节特征不变${input.referenceCount > 1 ? "；多张参考图描绘的是同一对象的不同方面，综合使用" : ""}。`);
     if (description) parts.push(`【补充描述】\n${description}`);
     if (template.category !== "scene") parts.push(STUDIO_RULES);
     parts.push(COMMON_RULES);
     return { prompt: parts.join("\n\n") };
+}
+
+/** A text preset's own instructions: the template with its `{{option}}` choices filled in (the node's choice, else the first). */
+export function artAssetSystemPrompt(template: ArtAssetTemplate | undefined, chosen?: Record<string, string>) {
+    if (!template) return "";
+    const values = artAssetOptionValues(template, chosen);
+    return template.prompt.replace(/\{\{(\w+)\}\}/g, (_, id: string) => values[id] ?? "");
 }
 
 /** The value of each option: the node's choice when it is one of the template's, else the first choice. */
@@ -147,13 +154,14 @@ export function artAssetOptionValues(template: ArtAssetTemplate, chosen: Record<
 
 /**
  * MOKE prompts are sent as written: `{{option}}` takes the chosen value, and `[主体]` (MOKE's "参考角色或 [主体]") takes
- * the description — or is dropped when there is none, leaving "参考角色". A description for a prompt without
- * `[主体]` is added at the end.
+ * the description — or is dropped when there is none, leaving "参考角色". With a description and no reference image,
+ * "参考角色或 [主体]" becomes just the description. A description for a prompt without `[主体]` is added at the end.
  */
-function fillMokePrompt(template: ArtAssetTemplate, description: string, chosen?: Record<string, string>) {
+function fillMokePrompt(template: ArtAssetTemplate, description: string, chosen?: Record<string, string>, referenceCount = 1) {
     const values = artAssetOptionValues(template, chosen);
     let prompt = template.prompt.replace(/\{\{(\w+)\}\}/g, (_, id: string) => values[id] ?? "");
     if (prompt.includes("[主体]")) {
+        if (description && referenceCount < 1) prompt = prompt.replace(/参考[^，。；、或\s]{0,8}或\s*\[主体\]/g, description);
         prompt = description ? prompt.replaceAll("[主体]", description) : prompt.replace(/或\s*\[主体\]\s*/g, "").replaceAll("[主体]", "参考图中的角色");
         return prompt;
     }

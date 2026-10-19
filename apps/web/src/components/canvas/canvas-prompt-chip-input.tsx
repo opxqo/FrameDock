@@ -9,7 +9,7 @@ import { canvasThemes } from "@/lib/canvas-theme";
 import { isImeComposing, isPlainEnterKey } from "@/lib/keyboard-event";
 import { useThemeStore } from "@/stores/use-theme-store";
 import type { CanvasResourceReference } from "@/lib/canvas/canvas-resource-references";
-import { nodeReferenceToken, parsePromptTokens } from "@/lib/canvas/prompt-reference-tokens";
+import { nodeReferenceToken, parsePromptTokens, referenceLabelAliases } from "@/lib/canvas/prompt-reference-tokens";
 
 type Props = {
     value: string;
@@ -50,9 +50,10 @@ export function CanvasPromptChipInput({ value, references, onChange, onSubmit, c
     const [imagePreview, setImagePreview] = useState<string | null>(null);
 
     const activeReferences = useMemo(() => references.filter((item) => item.active), [references]);
-    const referenceByLabel = useMemo(() => new Map(activeReferences.map((item) => [item.label, item])), [activeReferences]);
+    // In id mode "图1" written by hand (or by a skill) is the same reference as "图片1" and becomes a chip too.
+    const referenceByLabel = useMemo(() => new Map(activeReferences.flatMap((item) => [[item.label, item] as const, ...(tokenMode === "id" ? referenceLabelAliases(item.label).map((alias) => [alias, item] as const) : [])])), [activeReferences, tokenMode]);
     // Match longer labels first so a shorter label cannot split a longer one.
-    const activeLabels = useMemo(() => Array.from(new Set(activeReferences.map((item) => item.label))).sort((a, b) => b.length - a.length), [activeReferences]);
+    const activeLabels = useMemo(() => Array.from(referenceByLabel.keys()).sort((a, b) => b.length - a.length), [referenceByLabel]);
     const referenceByNodeId = useMemo(() => new Map(activeReferences.map((item) => [item.nodeId, item])), [activeReferences]);
     // In id mode, plain labels from prompts written before ids existed still become chips (and are saved as ids on the next edit).
     const tokens = useMemo<Token[]>(() => (tokenMode === "id" ? parsePromptTokens(value, activeLabels).map((token) => (token.type === "label" ? { type: "reference", label: token.label } : token)) : parseTokens(value, activeLabels)), [value, activeLabels, tokenMode]);

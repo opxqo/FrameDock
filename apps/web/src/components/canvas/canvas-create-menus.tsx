@@ -1,5 +1,5 @@
-import { Fragment, useEffect, useRef } from "react";
-import { ImageIcon, List, Music2, Settings2, Video, X } from "@/components/icons";
+import { Fragment, useEffect, useRef, useState } from "react";
+import { ChevronRight, ImageIcon, List, Music2, Settings2, Video, X } from "@/components/icons";
 import { CodexLogo } from "@/components/codex-logo";
 import { useTranslation } from "react-i18next";
 
@@ -7,6 +7,8 @@ import { canvasThemes } from "@/lib/canvas-theme";
 import { useThemeStore } from "@/stores/use-theme-store";
 import { listNodeDefinitions, useNodeRegistryVersion } from "@/lib/canvas/node-registry";
 import { getNodeSpec } from "@/constant/canvas";
+import { buildNodeMenu, countByKind, filterByKind } from "@/lib/canvas/node-menu-tree";
+import { NodeKindSwitch, skillSource, useNodeMenuKind } from "@/components/canvas/node-kind-switch";
 import { CanvasNodeType, type ConnectionHandle, type Position } from "@/types/canvas";
 
 export type PendingConnectionCreate = {
@@ -55,23 +57,25 @@ export function ConnectionCreateMenu({
     );
 }
 
-export function ConnectionCreateOption({ theme, icon, title, description, onClick }: { theme: (typeof canvasThemes)[keyof typeof canvasThemes]; icon: React.ReactNode; title: string; description?: string; onClick?: () => void }) {
+/** `kind="skill"`: a Skill node — its icon sits on a dashed tile instead of the solid one prompt nodes use, and `description` is the author line. */
+export function ConnectionCreateOption({ theme, icon, title, description, onClick, kind, hint }: { theme: (typeof canvasThemes)[keyof typeof canvasThemes]; icon: React.ReactNode; title: string; description?: string; onClick?: () => void; kind?: "prompt" | "skill"; hint?: string }) {
     return (
         <button
             type="button"
             className="flex min-h-10 w-full cursor-pointer items-center gap-2.5 rounded-xl px-2 py-1 text-left transition"
             style={{ color: theme.node.text }}
+            title={hint}
             onClick={onClick}
             onMouseEnter={(event) => (event.currentTarget.style.background = theme.node.fill)}
             onMouseLeave={(event) => (event.currentTarget.style.background = "transparent")}
         >
-            <span className="grid size-7 shrink-0 place-items-center rounded-lg" style={{ background: theme.node.fill, color: theme.node.muted }}>
+            <span className={`grid size-7 shrink-0 place-items-center rounded-lg ${kind === "skill" ? "border border-dashed" : ""}`} style={kind === "skill" ? { borderColor: theme.node.activeStroke, color: theme.node.muted } : { background: theme.node.fill, color: theme.node.muted }}>
                 {icon}
             </span>
             <span className="min-w-0 flex-1">
                 <span className="block truncate text-[13px] font-medium leading-4">{title}</span>
                 {description ? (
-                    <span className="mt-0.5 block truncate text-[11px] leading-4" style={{ color: theme.node.muted }}>
+                    <span className={`mt-0.5 block truncate text-[11px] leading-4 ${kind === "skill" ? "font-mono" : ""}`} style={{ color: theme.node.muted }}>
                         {description}
                     </span>
                 ) : null}
@@ -85,7 +89,17 @@ export function NodeCreateMenu({ position, scale = 1, onCreate, onClose }: { pos
     const { t } = useTranslation();
     useNodeRegistryVersion();
     const menuRef = useRef<HTMLDivElement>(null);
-    const definitions = listNodeDefinitions().filter((def) => def.showInCreateMenu !== false);
+    // Extension categories start collapsed; the node list stays short however many packs exist.
+    const [openCategories, setOpenCategories] = useState<Set<string>>(new Set());
+    const toggleCategory = (key: string) => setOpenCategories((current) => { const next = new Set(current); if (!next.delete(key)) next.add(key); return next; });
+    const allDefinitions = listNodeDefinitions().filter((def) => def.showInCreateMenu !== false);
+    const [kind, setKind] = useNodeMenuKind();
+    // Built-in nodes stay on both pages; the switch only chooses between the prompt and Skill extension nodes.
+    const definitions = filterByKind(allDefinitions, kind);
+    const tree = buildNodeMenu(definitions, (def) => getNodeSpec(def.type).title);
+    const firstGroup = tree.findIndex((entry) => entry.group);
+    const hasExtensions = countByKind(allDefinitions, "prompt") + countByKind(allDefinitions, "skill") > 0;
+    const kindSwitch = <NodeKindSwitch kind={kind} onChange={setKind} defs={allDefinitions} />;
     // Close automatically when clicking outside the menu.
     useEffect(() => {
         const handlePointerDown = (event: PointerEvent) => {
@@ -111,39 +125,54 @@ export function NodeCreateMenu({ position, scale = 1, onCreate, onClose }: { pos
                 </button>
             </div>
             <div className="grid gap-0.5">
-                {groupDefinitions(definitions).map(([group, subgroups]) => (
+                {tree.map(({ group, categories }, index) => (
                     <Fragment key={group || "_"}>
+                        {group && index === firstGroup ? <div className="mt-3 border-t px-0.5 pt-3" style={{ borderColor: theme.node.stroke }}>{kindSwitch}</div> : null}
                         {group ? (
-                            <div className="mt-3 border-t px-2 pb-1 pt-3 text-[11px] font-medium tracking-[0.08em]" style={{ color: theme.node.faint, borderColor: theme.node.stroke }}>
+                            <div className="px-2 pb-1 pt-3 text-[11px] font-medium tracking-[0.08em]" style={{ color: theme.node.muted }}>
                                 {group}
                             </div>
                         ) : null}
-                        {subgroups.map(([subgroup, items]) => (
-                            <Fragment key={subgroup || "_"}>
-                                {subgroup ? (
-                                    <div className="px-2 pb-0.5 pt-2 text-[11px]" style={{ color: theme.node.muted }}>
-                                        {subgroup}
-                                    </div>
-                                ) : null}
-                                {items.map((def) => (
-                                    <ConnectionCreateOption key={def.type} theme={theme} icon={def.icon} title={getNodeSpec(def.type).title} description={def.description} onClick={() => onCreate(def.type)} />
-                                ))}
-                            </Fragment>
-                        ))}
+                        {categories.map((category) => {
+                            const open = category.single || openCategories.has(`${group}/${category.key}`);
+                            return (
+                                <Fragment key={category.key}>
+                                    {category.single ? null : (
+                                        <button
+                                            type="button"
+                                            aria-expanded={open}
+                                            className="flex h-9 w-full items-center gap-2 rounded-lg px-2 text-left text-[13px] font-medium outline-none transition focus-visible:ring-2 focus-visible:ring-signal/60"
+                                            style={{ color: theme.node.text }}
+                                            onMouseEnter={(event) => (event.currentTarget.style.background = theme.node.fill)}
+                                            onMouseLeave={(event) => (event.currentTarget.style.background = "transparent")}
+                                            onClick={() => toggleCategory(`${group}/${category.key}`)}
+                                        >
+                                            <ChevronRight className={`size-3.5 shrink-0 transition-transform ${open ? "rotate-90" : ""}`} style={{ color: theme.node.muted }} />
+                                            <span className="flex-1">{category.name}</span>
+                                            <span className="tnum text-[11px] font-normal" style={{ color: theme.node.muted }}>
+                                                {category.defs.length}
+                                            </span>
+                                        </button>
+                                    )}
+                                    {open
+                                        ? category.defs.map((def) => (
+                                              <div key={def.type} className={category.single ? undefined : "pl-3"}>
+                                                  <ConnectionCreateOption theme={theme} icon={def.icon} title={getNodeSpec(def.type).title} description={def.kind === "skill" ? skillSource(def) : def.description} hint={def.kind === "skill" ? def.description : undefined} kind={def.kind} onClick={() => onCreate(def.type)} />
+                                              </div>
+                                          ))
+                                        : null}
+                                </Fragment>
+                            );
+                        })}
                     </Fragment>
                 ))}
+                {hasExtensions && firstGroup < 0 ? (
+                    <div className="mt-3 space-y-2 border-t px-0.5 pt-3" style={{ borderColor: theme.node.stroke }}>
+                        {kindSwitch}
+                        <p className="px-2 py-1 text-[11px]" style={{ color: theme.node.muted }}>{t("canvas.createMenu.kindEmpty")}</p>
+                    </div>
+                ) : null}
             </div>
         </div>
     );
-}
-
-/** FrameDock: ungrouped nodes first, then each group (and each subgroup inside it) under its heading, in registration order. */
-export function groupDefinitions<T extends { group?: string; subgroup?: string }>(definitions: T[]): Array<[string, Array<[string, T[]]>]> {
-    const groups = new Map<string, Map<string, T[]>>();
-    for (const def of definitions) {
-        const group = groups.get(def.group ?? "") ?? new Map<string, T[]>();
-        group.set(def.subgroup ?? "", [...(group.get(def.subgroup ?? "") ?? []), def]);
-        groups.set(def.group ?? "", group);
-    }
-    return [...groups].sort(([a], [b]) => (a ? 1 : 0) - (b ? 1 : 0)).map(([group, subgroups]) => [group, [...subgroups]]);
 }

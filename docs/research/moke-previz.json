@@ -1,0 +1,2894 @@
+{
+ "source": "MOKE AIGC 创作提示词库 (https://www.mokeaigc.ai/cinematique.html): 视频 › 摄影技法 (Camera Work) and 动画 › 动态分镜 / 循环 / 动作表演",
+ "capturedAt": "2026-10-19",
+ "note": "Verbatim. [主体]/[Subject] is MOKE's subject placeholder. Camera entries are short phrases meant to be combined (group = MOKE's sub-heading).",
+ "animatic": [
+  {
+   "index": 1,
+   "id": "creative-animation-board-establish",
+   "title": "空间建立动态分镜",
+   "titleEn": "Establishing Animatic",
+   "summary": "先交代角色、地标与目标的位置，再用镜头进入具体行动。",
+   "summaryEn": "Establish characters, landmarks and objectives before moving into specific actions.",
+   "prompt": "为 [Subject] 制作10秒动态分镜。全景建立空间，中景展示角色行动，末镜交代目标；保留连续走位与方向。\n按动作节点安排镜头与停留时间，使用简化角色和布景先检验空间、时序及剪辑。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+   "promptEn": "Create a ten-second animatic for [Subject]. Open wide, show the action in medium framing and end on the objective; preserve travel direction and blocking.\nTime shots and holds around action beats, using simplified characters and sets to assess space, timing and edits. Maintain character, costume, landmarks, scale, movement and lighting with plausible limbs, contacts and props. If required references are missing, list them before proceeding rather than inventing dialogue, audio or exact timecodes."
+  },
+  {
+   "index": 2,
+   "id": "creative-animation-board-dialogue",
+   "title": "对话动态分镜",
+   "titleEn": "Dialogue Animatic",
+   "summary": "通过双人空间、视线与反应镜头组织对话节奏。",
+   "summaryEn": "Organize dialogue through shared space, eye lines and response shots.",
+   "prompt": "为 [Subject] 制作10秒动态分镜。先双人镜头，再正反打与反应，保持轴线、视线高度和角色左右关系。\n按动作节点安排镜头与停留时间，使用简化角色和布景先检验空间、时序及剪辑。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+   "promptEn": "Create a ten-second animatic for [Subject]. Start with a two-shot, then use shot-reverse-shot and reactions with consistent axis, eye height and screen sides.\nTime shots and holds around action beats, using simplified characters and sets to assess space, timing and edits. Maintain character, costume, landmarks, scale, movement and lighting with plausible limbs, contacts and props. If required references are missing, list them before proceeding rather than inventing dialogue, audio or exact timecodes."
+  },
+  {
+   "index": 3,
+   "id": "creative-animation-board-chase",
+   "title": "追逐动态分镜",
+   "titleEn": "Chase Animatic",
+   "summary": "通过距离变化、障碍与节奏递增传达追逐中的压力。",
+   "summaryEn": "Convey chase pressure through distance changes, obstacles and increasing pace.",
+   "prompt": "为 [Subject] 制作10秒动态分镜。建立追逐方向，展示一次障碍跨越，再交代距离变化；不同镜头保持场景地图一致。\n按动作节点安排镜头与停留时间，使用简化角色和布景先检验空间、时序及剪辑。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+   "promptEn": "Create a ten-second animatic for [Subject]. Establish chase direction, show one obstacle and reveal the changed gap; keep the scene geography coherent.\nTime shots and holds around action beats, using simplified characters and sets to assess space, timing and edits. Maintain character, costume, landmarks, scale, movement and lighting with plausible limbs, contacts and props. If required references are missing, list them before proceeding rather than inventing dialogue, audio or exact timecodes."
+  },
+  {
+   "index": 4,
+   "id": "creative-animation-board-reveal",
+   "title": "揭示动态分镜",
+   "titleEn": "Reveal Animatic",
+   "summary": "先限制信息，再用遮挡解除或镜头变化让观众发现关键对象。",
+   "summaryEn": "Withhold information, then reveal a key object through framing or removal of occlusion.",
+   "prompt": "为 [Subject] 制作10秒动态分镜。先表现角色察觉，再改变构图揭示目标，保留反应停顿，避免提前露出关键对象。\n按动作节点安排镜头与停留时间，使用简化角色和布景先检验空间、时序及剪辑。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+   "promptEn": "Create a ten-second animatic for [Subject]. Show recognition, change framing to reveal the object and hold the reaction without revealing it prematurely.\nTime shots and holds around action beats, using simplified characters and sets to assess space, timing and edits. Maintain character, costume, landmarks, scale, movement and lighting with plausible limbs, contacts and props. If required references are missing, list them before proceeding rather than inventing dialogue, audio or exact timecodes."
+  },
+  {
+   "index": 5,
+   "id": "creative-animation-board-action",
+   "title": "动作分解动态分镜",
+   "titleEn": "Action Breakdown Animatic",
+   "summary": "把复杂动作拆成可理解的节点，再检验镜头和时长是否支持动作。",
+   "summaryEn": "Break complex action into readable beats and test whether framing and duration support them.",
+   "prompt": "为 [Subject] 制作10秒动态分镜。准备、发力、接触、结果四节点清楚，镜头不在关键接触前遮挡动作。\n按动作节点安排镜头与停留时间，使用简化角色和布景先检验空间、时序及剪辑。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+   "promptEn": "Create a ten-second animatic for [Subject]. Clearly stage preparation, effort, contact and result; keep the camera from hiding critical contact.\nTime shots and holds around action beats, using simplified characters and sets to assess space, timing and edits. Maintain character, costume, landmarks, scale, movement and lighting with plausible limbs, contacts and props. If required references are missing, list them before proceeding rather than inventing dialogue, audio or exact timecodes."
+  },
+  {
+   "index": 6,
+   "id": "creative-animation-board-emotion",
+   "title": "情绪转折动态分镜",
+   "titleEn": "Emotional Turn Animatic",
+   "summary": "通过动作与停顿展示角色认知改变，镜头强度服务情绪。",
+   "summaryEn": "Show a change in understanding through behavior and pauses, with framing supporting emotion.",
+   "prompt": "为 [Subject] 制作10秒动态分镜。从环境中景进入表情近景，再回到决定性动作；推近由情绪触发而非无目的移动。\n按动作节点安排镜头与停留时间，使用简化角色和布景先检验空间、时序及剪辑。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+   "promptEn": "Create a ten-second animatic for [Subject]. Move from a contextual medium shot to a facial close-up and back to a decisive action; motivate the push-in through emotion.\nTime shots and holds around action beats, using simplified characters and sets to assess space, timing and edits. Maintain character, costume, landmarks, scale, movement and lighting with plausible limbs, contacts and props. If required references are missing, list them before proceeding rather than inventing dialogue, audio or exact timecodes."
+  },
+  {
+   "index": 7,
+   "id": "creative-animation-board-musical",
+   "title": "音乐段落动态分镜",
+   "titleEn": "Musical Phrase Animatic",
+   "summary": "镜头、动作与音乐短句共同构成段落，需要节拍参考来校准。",
+   "summaryEn": "Camera, movement and a musical phrase form a sequence requiring a beat reference for alignment.",
+   "prompt": "为 [Subject] 制作10秒动态分镜。先给节拍或音频参考，按重音安排姿态与切点，保留动作完成时间。\n按动作节点安排镜头与停留时间，使用简化角色和布景先检验空间、时序及剪辑。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+   "promptEn": "Create a ten-second animatic for [Subject]. Provide a beat or audio reference, place poses and cuts on accents and allow time for action completion.\nTime shots and holds around action beats, using simplified characters and sets to assess space, timing and edits. Maintain character, costume, landmarks, scale, movement and lighting with plausible limbs, contacts and props. If required references are missing, list them before proceeding rather than inventing dialogue, audio or exact timecodes."
+  },
+  {
+   "index": 8,
+   "id": "creative-animation-board-transition",
+   "title": "场景转场动态分镜",
+   "titleEn": "Scene Transition Animatic",
+   "summary": "用形状、动作或视线关系连接两个场景，检验衔接是否可理解。",
+   "summaryEn": "Connect scenes through shape, movement or eye-line relationships and test continuity.",
+   "prompt": "为 [Subject] 制作10秒动态分镜。用相同运动方向衔接两个地点，明确转场前后角色状态与时间关系。\n按动作节点安排镜头与停留时间，使用简化角色和布景先检验空间、时序及剪辑。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+   "promptEn": "Create a ten-second animatic for [Subject]. Link two locations through a shared motion direction and establish character state and time relation across the cut.\nTime shots and holds around action beats, using simplified characters and sets to assess space, timing and edits. Maintain character, costume, landmarks, scale, movement and lighting with plausible limbs, contacts and props. If required references are missing, list them before proceeding rather than inventing dialogue, audio or exact timecodes."
+  }
+ ],
+ "loop": [
+  {
+   "index": 1,
+   "id": "creative-animation-loop-idle",
+   "title": "待机循环",
+   "titleEn": "Idle Loop",
+   "summary": "用呼吸、微移重与小动作表现持续存在，首尾状态需要连贯。",
+   "summaryEn": "Use breathing and subtle weight shifts to suggest presence with continuous loop endpoints.",
+   "prompt": "为 [Subject] 制作8秒循环动画。8秒内完成一次呼吸与小幅移重，首尾位置、姿态、速度与服装状态相接。\n明确初始姿态、动作意图、主动作与恢复；以可读全身构图表现动作。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。首尾姿态、位置、运动速度与事件尾部应连续，生成后检查接点。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+   "promptEn": "Create an eight-second looping animation for [Subject]. Complete one breath and subtle weight shift in eight seconds; match position, pose, velocity and clothing at the endpoints.\nDefine starting pose, intent, main action and recovery in readable full-body framing. Maintain character, costume, landmarks, scale, movement and lighting with plausible limbs, contacts and props. Match endpoint pose, position, velocity and event tails, then inspect the seam.If required references are missing, list them before proceeding rather than inventing dialogue, audio or exact timecodes."
+  },
+  {
+   "index": 2,
+   "id": "creative-animation-loop-walk-cycle",
+   "title": "步行循环",
+   "titleEn": "Walk Cycle",
+   "summary": "在原地或持续行进条件下重复完整步态周期，需明确是否含根位移。",
+   "summaryEn": "Repeat a full walking gait while specifying stationary motion or root travel.",
+   "prompt": "为 [Subject] 制作8秒循环动画。原地循环，双脚交替完成完整步态，支撑点稳定，首尾步态相位一致。\n明确初始姿态、动作意图、主动作与恢复；以可读全身构图表现动作。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。首尾姿态、位置、运动速度与事件尾部应连续，生成后检查接点。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+   "promptEn": "Create an eight-second looping animation for [Subject]. Use an in-place cycle with alternating full strides, stable support and matched gait phase.\nDefine starting pose, intent, main action and recovery in readable full-body framing. Maintain character, costume, landmarks, scale, movement and lighting with plausible limbs, contacts and props. Match endpoint pose, position, velocity and event tails, then inspect the seam.If required references are missing, list them before proceeding rather than inventing dialogue, audio or exact timecodes."
+  },
+  {
+   "index": 3,
+   "id": "creative-animation-loop-run-cycle",
+   "title": "跑步循环",
+   "titleEn": "Run Cycle",
+   "summary": "重复蹬地与腾空节奏，周期连接要保留速度与身体起伏连续。",
+   "summaryEn": "Repeat push-off and flight with continuous speed and body motion across the cycle.",
+   "prompt": "为 [Subject] 制作8秒循环动画。原地跑步，明确腾空阶段，髋肩与手臂对应，首尾垂直速度相接。\n明确初始姿态、动作意图、主动作与恢复；以可读全身构图表现动作。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。首尾姿态、位置、运动速度与事件尾部应连续，生成后检查接点。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+   "promptEn": "Create an eight-second looping animation for [Subject]. Run in place with clear flight phases and coordinated hips, shoulders and arms; match vertical velocity at the endpoints.\nDefine starting pose, intent, main action and recovery in readable full-body framing. Maintain character, costume, landmarks, scale, movement and lighting with plausible limbs, contacts and props. Match endpoint pose, position, velocity and event tails, then inspect the seam.If required references are missing, list them before proceeding rather than inventing dialogue, audio or exact timecodes."
+  },
+  {
+   "index": 4,
+   "id": "creative-animation-loop-dance-loop",
+   "title": "舞蹈循环",
+   "titleEn": "Dance Loop",
+   "summary": "从一个可重复动作母题构造短句，不能只让末帧突然回到起点。",
+   "summaryEn": "Build a phrase from a repeatable movement motif rather than snapping the last frame back to the start.",
+   "prompt": "为 [Subject] 制作8秒循环动画。选两组可接续舞步，最后一步自然衔接第一步，保留拍点和衣物惯性。\n明确初始姿态、动作意图、主动作与恢复；以可读全身构图表现动作。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。首尾姿态、位置、运动速度与事件尾部应连续，生成后检查接点。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+   "promptEn": "Create an eight-second looping animation for [Subject]. Choose two connected step phrases whose final step leads naturally into the first, preserving beats and cloth inertia.\nDefine starting pose, intent, main action and recovery in readable full-body framing. Maintain character, costume, landmarks, scale, movement and lighting with plausible limbs, contacts and props. Match endpoint pose, position, velocity and event tails, then inspect the seam.If required references are missing, list them before proceeding rather than inventing dialogue, audio or exact timecodes."
+  },
+  {
+   "index": 5,
+   "id": "creative-animation-loop-breath",
+   "title": "呼吸与眨眼循环",
+   "titleEn": "Breathing and Blink Loop",
+   "summary": "细微生命感需要自然变化，避免机械同步或过度幅度。",
+   "summaryEn": "Subtle life motion needs natural variation without mechanical synchronization or exaggerated amplitude.",
+   "prompt": "为 [Subject] 制作8秒循环动画。胸肩轻微起伏，眨眼不与呼吸完全同步，头发变化幅度有限，末段恢复状态。\n明确初始姿态、动作意图、主动作与恢复；以可读全身构图表现动作。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。首尾姿态、位置、运动速度与事件尾部应连续，生成后检查接点。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+   "promptEn": "Create an eight-second looping animation for [Subject]. Use slight chest and shoulder motion, desynchronize blinks from breathing and keep hair motion restrained before returning to the starting state.\nDefine starting pose, intent, main action and recovery in readable full-body framing. Maintain character, costume, landmarks, scale, movement and lighting with plausible limbs, contacts and props. Match endpoint pose, position, velocity and event tails, then inspect the seam.If required references are missing, list them before proceeding rather than inventing dialogue, audio or exact timecodes."
+  },
+  {
+   "index": 6,
+   "id": "creative-animation-loop-mechanical",
+   "title": "机械运行循环",
+   "titleEn": "Mechanical Loop",
+   "summary": "通过轮转、往复或传动关系展示稳定重复运行。",
+   "summaryEn": "Show repeatable mechanical operation through rotation, reciprocation or connected transmission.",
+   "prompt": "为 [Subject] 制作8秒循环动画。明确齿轮或连杆关系，部件速度相互匹配，周期结束不跳位，结构不穿插。\n明确初始姿态、动作意图、主动作与恢复；以可读全身构图表现动作。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。首尾姿态、位置、运动速度与事件尾部应连续，生成后检查接点。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+   "promptEn": "Create an eight-second looping animation for [Subject]. Define gear or linkage relationships with matched speeds, stable cycle endpoints and non-intersecting parts.\nDefine starting pose, intent, main action and recovery in readable full-body framing. Maintain character, costume, landmarks, scale, movement and lighting with plausible limbs, contacts and props. Match endpoint pose, position, velocity and event tails, then inspect the seam.If required references are missing, list them before proceeding rather than inventing dialogue, audio or exact timecodes."
+  },
+  {
+   "index": 7,
+   "id": "creative-animation-loop-environment",
+   "title": "环境微动循环",
+   "titleEn": "Environmental Motion Loop",
+   "summary": "树叶、水面或布帘的持续变化提供环境生命感，主场景结构应固定。",
+   "summaryEn": "Continuous leaves, water or curtains add environmental life while the main scene remains stable.",
+   "prompt": "为 [Subject] 制作8秒循环动画。固定镜头与地标，限定风向，叶片或布料轻摆，避免纹理漂移与全画面呼吸变形。\n明确初始姿态、动作意图、主动作与恢复；以可读全身构图表现动作。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。首尾姿态、位置、运动速度与事件尾部应连续，生成后检查接点。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+   "promptEn": "Create an eight-second looping animation for [Subject]. Lock the camera and landmarks, define wind direction and use gentle foliage or fabric motion without texture drift or global warping.\nDefine starting pose, intent, main action and recovery in readable full-body framing. Maintain character, costume, landmarks, scale, movement and lighting with plausible limbs, contacts and props. Match endpoint pose, position, velocity and event tails, then inspect the seam.If required references are missing, list them before proceeding rather than inventing dialogue, audio or exact timecodes."
+  },
+  {
+   "index": 8,
+   "id": "creative-animation-loop-seam-check",
+   "title": "首尾衔接检验",
+   "titleEn": "Loop Seam Study",
+   "summary": "通过明确的起止状态检查姿态、速度与光照能否连续衔接。",
+   "summaryEn": "Define start and end states to assess continuity of pose, velocity and lighting.",
+   "prompt": "为 [Subject] 制作8秒循环动画。先列起止姿态与运动方向，再制作循环短片，重点检查脚部、道具和光照，不宣称生成后自动无缝。\n明确初始姿态、动作意图、主动作与恢复；以可读全身构图表现动作。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。首尾姿态、位置、运动速度与事件尾部应连续，生成后检查接点。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+   "promptEn": "Create an eight-second looping animation for [Subject]. Specify endpoint poses and motion directions, then create a loop study focused on feet, props and lighting; verify the seam after generation.\nDefine starting pose, intent, main action and recovery in readable full-body framing. Maintain character, costume, landmarks, scale, movement and lighting with plausible limbs, contacts and props. Match endpoint pose, position, velocity and event tails, then inspect the seam.If required references are missing, list them before proceeding rather than inventing dialogue, audio or exact timecodes."
+  }
+ ],
+ "acting": [
+  {
+   "index": 1,
+   "id": "creative-animation-performance-walk",
+   "title": "步行与重心",
+   "titleEn": "Walk and Weight",
+   "summary": "通过支撑腿、摆动腿与身体起伏表达步行，速度和角色性格改变节奏。",
+   "summaryEn": "Build a walk from support legs, swing legs and body motion; speed and personality shape timing.",
+   "prompt": "为 [Subject] 制作8秒动画短片。展示接触、下沉、经过、上升四阶段，支撑脚不滑动，髋肩轻微反向。\n明确初始姿态、动作意图、主动作与恢复；以可读全身构图表现动作。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+   "promptEn": "Create an eight-second animated shot for [Subject]. Show contact, down, passing and up phases; avoid sliding support feet and use subtle opposing hip and shoulder motion.\nDefine starting pose, intent, main action and recovery in readable full-body framing. Maintain character, costume, landmarks, scale, movement and lighting with plausible limbs, contacts and props. If required references are missing, list them before proceeding rather than inventing dialogue, audio or exact timecodes."
+  },
+  {
+   "index": 2,
+   "id": "creative-animation-performance-run",
+   "title": "跑步与加速",
+   "titleEn": "Run and Acceleration",
+   "summary": "跑步包含腾空与更强的重心前移，加速需要步幅与节奏共同变化。",
+   "summaryEn": "Running adds airborne phases and stronger forward weight; acceleration changes both stride and cadence.",
+   "prompt": "为 [Subject] 制作8秒动画短片。从慢跑过渡到加速，明确蹬地与腾空，前倾程度合理，落地后恢复支撑。\n明确初始姿态、动作意图、主动作与恢复；以可读全身构图表现动作。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+   "promptEn": "Create an eight-second animated shot for [Subject]. Transition from a jog into acceleration, showing push-off and flight with plausible lean and recovered support.\nDefine starting pose, intent, main action and recovery in readable full-body framing. Maintain character, costume, landmarks, scale, movement and lighting with plausible limbs, contacts and props. If required references are missing, list them before proceeding rather than inventing dialogue, audio or exact timecodes."
+  },
+  {
+   "index": 3,
+   "id": "creative-animation-performance-jump",
+   "title": "跳跃与落地",
+   "titleEn": "Jump and Landing",
+   "summary": "起跳、腾空和落地组成完整动作，预备与缓冲让力度可被理解。",
+   "summaryEn": "A complete jump combines preparation, takeoff, flight and landing with readable force and cushioning.",
+   "prompt": "为 [Subject] 制作8秒动画短片。先下蹲蓄力，再伸展腾空，最后屈膝缓冲；重心轨迹连续。\n明确初始姿态、动作意图、主动作与恢复；以可读全身构图表现动作。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+   "promptEn": "Create an eight-second animated shot for [Subject]. Crouch to prepare, extend into flight and bend the knees on landing; maintain a continuous center-of-mass path.\nDefine starting pose, intent, main action and recovery in readable full-body framing. Maintain character, costume, landmarks, scale, movement and lighting with plausible limbs, contacts and props. If required references are missing, list them before proceeding rather than inventing dialogue, audio or exact timecodes."
+  },
+  {
+   "index": 4,
+   "id": "creative-animation-performance-lift",
+   "title": "举重与搬运",
+   "titleEn": "Lifting and Carrying",
+   "summary": "角色与物体的重量关系通过抓握、支撑和动作速度表达。",
+   "summaryEn": "Show object weight through grip, support and movement speed.",
+   "prompt": "为 [Subject] 制作8秒动画短片。先确认抓握点与物体重量，再用腿部与躯干发力，双手不穿透物体。\n明确初始姿态、动作意图、主动作与恢复；以可读全身构图表现动作。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+   "promptEn": "Create an eight-second animated shot for [Subject]. Establish grip and weight, lift with coordinated legs and torso, and keep hands from passing through the object.\nDefine starting pose, intent, main action and recovery in readable full-body framing. Maintain character, costume, landmarks, scale, movement and lighting with plausible limbs, contacts and props. If required references are missing, list them before proceeding rather than inventing dialogue, audio or exact timecodes."
+  },
+  {
+   "index": 5,
+   "id": "creative-animation-performance-anticipation",
+   "title": "预备动作",
+   "titleEn": "Anticipation",
+   "summary": "主动作前的反向或准备动作帮助观众理解意图和力度。",
+   "summaryEn": "A preparatory or counter movement makes the following action's intent and force readable.",
+   "prompt": "为 [Subject] 制作8秒动画短片。安排短暂准备、明确主动作和恢复，预备幅度与主动作力度相称。\n明确初始姿态、动作意图、主动作与恢复；以可读全身构图表现动作。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+   "promptEn": "Create an eight-second animated shot for [Subject]. Stage a brief preparation, clear main action and recovery; scale anticipation to the action's force.\nDefine starting pose, intent, main action and recovery in readable full-body framing. Maintain character, costume, landmarks, scale, movement and lighting with plausible limbs, contacts and props. If required references are missing, list them before proceeding rather than inventing dialogue, audio or exact timecodes."
+  },
+  {
+   "index": 6,
+   "id": "creative-animation-performance-squash-stretch",
+   "title": "挤压与拉伸",
+   "titleEn": "Squash and Stretch",
+   "summary": "适度形变可表达弹性与力度，应保持体积感和角色识别。",
+   "summaryEn": "Controlled deformation conveys elasticity and force while preserving perceived volume and identity.",
+   "prompt": "为 [Subject] 制作8秒动画短片。碰撞时压缩、加速时拉伸，变化与速度对应，避免无理由变胖或消失。\n明确初始姿态、动作意图、主动作与恢复；以可读全身构图表现动作。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+   "promptEn": "Create an eight-second animated shot for [Subject]. Compress at impact and stretch during acceleration; preserve volume and avoid unexplained size changes.\nDefine starting pose, intent, main action and recovery in readable full-body framing. Maintain character, costume, landmarks, scale, movement and lighting with plausible limbs, contacts and props. If required references are missing, list them before proceeding rather than inventing dialogue, audio or exact timecodes."
+  },
+  {
+   "index": 7,
+   "id": "creative-animation-performance-follow-through",
+   "title": "跟随与拖尾",
+   "titleEn": "Follow-through",
+   "summary": "头发、衣摆和末端肢体在主体运动结束后继续响应惯性。",
+   "summaryEn": "Hair, clothing and extremities continue responding to momentum after the main body stops.",
+   "prompt": "为 [Subject] 制作8秒动画短片。先停躯干，再让衣摆、头发与手臂自然衰减摆动，避免所有部件同时停住。\n明确初始姿态、动作意图、主动作与恢复；以可读全身构图表现动作。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+   "promptEn": "Create an eight-second animated shot for [Subject]. Stop the torso first, then let clothing, hair and arms settle with diminishing motion rather than stopping simultaneously.\nDefine starting pose, intent, main action and recovery in readable full-body framing. Maintain character, costume, landmarks, scale, movement and lighting with plausible limbs, contacts and props. If required references are missing, list them before proceeding rather than inventing dialogue, audio or exact timecodes."
+  },
+  {
+   "index": 8,
+   "id": "creative-animation-performance-facial",
+   "title": "情绪表演",
+   "titleEn": "Facial Acting",
+   "summary": "通过情绪触发、眼神与面部张力的小变化形成可信表演。",
+   "summaryEn": "Build believable acting from emotional triggers, eye movement and changes in facial tension.",
+   "prompt": "为 [Subject] 制作8秒动画短片。从中性到察觉再到反应，眉眼和嘴角变化一致，保留停顿与呼吸。\n明确初始姿态、动作意图、主动作与恢复；以可读全身构图表现动作。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+   "promptEn": "Create an eight-second animated shot for [Subject]. Move from neutral to recognition to response; align brows, eyes and mouth while retaining pauses and breathing.\nDefine starting pose, intent, main action and recovery in readable full-body framing. Maintain character, costume, landmarks, scale, movement and lighting with plausible limbs, contacts and props. If required references are missing, list them before proceeding rather than inventing dialogue, audio or exact timecodes."
+  },
+  {
+   "index": 9,
+   "id": "creative-animation-performance-lip-sync",
+   "title": "口型与对白",
+   "titleEn": "Lip Sync",
+   "summary": "口型应对应语音节奏，同时保持表情、下颌与角色身份一致。",
+   "summaryEn": "Match mouth movement to speech timing while preserving expression, jaw behavior and character identity.",
+   "prompt": "为 [Subject] 制作8秒动画短片。需要另附对白及音频或时间码；展示短句口型，辅音闭口与元音开口有区别。\n明确初始姿态、动作意图、主动作与恢复；以可读全身构图表现动作。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+   "promptEn": "Create an eight-second animated shot for [Subject]. Require dialogue and audio or timecodes; distinguish closed consonant shapes from open vowel shapes in a short phrase.\nDefine starting pose, intent, main action and recovery in readable full-body framing. Maintain character, costume, landmarks, scale, movement and lighting with plausible limbs, contacts and props. If required references are missing, list them before proceeding rather than inventing dialogue, audio or exact timecodes."
+  },
+  {
+   "index": 10,
+   "id": "creative-animation-performance-dance",
+   "title": "舞蹈短句",
+   "titleEn": "Dance Phrase",
+   "summary": "用准备、舞步组合与恢复组织短句，动作语汇需明确舞种和变体。",
+   "summaryEn": "Structure a dance phrase with preparation, movement and recovery, specifying the tradition and variant.",
+   "prompt": "为 [Subject] 制作8秒动画短片。先明确舞种与动作参考，保留脚步接地、手势、节拍及服装惯性。\n明确初始姿态、动作意图、主动作与恢复；以可读全身构图表现动作。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+   "promptEn": "Create an eight-second animated shot for [Subject]. Specify the dance and movement reference; preserve foot contacts, gestures, timing and costume inertia.\nDefine starting pose, intent, main action and recovery in readable full-body framing. Maintain character, costume, landmarks, scale, movement and lighting with plausible limbs, contacts and props. If required references are missing, list them before proceeding rather than inventing dialogue, audio or exact timecodes."
+  },
+  {
+   "index": 11,
+   "id": "creative-animation-performance-quadruped",
+   "title": "四足动物运动",
+   "titleEn": "Quadruped Motion",
+   "summary": "不同步态的足部接触顺序与脊柱运动构成动物行进特征。",
+   "summaryEn": "Animal gaits depend on footfall order and spinal movement.",
+   "prompt": "为 [Subject] 制作8秒动画短片。明确动物种类与步态，保持四肢接触顺序、肩胯运动与尾部平衡一致。\n明确初始姿态、动作意图、主动作与恢复；以可读全身构图表现动作。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+   "promptEn": "Create an eight-second animated shot for [Subject]. Specify species and gait; maintain consistent footfall order, shoulder and hip motion and tail balance.\nDefine starting pose, intent, main action and recovery in readable full-body framing. Maintain character, costume, landmarks, scale, movement and lighting with plausible limbs, contacts and props. If required references are missing, list them before proceeding rather than inventing dialogue, audio or exact timecodes."
+  },
+  {
+   "index": 12,
+   "id": "creative-animation-performance-partner",
+   "title": "双人互动",
+   "titleEn": "Partner Interaction",
+   "summary": "两名角色的接触、视线与反应需要共享同一空间和时序。",
+   "summaryEn": "Two characters must share coherent contact, eye lines and response timing.",
+   "prompt": "为 [Subject] 制作8秒动画短片。设计递物或握手短句，接触点同时成立，保留一人发起、一人回应的时间差。\n明确初始姿态、动作意图、主动作与恢复；以可读全身构图表现动作。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+   "promptEn": "Create an eight-second animated shot for [Subject]. Stage a handoff or handshake with matching contact points and a clear initiation-response delay.\nDefine starting pose, intent, main action and recovery in readable full-body framing. Maintain character, costume, landmarks, scale, movement and lighting with plausible limbs, contacts and props. If required references are missing, list them before proceeding rather than inventing dialogue, audio or exact timecodes."
+  }
+ ],
+ "camera": [
+  {
+   "id": "t8-03-8ffed02f15dc",
+   "group": "成片场景",
+   "title": "角色登场",
+   "titleEn": "Character Entry",
+   "summary": "成片场景 · 角色登场镜头，用有气势的运动逐步揭示主体",
+   "prompt": "角色登场镜头，用有气势的运动逐步揭示主体",
+   "promptEn": "cinematic character entrance, reveal the subject with confident movement"
+  },
+  {
+   "id": "t8-03-75ef7636f471",
+   "group": "成片场景",
+   "title": "产品展示",
+   "titleEn": "Product Showcase",
+   "summary": "成片场景 · 高级产品展示运镜，路径干净可控",
+   "prompt": "高级产品展示运镜，路径干净可控",
+   "promptEn": "premium product showcase movement, clean controlled camera path"
+  },
+  {
+   "id": "t8-03-73f82d957f02",
+   "group": "成片场景",
+   "title": "情绪推近",
+   "titleEn": "Emotion Push",
+   "summary": "成片场景 · 情绪推近，逐步强化人物情绪",
+   "prompt": "情绪推近，逐步强化人物情绪",
+   "promptEn": "emotional push-in, gradually intensify the character feeling"
+  },
+  {
+   "id": "t8-03-23ee8daa61b1",
+   "group": "成片场景",
+   "title": "环绕展示",
+   "titleEn": "Orbit Reveal",
+   "summary": "成片场景 · 主角式环绕展示，从动态角度呈现主体",
+   "prompt": "主角式环绕展示，从动态角度呈现主体",
+   "promptEn": "hero orbit reveal, show the subject from a dynamic surrounding angle"
+  },
+  {
+   "id": "t8-03-cb386f6f8b64",
+   "group": "成片场景",
+   "title": "环境揭示",
+   "titleEn": "World Reveal",
+   "summary": "成片场景 · 环境揭示镜头，从局部逐渐打开到更大场景",
+   "prompt": "环境揭示镜头，从局部逐渐打开到更大场景",
+   "promptEn": "environment reveal shot, start intimate then open into the wider scene"
+  },
+  {
+   "id": "t8-03-5f7411e39faa",
+   "group": "成片场景",
+   "title": "战斗冲击",
+   "titleEn": "Impact Action",
+   "summary": "成片场景 · 战斗冲击运镜，有能量但画面可读",
+   "prompt": "战斗冲击运镜，有能量但画面可读",
+   "promptEn": "impactful action camera move, energetic but readable motion"
+  },
+  {
+   "id": "t8-03-dd65314ab0ef",
+   "group": "成片场景",
+   "title": "梦幻漂移",
+   "titleEn": "Dream Drift",
+   "summary": "成片场景 · 梦幻漂移镜头，漂浮而优雅的运动",
+   "prompt": "梦幻漂移镜头，漂浮而优雅的运动",
+   "promptEn": "dreamlike drifting camera, floating graceful movement"
+  },
+  {
+   "id": "t8-03-205dcd80e87e",
+   "group": "成片场景",
+   "title": "建筑巡游",
+   "titleEn": "Architecture Tour",
+   "summary": "成片场景 · 建筑巡游运镜，平滑穿行并展示空间层次",
+   "prompt": "建筑巡游运镜，平滑穿行并展示空间层次",
+   "promptEn": "architectural tour movement, glide through space with clear depth"
+  },
+  {
+   "id": "t8-03-6da8f8c67c9a",
+   "group": "成片场景",
+   "title": "美食细节",
+   "titleEn": "Food Detail",
+   "summary": "成片场景 · 美食细节运镜，微距滑动并突出诱人焦点",
+   "prompt": "美食细节运镜，微距滑动并突出诱人焦点",
+   "promptEn": "food detail camera move, macro glide with appetizing focus"
+  },
+  {
+   "id": "t8-03-3b31c9b34f51",
+   "group": "成片场景",
+   "title": "旅行航拍",
+   "titleEn": "Travel Drone",
+   "summary": "成片场景 · 旅行航拍揭示镜头，从空中电影化展示场景",
+   "prompt": "旅行航拍揭示镜头，从空中电影化展示场景",
+   "promptEn": "travel drone reveal, cinematic aerial movement over the scene"
+  },
+  {
+   "id": "t8-03-c159adaa1aea",
+   "group": "成片场景",
+   "title": "对话跟随",
+   "titleEn": "Dialogue Follow",
+   "summary": "成片场景 · 对话跟随镜头，自然移动并保持构图稳定",
+   "prompt": "对话跟随镜头，自然移动并保持构图稳定",
+   "promptEn": "dialogue follow camera, natural human movement and stable framing"
+  },
+  {
+   "id": "t8-03-c8491099e3a4",
+   "group": "成片场景",
+   "title": "转场甩镜",
+   "titleEn": "Transition Whip",
+   "summary": "成片场景 · 甩镜转场能量，用快速方向运动衔接场景",
+   "prompt": "甩镜转场能量，用快速方向运动衔接场景",
+   "promptEn": "whip pan transition energy, fast directional motion for a scene change"
+  },
+  {
+   "id": "t8-03-7413b6d6f691",
+   "group": "成片场景",
+   "title": "时尚走秀",
+   "titleEn": "Fashion Walk",
+   "summary": "成片场景 · 时尚走秀运镜，节奏优雅并自信揭示主体",
+   "prompt": "时尚走秀运镜，节奏优雅并自信揭示主体",
+   "promptEn": "fashion runway camera move, elegant pacing and confident subject reveal"
+  },
+  {
+   "id": "t8-03-693d957fe7dd",
+   "group": "成片场景",
+   "title": "浪漫相遇",
+   "titleEn": "Romantic Meet",
+   "summary": "成片场景 · 浪漫相遇运镜，柔和揭示并保持温柔情绪距离",
+   "prompt": "浪漫相遇运镜，柔和揭示并保持温柔情绪距离",
+   "promptEn": "romantic meeting camera move, soft reveal and gentle emotional distance"
+  },
+  {
+   "id": "t8-03-b726eade66ac",
+   "group": "成片场景",
+   "title": "悬疑搜寻",
+   "titleEn": "Suspense Search",
+   "summary": "成片场景 · 悬疑搜寻运镜，谨慎探索并保留隐藏张力",
+   "prompt": "悬疑搜寻运镜，谨慎探索并保留隐藏张力",
+   "promptEn": "suspense search movement, cautious camera exploration with hidden tension"
+  },
+  {
+   "id": "t8-03-fe0f93168ecb",
+   "group": "成片场景",
+   "title": "惊悚逼近",
+   "titleEn": "Horror Creep",
+   "summary": "成片场景 · 惊悚逼近运镜，缓慢不安地接近并增强恐惧",
+   "prompt": "惊悚逼近运镜，缓慢不安地接近并增强恐惧",
+   "promptEn": "horror creeping camera move, slow uneasy approach with growing dread"
+  },
+  {
+   "id": "t8-03-9bb5197d3a5e",
+   "group": "成片场景",
+   "title": "科幻启动",
+   "titleEn": "Sci Fi Launch",
+   "summary": "成片场景 · 科幻启动序列运镜，精准未来感揭示与尺度",
+   "prompt": "科幻启动序列运镜，精准未来感揭示与尺度",
+   "promptEn": "sci-fi launch sequence movement, precise futuristic reveal and scale"
+  },
+  {
+   "id": "t8-03-701a75fed7df",
+   "group": "成片场景",
+   "title": "魔法降临",
+   "titleEn": "Fantasy Magic",
+   "summary": "成片场景 · 魔法降临揭示，围绕超自然瞬间优雅运动",
+   "prompt": "魔法降临揭示，围绕超自然瞬间优雅运动",
+   "promptEn": "fantasy magic reveal, graceful camera motion around a supernatural moment"
+  },
+  {
+   "id": "t8-03-f673132eca14",
+   "group": "成片场景",
+   "title": "车辆追逐",
+   "titleEn": "Vehicle Chase",
+   "summary": "成片场景 · 车辆追逐运镜，快速但可读，动势紧张",
+   "prompt": "车辆追逐运镜，快速但可读，动势紧张",
+   "promptEn": "vehicle chase camera movement, fast readable motion with kinetic tension"
+  },
+  {
+   "id": "t8-03-1c8b28bb2465",
+   "group": "成片场景",
+   "title": "运动高光",
+   "titleEn": "Sports Highlight",
+   "summary": "成片场景 · 运动高光运镜，强调冲击、速度和英雄感动作",
+   "prompt": "运动高光运镜，强调冲击、速度和英雄感动作",
+   "promptEn": "sports highlight camera move, emphasize impact, speed, and heroic action"
+  },
+  {
+   "id": "t8-03-c0031c83f24d",
+   "group": "成片场景",
+   "title": "舞蹈表演",
+   "titleEn": "Dance Performance",
+   "summary": "成片场景 · 舞蹈表演运镜，顺着编舞平滑跟随节奏",
+   "prompt": "舞蹈表演运镜，顺着编舞平滑跟随节奏",
+   "promptEn": "dance performance camera movement, follow choreography with smooth rhythm"
+  },
+  {
+   "id": "t8-03-4a32d3a578d5",
+   "group": "成片场景",
+   "title": "宠物瞬间",
+   "titleEn": "Pet Moment",
+   "summary": "成片场景 · 宠物瞬间运镜，轻松可爱并保持表情清晰",
+   "prompt": "宠物瞬间运镜，轻松可爱并保持表情清晰",
+   "promptEn": "pet moment camera move, playful gentle framing with clear expression"
+  },
+  {
+   "id": "t8-03-5de9efeb1d1b",
+   "group": "成片场景",
+   "title": "自然微距",
+   "titleEn": "Nature Macro",
+   "summary": "成片场景 · 自然微距运镜，缓慢细腻滑过微小纹理",
+   "prompt": "自然微距运镜，缓慢细腻滑过微小纹理",
+   "promptEn": "nature macro camera move, slow delicate glide across tiny textures"
+  },
+  {
+   "id": "t8-03-509afc43c06a",
+   "group": "成片场景",
+   "title": "城市夜行",
+   "titleEn": "City Night",
+   "summary": "成片场景 · 城市夜行运镜，穿过霓虹街道并保留氛围深度",
+   "prompt": "城市夜行运镜，穿过霓虹街道并保留氛围深度",
+   "promptEn": "city night camera move, glide through neon streets with atmospheric depth"
+  },
+  {
+   "id": "t8-03-53056c0be6d1",
+   "group": "成片场景",
+   "title": "雨街漫步",
+   "titleEn": "Rain Street",
+   "summary": "成片场景 · 雨街漫步运镜，突出反光地面和轻柔情绪漂移",
+   "prompt": "雨街漫步运镜，突出反光地面和轻柔情绪漂移",
+   "promptEn": "rainy street walk movement, reflective surfaces and gentle emotional drift"
+  },
+  {
+   "id": "t8-03-c1e10f15dd82",
+   "group": "成片场景",
+   "title": "对峙开场",
+   "titleEn": "Battle Standoff",
+   "summary": "成片场景 · 对峙开场运镜，用戏剧压力呈现双方力量",
+   "prompt": "对峙开场运镜，用戏剧压力呈现双方力量",
+   "promptEn": "battle standoff opening move, frame opposing forces with dramatic pressure"
+  },
+  {
+   "id": "t8-03-f127d6c33e60",
+   "group": "成片场景",
+   "title": "服装展示",
+   "titleEn": "Costume Reveal",
+   "summary": "成片场景 · 服装展示运镜，呈现轮廓、面料和造型细节",
+   "prompt": "服装展示运镜，呈现轮廓、面料和造型细节",
+   "promptEn": "costume reveal camera move, show silhouette, fabric, and styling details"
+  },
+  {
+   "id": "t8-03-c03736db375d",
+   "group": "成片场景",
+   "title": "美妆特写",
+   "titleEn": "Makeup Beauty",
+   "summary": "成片场景 · 美妆特写运镜，以柔和微距呈现皮肤和妆面细节",
+   "prompt": "美妆特写运镜，以柔和微距呈现皮肤和妆面细节",
+   "promptEn": "beauty close-up movement, gentle macro motion for skin and makeup detail"
+  },
+  {
+   "id": "t8-03-9c6e28b82b2c",
+   "group": "成片场景",
+   "title": "室内巡游",
+   "titleEn": "Room Tour",
+   "summary": "成片场景 · 室内巡游运镜，平滑揭示布局、光线和氛围",
+   "prompt": "室内巡游运镜，平滑揭示布局、光线和氛围",
+   "promptEn": "interior room tour movement, reveal layout, light, and atmosphere smoothly"
+  },
+  {
+   "id": "t8-03-50528905f7d2",
+   "group": "成片场景",
+   "title": "工作流程",
+   "titleEn": "Workspace Process",
+   "summary": "成片场景 · 创作流程运镜，清楚跟随双手、工具和步骤",
+   "prompt": "创作流程运镜，清楚跟随双手、工具和步骤",
+   "promptEn": "creative workflow camera move, follow hands, tools, and process clearly"
+  },
+  {
+   "id": "t8-03-02307786cd1e",
+   "group": "成片场景",
+   "title": "教程演示",
+   "titleEn": "Tutorial Demo",
+   "summary": "成片场景 · 教程演示运镜，稳定构图呈现清晰步骤",
+   "prompt": "教程演示运镜，稳定构图呈现清晰步骤",
+   "promptEn": "tutorial demonstration camera move, stable framing for clear step-by-step action"
+  },
+  {
+   "id": "t8-03-61971ddf75b6",
+   "group": "成片场景",
+   "title": "前后对比",
+   "titleEn": "Before After",
+   "summary": "成片场景 · 前后对比揭示运镜，用干净连续性展示变化",
+   "prompt": "前后对比揭示运镜，用干净连续性展示变化",
+   "promptEn": "before and after reveal movement, compare transformation with clean continuity"
+  },
+  {
+   "id": "t8-03-e5a6d3be8018",
+   "group": "成片场景",
+   "title": "生活 Vlog",
+   "titleEn": "Social Vlog",
+   "summary": "成片场景 · 生活 Vlog 运镜，亲切手持感并保持构图可读",
+   "prompt": "生活 Vlog 运镜，亲切手持感并保持构图可读",
+   "promptEn": "casual vlog movement, friendly handheld energy with readable framing"
+  },
+  {
+   "id": "t8-03-c2726156e6fd",
+   "group": "成片场景",
+   "title": "节庆人群",
+   "titleEn": "Festival Crowd",
+   "summary": "成片场景 · 节庆人群运镜，穿过庆典并呈现层次氛围",
+   "prompt": "节庆人群运镜，穿过庆典并呈现层次氛围",
+   "promptEn": "festival crowd movement, move through celebration with layered atmosphere"
+  },
+  {
+   "id": "t8-03-ef07c102c664",
+   "group": "成片场景",
+   "title": "演唱舞台",
+   "titleEn": "Concert Stage",
+   "summary": "成片场景 · 演唱舞台运镜，动态揭示表演、灯光和人群能量",
+   "prompt": "演唱舞台运镜，动态揭示表演、灯光和人群能量",
+   "promptEn": "concert stage camera move, dynamic performance reveal with light and crowd energy"
+  },
+  {
+   "id": "t8-03-82719b486bb4",
+   "group": "成片场景",
+   "title": "展品巡览",
+   "titleEn": "Museum Piece",
+   "summary": "成片场景 · 展品巡览运镜，缓慢克制地围绕展品展示",
+   "prompt": "展品巡览运镜，缓慢克制地围绕展品展示",
+   "promptEn": "museum object tour, slow respectful camera move around the exhibit"
+  },
+  {
+   "id": "t8-03-e0af64caec59",
+   "group": "成片场景",
+   "title": "游戏预告",
+   "titleEn": "Game Trailer",
+   "summary": "成片场景 · 游戏预告运镜，大胆英雄构图和高能揭示",
+   "prompt": "游戏预告运镜，大胆英雄构图和高能揭示",
+   "promptEn": "game trailer camera move, bold heroic framing and energetic reveal"
+  },
+  {
+   "id": "t8-03-1d2597086f1e",
+   "group": "成片场景",
+   "title": "动漫开场",
+   "titleEn": "Anime Opening",
+   "summary": "成片场景 · 动漫开场式运镜，用有节奏运动揭示标志姿态",
+   "prompt": "动漫开场式运镜，用有节奏运动揭示标志姿态",
+   "promptEn": "anime opening style camera move, iconic pose reveal with rhythmic motion"
+  },
+  {
+   "id": "t8-03-4baded853279",
+   "group": "成片场景",
+   "title": "漫画分镜",
+   "titleEn": "Comic Panel",
+   "summary": "成片场景 · 漫画分镜灵感运镜，图形化构图和舞台式揭示",
+   "prompt": "漫画分镜灵感运镜，图形化构图和舞台式揭示",
+   "promptEn": "comic panel inspired camera move, graphic framing and staged reveal"
+  },
+  {
+   "id": "t8-03-0fd58d8ebcc7",
+   "group": "成片场景",
+   "title": "奢侈广告",
+   "titleEn": "Luxury Ad",
+   "summary": "成片场景 · 奢侈广告运镜，精致可控并保持高级克制",
+   "prompt": "奢侈广告运镜，精致可控并保持高级克制",
+   "promptEn": "luxury advertisement movement, polished controlled reveal with premium restraint"
+  },
+  {
+   "id": "t8-03-b9c89c43d03e",
+   "group": "成片场景",
+   "title": "纪录观察",
+   "titleEn": "Documentary Observe",
+   "summary": "成片场景 · 纪录观察运镜，自然在场不过度导演",
+   "prompt": "纪录观察运镜，自然在场不过度导演",
+   "promptEn": "documentary observation movement, natural camera presence without overdirecting"
+  },
+  {
+   "id": "t8-03-65c1dd36a870",
+   "group": "成片场景",
+   "title": "神秘揭示",
+   "titleEn": "Mystery Reveal",
+   "summary": "成片场景 · 神秘揭示运镜，带张力地隐藏并展示关键细节",
+   "prompt": "神秘揭示运镜，带张力地隐藏并展示关键细节",
+   "promptEn": "mystery reveal movement, hide and disclose key details with tension"
+  },
+  {
+   "id": "t8-03-e58bc4f4b7cf",
+   "group": "成片场景",
+   "title": "海上航行",
+   "titleEn": "Ocean Voyage",
+   "summary": "成片场景 · 海上航行运镜，宽阔漂移并表现风和尺度",
+   "prompt": "海上航行运镜，宽阔漂移并表现风和尺度",
+   "promptEn": "ocean voyage camera movement, wide drifting motion with wind and scale"
+  },
+  {
+   "id": "t8-03-1725745a4947",
+   "group": "成片场景",
+   "title": "森林探索",
+   "titleEn": "Forest Explore",
+   "summary": "成片场景 · 森林探索运镜，穿过自然层次并表现纵深",
+   "prompt": "森林探索运镜，穿过自然层次并表现纵深",
+   "promptEn": "forest exploration movement, weave through natural layers with depth"
+  },
+  {
+   "id": "t8-03-2139cdab866b",
+   "group": "成片场景",
+   "title": "沙漠穿越",
+   "titleEn": "Desert Crossing",
+   "summary": "成片场景 · 沙漠穿越运镜，缓慢开阔地穿过热浪和距离感",
+   "prompt": "沙漠穿越运镜，缓慢开阔地穿过热浪和距离感",
+   "promptEn": "desert crossing camera move, slow expansive travel through heat and distance"
+  },
+  {
+   "id": "t8-03-a47f2feabb61",
+   "group": "成片场景",
+   "title": "太空靠近",
+   "titleEn": "Space Approach",
+   "summary": "成片场景 · 太空靠近运镜，安静宏大地靠近宇宙主体",
+   "prompt": "太空靠近运镜，安静宏大地靠近宇宙主体",
+   "promptEn": "space approach movement, quiet grand motion toward a cosmic subject"
+  },
+  {
+   "id": "t8-03-e3ffa2e9820f",
+   "group": "成片场景",
+   "title": "教室场景",
+   "titleEn": "Classroom Scene",
+   "summary": "成片场景 · 教室场景运镜，自然揭示人物、桌面和氛围",
+   "prompt": "教室场景运镜，自然揭示人物、桌面和氛围",
+   "promptEn": "classroom scene movement, natural reveal of people, desks, and atmosphere"
+  },
+  {
+   "id": "t8-03-985cf84dd726",
+   "group": "成片场景",
+   "title": "咖啡馆日常",
+   "titleEn": "Cafe Moment",
+   "summary": "成片场景 · 咖啡馆日常运镜，温暖亲密地围绕生活细节移动",
+   "prompt": "咖啡馆日常运镜，温暖亲密地围绕生活细节移动",
+   "promptEn": "cafe slice-of-life camera move, warm intimate motion around daily details"
+  },
+  {
+   "id": "t8-03-65fd51035c33",
+   "group": "成片场景",
+   "title": "变身展示",
+   "titleEn": "Transformation",
+   "summary": "成片场景 · 变身展示运镜，从普通细节推进到戏剧最终形态",
+   "prompt": "变身展示运镜，从普通细节推进到戏剧最终形态",
+   "promptEn": "transformation reveal movement, build from ordinary detail into dramatic final form"
+  },
+  {
+   "id": "t8-03-2fbb43d97cfd",
+   "group": "运镜动作",
+   "title": "静止",
+   "titleEn": "Static",
+   "summary": "运镜动作 · 固定机位，无镜头运动",
+   "prompt": "固定机位，无镜头运动",
+   "promptEn": "static locked-off shot, no camera movement"
+  },
+  {
+   "id": "t8-03-0a534500ac57",
+   "group": "运镜动作",
+   "title": "推近",
+   "titleEn": "Zoom In",
+   "summary": "运镜动作 · 镜头缓慢向主体推进",
+   "prompt": "镜头缓慢向主体推进",
+   "promptEn": "slow dolly in toward the subject"
+  },
+  {
+   "id": "t8-03-fda9597f9202",
+   "group": "运镜动作",
+   "title": "拉远",
+   "titleEn": "Zoom Out",
+   "summary": "运镜动作 · 镜头缓慢拉远，展示更多场景",
+   "prompt": "镜头缓慢拉远，展示更多场景",
+   "promptEn": "slow dolly out, revealing more of the scene"
+  },
+  {
+   "id": "t8-03-21729b73b23b",
+   "group": "运镜动作",
+   "title": "左摇",
+   "titleEn": "Pan L",
+   "summary": "运镜动作 · 镜头平滑向左摇动",
+   "prompt": "镜头平滑向左摇动",
+   "promptEn": "smooth pan to the left"
+  },
+  {
+   "id": "t8-03-cf9a313b8438",
+   "group": "运镜动作",
+   "title": "右摇",
+   "titleEn": "Pan R",
+   "summary": "运镜动作 · 镜头平滑向右摇动",
+   "prompt": "镜头平滑向右摇动",
+   "promptEn": "smooth pan to the right"
+  },
+  {
+   "id": "t8-03-577eab74bad8",
+   "group": "运镜动作",
+   "title": "上摇",
+   "titleEn": "Tilt Up",
+   "summary": "运镜动作 · 镜头平滑上摇，揭示高度和尺度",
+   "prompt": "镜头平滑上摇，揭示高度和尺度",
+   "promptEn": "smooth tilt up, revealing height and scale"
+  },
+  {
+   "id": "t8-03-592789a8f9cd",
+   "group": "运镜动作",
+   "title": "下摇",
+   "titleEn": "Tilt Down",
+   "summary": "运镜动作 · 镜头平滑下摇，从上方揭示主体",
+   "prompt": "镜头平滑下摇，从上方揭示主体",
+   "promptEn": "smooth tilt down, revealing the subject from above"
+  },
+  {
+   "id": "t8-03-c4420e9bd165",
+   "group": "运镜动作",
+   "title": "环绕",
+   "titleEn": "Orbit",
+   "summary": "运镜动作 · 围绕主体环绕，运动轨迹清晰",
+   "prompt": "围绕主体环绕，运动轨迹清晰",
+   "promptEn": "orbit around the subject with a clear circular camera move"
+  },
+  {
+   "id": "t8-03-68f086a43906",
+   "group": "运镜动作",
+   "title": "跟拍",
+   "titleEn": "Tracking",
+   "summary": "运镜动作 · 跟拍主体移动，保持连续跟随",
+   "prompt": "跟拍主体移动，保持连续跟随",
+   "promptEn": "tracking shot following the subject movement"
+  },
+  {
+   "id": "t8-03-67377c86e150",
+   "group": "运镜动作",
+   "title": "滑轨",
+   "titleEn": "Dolly",
+   "summary": "运镜动作 · 滑轨式平滑穿过场景",
+   "prompt": "滑轨式平滑穿过场景",
+   "promptEn": "smooth dolly track through the scene"
+  },
+  {
+   "id": "t8-03-5575cbc0e2c8",
+   "group": "运镜动作",
+   "title": "升降",
+   "titleEn": "Pedestal",
+   "summary": "运镜动作 · 垂直升降运镜，平滑上升或下降",
+   "prompt": "垂直升降运镜，平滑上升或下降",
+   "promptEn": "vertical pedestal camera move, rising or descending smoothly"
+  },
+  {
+   "id": "t8-03-c96b2d40918e",
+   "group": "运镜动作",
+   "title": "手持",
+   "titleEn": "Handheld",
+   "summary": "运镜动作 · 轻微手持镜头，有生命感但可控",
+   "prompt": "轻微手持镜头，有生命感但可控",
+   "promptEn": "subtle handheld camera motion, alive but controlled"
+  },
+  {
+   "id": "t8-03-24b458dcb962",
+   "group": "运镜动作",
+   "title": "甩镜",
+   "titleEn": "Whip",
+   "summary": "运镜动作 · 快速甩镜，带方向性运动模糊",
+   "prompt": "快速甩镜，带方向性运动模糊",
+   "promptEn": "fast whip pan motion with directional blur"
+  },
+  {
+   "id": "t8-03-9d97cd380ddc",
+   "group": "运镜动作",
+   "title": "推拉",
+   "titleEn": "Push Pull",
+   "summary": "运镜动作 · 推拉运镜，在主体周围形成滑轨与变焦张力",
+   "prompt": "推拉运镜，在主体周围形成滑轨与变焦张力",
+   "promptEn": "push-pull camera move, dolly and zoom tension around the subject"
+  },
+  {
+   "id": "t8-03-b38e3ed205c5",
+   "group": "运镜动作",
+   "title": "视差",
+   "titleEn": "Parallax",
+   "summary": "运镜动作 · 视差运镜，让前景和背景产生纵深位移",
+   "prompt": "视差运镜，让前景和背景产生纵深位移",
+   "promptEn": "parallax camera move, foreground and background shift with depth"
+  },
+  {
+   "id": "t8-03-f90d13072594",
+   "group": "运镜动作",
+   "title": "左滚转",
+   "titleEn": "Roll Left",
+   "summary": "运镜动作 · 镜头向左可控滚转，增加风格化张力",
+   "prompt": "镜头向左可控滚转，增加风格化张力",
+   "promptEn": "controlled camera roll to the left for stylized tension"
+  },
+  {
+   "id": "t8-03-d3b9fe709f66",
+   "group": "运镜动作",
+   "title": "右滚转",
+   "titleEn": "Roll Right",
+   "summary": "运镜动作 · 镜头向右可控滚转，增加风格化张力",
+   "prompt": "镜头向右可控滚转，增加风格化张力",
+   "promptEn": "controlled camera roll to the right for stylized tension"
+  },
+  {
+   "id": "t8-03-ab5a5101d664",
+   "group": "运镜动作",
+   "title": "荷兰倾斜",
+   "titleEn": "Dutch Tilt",
+   "summary": "运镜动作 · 荷兰倾斜运镜，倾斜地平线带来不安戏剧感",
+   "prompt": "荷兰倾斜运镜，倾斜地平线带来不安戏剧感",
+   "promptEn": "dutch angle camera move, tilted horizon with uneasy drama"
+  },
+  {
+   "id": "t8-03-2d2bdf21c99a",
+   "group": "运镜动作",
+   "title": "回弹",
+   "titleEn": "Boomerang",
+   "summary": "运镜动作 · 回弹运镜，推进后回拉，带有轻快节奏",
+   "prompt": "回弹运镜，推进后回拉，带有轻快节奏",
+   "promptEn": "boomerang camera move, move in then rebound out with playful rhythm"
+  },
+  {
+   "id": "t8-03-e31e9df9466a",
+   "group": "运镜动作",
+   "title": "瞬变焦",
+   "titleEn": "Snap Zoom",
+   "summary": "运镜动作 · 瞬间变焦，用焦段跳变制造喜剧或戏剧强调",
+   "prompt": "瞬间变焦，用焦段跳变制造喜剧或戏剧强调",
+   "promptEn": "snap zoom movement, instant focal jump for comedic or dramatic emphasis"
+  },
+  {
+   "id": "t8-03-851759c0ee89",
+   "group": "运镜动作",
+   "title": "揭示摇镜",
+   "titleEn": "Reveal Pan",
+   "summary": "运镜动作 · 揭示摇镜，横扫画面露出主体",
+   "prompt": "揭示摇镜，横扫画面露出主体",
+   "promptEn": "reveal pan, sweep across the frame to uncover the subject"
+  },
+  {
+   "id": "t8-03-7e102e70973b",
+   "group": "运镜动作",
+   "title": "摇臂下降",
+   "titleEn": "Crane Down",
+   "summary": "运镜动作 · 摇臂下降运镜，优雅下降进入场景",
+   "prompt": "摇臂下降运镜，优雅下降进入场景",
+   "promptEn": "crane down camera move, descend elegantly into the scene"
+  },
+  {
+   "id": "t8-03-5d0dbfe19551",
+   "group": "运镜动作",
+   "title": "摇臂上升",
+   "titleEn": "Crane Up",
+   "summary": "运镜动作 · 摇臂上升运镜，从主体优雅上升到环境",
+   "prompt": "摇臂上升运镜，从主体优雅上升到环境",
+   "promptEn": "crane up camera move, rise elegantly from the subject to the world"
+  },
+  {
+   "id": "t8-03-14d4008ed596",
+   "group": "运镜动作",
+   "title": "左弧绕",
+   "titleEn": "Arc Left",
+   "summary": "运镜动作 · 围绕主体向左弧线移动",
+   "prompt": "围绕主体向左弧线移动",
+   "promptEn": "left arc camera move around the subject"
+  },
+  {
+   "id": "t8-03-5ac4d3e2faf3",
+   "group": "运镜动作",
+   "title": "右弧绕",
+   "titleEn": "Arc Right",
+   "summary": "运镜动作 · 围绕主体向右弧线移动",
+   "prompt": "围绕主体向右弧线移动",
+   "promptEn": "right arc camera move around the subject"
+  },
+  {
+   "id": "t8-03-8a134ed20146",
+   "group": "运镜动作",
+   "title": "螺旋推进",
+   "titleEn": "Spiral In",
+   "summary": "运镜动作 · 向内螺旋推进，环绕靠近主体",
+   "prompt": "向内螺旋推进，环绕靠近主体",
+   "promptEn": "spiral inward camera move, circular approach toward the subject"
+  },
+  {
+   "id": "t8-03-43169938f951",
+   "group": "运镜动作",
+   "title": "螺旋拉远",
+   "titleEn": "Spiral Out",
+   "summary": "运镜动作 · 向外螺旋拉远，环绕离开主体",
+   "prompt": "向外螺旋拉远，环绕离开主体",
+   "promptEn": "spiral outward camera move, circular pull away from the subject"
+  },
+  {
+   "id": "t8-03-486e546967e9",
+   "group": "运镜动作",
+   "title": "垂直上升",
+   "titleEn": "Elevator Rise",
+   "summary": "运镜动作 · 垂直上升运镜，直线上升并保持构图干净",
+   "prompt": "垂直上升运镜，直线上升并保持构图干净",
+   "promptEn": "vertical rising camera move, lift straight upward with clean framing"
+  },
+  {
+   "id": "t8-03-3fe1691f83d1",
+   "group": "运镜动作",
+   "title": "垂直下降",
+   "titleEn": "Elevator Drop",
+   "summary": "运镜动作 · 垂直下降运镜，直线下降并保持构图可控",
+   "prompt": "垂直下降运镜，直线下降并保持构图可控",
+   "promptEn": "vertical descending camera move, drop straight down with controlled framing"
+  },
+  {
+   "id": "t8-03-8c5a1e789ed0",
+   "group": "运镜动作",
+   "title": "肩后跟随",
+   "titleEn": "Shoulder Follow",
+   "summary": "运镜动作 · 肩后跟随运镜，贴近主体背后移动",
+   "prompt": "肩后跟随运镜，贴近主体背后移动",
+   "promptEn": "over-the-shoulder follow movement, stay close behind the subject"
+  },
+  {
+   "id": "t8-03-6cf7dbff83e5",
+   "group": "运镜动作",
+   "title": "主观移动",
+   "titleEn": "Pov Move",
+   "summary": "运镜动作 · 主观视角移动，沉浸式第一人称运镜",
+   "prompt": "主观视角移动，沉浸式第一人称运镜",
+   "promptEn": "point-of-view camera movement, immersive first-person motion"
+  },
+  {
+   "id": "t8-03-b5bfaef2fca6",
+   "group": "运镜动作",
+   "title": "追逐镜头",
+   "titleEn": "Chase Cam",
+   "summary": "运镜动作 · 追逐镜头，跟随快速动作并带紧迫动势",
+   "prompt": "追逐镜头，跟随快速动作并带紧迫动势",
+   "promptEn": "chase camera movement, follow fast action with kinetic urgency"
+  },
+  {
+   "id": "t8-03-f9fa004bae59",
+   "group": "运镜动作",
+   "title": "迎面跟拍",
+   "titleEn": "Leading Shot",
+   "summary": "运镜动作 · 迎面跟拍，镜头后退并面对主体",
+   "prompt": "迎面跟拍，镜头后退并面对主体",
+   "promptEn": "leading camera shot, move backward while facing the subject"
+  },
+  {
+   "id": "t8-03-7522cdb1f38a",
+   "group": "运镜动作",
+   "title": "侧向跟拍",
+   "titleEn": "Side Track",
+   "summary": "运镜动作 · 侧向跟拍，与主体并行同速移动",
+   "prompt": "侧向跟拍，与主体并行同速移动",
+   "promptEn": "side tracking shot, move alongside the subject at matching speed"
+  },
+  {
+   "id": "t8-03-60b9accd2cfd",
+   "group": "运镜动作",
+   "title": "俯冲下降",
+   "titleEn": "Top Down Drop",
+   "summary": "运镜动作 · 俯冲下降运镜，从上方向主体俯冲",
+   "prompt": "俯冲下降运镜，从上方向主体俯冲",
+   "promptEn": "top-down drop camera move, dive from above toward the subject"
+  },
+  {
+   "id": "t8-03-eb9cce3783cb",
+   "group": "运镜动作",
+   "title": "贴地升起",
+   "titleEn": "Ground Rise",
+   "summary": "运镜动作 · 贴地升起，从低位抬升到主体",
+   "prompt": "贴地升起，从低位抬升到主体",
+   "promptEn": "ground-level rise, start low then lift into the subject"
+  },
+  {
+   "id": "t8-03-de777707f5ba",
+   "group": "运镜动作",
+   "title": "微距滑动",
+   "titleEn": "Macro Glide",
+   "summary": "运镜动作 · 微距滑动运镜，缓慢贴近细节移动",
+   "prompt": "微距滑动运镜，缓慢贴近细节移动",
+   "promptEn": "macro glide camera move, slow close movement over tiny details"
+  },
+  {
+   "id": "t8-03-fc2675bc6595",
+   "group": "运镜动作",
+   "title": "甩镜变焦",
+   "titleEn": "Whip Zoom",
+   "summary": "运镜动作 · 甩镜变焦，快速方向变化并加强焦点冲击",
+   "prompt": "甩镜变焦，快速方向变化并加强焦点冲击",
+   "promptEn": "whip zoom camera move, fast direction change with focal punch"
+  },
+  {
+   "id": "t8-03-42fcb60488f8",
+   "group": "运镜动作",
+   "title": "变速推进",
+   "titleEn": "Speed Ramp",
+   "summary": "运镜动作 · 变速推进，在慢速和快速之间切换",
+   "prompt": "变速推进，在慢速和快速之间切换",
+   "promptEn": "speed-ramped camera move, shift between slow and fast motion"
+  },
+  {
+   "id": "t8-03-8c5fe3e92ac0",
+   "group": "运镜动作",
+   "title": "呼吸手持",
+   "titleEn": "Handheld Breath",
+   "summary": "运镜动作 · 呼吸感手持运镜，保留细微人体运动",
+   "prompt": "呼吸感手持运镜，保留细微人体运动",
+   "promptEn": "breathing handheld camera motion, subtle human micro-movement"
+  },
+  {
+   "id": "t8-03-45aaf1867643",
+   "group": "运镜动作",
+   "title": "漂浮移动",
+   "titleEn": "Float Drift",
+   "summary": "运镜动作 · 漂浮移动运镜，轻盈失重且柔和",
+   "prompt": "漂浮移动运镜，轻盈失重且柔和",
+   "promptEn": "floating drift camera move, weightless and soft motion"
+  },
+  {
+   "id": "t8-03-2ec877451717",
+   "group": "运镜动作",
+   "title": "倾斜揭示",
+   "titleEn": "Reveal Tilt",
+   "summary": "运镜动作 · 倾斜揭示运镜，旋转或倾斜进入关键主体",
+   "prompt": "倾斜揭示运镜，旋转或倾斜进入关键主体",
+   "promptEn": "tilting reveal move, rotate or tilt into the key subject"
+  },
+  {
+   "id": "t8-03-c1e077012365",
+   "group": "运镜动作",
+   "title": "穿越推进",
+   "titleEn": "Push Through",
+   "summary": "运镜动作 · 穿越推进，穿过前景层次靠近主体",
+   "prompt": "穿越推进，穿过前景层次靠近主体",
+   "promptEn": "push through the scene, pass through foreground layers toward the subject"
+  },
+  {
+   "id": "t8-03-1e8aae2e86b4",
+   "group": "运镜动作",
+   "title": "掠过",
+   "titleEn": "Pass By",
+   "summary": "运镜动作 · 掠过运镜，贴近主体后继续越过",
+   "prompt": "掠过运镜，贴近主体后继续越过",
+   "promptEn": "pass-by camera move, sweep near the subject and continue beyond"
+  },
+  {
+   "id": "t8-03-0c8e8afc3a29",
+   "group": "运镜动作",
+   "title": "反向滑轨",
+   "titleEn": "Reverse Dolly",
+   "summary": "运镜动作 · 反向滑轨，镜头与主体运动方向相反",
+   "prompt": "反向滑轨，镜头与主体运动方向相反",
+   "promptEn": "reverse dolly movement, pull the camera opposite the subject motion"
+  },
+  {
+   "id": "t8-03-cbf4f7c668a1",
+   "group": "运镜动作",
+   "title": "子弹时间",
+   "titleEn": "Bullet Time",
+   "summary": "运镜动作 · 子弹时间灵感运镜，冻结动作并形成环绕能量",
+   "prompt": "子弹时间灵感运镜，冻结动作并形成环绕能量",
+   "promptEn": "bullet-time inspired move, frozen action with circular camera energy"
+  },
+  {
+   "id": "t8-03-613e238b8790",
+   "group": "运镜动作",
+   "title": "环绕变焦",
+   "titleEn": "Orbit Zoom",
+   "summary": "运镜动作 · 环绕变焦，围绕主体同时改变焦距距离",
+   "prompt": "环绕变焦，围绕主体同时改变焦距距离",
+   "promptEn": "orbit with zoom, circle the subject while changing focal distance"
+  },
+  {
+   "id": "t8-03-8735d8d098ff",
+   "group": "运镜动作",
+   "title": "冲击震动",
+   "titleEn": "Shake Impact",
+   "summary": "运镜动作 · 冲击震动运镜，用短促可控震动表现力量",
+   "prompt": "冲击震动运镜，用短促可控震动表现力量",
+   "promptEn": "impact shake camera move, brief controlled vibration for force"
+  },
+  {
+   "id": "t8-03-8853590082e7",
+   "group": "运动路径",
+   "title": "向前推进",
+   "titleEn": "Forward",
+   "summary": "运动路径 · 穿过空间向前推进",
+   "prompt": "穿过空间向前推进",
+   "promptEn": "move forward through the space"
+  },
+  {
+   "id": "t8-03-bd91557033cf",
+   "group": "运动路径",
+   "title": "向后拉开",
+   "titleEn": "Backward",
+   "summary": "运动路径 · 向后拉开，揭示更大场景",
+   "prompt": "向后拉开，揭示更大场景",
+   "promptEn": "pull backward to reveal the wider scene"
+  },
+  {
+   "id": "t8-03-74ac3d003f67",
+   "group": "运动路径",
+   "title": "左到右",
+   "titleEn": "Left To Right",
+   "summary": "运动路径 · 从画面左侧移动到右侧",
+   "prompt": "从画面左侧移动到右侧",
+   "promptEn": "travel from left to right across the frame"
+  },
+  {
+   "id": "t8-03-53fd52e4997e",
+   "group": "运动路径",
+   "title": "右到左",
+   "titleEn": "Right To Left",
+   "summary": "运动路径 · 从画面右侧移动到左侧",
+   "prompt": "从画面右侧移动到左侧",
+   "promptEn": "travel from right to left across the frame"
+  },
+  {
+   "id": "t8-03-444d1744e5b7",
+   "group": "运动路径",
+   "title": "低处上升",
+   "titleEn": "Rise",
+   "summary": "运动路径 · 从低处上升到更开阔视角",
+   "prompt": "从低处上升到更开阔视角",
+   "promptEn": "rise from a low position into a broader view"
+  },
+  {
+   "id": "t8-03-3d6bc76c4dbb",
+   "group": "运动路径",
+   "title": "高处下降",
+   "titleEn": "Descend",
+   "summary": "运动路径 · 从高处向主体下降",
+   "prompt": "从高处向主体下降",
+   "promptEn": "descend from above toward the subject"
+  },
+  {
+   "id": "t8-03-b69b587e1292",
+   "group": "运动路径",
+   "title": "顺时针",
+   "titleEn": "Clockwise",
+   "summary": "运动路径 · 顺时针围绕主体运动",
+   "prompt": "顺时针围绕主体运动",
+   "promptEn": "circle clockwise around the subject"
+  },
+  {
+   "id": "t8-03-753755857dcb",
+   "group": "运动路径",
+   "title": "逆时针",
+   "titleEn": "Counter Clockwise",
+   "summary": "运动路径 · 逆时针围绕主体运动",
+   "prompt": "逆时针围绕主体运动",
+   "promptEn": "circle counter-clockwise around the subject"
+  },
+  {
+   "id": "t8-03-9e7c4542acea",
+   "group": "运动路径",
+   "title": "遮挡露出",
+   "titleEn": "From Cover",
+   "summary": "运动路径 · 从前景遮挡后露出主体",
+   "prompt": "从前景遮挡后露出主体",
+   "promptEn": "reveal the subject from behind a foreground obstruction"
+  },
+  {
+   "id": "t8-03-d2d94add6d6b",
+   "group": "运动路径",
+   "title": "细节到全景",
+   "titleEn": "Detail To Wide",
+   "summary": "运动路径 · 从近处细节打开到全景",
+   "prompt": "从近处细节打开到全景",
+   "promptEn": "begin on a close detail and open into a wide view"
+  },
+  {
+   "id": "t8-03-9396daf8ba5b",
+   "group": "运动路径",
+   "title": "全景到细节",
+   "titleEn": "Wide To Detail",
+   "summary": "运动路径 · 从全景推进到具体细节",
+   "prompt": "从全景推进到具体细节",
+   "promptEn": "begin wide and move into a specific detail"
+  },
+  {
+   "id": "t8-03-ef591a8a16a9",
+   "group": "运动路径",
+   "title": "穿越空间",
+   "titleEn": "Through Space",
+   "summary": "运动路径 · 穿过环境层次，表现空间深度",
+   "prompt": "穿过环境层次，表现空间深度",
+   "promptEn": "move through layers of the environment with depth"
+  },
+  {
+   "id": "t8-03-d48796991fad",
+   "group": "运动路径",
+   "title": "平行跟随",
+   "titleEn": "Parallel Follow",
+   "summary": "运动路径 · 与主体平行移动并保持速度一致",
+   "prompt": "与主体平行移动并保持速度一致",
+   "promptEn": "move parallel with the subject at matching speed"
+  },
+  {
+   "id": "t8-03-b2bf2023c3e9",
+   "group": "运动路径",
+   "title": "斜向推进",
+   "titleEn": "Diagonal",
+   "summary": "运动路径 · 斜向推进主体，增加动态纵深",
+   "prompt": "斜向推进主体，增加动态纵深",
+   "promptEn": "move diagonally toward the subject for dynamic depth"
+  },
+  {
+   "id": "t8-03-9a7c7cd71b1f",
+   "group": "运动路径",
+   "title": "弧线移动",
+   "titleEn": "Arc",
+   "summary": "运动路径 · 沿柔和弧线路径移动",
+   "prompt": "沿柔和弧线路径移动",
+   "promptEn": "move along a gentle arc path"
+  },
+  {
+   "id": "t8-03-ea13d9af1436",
+   "group": "运动路径",
+   "title": "S 形路径",
+   "titleEn": "S Curve",
+   "summary": "运动路径 · 沿 S 形路径移动，形成优雅空间流动",
+   "prompt": "沿 S 形路径移动，形成优雅空间流动",
+   "promptEn": "move along an S-curve path for graceful spatial flow"
+  },
+  {
+   "id": "t8-03-82c3cd3ca9ea",
+   "group": "运动路径",
+   "title": "折线路径",
+   "titleEn": "Zigzag",
+   "summary": "运动路径 · 沿可控折线路径移动，带有明确方向变化",
+   "prompt": "沿可控折线路径移动，带有明确方向变化",
+   "promptEn": "move through a controlled zigzag path with intentional shifts"
+  },
+  {
+   "id": "t8-03-a94b20d329fa",
+   "group": "运动路径",
+   "title": "螺旋入",
+   "titleEn": "Spiral In Path",
+   "summary": "运动路径 · 向主体螺旋靠近",
+   "prompt": "向主体螺旋靠近",
+   "promptEn": "spiral inward toward the subject"
+  },
+  {
+   "id": "t8-03-c59e335c7f45",
+   "group": "运动路径",
+   "title": "螺旋出",
+   "titleEn": "Spiral Out Path",
+   "summary": "运动路径 · 从主体向外螺旋离开",
+   "prompt": "从主体向外螺旋离开",
+   "promptEn": "spiral outward away from the subject"
+  },
+  {
+   "id": "t8-03-c9f85d52793c",
+   "group": "运动路径",
+   "title": "俯冲落下",
+   "titleEn": "Overhead Drop",
+   "summary": "运动路径 · 从高空俯冲落向场景",
+   "prompt": "从高空俯冲落向场景",
+   "promptEn": "drop from overhead toward the scene"
+  },
+  {
+   "id": "t8-03-52f4b43af4e8",
+   "group": "运动路径",
+   "title": "贴地掠过",
+   "titleEn": "Ground Skimming",
+   "summary": "运动路径 · 贴近地面掠过后抬升到主体",
+   "prompt": "贴近地面掠过后抬升到主体",
+   "promptEn": "skim close to the ground before rising into the subject"
+  },
+  {
+   "id": "t8-03-00a1d7921189",
+   "group": "运动路径",
+   "title": "穿门进入",
+   "titleEn": "Doorway Pass",
+   "summary": "运动路径 · 穿过门洞或开口进入场景",
+   "prompt": "穿过门洞或开口进入场景",
+   "promptEn": "pass through a doorway or opening into the scene"
+  },
+  {
+   "id": "t8-03-cc6aa30ba3a0",
+   "group": "运动路径",
+   "title": "窗口揭示",
+   "titleEn": "Window Reveal",
+   "summary": "运动路径 · 通过窗口或框景揭示主体",
+   "prompt": "通过窗口或框景揭示主体",
+   "promptEn": "reveal the subject through a window or framed opening"
+  },
+  {
+   "id": "t8-03-a61265444231",
+   "group": "运动路径",
+   "title": "前景擦过",
+   "titleEn": "Foreground Wipe",
+   "summary": "运动路径 · 移动时让前景元素擦过画面",
+   "prompt": "移动时让前景元素擦过画面",
+   "promptEn": "let foreground elements wipe across the frame during movement"
+  },
+  {
+   "id": "t8-03-970cb26e0271",
+   "group": "运动路径",
+   "title": "隧道穿行",
+   "titleEn": "Tunnel Through",
+   "summary": "运动路径 · 穿过隧道式空间，形成强纵深",
+   "prompt": "穿过隧道式空间，形成强纵深",
+   "promptEn": "travel through a tunnel-like space with strong depth"
+  },
+  {
+   "id": "t8-03-7133c870aa9c",
+   "group": "运动路径",
+   "title": "随阶上升",
+   "titleEn": "Stairs Up",
+   "summary": "运动路径 · 沿楼梯或层级向上移动",
+   "prompt": "沿楼梯或层级向上移动",
+   "promptEn": "move upward along stairs or stepped layers"
+  },
+  {
+   "id": "t8-03-ae0b187775be",
+   "group": "运动路径",
+   "title": "随阶下降",
+   "titleEn": "Stairs Down",
+   "summary": "运动路径 · 沿楼梯或层级向下移动",
+   "prompt": "沿楼梯或层级向下移动",
+   "promptEn": "move downward along stairs or stepped layers"
+  },
+  {
+   "id": "t8-03-dd0a3a239428",
+   "group": "运动路径",
+   "title": "8 字路径",
+   "titleEn": "Figure Eight",
+   "summary": "运动路径 · 围绕主体区域做 8 字路径移动",
+   "prompt": "围绕主体区域做 8 字路径移动",
+   "promptEn": "move in a figure-eight path around the subject area"
+  },
+  {
+   "id": "t8-03-680a09d82b04",
+   "group": "运动路径",
+   "title": "紧环绕",
+   "titleEn": "Tight Orbit",
+   "summary": "运动路径 · 贴近主体做紧密环绕",
+   "prompt": "贴近主体做紧密环绕",
+   "promptEn": "circle tightly around the subject"
+  },
+  {
+   "id": "t8-03-272db8d81187",
+   "group": "运动路径",
+   "title": "大环绕",
+   "titleEn": "Wide Orbit",
+   "summary": "运动路径 · 大范围环绕主体并揭示环境",
+   "prompt": "大范围环绕主体并揭示环境",
+   "promptEn": "circle widely around the subject to reveal the environment"
+  },
+  {
+   "id": "t8-03-d97095dacd4b",
+   "group": "运动路径",
+   "title": "越过主体",
+   "titleEn": "Push Past",
+   "summary": "运动路径 · 推进越过主体并继续进入背景",
+   "prompt": "推进越过主体并继续进入背景",
+   "promptEn": "push past the subject and continue into the background"
+  },
+  {
+   "id": "t8-03-34bb0d47c475",
+   "group": "运动路径",
+   "title": "迎面靠近",
+   "titleEn": "Lead In",
+   "summary": "运动路径 · 从正面迎向主体靠近",
+   "prompt": "从正面迎向主体靠近",
+   "promptEn": "approach the subject from the front"
+  },
+  {
+   "id": "t8-03-7f33a150d436",
+   "group": "运动路径",
+   "title": "背向远离",
+   "titleEn": "Lead Out",
+   "summary": "运动路径 · 主体面向镜头方向时镜头向后远离",
+   "prompt": "主体面向镜头方向时镜头向后远离",
+   "promptEn": "move away while the subject faces the camera direction"
+  },
+  {
+   "id": "t8-03-47cbcb4de8ac",
+   "group": "运动路径",
+   "title": "垂直弧线",
+   "titleEn": "Vertical Arc",
+   "summary": "运动路径 · 沿垂直弧线路径移动",
+   "prompt": "沿垂直弧线路径移动",
+   "promptEn": "move along a vertical arc path"
+  },
+  {
+   "id": "t8-03-9c31a42f1d37",
+   "group": "运动路径",
+   "title": "水平弧线",
+   "titleEn": "Horizontal Arc",
+   "summary": "运动路径 · 沿水平弧线路径移动",
+   "prompt": "沿水平弧线路径移动",
+   "promptEn": "move along a horizontal arc path"
+  },
+  {
+   "id": "t8-03-14e9f081e9ed",
+   "group": "运动路径",
+   "title": "摇臂扫过",
+   "titleEn": "Crane Sweep",
+   "summary": "运动路径 · 以摇臂式路径扫过场景",
+   "prompt": "以摇臂式路径扫过场景",
+   "promptEn": "sweep across the scene with a crane-like path"
+  },
+  {
+   "id": "t8-03-fa7a3f81f037",
+   "group": "运动路径",
+   "title": "暗处显现",
+   "titleEn": "From Dark",
+   "summary": "运动路径 · 从暗处或阴影中移动并揭示主体",
+   "prompt": "从暗处或阴影中移动并揭示主体",
+   "promptEn": "move from darkness or shadow into the revealed subject"
+  },
+  {
+   "id": "t8-03-87fef253b0da",
+   "group": "运动路径",
+   "title": "横穿画面",
+   "titleEn": "Cross Screen",
+   "summary": "运动路径 · 从一侧完整横穿到另一侧",
+   "prompt": "从一侧完整横穿到另一侧",
+   "promptEn": "cross the full frame from one side to the other"
+  },
+  {
+   "id": "t8-03-65744e98d026",
+   "group": "运动路径",
+   "title": "斜向后撤",
+   "titleEn": "Diagonal Retreat",
+   "summary": "运动路径 · 从主体斜向后撤",
+   "prompt": "从主体斜向后撤",
+   "promptEn": "retreat diagonally away from the subject"
+  },
+  {
+   "id": "t8-03-cca36c5c136a",
+   "group": "运动路径",
+   "title": "上升环绕",
+   "titleEn": "Rising Orbit",
+   "summary": "运动路径 · 环绕主体同时上升",
+   "prompt": "环绕主体同时上升",
+   "promptEn": "orbit while rising upward"
+  },
+  {
+   "id": "t8-03-3f0ee058dd53",
+   "group": "运动路径",
+   "title": "下降环绕",
+   "titleEn": "Descending Orbit",
+   "summary": "运动路径 · 环绕主体同时下降",
+   "prompt": "环绕主体同时下降",
+   "promptEn": "orbit while descending downward"
+  },
+  {
+   "id": "t8-03-c76f45114c0f",
+   "group": "运动路径",
+   "title": "向心螺旋",
+   "titleEn": "Inward Spiral",
+   "summary": "运动路径 · 沿收紧螺旋向中心移动",
+   "prompt": "沿收紧螺旋向中心移动",
+   "promptEn": "move in a tightening spiral toward the center"
+  },
+  {
+   "id": "t8-03-ee9cfe31cc7d",
+   "group": "运动路径",
+   "title": "离心螺旋",
+   "titleEn": "Outward Spiral",
+   "summary": "运动路径 · 沿扩张螺旋离开中心",
+   "prompt": "沿扩张螺旋离开中心",
+   "promptEn": "move in an expanding spiral away from the center"
+  },
+  {
+   "id": "t8-03-86d4e3c9fe6b",
+   "group": "运动路径",
+   "title": "身后跟随",
+   "titleEn": "Follow Behind",
+   "summary": "运动路径 · 从主体身后跟随",
+   "prompt": "从主体身后跟随",
+   "promptEn": "follow from behind the subject"
+  },
+  {
+   "id": "t8-03-101204efb0ba",
+   "group": "运动路径",
+   "title": "前方引导",
+   "titleEn": "Lead Ahead",
+   "summary": "运动路径 · 位于主体前方，引导观众向前",
+   "prompt": "位于主体前方，引导观众向前",
+   "promptEn": "move ahead of the subject while guiding the viewer forward"
+  },
+  {
+   "id": "t8-03-472b372be5c2",
+   "group": "运动路径",
+   "title": "穿过人群",
+   "titleEn": "Crowd Through",
+   "summary": "运动路径 · 穿过人群并保持主主体可见",
+   "prompt": "穿过人群并保持主主体可见",
+   "promptEn": "move through a crowd while preserving the main subject"
+  },
+  {
+   "id": "t8-03-bbd814e7f425",
+   "group": "运动路径",
+   "title": "货架滑行",
+   "titleEn": "Shelf Slide",
+   "summary": "运动路径 · 沿货架或行列滑行，形成层次纵深",
+   "prompt": "沿货架或行列滑行，形成层次纵深",
+   "promptEn": "slide along shelves or rows with strong layered depth"
+  },
+  {
+   "id": "t8-03-29d664daa52a",
+   "group": "运动路径",
+   "title": "桌面路径",
+   "titleEn": "Tabletop",
+   "summary": "运动路径 · 沿桌面或平面表面移动",
+   "prompt": "沿桌面或平面表面移动",
+   "promptEn": "travel across a tabletop or flat surface"
+  },
+  {
+   "id": "t8-03-702b2e58884f",
+   "group": "运动路径",
+   "title": "天际扫过",
+   "titleEn": "Skyline Sweep",
+   "summary": "运动路径 · 扫过天际线或远处地平线",
+   "prompt": "扫过天际线或远处地平线",
+   "promptEn": "sweep across the skyline or distant horizon"
+  },
+  {
+   "id": "t8-03-54ed2b71bb47",
+   "group": "运动路径",
+   "title": "反射揭示",
+   "titleEn": "Reflection Reveal",
+   "summary": "运动路径 · 通过镜面、水面或玻璃反射揭示主体",
+   "prompt": "通过镜面、水面或玻璃反射揭示主体",
+   "promptEn": "reveal the subject through mirror, water, or glass reflection"
+  },
+  {
+   "id": "t8-03-31b429ce4900",
+   "group": "节奏速度",
+   "title": "极慢",
+   "titleEn": "Very Slow",
+   "summary": "节奏速度 · 极慢运动，安静而克制",
+   "prompt": "极慢运动，安静而克制",
+   "promptEn": "very slow movement, calm and deliberate"
+  },
+  {
+   "id": "t8-03-4203bc67c8ef",
+   "group": "节奏速度",
+   "title": "慢速",
+   "titleEn": "Slow",
+   "summary": "节奏速度 · 慢速电影化运动",
+   "prompt": "慢速电影化运动",
+   "promptEn": "slow cinematic movement"
+  },
+  {
+   "id": "t8-03-cda6dae5c1ca",
+   "group": "节奏速度",
+   "title": "快速",
+   "titleEn": "Fast",
+   "summary": "节奏速度 · 快速有能量的运镜，同时保持主体可读",
+   "prompt": "快速有能量的运镜，同时保持主体可读",
+   "promptEn": "fast energetic camera movement while keeping the subject readable"
+  },
+  {
+   "id": "t8-03-b55cc36d78c2",
+   "group": "节奏速度",
+   "title": "加速",
+   "titleEn": "Accelerate",
+   "summary": "节奏速度 · 镜头运动逐渐加速",
+   "prompt": "镜头运动逐渐加速",
+   "promptEn": "gradually accelerate the camera movement"
+  },
+  {
+   "id": "t8-03-93267d5dc526",
+   "group": "节奏速度",
+   "title": "减速",
+   "titleEn": "Decelerate",
+   "summary": "节奏速度 · 逐渐减速并落到最终画面",
+   "prompt": "逐渐减速并落到最终画面",
+   "promptEn": "gradually slow down into the final frame"
+  },
+  {
+   "id": "t8-03-faf66a5b52c8",
+   "group": "节奏速度",
+   "title": "缓入缓出",
+   "titleEn": "Ease",
+   "summary": "节奏速度 · 平滑缓入缓出运动",
+   "prompt": "平滑缓入缓出运动",
+   "promptEn": "smooth ease-in and ease-out motion"
+  },
+  {
+   "id": "t8-03-5ecd21297ad9",
+   "group": "节奏速度",
+   "title": "突然停顿",
+   "titleEn": "Sudden Stop",
+   "summary": "节奏速度 · 以可控的突然停顿强化重点",
+   "prompt": "以可控的突然停顿强化重点",
+   "promptEn": "end with a controlled sudden stop for emphasis"
+  },
+  {
+   "id": "t8-03-3b61226ce9a8",
+   "group": "节奏速度",
+   "title": "一镜到底",
+   "titleEn": "Oner",
+   "summary": "节奏速度 · 一镜到底，不切镜头",
+   "prompt": "一镜到底，不切镜头",
+   "promptEn": "single continuous take, no cuts"
+  },
+  {
+   "id": "t8-03-58cfa15026b2",
+   "group": "节奏速度",
+   "title": "呼吸感",
+   "titleEn": "Breathing",
+   "summary": "节奏速度 · 呼吸感节奏，带自然细微起伏",
+   "prompt": "呼吸感节奏，带自然细微起伏",
+   "promptEn": "breathing tempo, tiny natural rises and falls"
+  },
+  {
+   "id": "t8-03-13e9a9e4db1b",
+   "group": "节奏速度",
+   "title": "轻脉冲",
+   "titleEn": "Gentle Pulse",
+   "summary": "节奏速度 · 轻微脉冲节奏，柔和重复强调",
+   "prompt": "轻微脉冲节奏，柔和重复强调",
+   "promptEn": "gentle pulsing tempo, soft repeated emphasis"
+  },
+  {
+   "id": "t8-03-0efff05f7b18",
+   "group": "节奏速度",
+   "title": "有节奏",
+   "titleEn": "Rhythmic",
+   "summary": "节奏速度 · 有明确拍点结构的节奏运镜",
+   "prompt": "有明确拍点结构的节奏运镜",
+   "promptEn": "rhythmic camera movement with clear beat structure"
+  },
+  {
+   "id": "t8-03-1067aa44c9dc",
+   "group": "节奏速度",
+   "title": "贴音乐",
+   "titleEn": "Music Synced",
+   "summary": "节奏速度 · 贴合音乐节奏，让运动跟随配乐拍点",
+   "prompt": "贴合音乐节奏，让运动跟随配乐拍点",
+   "promptEn": "music-synced movement, match motion to the soundtrack rhythm"
+  },
+  {
+   "id": "t8-03-201fbc538de5",
+   "group": "节奏速度",
+   "title": "卡点感",
+   "titleEn": "Beat Cut",
+   "summary": "节奏速度 · 卡点式运动，重点落在视觉拍点上",
+   "prompt": "卡点式运动，重点落在视觉拍点上",
+   "promptEn": "beat-driven motion, accents land on visual beats"
+  },
+  {
+   "id": "t8-03-60280f251965",
+   "group": "节奏速度",
+   "title": "慢铺垫",
+   "titleEn": "Slow Build",
+   "summary": "节奏速度 · 慢铺垫节奏，逐步增强情绪压力",
+   "prompt": "慢铺垫节奏，逐步增强情绪压力",
+   "promptEn": "slow build tempo, gradually increase emotional pressure"
+  },
+  {
+   "id": "t8-03-eec802ce0537",
+   "group": "节奏速度",
+   "title": "短爆发",
+   "titleEn": "Quick Burst",
+   "summary": "节奏速度 · 短暂快速爆发后回到可控状态",
+   "prompt": "短暂快速爆发后回到可控状态",
+   "promptEn": "short burst of fast movement, then return to control"
+  },
+  {
+   "id": "t8-03-9255f7cc60d0",
+   "group": "节奏速度",
+   "title": "甩动快",
+   "titleEn": "Whip Fast",
+   "summary": "节奏速度 · 非常快的甩动节奏，带短暂运动模糊",
+   "prompt": "非常快的甩动节奏，带短暂运动模糊",
+   "promptEn": "very fast whip-like tempo with brief motion blur"
+  },
+  {
+   "id": "t8-03-774eb2d2cf93",
+   "group": "节奏速度",
+   "title": "连续顺滑",
+   "titleEn": "Smooth Continuous",
+   "summary": "节奏速度 · 连续顺滑节奏，无明显停顿",
+   "prompt": "连续顺滑节奏，无明显停顿",
+   "promptEn": "smooth continuous tempo without visible stops"
+  },
+  {
+   "id": "t8-03-712df08c4ee7",
+   "group": "节奏速度",
+   "title": "漂浮慢",
+   "titleEn": "Floating",
+   "summary": "节奏速度 · 漂浮慢节奏，轻盈失重且柔和",
+   "prompt": "漂浮慢节奏，轻盈失重且柔和",
+   "promptEn": "floating slow tempo, weightless and soft"
+  },
+  {
+   "id": "t8-03-5130f980d1e5",
+   "group": "节奏速度",
+   "title": "断奏",
+   "titleEn": "Staccato",
+   "summary": "节奏速度 · 断奏式节奏，运动拍点清晰分离",
+   "prompt": "断奏式节奏，运动拍点清晰分离",
+   "promptEn": "staccato movement, crisp separated motion beats"
+  },
+  {
+   "id": "t8-03-1236070d6be9",
+   "group": "节奏速度",
+   "title": "弹性",
+   "titleEn": "Elastic",
+   "summary": "节奏速度 · 弹性节奏，运动中拉伸并回弹",
+   "prompt": "弹性节奏，运动中拉伸并回弹",
+   "promptEn": "elastic tempo, stretch and rebound through the move"
+  },
+  {
+   "id": "t8-03-ebeb0a1c7453",
+   "group": "节奏速度",
+   "title": "悬念停留",
+   "titleEn": "Suspense Hold",
+   "summary": "节奏速度 · 悬念停留，用耐心张力延迟揭示",
+   "prompt": "悬念停留，用耐心张力延迟揭示",
+   "promptEn": "suspenseful hold, delay the reveal with patient tension"
+  },
+  {
+   "id": "t8-03-18f75035df09",
+   "group": "节奏速度",
+   "title": "先停后动",
+   "titleEn": "Hold Then Move",
+   "summary": "节奏速度 · 先保持静止，再开始运镜",
+   "prompt": "先保持静止，再开始运镜",
+   "promptEn": "hold still first, then begin the camera move"
+  },
+  {
+   "id": "t8-03-c05ff287023c",
+   "group": "节奏速度",
+   "title": "先动后停",
+   "titleEn": "Move Then Hold",
+   "summary": "节奏速度 · 先移动，再稳定停在最终画面",
+   "prompt": "先移动，再稳定停在最终画面",
+   "promptEn": "move first, then settle into a held final frame"
+  },
+  {
+   "id": "t8-03-6b957fb3d3c0",
+   "group": "节奏速度",
+   "title": "微运动",
+   "titleEn": "Micro Motion",
+   "summary": "节奏速度 · 微运动节奏，几乎不可察觉的镜头漂移",
+   "prompt": "微运动节奏，几乎不可察觉的镜头漂移",
+   "promptEn": "micro movement tempo, barely perceptible camera drift"
+  },
+  {
+   "id": "t8-03-bd1895669480",
+   "group": "节奏速度",
+   "title": "缓慢逼近",
+   "titleEn": "Creeping",
+   "summary": "节奏速度 · 缓慢逼近节奏，带紧张感地靠近",
+   "prompt": "缓慢逼近节奏，带紧张感地靠近",
+   "promptEn": "creeping tempo, slow tense approach"
+  },
+  {
+   "id": "t8-03-aadb43f2c6cf",
+   "group": "节奏速度",
+   "title": "滑行",
+   "titleEn": "Gliding",
+   "summary": "节奏速度 · 滑行节奏，平滑移动且无突兀加速",
+   "prompt": "滑行节奏，平滑移动且无突兀加速",
+   "promptEn": "gliding tempo, smooth travel with no harsh acceleration"
+  },
+  {
+   "id": "t8-03-e52cd78b7d85",
+   "group": "节奏速度",
+   "title": "紧迫",
+   "titleEn": "Urgent",
+   "summary": "节奏速度 · 紧迫节奏，快速且有压力的动机运动",
+   "prompt": "紧迫节奏，快速且有压力的动机运动",
+   "promptEn": "urgent tempo, fast motivated movement with pressure"
+  },
+  {
+   "id": "t8-03-c6ac0507f0f7",
+   "group": "节奏速度",
+   "title": "英雄节奏",
+   "titleEn": "Heroic",
+   "summary": "节奏速度 · 英雄节奏，自信铺垫到强揭示",
+   "prompt": "英雄节奏，自信铺垫到强揭示",
+   "promptEn": "heroic tempo, confident build into a strong reveal"
+  },
+  {
+   "id": "t8-03-ecd4ac261a9f",
+   "group": "节奏速度",
+   "title": "俏皮",
+   "titleEn": "Playful",
+   "summary": "节奏速度 · 俏皮节奏，轻快弹跳的镜头时机",
+   "prompt": "俏皮节奏，轻快弹跳的镜头时机",
+   "promptEn": "playful tempo, light bouncy camera timing"
+  },
+  {
+   "id": "t8-03-2aaf3a2d9864",
+   "group": "节奏速度",
+   "title": "机械",
+   "titleEn": "Mechanical",
+   "summary": "节奏速度 · 机械节奏，精准重复如机器般计时",
+   "prompt": "机械节奏，精准重复如机器般计时",
+   "promptEn": "mechanical tempo, precise repeated motion with machine-like timing"
+  },
+  {
+   "id": "t8-03-7eaec874270d",
+   "group": "节奏速度",
+   "title": "心跳",
+   "titleEn": "Heartbeat",
+   "summary": "节奏速度 · 心跳节奏，轻微脉冲贴合情绪张力",
+   "prompt": "心跳节奏，轻微脉冲贴合情绪张力",
+   "promptEn": "heartbeat tempo, subtle pulse matching emotional tension"
+  },
+  {
+   "id": "t8-03-d37fb12392ef",
+   "group": "节奏速度",
+   "title": "快慢起伏",
+   "titleEn": "Ramp Up Down",
+   "summary": "节奏速度 · 先加速再减速，在单次运镜中变化速度",
+   "prompt": "先加速再减速，在单次运镜中变化速度",
+   "promptEn": "ramp up then down, vary speed within one camera move"
+  },
+  {
+   "id": "t8-03-44da4addbadb",
+   "group": "节奏速度",
+   "title": "循环感",
+   "titleEn": "Looped",
+   "summary": "节奏速度 · 循环感节奏，运动可无缝重复",
+   "prompt": "循环感节奏，运动可无缝重复",
+   "promptEn": "loopable tempo, movement can repeat seamlessly"
+  },
+  {
+   "id": "t8-03-487d5dfaa0c2",
+   "group": "节奏速度",
+   "title": "回弹节奏",
+   "titleEn": "Boomerang Tempo",
+   "summary": "节奏速度 · 回弹节奏，离开后以相同节奏返回",
+   "prompt": "回弹节奏，离开后以相同节奏返回",
+   "promptEn": "boomerang tempo, move out and return with matching rhythm"
+  },
+  {
+   "id": "t8-03-3d3944b4f9f0",
+   "group": "节奏速度",
+   "title": "停顿拍",
+   "titleEn": "Pause Beat",
+   "summary": "节奏速度 · 在下一段运动前插入清晰停顿拍",
+   "prompt": "在下一段运动前插入清晰停顿拍",
+   "promptEn": "insert a clear pause beat before the next motion"
+  },
+  {
+   "id": "t8-03-c442d42ba0e5",
+   "group": "节奏速度",
+   "title": "揭示拍",
+   "titleEn": "Reveal Beat",
+   "summary": "节奏速度 · 将主揭示落在强视觉拍点上",
+   "prompt": "将主揭示落在强视觉拍点上",
+   "promptEn": "time the main reveal to a strong visual beat"
+  },
+  {
+   "id": "t8-03-7f1f41902c48",
+   "group": "节奏速度",
+   "title": "张力递增",
+   "titleEn": "Tension Rise",
+   "summary": "节奏速度 · 通过可控节奏持续提升张力",
+   "prompt": "通过可控节奏持续提升张力",
+   "promptEn": "steadily rising tension through controlled pacing"
+  },
+  {
+   "id": "t8-03-8d2944206740",
+   "group": "节奏速度",
+   "title": "平静落定",
+   "titleEn": "Calm Settle",
+   "summary": "节奏速度 · 平静落定节奏，温柔到达最终画面",
+   "prompt": "平静落定节奏，温柔到达最终画面",
+   "promptEn": "calm settling tempo, gently arrive at the final frame"
+  },
+  {
+   "id": "t8-03-779807f1d639",
+   "group": "节奏速度",
+   "title": "动作涌动",
+   "titleEn": "Action Surge",
+   "summary": "节奏速度 · 动作涌动节奏，突然向前但保持可读",
+   "prompt": "动作涌动节奏，突然向前但保持可读",
+   "promptEn": "surging action tempo, sudden forward energy with readability"
+  },
+  {
+   "id": "t8-03-5089a4afd2a5",
+   "group": "节奏速度",
+   "title": "定格启动",
+   "titleEn": "Freeze To Move",
+   "summary": "节奏速度 · 从定格瞬间开始，再缓慢进入运动",
+   "prompt": "从定格瞬间开始，再缓慢进入运动",
+   "promptEn": "start from a frozen moment, then ease into motion"
+  },
+  {
+   "id": "t8-03-9b8122628efe",
+   "group": "节奏速度",
+   "title": "漂移停住",
+   "titleEn": "Drift Stop",
+   "summary": "节奏速度 · 轻轻漂移，然后干净停在主体上",
+   "prompt": "轻轻漂移，然后干净停在主体上",
+   "promptEn": "drift gently, then stop cleanly on the subject"
+  },
+  {
+   "id": "t8-03-d4a5b5de8151",
+   "group": "节奏速度",
+   "title": "脉冲变焦",
+   "titleEn": "Pulse Zoom",
+   "summary": "节奏速度 · 脉冲变焦节奏，重复小幅焦点强调",
+   "prompt": "脉冲变焦节奏，重复小幅焦点强调",
+   "promptEn": "pulsing zoom tempo, small repeated focal emphasis"
+  },
+  {
+   "id": "t8-03-3d415bcc0688",
+   "group": "节奏速度",
+   "title": "丝滑",
+   "titleEn": "Silky",
+   "summary": "节奏速度 · 丝滑节奏，超平滑运动和柔和加速度",
+   "prompt": "丝滑节奏，超平滑运动和柔和加速度",
+   "promptEn": "silky tempo, ultra-smooth motion with soft acceleration"
+  },
+  {
+   "id": "t8-03-65953b2af2bc",
+   "group": "节奏速度",
+   "title": "粗粝能量",
+   "titleEn": "Rough Energy",
+   "summary": "节奏速度 · 粗粝能量节奏，原始运动带明确力量",
+   "prompt": "粗粝能量节奏，原始运动带明确力量",
+   "promptEn": "rough energetic tempo, raw movement with intentional force"
+  },
+  {
+   "id": "t8-03-75d5102e9a7c",
+   "group": "节奏速度",
+   "title": "精准",
+   "titleEn": "Precise",
+   "summary": "节奏速度 · 精准节奏，时间点准确且运动控制干净",
+   "prompt": "精准节奏，时间点准确且运动控制干净",
+   "promptEn": "precise tempo, exact timing and clean motion control"
+  },
+  {
+   "id": "t8-03-d350ed175fdf",
+   "group": "节奏速度",
+   "title": "可控混乱",
+   "titleEn": "Controlled Chaos",
+   "summary": "节奏速度 · 可控混乱节奏，强烈运动但保持可读",
+   "prompt": "可控混乱节奏，强烈运动但保持可读",
+   "promptEn": "controlled chaotic tempo, intense movement that remains readable"
+  },
+  {
+   "id": "t8-03-3bb00c72f033",
+   "group": "稳定质感",
+   "title": "稳定器",
+   "titleEn": "Stabilizer",
+   "summary": "稳定质感 · 稳定器般平滑运镜",
+   "prompt": "稳定器般平滑运镜",
+   "promptEn": "smooth gimbal-stabilized camera movement"
+  },
+  {
+   "id": "t8-03-91fecdb3fed9",
+   "group": "稳定质感",
+   "title": "轻手持",
+   "titleEn": "Subtle Handheld",
+   "summary": "稳定质感 · 轻微手持感，自然且可控",
+   "prompt": "轻微手持感，自然且可控",
+   "promptEn": "subtle handheld motion, organic and controlled"
+  },
+  {
+   "id": "t8-03-74669217f40f",
+   "group": "稳定质感",
+   "title": "强手持",
+   "titleEn": "Strong Handheld",
+   "summary": "稳定质感 · 强手持运动，有意图的抖动感",
+   "prompt": "强手持运动，有意图的抖动感",
+   "promptEn": "energetic handheld motion with intentional shake"
+  },
+  {
+   "id": "t8-03-dc9f8ab23bef",
+   "group": "稳定质感",
+   "title": "无人机",
+   "titleEn": "Drone",
+   "summary": "稳定质感 · 无人机般稳定的空中运动",
+   "prompt": "无人机般稳定的空中运动",
+   "promptEn": "drone-like stabilized aerial motion"
+  },
+  {
+   "id": "t8-03-d4eb99638132",
+   "group": "稳定质感",
+   "title": "摇臂",
+   "titleEn": "Crane",
+   "summary": "稳定质感 · 摇臂式运镜，优雅纵向扫动",
+   "prompt": "摇臂式运镜，优雅纵向扫动",
+   "promptEn": "crane-style camera move with elegant vertical sweep"
+  },
+  {
+   "id": "t8-03-cdb3b40c86d6",
+   "group": "稳定质感",
+   "title": "长焦压缩",
+   "titleEn": "Telephoto",
+   "summary": "稳定质感 · 长焦压缩空间，背景分离平滑",
+   "prompt": "长焦压缩空间，背景分离平滑",
+   "promptEn": "telephoto compression, smooth background separation"
+  },
+  {
+   "id": "t8-03-22b58dfff9e9",
+   "group": "稳定质感",
+   "title": "广角空间",
+   "titleEn": "Wide Angle",
+   "summary": "稳定质感 · 广角空间运镜，纵深和尺度强",
+   "prompt": "广角空间运镜，纵深和尺度强",
+   "promptEn": "wide-angle spatial movement, strong depth and scale"
+  },
+  {
+   "id": "t8-03-7b175afb768b",
+   "group": "稳定质感",
+   "title": "无抖动",
+   "titleEn": "No Shake",
+   "summary": "稳定质感 · 无多余抖动，无跳动，保持运动干净",
+   "prompt": "无多余抖动，无跳动，保持运动干净",
+   "promptEn": "no unwanted shake, no jitter, keep motion clean"
+  },
+  {
+   "id": "t8-03-9fc105ce4d26",
+   "group": "稳定质感",
+   "title": "三脚架",
+   "titleEn": "Studio Tripod",
+   "summary": "稳定质感 · 棚拍三脚架稳定，完全锁定且构图严谨",
+   "prompt": "棚拍三脚架稳定，完全锁定且构图严谨",
+   "promptEn": "studio tripod stability, completely locked and composed"
+  },
+  {
+   "id": "t8-03-196f902386e8",
+   "group": "稳定质感",
+   "title": "独脚架",
+   "titleEn": "Monopod",
+   "summary": "稳定质感 · 独脚架稳定，轻便移动并保持垂直稳定",
+   "prompt": "独脚架稳定，轻便移动并保持垂直稳定",
+   "promptEn": "monopod stability, lightly mobile with vertical steadiness"
+  },
+  {
+   "id": "t8-03-ba435dde52b5",
+   "group": "稳定质感",
+   "title": "肩扛",
+   "titleEn": "Shoulder Rig",
+   "summary": "稳定质感 · 肩扛稳定，手持重量感明确且抖动可控",
+   "prompt": "肩扛稳定，手持重量感明确且抖动可控",
+   "promptEn": "shoulder-rig stability, grounded handheld weight with controlled shake"
+  },
+  {
+   "id": "t8-03-65bba684416c",
+   "group": "稳定质感",
+   "title": "车载",
+   "titleEn": "Car Mount",
+   "summary": "稳定质感 · 车载稳定，平滑移动并保留道路能量",
+   "prompt": "车载稳定，平滑移动并保留道路能量",
+   "promptEn": "car-mounted stability, smooth travel with road energy"
+  },
+  {
+   "id": "t8-03-8401443bbd1c",
+   "group": "稳定质感",
+   "title": "随身相机",
+   "titleEn": "Bodycam",
+   "summary": "稳定质感 · 随身相机稳定，贴近表演者的沉浸运动",
+   "prompt": "随身相机稳定，贴近表演者的沉浸运动",
+   "promptEn": "bodycam stability, immersive movement attached to the performer"
+  },
+  {
+   "id": "t8-03-e04b64d7c6fb",
+   "group": "稳定质感",
+   "title": "FPV 无人机",
+   "titleEn": "Fpv Drone",
+   "summary": "稳定质感 · FPV 无人机稳定，快速灵活飞行并可控倾斜",
+   "prompt": "FPV 无人机稳定，快速灵活飞行并可控倾斜",
+   "promptEn": "FPV drone stability, fast agile flight with controlled banking"
+  },
+  {
+   "id": "t8-03-bba969bd0ec1",
+   "group": "稳定质感",
+   "title": "索道机位",
+   "titleEn": "Cable Cam",
+   "summary": "稳定质感 · 索道机位稳定，悬挂式平滑跨越距离",
+   "prompt": "索道机位稳定，悬挂式平滑跨越距离",
+   "promptEn": "cable-cam stability, suspended smooth travel across distance"
+  },
+  {
+   "id": "t8-03-65e625d4ae08",
+   "group": "稳定质感",
+   "title": "机械控轨",
+   "titleEn": "Motion Control",
+   "summary": "稳定质感 · 机械控轨稳定，可重复且路径精准",
+   "prompt": "机械控轨稳定，可重复且路径精准",
+   "promptEn": "motion-control rig stability, repeatable precise camera path"
+  },
+  {
+   "id": "t8-03-5ac8dcc92e23",
+   "group": "稳定质感",
+   "title": "机械臂",
+   "titleEn": "Robotic Arm",
+   "summary": "稳定质感 · 机械臂稳定，机器控制下的精准曲线运动",
+   "prompt": "机械臂稳定，机器控制下的精准曲线运动",
+   "promptEn": "robotic arm stability, precise curved motion with machine control"
+  },
+  {
+   "id": "t8-03-8ba9c726fa5e",
+   "group": "稳定质感",
+   "title": "轨道车",
+   "titleEn": "Dolly Track",
+   "summary": "稳定质感 · 轨道车稳定，厚重顺滑的电影移动",
+   "prompt": "轨道车稳定，厚重顺滑的电影移动",
+   "promptEn": "dolly track stability, heavy smooth cinematic travel"
+  },
+  {
+   "id": "t8-03-7ff8f792923c",
+   "group": "稳定质感",
+   "title": "纪录手持",
+   "titleEn": "Doc Handheld",
+   "summary": "稳定质感 · 纪录手持稳定，自然观察式抖动",
+   "prompt": "纪录手持稳定，自然观察式抖动",
+   "promptEn": "documentary handheld stability, natural observational shake"
+  },
+  {
+   "id": "t8-03-7ba041893497",
+   "group": "稳定质感",
+   "title": "混乱手持",
+   "titleEn": "Chaos Handheld",
+   "summary": "稳定质感 · 混乱手持稳定，抖动强烈但主体仍可读",
+   "prompt": "混乱手持稳定，抖动强烈但主体仍可读",
+   "promptEn": "chaotic handheld stability, intense shake but subject remains readable"
+  },
+  {
+   "id": "t8-03-72af23d08f0c",
+   "group": "稳定质感",
+   "title": "水下",
+   "titleEn": "Underwater",
+   "summary": "稳定质感 · 水下稳定，缓慢浮力运动和柔和阻力",
+   "prompt": "水下稳定，缓慢浮力运动和柔和阻力",
+   "promptEn": "underwater stability, slow buoyant motion and softened resistance"
+  },
+  {
+   "id": "t8-03-c691d6012515",
+   "group": "稳定质感",
+   "title": "水中漂浮",
+   "titleEn": "Underwater Float",
+   "summary": "稳定质感 · 水中漂浮稳定，悬浮而宁静的运动",
+   "prompt": "水中漂浮稳定，悬浮而宁静的运动",
+   "promptEn": "floating underwater stability, suspended calm movement"
+  },
+  {
+   "id": "t8-03-4ef2a1bdaefd",
+   "group": "稳定质感",
+   "title": "漂浮摇臂",
+   "titleEn": "Floating Crane",
+   "summary": "稳定质感 · 漂浮摇臂稳定，优雅高位移动且无硬停顿",
+   "prompt": "漂浮摇臂稳定，优雅高位移动且无硬停顿",
+   "promptEn": "floating crane stability, elegant elevated movement without harsh stops"
+  },
+  {
+   "id": "t8-03-3b5158de02f7",
+   "group": "稳定质感",
+   "title": "稳定航拍",
+   "titleEn": "Drone Stable",
+   "summary": "稳定质感 · 高度稳定航拍，地平线干净且飞行可控",
+   "prompt": "高度稳定航拍，地平线干净且飞行可控",
+   "promptEn": "highly stabilized drone motion, clean horizon and controlled flight"
+  },
+  {
+   "id": "t8-03-01e24c58f8fe",
+   "group": "稳定质感",
+   "title": "微抖动",
+   "titleEn": "Micro Jitter",
+   "summary": "稳定质感 · 细小微抖增加真实感，但不干扰画面",
+   "prompt": "细小微抖增加真实感，但不干扰画面",
+   "promptEn": "tiny micro-jitter for realism, without distracting shake"
+  },
+  {
+   "id": "t8-03-89e217d643a5",
+   "group": "稳定质感",
+   "title": "冲击抖动",
+   "titleEn": "Impact Shake",
+   "summary": "稳定质感 · 有意冲击抖动，只在关键拍点短促震动",
+   "prompt": "有意冲击抖动，只在关键拍点短促震动",
+   "promptEn": "intentional impact shake, brief forceful vibration only on key beats"
+  },
+  {
+   "id": "t8-03-abdc6e9ebe2e",
+   "group": "稳定质感",
+   "title": "无震动",
+   "titleEn": "Vibration Free",
+   "summary": "稳定质感 · 无震动运动，去除机械晃动和跳动",
+   "prompt": "无震动运动，去除机械晃动和跳动",
+   "promptEn": "vibration-free movement, remove mechanical wobble and jitter"
+  },
+  {
+   "id": "t8-03-fc5e05d2c1c9",
+   "group": "稳定质感",
+   "title": "无果冻",
+   "titleEn": "No Rolling Shutter",
+   "summary": "稳定质感 · 避免果冻效应，保持竖线稳定",
+   "prompt": "避免果冻效应，保持竖线稳定",
+   "promptEn": "avoid rolling-shutter wobble, keep vertical lines stable"
+  },
+  {
+   "id": "t8-03-ce4cb917865d",
+   "group": "稳定质感",
+   "title": "低机位架",
+   "titleEn": "Low Rig",
+   "summary": "稳定质感 · 低机位架稳定，贴近地面的稳定移动",
+   "prompt": "低机位架稳定，贴近地面的稳定移动",
+   "promptEn": "low-rig stability, steady movement close to the ground"
+  },
+  {
+   "id": "t8-03-a2346bba9cd4",
+   "group": "稳定质感",
+   "title": "高机位架",
+   "titleEn": "High Rig",
+   "summary": "稳定质感 · 高机位架稳定，在主体上方稳定移动",
+   "prompt": "高机位架稳定，在主体上方稳定移动",
+   "promptEn": "high-rig stability, steady movement above the subject"
+  },
+  {
+   "id": "t8-03-02b5e3a680d5",
+   "group": "稳定质感",
+   "title": "微距轨道",
+   "titleEn": "Macro Rail",
+   "summary": "稳定质感 · 微距轨道稳定，用精准小运动呈现近距离细节",
+   "prompt": "微距轨道稳定，用精准小运动呈现近距离细节",
+   "promptEn": "macro rail stability, precise tiny movement for close details"
+  },
+  {
+   "id": "t8-03-84a49f35706b",
+   "group": "稳定质感",
+   "title": "转台",
+   "titleEn": "Turntable",
+   "summary": "稳定质感 · 转台稳定，主体旋转而构图保持干净",
+   "prompt": "转台稳定，主体旋转而构图保持干净",
+   "promptEn": "turntable stability, subject rotates while framing stays clean"
+  },
+  {
+   "id": "t8-03-a1cc635e4df8",
+   "group": "稳定质感",
+   "title": "虚拟摄影机",
+   "titleEn": "Virtual Camera",
+   "summary": "稳定质感 · 虚拟摄影机稳定，干净非现实路径且无物理抖动",
+   "prompt": "虚拟摄影机稳定，干净非现实路径且无物理抖动",
+   "promptEn": "virtual camera stability, clean impossible movement with no physical shake"
+  },
+  {
+   "id": "t8-03-c1d2fececb6c",
+   "group": "稳定质感",
+   "title": "游戏镜头",
+   "titleEn": "Game Camera",
+   "summary": "稳定质感 · 游戏镜头稳定，响应灵敏但第三人称可读",
+   "prompt": "游戏镜头稳定，响应灵敏但第三人称可读",
+   "promptEn": "game camera stability, responsive but readable third-person motion"
+  },
+  {
+   "id": "t8-03-423ec3096db7",
+   "group": "稳定质感",
+   "title": "监控镜头",
+   "titleEn": "Security Cam",
+   "summary": "稳定质感 · 监控镜头稳定，固定观察式构图",
+   "prompt": "监控镜头稳定，固定观察式构图",
+   "promptEn": "security camera stability, fixed observational framing"
+  },
+  {
+   "id": "t8-03-9a84a7da20b2",
+   "group": "稳定质感",
+   "title": "新闻镜头",
+   "titleEn": "News Camera",
+   "summary": "稳定质感 · 新闻镜头稳定，实用直播式稳定感",
+   "prompt": "新闻镜头稳定，实用直播式稳定感",
+   "promptEn": "news camera stability, practical live-broadcast steadiness"
+  },
+  {
+   "id": "t8-03-720de61ecceb",
+   "group": "稳定质感",
+   "title": "电影套件",
+   "titleEn": "Cinema Rig",
+   "summary": "稳定质感 · 电影套件稳定，专业支撑带来精致运动",
+   "prompt": "电影套件稳定，专业支撑带来精致运动",
+   "promptEn": "cinema rig stability, polished professional camera support"
+  },
+  {
+   "id": "t8-03-55a7a72413a1",
+   "group": "稳定质感",
+   "title": "车辆支架",
+   "titleEn": "Vehicle Rig",
+   "summary": "稳定质感 · 车辆支架稳定，附着式移动并控制路面震动",
+   "prompt": "车辆支架稳定，附着式移动并控制路面震动",
+   "promptEn": "vehicle rig stability, attached movement with controlled road vibration"
+  },
+  {
+   "id": "t8-03-b6ce18c41558",
+   "group": "稳定质感",
+   "title": "骑行支架",
+   "titleEn": "Bike Rig",
+   "summary": "稳定质感 · 骑行支架稳定，户外移动并带轻微震动",
+   "prompt": "骑行支架稳定，户外移动并带轻微震动",
+   "promptEn": "bike rig stability, mobile outdoor movement with gentle vibration"
+  },
+  {
+   "id": "t8-03-a3ce71516134",
+   "group": "稳定质感",
+   "title": "高速支架",
+   "titleEn": "Speed Rig",
+   "summary": "稳定质感 · 高速支架稳定，快速移动并稳固跟踪主体",
+   "prompt": "高速支架稳定，快速移动并稳固跟踪主体",
+   "promptEn": "speed rig stability, fast movement with firm subject tracking"
+  },
+  {
+   "id": "t8-03-295dee35f203",
+   "group": "稳定质感",
+   "title": "慢滑轨",
+   "titleEn": "Slow Slider",
+   "summary": "稳定质感 · 慢滑轨稳定，超顺滑慢速横移",
+   "prompt": "慢滑轨稳定，超顺滑慢速横移",
+   "promptEn": "slow slider stability, ultra-smooth slow lateral motion"
+  },
+  {
+   "id": "t8-03-76b5c64983f5",
+   "group": "稳定质感",
+   "title": "重机身",
+   "titleEn": "Heavy Camera",
+   "summary": "稳定质感 · 重机身稳定，带电影惯性的厚重移动",
+   "prompt": "重机身稳定，带电影惯性的厚重移动",
+   "promptEn": "heavy camera stability, weighted movement with cinematic inertia"
+  },
+  {
+   "id": "t8-03-39314dc519d2",
+   "group": "稳定质感",
+   "title": "轻机身",
+   "titleEn": "Light Camera",
+   "summary": "稳定质感 · 轻机身稳定，灵活响应且可控",
+   "prompt": "轻机身稳定，灵活响应且可控",
+   "promptEn": "light camera stability, agile motion with controlled responsiveness"
+  },
+  {
+   "id": "t8-03-95aca7aec427",
+   "group": "稳定质感",
+   "title": "稳长焦",
+   "titleEn": "Stable Telephoto",
+   "summary": "稳定质感 · 稳定长焦运动，压缩空间且无跳动",
+   "prompt": "稳定长焦运动，压缩空间且无跳动",
+   "promptEn": "stabilized telephoto movement, compressed depth without jitter"
+  },
+  {
+   "id": "t8-03-1e37fa21094c",
+   "group": "稳定质感",
+   "title": "稳广角",
+   "titleEn": "Stable Wide",
+   "summary": "稳定质感 · 稳定广角运动，强纵深且地平线干净",
+   "prompt": "稳定广角运动，强纵深且地平线干净",
+   "promptEn": "stabilized wide-angle movement, strong depth with clean horizon"
+  },
+  {
+   "id": "t8-03-640a8da25382",
+   "group": "稳定质感",
+   "title": "锁地平线",
+   "titleEn": "Horizon Lock",
+   "summary": "稳定质感 · 锁定地平线稳定，运动中保持地平线水平",
+   "prompt": "锁定地平线稳定，运动中保持地平线水平",
+   "promptEn": "horizon-locked stability, keep the horizon level through motion"
+  },
+  {
+   "id": "t8-03-cc5f12d4ef21",
+   "group": "稳定质感",
+   "title": "锁主体",
+   "titleEn": "Subject Lock",
+   "summary": "稳定质感 · 锁定主体稳定，移动中保持目标固定在画面里",
+   "prompt": "锁定主体稳定，移动中保持目标固定在画面里",
+   "promptEn": "subject-locked stability, keep the target fixed in frame during motion"
+  },
+  {
+   "id": "t8-03-190ee6ece1b4",
+   "group": "主体约束",
+   "title": "主体居中",
+   "titleEn": "Centered",
+   "summary": "主体约束 · 保持主体居中",
+   "prompt": "保持主体居中",
+   "promptEn": "keep the subject centered in frame"
+  },
+  {
+   "id": "t8-03-631c3b0af033",
+   "group": "主体约束",
+   "title": "脸部清晰",
+   "titleEn": "Face Clear",
+   "summary": "主体约束 · 保持脸部清晰可读",
+   "prompt": "保持脸部清晰可读",
+   "promptEn": "keep the face clear and readable"
+  },
+  {
+   "id": "t8-03-c8543a7ec00d",
+   "group": "主体约束",
+   "title": "跟随人物",
+   "titleEn": "Follow Person",
+   "summary": "主体约束 · 自然跟随人物，不丢失构图",
+   "prompt": "自然跟随人物，不丢失构图",
+   "promptEn": "follow the person naturally without losing framing"
+  },
+  {
+   "id": "t8-03-caae64328499",
+   "group": "主体约束",
+   "title": "围绕主体",
+   "titleEn": "Surround Subject",
+   "summary": "主体约束 · 围绕主体移动并保持焦点",
+   "prompt": "围绕主体移动并保持焦点",
+   "promptEn": "move around the subject while maintaining focus"
+  },
+  {
+   "id": "t8-03-5cb22180f405",
+   "group": "主体约束",
+   "title": "揭示背景",
+   "titleEn": "Reveal Background",
+   "summary": "主体约束 · 揭示背景，同时保持主体重要性",
+   "prompt": "揭示背景，同时保持主体重要性",
+   "promptEn": "reveal the background while keeping the subject important"
+  },
+  {
+   "id": "t8-03-f01a8d59dee4",
+   "group": "主体约束",
+   "title": "强调细节",
+   "titleEn": "Detail Emphasis",
+   "summary": "主体约束 · 用可控运动强调关键细节",
+   "prompt": "用可控运动强调关键细节",
+   "promptEn": "emphasize key details with controlled motion"
+  },
+  {
+   "id": "t8-03-ea60e5eb2ed5",
+   "group": "主体约束",
+   "title": "构图稳定",
+   "titleEn": "Stable Framing",
+   "summary": "主体约束 · 保持构图稳定平衡",
+   "prompt": "保持构图稳定平衡",
+   "promptEn": "keep composition stable and balanced"
+  },
+  {
+   "id": "t8-03-627cbd509f5d",
+   "group": "主体约束",
+   "title": "不切镜",
+   "titleEn": "No Cuts",
+   "summary": "主体约束 · 避免切镜，保持连续运镜",
+   "prompt": "避免切镜，保持连续运镜",
+   "promptEn": "avoid cuts, keep one continuous camera move"
+  },
+  {
+   "id": "t8-03-13ade1f6ebb8",
+   "group": "主体约束",
+   "title": "不变形",
+   "titleEn": "No Warp",
+   "summary": "主体约束 · 避免主体变形、融化或漂移",
+   "prompt": "避免主体变形、融化或漂移",
+   "promptEn": "avoid warping, melting, or drifting subject geometry"
+  },
+  {
+   "id": "t8-03-c146aadc29ea",
+   "group": "主体约束",
+   "title": "眼睛清晰",
+   "titleEn": "Eyes Sharp",
+   "summary": "主体约束 · 运动中保持眼睛清晰且有表现力",
+   "prompt": "运动中保持眼睛清晰且有表现力",
+   "promptEn": "keep the eyes sharp and expressive throughout the movement"
+  },
+  {
+   "id": "t8-03-c0335d27788a",
+   "group": "主体约束",
+   "title": "手部可见",
+   "titleEn": "Hands Visible",
+   "summary": "主体约束 · 手部重要时保持可见且自然",
+   "prompt": "手部重要时保持可见且自然",
+   "promptEn": "keep the hands visible and natural when they are important"
+  },
+  {
+   "id": "t8-03-be95db88abf3",
+   "group": "主体约束",
+   "title": "标签清楚",
+   "titleEn": "Product Label",
+   "summary": "主体约束 · 保持产品标签清楚可读",
+   "prompt": "保持产品标签清楚可读",
+   "promptEn": "keep product labels clear and readable"
+  },
+  {
+   "id": "t8-03-08ead070c150",
+   "group": "主体约束",
+   "title": "Logo 可读",
+   "titleEn": "Logo Readable",
+   "summary": "主体约束 · 保持 Logo 可读且不变形",
+   "prompt": "保持 Logo 可读且不变形",
+   "promptEn": "keep logos readable without distortion"
+  },
+  {
+   "id": "t8-03-fe71c5f0e090",
+   "group": "主体约束",
+   "title": "服装一致",
+   "titleEn": "Outfit Consistent",
+   "summary": "主体约束 · 运镜中保持服装和造型一致",
+   "prompt": "运镜中保持服装和造型一致",
+   "promptEn": "keep clothing and styling consistent through the camera move"
+  },
+  {
+   "id": "t8-03-983c87dab456",
+   "group": "主体约束",
+   "title": "全身完整",
+   "titleEn": "Full Body Visible",
+   "summary": "主体约束 · 保持全身完整，不截断关键肢体",
+   "prompt": "保持全身完整，不截断关键肢体",
+   "promptEn": "keep the full body visible without cutting off key limbs"
+  },
+  {
+   "id": "t8-03-a5e8be82524c",
+   "group": "主体约束",
+   "title": "轮廓清晰",
+   "titleEn": "Silhouette Clear",
+   "summary": "主体约束 · 保持主体轮廓与背景分离清晰",
+   "prompt": "保持主体轮廓与背景分离清晰",
+   "promptEn": "keep the subject silhouette clear against the background"
+  },
+  {
+   "id": "t8-03-7ee1bb3b7952",
+   "group": "主体约束",
+   "title": "脸不变形",
+   "titleEn": "No Face Distort",
+   "summary": "主体约束 · 避免运动和透视变化导致脸部变形",
+   "prompt": "避免运动和透视变化导致脸部变形",
+   "promptEn": "avoid face distortion during motion and perspective changes"
+  },
+  {
+   "id": "t8-03-33577eefb390",
+   "group": "主体约束",
+   "title": "发丝稳定",
+   "titleEn": "Hair Stable",
+   "summary": "主体约束 · 保持发丝结构稳定，只保留自然运动",
+   "prompt": "保持发丝结构稳定，只保留自然运动",
+   "promptEn": "keep hair structure stable with natural motion only"
+  },
+  {
+   "id": "t8-03-7476e9d952ba",
+   "group": "主体约束",
+   "title": "背景视差",
+   "titleEn": "Background Parallax",
+   "summary": "主体约束 · 使用背景视差，同时保持主体占优",
+   "prompt": "使用背景视差，同时保持主体占优",
+   "promptEn": "use background parallax while keeping the subject dominant"
+  },
+  {
+   "id": "t8-03-7bbfe5b56d39",
+   "group": "主体约束",
+   "title": "前景层次",
+   "titleEn": "Foreground Depth",
+   "summary": "主体约束 · 加入前景层次但不遮挡主体",
+   "prompt": "加入前景层次但不遮挡主体",
+   "promptEn": "include foreground depth without blocking the subject"
+  },
+  {
+   "id": "t8-03-cf68a5da761c",
+   "group": "主体约束",
+   "title": "眼神交流",
+   "titleEn": "Eye Contact",
+   "summary": "主体约束 · 合适时保持与观众的眼神交流",
+   "prompt": "合适时保持与观众的眼神交流",
+   "promptEn": "keep eye contact with the viewer when appropriate"
+  },
+  {
+   "id": "t8-03-15af190dd5ae",
+   "group": "主体约束",
+   "title": "侧脸可读",
+   "titleEn": "Profile Readable",
+   "summary": "主体约束 · 侧角度运动中保持侧脸可读",
+   "prompt": "侧角度运动中保持侧脸可读",
+   "promptEn": "keep the profile readable in side-angle movement"
+  },
+  {
+   "id": "t8-03-d4ee561ba0da",
+   "group": "主体约束",
+   "title": "手不变形",
+   "titleEn": "Hands No Warp",
+   "summary": "主体约束 · 避免手指扭曲或手型不自然",
+   "prompt": "避免手指扭曲或手型不自然",
+   "promptEn": "avoid warped fingers or unnatural hand shapes"
+  },
+  {
+   "id": "t8-03-d648f06a916f",
+   "group": "主体约束",
+   "title": "道具可见",
+   "titleEn": "Prop Visible",
+   "summary": "主体约束 · 保持重要道具可见且稳定",
+   "prompt": "保持重要道具可见且稳定",
+   "promptEn": "keep important props visible and stable"
+  },
+  {
+   "id": "t8-03-3d5e09b29d5a",
+   "group": "主体约束",
+   "title": "道具稳定",
+   "titleEn": "Prop Stable",
+   "summary": "主体约束 · 避免道具漂移、融化或身份变化",
+   "prompt": "避免道具漂移、融化或身份变化",
+   "promptEn": "avoid prop drift, melting, or identity changes"
+  },
+  {
+   "id": "t8-03-2cb00ced140e",
+   "group": "主体约束",
+   "title": "文字可读",
+   "titleEn": "Text Readable",
+   "summary": "主体约束 · 运镜中保持画面文字可读",
+   "prompt": "运镜中保持画面文字可读",
+   "promptEn": "keep on-screen text readable during the camera move"
+  },
+  {
+   "id": "t8-03-67c7a3ce7677",
+   "group": "主体约束",
+   "title": "嘴型自然",
+   "titleEn": "Mouth Natural",
+   "summary": "主体约束 · 保持嘴型自然，避免面部瑕疵",
+   "prompt": "保持嘴型自然，避免面部瑕疵",
+   "promptEn": "keep mouth shape natural and avoid facial artifacts"
+  },
+  {
+   "id": "t8-03-f99af0964393",
+   "group": "主体约束",
+   "title": "无多肢",
+   "titleEn": "No Extra Limbs",
+   "summary": "主体约束 · 避免多余肢体、重复手部或身体瑕疵",
+   "prompt": "避免多余肢体、重复手部或身体瑕疵",
+   "promptEn": "avoid extra limbs, duplicated hands, or body artifacts"
+  },
+  {
+   "id": "t8-03-461617c5ca45",
+   "group": "主体约束",
+   "title": "群像间距",
+   "titleEn": "Group Spacing",
+   "summary": "主体约束 · 多人画面中保持清晰间距",
+   "prompt": "多人画面中保持清晰间距",
+   "promptEn": "maintain clear spacing between multiple people"
+  },
+  {
+   "id": "t8-03-3e1dd551802a",
+   "group": "主体约束",
+   "title": "多主体清楚",
+   "titleEn": "Multi Subjects",
+   "summary": "主体约束 · 保持多个主体清楚且画面平衡",
+   "prompt": "保持多个主体清楚且画面平衡",
+   "promptEn": "keep multiple subjects readable and balanced in frame"
+  },
+  {
+   "id": "t8-03-eb05ff2c230b",
+   "group": "主体约束",
+   "title": "物体居中",
+   "titleEn": "Object Centered",
+   "summary": "主体约束 · 保持主物体居中且稳定",
+   "prompt": "保持主物体居中且稳定",
+   "promptEn": "keep the main object centered and stable"
+  },
+  {
+   "id": "t8-03-4c3e4f008036",
+   "group": "主体约束",
+   "title": "动作清楚",
+   "titleEn": "Action Clear",
+   "summary": "主体约束 · 保持动作清楚，不要过度模糊",
+   "prompt": "保持动作清楚，不要过度模糊",
+   "promptEn": "keep the action readable without excessive blur"
+  },
+  {
+   "id": "t8-03-6b7ac0e61bb7",
+   "group": "主体约束",
+   "title": "手势清楚",
+   "titleEn": "Gesture Clear",
+   "summary": "主体约束 · 保持手势清楚易懂",
+   "prompt": "保持手势清楚易懂",
+   "promptEn": "keep gestures clear and easy to understand"
+  },
+  {
+   "id": "t8-03-6fa530a3f73a",
+   "group": "主体约束",
+   "title": "反射一致",
+   "titleEn": "Reflection Consistent",
+   "summary": "主体约束 · 保持反射与主体运动一致",
+   "prompt": "保持反射与主体运动一致",
+   "promptEn": "keep reflections consistent with subject motion"
+  },
+  {
+   "id": "t8-03-315fcdc646bd",
+   "group": "主体约束",
+   "title": "阴影一致",
+   "titleEn": "Shadow Consistent",
+   "summary": "主体约束 · 保持阴影与运动和光照一致",
+   "prompt": "保持阴影与运动和光照一致",
+   "promptEn": "keep shadows consistent with motion and lighting"
+  },
+  {
+   "id": "t8-03-8d797b1ec944",
+   "group": "主体约束",
+   "title": "比例稳定",
+   "titleEn": "Scale Consistent",
+   "summary": "主体约束 · 除非镜头主动变距，否则保持主体比例稳定",
+   "prompt": "除非镜头主动变距，否则保持主体比例稳定",
+   "promptEn": "keep subject scale consistent unless the camera intentionally changes distance"
+  },
+  {
+   "id": "t8-03-1a7584543745",
+   "group": "主体约束",
+   "title": "地平稳定",
+   "titleEn": "Horizon Stable",
+   "summary": "主体约束 · 保持地平线稳定，避免不必要倾斜",
+   "prompt": "保持地平线稳定，避免不必要倾斜",
+   "promptEn": "keep the horizon stable and avoid unwanted tilt"
+  },
+  {
+   "id": "t8-03-750d97a67cd5",
+   "group": "主体约束",
+   "title": "头顶留白",
+   "titleEn": "Headroom Balanced",
+   "summary": "主体约束 · 保持主体头顶留白平衡",
+   "prompt": "保持主体头顶留白平衡",
+   "promptEn": "keep balanced headroom above the subject"
+  },
+  {
+   "id": "t8-03-19e7e6f6a595",
+   "group": "主体约束",
+   "title": "脸部特写",
+   "titleEn": "Face Closeup",
+   "summary": "主体约束 · 近景构图中保护脸部细节",
+   "prompt": "近景构图中保护脸部细节",
+   "promptEn": "protect facial detail in close-up framing"
+  },
+  {
+   "id": "t8-03-15591f717731",
+   "group": "主体约束",
+   "title": "环境完整",
+   "titleEn": "Wide Context",
+   "summary": "主体约束 · 保留足够环境信息以理解场景",
+   "prompt": "保留足够环境信息以理解场景",
+   "promptEn": "keep enough environment visible to understand the scene"
+  },
+  {
+   "id": "t8-03-a629926ec807",
+   "group": "主体约束",
+   "title": "保护细节",
+   "titleEn": "Detail Protection",
+   "summary": "主体约束 · 保护重要小细节，避免模糊或变形",
+   "prompt": "保护重要小细节，避免模糊或变形",
+   "promptEn": "protect important small details from blur or deformation"
+  },
+  {
+   "id": "t8-03-7f4863cc0059",
+   "group": "主体约束",
+   "title": "面料细节",
+   "titleEn": "Fabric Detail",
+   "summary": "主体约束 · 运动中保持面料纹理和褶皱连贯",
+   "prompt": "运动中保持面料纹理和褶皱连贯",
+   "promptEn": "keep fabric texture and folds coherent during movement"
+  },
+  {
+   "id": "t8-03-1c2c7eb3a7c2",
+   "group": "主体约束",
+   "title": "饰品细节",
+   "titleEn": "Jewelry Detail",
+   "summary": "主体约束 · 保持饰品和小配件可见且稳定",
+   "prompt": "保持饰品和小配件可见且稳定",
+   "promptEn": "keep jewelry and small accessories visible and stable"
+  },
+  {
+   "id": "t8-03-fa663997b242",
+   "group": "主体约束",
+   "title": "车体稳定",
+   "titleEn": "Vehicle Shape",
+   "summary": "主体约束 · 运镜中保持车体形状和比例稳定",
+   "prompt": "运镜中保持车体形状和比例稳定",
+   "promptEn": "keep vehicle shape and proportions stable through motion"
+  },
+  {
+   "id": "t8-03-2f088a6a1dc9",
+   "group": "主体约束",
+   "title": "建筑线条",
+   "titleEn": "Architecture Lines",
+   "summary": "主体约束 · 保持建筑线条笔直且连贯",
+   "prompt": "保持建筑线条笔直且连贯",
+   "promptEn": "keep architectural lines straight and coherent"
+  },
+  {
+   "id": "t8-03-6f9834f361bd",
+   "group": "主体约束",
+   "title": "食物质感",
+   "titleEn": "Food Texture",
+   "summary": "主体约束 · 保持食物质感诱人且稳定",
+   "prompt": "保持食物质感诱人且稳定",
+   "promptEn": "keep food texture appetizing and stable"
+  },
+  {
+   "id": "t8-03-fe7b9331fdf1",
+   "group": "主体约束",
+   "title": "宠物表情",
+   "titleEn": "Pet Expression",
+   "summary": "主体约束 · 保持宠物表情清楚可爱",
+   "prompt": "保持宠物表情清楚可爱",
+   "promptEn": "keep pet expression clear and charming"
+  },
+  {
+   "id": "t8-03-9ee8ac226c1b",
+   "group": "主体约束",
+   "title": "色彩稳定",
+   "titleEn": "Color Consistent",
+   "summary": "主体约束 · 在光照和运动变化中保持主体色彩稳定",
+   "prompt": "在光照和运动变化中保持主体色彩稳定",
+   "promptEn": "keep subject color consistent through lighting and motion changes"
+  },
+  {
+   "id": "t8-03-a67a46a958d8",
+   "group": "主体约束",
+   "title": "无闪烁",
+   "titleEn": "No Flicker",
+   "summary": "主体约束 · 避免闪烁、身份漂移或细节不稳定",
+   "prompt": "避免闪烁、身份漂移或细节不稳定",
+   "promptEn": "avoid flicker, identity shifts, or unstable details"
+  }
+ ]
+}

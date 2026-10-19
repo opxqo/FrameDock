@@ -163,7 +163,7 @@ export default {
             "prop-turnaround": { title: "Prop turnaround", summary: "Front, side, back, 45° plus a detail close-up" },
             "prop-extract": { title: "Prop extraction", summary: "Take an item out of the image, complete hidden parts, show it alone" },
         },
-        errors: { needsMaster: "Connect a master image first", noInput: "Connect a reference image or write a description", needsImage: "This template needs a connected reference image first", noTemplate: "Pick a template on the node first" },
+        errors: { needsMaster: "Connect a master image first", noInput: "Connect a reference image or write a description", needsImage: "This template needs a connected reference image first", skillFailed: "Could not read the MOKE skill: {{error}}", noTemplate: "Pick a template on the node first" },
     },
     yfaiPanel: {
         open: "Manage in the YFAI panel →",
@@ -176,6 +176,18 @@ export default {
         tabs: { works: "Recent works", usage: "Ledger", logs: "Call log", adjustments: "Parameter receipts", models: "Models" },
         works: {
             description: "Tasks FrameDock ran on YFAI. Results are stored on this machine, so viewing them needs no network; YFAI keeps them only ~15 days, the local copies do not expire. A result missing locally is downloaded from YFAI again once.",
+        skillBadge: "Skill",
+        skillInput: "Input",
+        skillInputEmpty: "Connect character and scene images, or just write a description.",
+        textTier: "Writes a prompt",
+        textReferences: "References (characters, scene)",
+        textReferencesEmpty: "Connect character and scene images and the prompt will refer to them, or just write a description.",
+        textDefaultAsk: "Design an action scene from the connected character and scene images.",
+        placeholderText: "One line: who fights whom, where, and who has the upper hand (optional). Connected images decide the people and place.",
+        videoTier: "Generates video",
+        videoReferences: "Reference frame",
+        videoReferencesEmpty: "Connect a storyboard, master or scene image as the frame, or just write a description.",
+        placeholderVideo: "Describe the subject and setting (optional), e.g. a detective in a trench coat on a rainy street. A connected image is used as the frame.",
             restoring: "Downloading from YFAI…",
             fileGone: "Not stored locally, and YFAI no longer has it",
             empty: "No YFAI tasks yet",
@@ -582,6 +594,7 @@ export default {
         composer: { title: "Compose prompt", description: "Use @ to reference connected assets; references are renumbered before sending", placeholder: "Enter a prompt and use @ to reference connected images, text, or groups", imagePreview: "Referenced image preview", resources: { image: "Image {{index}}", video: "Video {{index}}", audio: "Audio {{index}}", text: "Text {{index}}", group: "Group {{index}}" } },
         controls: { ratio: "Ratio", duplicate: "Duplicate", delete: "Delete", images: "{{count}} images", texts: "{{count}} options", generations: "{{count}} runs", reasoning: "Reasoning" },
         generation: { interrupted: "Generation was interrupted by a page refresh. Generate again.", front: "front view", rotateRight: "rotated {{angle}} degrees right", rotateLeft: "rotated {{angle}} degrees left", level: "eye-level view", topDown: "{{angle}}-degree top-down view", lowAngle: "{{angle}}-degree low-angle view", angleLabel: "AI multi-angle: {{horizontal}}, {{pitch}}, camera distance {{distance}}, {{lens}} lens", anglePrompt: "Regenerate a new view of the same subject from the reference image. Preserve the subject, colors, materials, and visual style; do not merely apply perspective distortion. {{angle}}." },
+            kindPrompt: "Prompts", kindSkill: "Skills", kindEmpty: "No nodes on this page yet",
         agentOps: { add_node: "Add node", update_node: "Update node", delete_node: "Delete node", delete_connections: "Delete connections", connect_nodes: "Connect", set_viewport: "Adjust view", select_nodes: "Select nodes", run_generation: "Run generation" },
         pluginErrors: { invalidExport: "The plugin did not export a valid object", missingFields: "The plugin is missing id or nodes", downloadFailed: "Download failed (HTTP {{status}})", registryFailed: "Failed to load the official plugin registry (HTTP {{status}})" },
         shortcut: {
@@ -1057,3 +1070,4 @@ export default {
         enUS: "English",
     },
 };
+        presetBadge: "Skill node: built on MOKE skills",

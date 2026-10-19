@@ -1,0 +1,106 @@
+// FrameDock: 循环动作 video pack. MOKE AIGC prompt library, section 动画 › 循环 (docs/research/moke-previz.json, loop 1–8),
+// used verbatim except that MOKE's [Subject] placeholder is written [主体] like the other packs. The node generates a
+// video; MOKE plans 8-second loops, the duration itself is set in the video panel.
+
+import { GROUP_PREVIZ } from "@/lib/art-assets/groups";
+import type { ArtAssetPack } from "@/lib/art-assets/packs";
+import type { ArtAssetTemplate } from "@/lib/art-assets/templates";
+
+const TEMPLATES: ArtAssetTemplate[] = [
+    {
+        id: "moke-loop-idle-loop",
+        title: { zh: "待机循环", en: "Idle Loop" },
+        summary: { zh: "用呼吸、微移重与小动作表现持续存在，首尾状态需要连贯。", en: "Use breathing and subtle weight shifts to suggest presence with continuous loop endpoints." },
+        category: "loop",
+        tier: "master",
+        input: "either",
+        size: "16:9",
+        source: "moke",
+        prompt: "为 [主体] 制作8秒循环动画。8秒内完成一次呼吸与小幅移重，首尾位置、姿态、速度与服装状态相接。\n明确初始姿态、动作意图、主动作与恢复；以可读全身构图表现动作。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。首尾姿态、位置、运动速度与事件尾部应连续，生成后检查接点。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+    },
+    {
+        id: "moke-loop-walk-cycle",
+        title: { zh: "步行循环", en: "Walk Cycle" },
+        summary: { zh: "在原地或持续行进条件下重复完整步态周期，需明确是否含根位移。", en: "Repeat a full walking gait while specifying stationary motion or root travel." },
+        category: "loop",
+        tier: "master",
+        input: "either",
+        size: "16:9",
+        source: "moke",
+        prompt: "为 [主体] 制作8秒循环动画。原地循环，双脚交替完成完整步态，支撑点稳定，首尾步态相位一致。\n明确初始姿态、动作意图、主动作与恢复；以可读全身构图表现动作。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。首尾姿态、位置、运动速度与事件尾部应连续，生成后检查接点。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+    },
+    {
+        id: "moke-loop-run-cycle",
+        title: { zh: "跑步循环", en: "Run Cycle" },
+        summary: { zh: "重复蹬地与腾空节奏，周期连接要保留速度与身体起伏连续。", en: "Repeat push-off and flight with continuous speed and body motion across the cycle." },
+        category: "loop",
+        tier: "master",
+        input: "either",
+        size: "16:9",
+        source: "moke",
+        prompt: "为 [主体] 制作8秒循环动画。原地跑步，明确腾空阶段，髋肩与手臂对应，首尾垂直速度相接。\n明确初始姿态、动作意图、主动作与恢复；以可读全身构图表现动作。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。首尾姿态、位置、运动速度与事件尾部应连续，生成后检查接点。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+    },
+    {
+        id: "moke-loop-dance-loop",
+        title: { zh: "舞蹈循环", en: "Dance Loop" },
+        summary: { zh: "从一个可重复动作母题构造短句，不能只让末帧突然回到起点。", en: "Build a phrase from a repeatable movement motif rather than snapping the last frame back to the start." },
+        category: "loop",
+        tier: "master",
+        input: "either",
+        size: "16:9",
+        source: "moke",
+        prompt: "为 [主体] 制作8秒循环动画。选两组可接续舞步，最后一步自然衔接第一步，保留拍点和衣物惯性。\n明确初始姿态、动作意图、主动作与恢复；以可读全身构图表现动作。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。首尾姿态、位置、运动速度与事件尾部应连续，生成后检查接点。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+    },
+    {
+        id: "moke-loop-breathing-and-blink-loop",
+        title: { zh: "呼吸与眨眼循环", en: "Breathing and Blink Loop" },
+        summary: { zh: "细微生命感需要自然变化，避免机械同步或过度幅度。", en: "Subtle life motion needs natural variation without mechanical synchronization or exaggerated amplitude." },
+        category: "loop",
+        tier: "master",
+        input: "either",
+        size: "16:9",
+        source: "moke",
+        prompt: "为 [主体] 制作8秒循环动画。胸肩轻微起伏，眨眼不与呼吸完全同步，头发变化幅度有限，末段恢复状态。\n明确初始姿态、动作意图、主动作与恢复；以可读全身构图表现动作。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。首尾姿态、位置、运动速度与事件尾部应连续，生成后检查接点。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+    },
+    {
+        id: "moke-loop-mechanical-loop",
+        title: { zh: "机械运行循环", en: "Mechanical Loop" },
+        summary: { zh: "通过轮转、往复或传动关系展示稳定重复运行。", en: "Show repeatable mechanical operation through rotation, reciprocation or connected transmission." },
+        category: "loop",
+        tier: "master",
+        input: "either",
+        size: "16:9",
+        source: "moke",
+        prompt: "为 [主体] 制作8秒循环动画。明确齿轮或连杆关系，部件速度相互匹配，周期结束不跳位，结构不穿插。\n明确初始姿态、动作意图、主动作与恢复；以可读全身构图表现动作。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。首尾姿态、位置、运动速度与事件尾部应连续，生成后检查接点。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+    },
+    {
+        id: "moke-loop-environmental-motion-loop",
+        title: { zh: "环境微动循环", en: "Environmental Motion Loop" },
+        summary: { zh: "树叶、水面或布帘的持续变化提供环境生命感，主场景结构应固定。", en: "Continuous leaves, water or curtains add environmental life while the main scene remains stable." },
+        category: "loop",
+        tier: "master",
+        input: "either",
+        size: "16:9",
+        source: "moke",
+        prompt: "为 [主体] 制作8秒循环动画。固定镜头与地标，限定风向，叶片或布料轻摆，避免纹理漂移与全画面呼吸变形。\n明确初始姿态、动作意图、主动作与恢复；以可读全身构图表现动作。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。首尾姿态、位置、运动速度与事件尾部应连续，生成后检查接点。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+    },
+    {
+        id: "moke-loop-loop-seam-study",
+        title: { zh: "首尾衔接检验", en: "Loop Seam Study" },
+        summary: { zh: "通过明确的起止状态检查姿态、速度与光照能否连续衔接。", en: "Define start and end states to assess continuity of pose, velocity and lighting." },
+        category: "loop",
+        tier: "master",
+        input: "either",
+        size: "16:9",
+        source: "moke",
+        prompt: "为 [主体] 制作8秒循环动画。先列起止姿态与运动方向，再制作循环短片，重点检查脚部、道具和光照，不宣称生成后自动无缝。\n明确初始姿态、动作意图、主动作与恢复；以可读全身构图表现动作。角色、服装、地标、尺度、动作与光照连续；手脚、接触点和道具关系合理。首尾姿态、位置、运动速度与事件尾部应连续，生成后检查接点。所需参考未提供时先列待补输入，不编造对白、音频或准确时间码。",
+    },
+];
+
+export const LOOP_PACK: ArtAssetPack = {
+    category: "loop",
+    group: GROUP_PREVIZ,
+    output: "video",
+    label: { zh: "循环动作", en: "Motion loop" },
+    master: { title: { zh: "循环动作", en: "Motion loop" }, description: { zh: "待机、步行、跑步、环境", en: "Idle, walk, run, ambient" }, templates: TEMPLATES },
+};

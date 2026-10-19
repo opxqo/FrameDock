@@ -11,7 +11,7 @@ import { useTranslation } from "react-i18next";
 
 import { requestEdit, requestGeneration, requestImageQuestion } from "@/services/api/image";
 import { requestAudioGeneration, storeGeneratedAudio } from "@/services/api/audio";
-import { readablePrompt } from "@/lib/canvas/prompt-reference-tokens";
+import { labelsToNodeTokens, readablePrompt } from "@/lib/canvas/prompt-reference-tokens";
 import { referenceOverflowIssue, yfaiBalanceIssue, yfaiPromptIssue, type PreflightIssue } from "@/lib/yfai-preflight";
 import { findYfaiModel, isYfaiUrl, withPreferredYfaiRatio } from "@/lib/yfai-catalog";
 import { getYfaiQuote } from "@/lib/yfai-pricing";
@@ -62,7 +62,7 @@ import { useAgentStore } from "@/stores/use-agent-store";
 import { useCanvasStore } from "@/stores/canvas/use-canvas-store";
 import { useAgentBridge } from "@/pages/canvas/hooks/use-agent-bridge";
 import { usePluginHost } from "@/pages/canvas/hooks/use-plugin-host";
-import { buildNodeMentionReferences, getGroupResourceNodes, isCanvasReferenceNode, type CanvasResourceReference } from "@/lib/canvas/canvas-resource-references";
+import { buildCanvasResourceReferences, buildNodeMentionReferences, getGroupResourceNodes, isCanvasReferenceNode, type CanvasResourceReference } from "@/lib/canvas/canvas-resource-references";
 import { exportCanvasProjects } from "@/lib/canvas/canvas-export";
 import { SNAP_GUIDE_COLOR, computeResizeSnap, computeSnap, getNodesBounds, type SnapGuide } from "@/lib/canvas/canvas-snap";
 import { applyNodeConfigPatch, audioMetadata, buildAudioGenerationMetadata, buildImageGenerationMetadata, createCanvasNode, imageMetadata, videoMetadata } from "@/lib/canvas/canvas-node-factory";
@@ -98,6 +98,7 @@ import { getNodeDefinition, isBuiltinNodeType as isBuiltinType, useNodeRegistryV
 import { registerBuiltinNodes } from "@/components/canvas/nodes/builtin-nodes";
 import { artAssetDeriveType } from "@/lib/art-assets/node-types";
 import { CanvasPluginManagerModal } from "@/components/canvas/canvas-plugin-manager-modal";
+import { mokeSkillBundle } from "@/lib/skills/moke-skill-bundle";
 import { CanvasRefreshShell } from "@/components/canvas/canvas-refresh-shell";
 import { CanvasTopBar, useShortcutSheetStore } from "@/components/canvas/canvas-top-bar";
 import { ConnectionCreateMenu, NodeCreateMenu, type PendingConnectionCreate } from "@/components/canvas/canvas-create-menus";
@@ -695,6 +696,11 @@ function InfiniteCanvasPage() {
 
     useLayoutEffect(() => {
         nodesRef.current = nodes;
+    // FrameDock: preset cards (美术资产, 动作戏导演) read their neighbours through these refs while they render. An effect runs after
+    // the children have rendered, so the cards would always draw the previous canvas (an empty strip on first paint); the refs are
+    // set here, during render, as well.
+    nodesRef.current = nodes;
+    connectionsRef.current = connections;
         connectionsRef.current = connections;
         selectedNodeIdsRef.current = selectedNodeIds;
         viewportRef.current = viewport;
@@ -1090,6 +1096,33 @@ function InfiniteCanvasPage() {
         return map;
     }, [connections, nodeById]);
     const referenceConnectedNodeIds = useMemo(() => new Set([referencePickerNodeId, ...(referencePickerNodeId ? connectedNodesByNodeId.get(referencePickerNodeId)?.flatMap((node) => node.type === CanvasNodeType.Group ? [node.id, ...getGroupResourceNodes(node.id, nodes).map((child) => child.id)] : [node.id]) || [] : [])].filter((id): id is string => Boolean(id))), [connectedNodesByNodeId, nodes, referencePickerNodeId]);
+    // A text made by a preset node cites images that are not its own inputs; they are looked up by id for display.
+    const citedReferencesByNodeId = useMemo(() => {
+        const map = new Map<string, CanvasResourceReference[]>();
+        const byId = new Map(nodes.map((node) => [node.id, node]));
+        nodes.forEach((node) => {
+            const ids = node.type === CanvasNodeType.Text ? node.metadata?.referenceNodeIds : undefined;
+            if (!ids?.length) return;
+            map.set(node.id, buildCanvasResourceReferences(ids.flatMap((id) => (byId.get(id) ? [byId.get(id)!] : []))));
+        });
+        return map;
+    }, [nodes]);
+    // Preset cards (美术资产, 动作戏导演 …) draw their reference strip from the nodes around them; the signature makes them redraw when those change.
+    const contextSignatureByNodeId = useMemo(() => {
+        const byId = new Map(nodes.map((node) => [node.id, node]));
+        const around = new Map<string, string[]>();
+        for (const connection of connections) {
+            const from = byId.get(connection.fromNodeId);
+            const to = byId.get(connection.toNodeId);
+            if (from && to) {
+                (around.get(to.id) ?? around.set(to.id, []).get(to.id)!).push(`${from.id}:${from.metadata?.content?.length ?? 0}:${from.metadata?.status ?? ""}`);
+                (around.get(from.id) ?? around.set(from.id, []).get(from.id)!).push(`${to.id}:${to.metadata?.content?.length ?? 0}:${to.metadata?.artAssetFrom ?? ""}`);
+            }
+        }
+        const map = new Map<string, string>();
+        for (const node of nodes) if (getNodeDefinition(node.type)?.useBuiltinPanel?.composePrompt) map.set(node.id, (around.get(node.id) ?? []).join("|"));
+        return map;
+    }, [connections, nodes]);
     const { applyAgentOps } = useAgentBridge({
         projectId,
         title: currentProject?.title,
@@ -2906,7 +2939,18 @@ function InfiniteCanvasPage() {
             // "generate" clicks look it up the same way), so results keep flowing downstream.
             const targetNodeId = options.targetNodeId ?? (sourceNode?.type === CanvasNodeType.Config ? configResultTarget(sourceNode, mode, nodesRef.current, connectionsRef.current)?.id : undefined);
             const retargetNode = targetNodeId ? nodesRef.current.find((node) => node.id === targetNodeId) : undefined;
-            const baseGenerationConfig = buildGenerationConfig(effectiveConfig, sourceNode, mode);
+            // FrameDock text presets (动作戏导演) are built on MOKE skills, read through the server proxy the first time they run.
+            const presetPanel = sourceNode ? getNodeDefinition(sourceNode.type)?.useBuiltinPanel : undefined;
+            let configNode = sourceNode;
+            if (sourceNode && mode === "text" && presetPanel?.mokeSkills?.length) {
+                try {
+                    configNode = { ...sourceNode, metadata: { ...sourceNode.metadata, skill: await mokeSkillBundle(presetPanel.mokeSkills) } };
+                } catch (error) {
+                    message.error(t("artAsset.errors.skillFailed", { error: error instanceof Error ? error.message : String(error) }));
+                    return;
+                }
+            }
+            const baseGenerationConfig = buildGenerationConfig(effectiveConfig, configNode, mode, sourceNode && mode === "text" ? presetPanel?.systemPrompt?.(sourceNode) : undefined);
             // FrameDock preset nodes (美术资产) recommend a ratio; YFAI models keep theirs in yfaiParams, so it is filled in
             // there unless the user picked one for this model.
             const generationConfig = sourceNode && getNodeDefinition(sourceNode.type)?.useBuiltinPanel?.composePrompt
@@ -3225,8 +3269,14 @@ function InfiniteCanvasPage() {
                     const videoNode: CanvasNodeData = {
                         id: videoId,
                         type: CanvasNodeType.Video,
-                        title: retargetVideo?.title || effectivePrompt.slice(0, 32) || "Generated Video",
-                        position: retargetVideo ? retargetVideo.position : reuseVideoNode ? sourceNode.position : { x: parent.x + (sourceNode?.width || spec.width) + 96, y: parent.y },
+                        title: retargetVideo?.title || presetTitle || effectivePrompt.slice(0, 32) || "Generated Video",
+                        position: retargetVideo
+                            ? retargetVideo.position
+                            : reuseVideoNode
+                              ? sourceNode.position
+                              : presetVideos.length
+                                ? { x: presetVideos[0]!.position.x, y: Math.max(...presetVideos.map((node) => node.position.y + node.height)) + 48 }
+                                : { x: parent.x + (sourceNode?.width || spec.width) + 96, y: parent.y },
                         width: retargetVideo ? retargetVideo.width : reuseVideoNode ? sourceNode.width : spec.width,
                         height: retargetVideo ? retargetVideo.height : reuseVideoNode ? sourceNode.height : spec.height,
                         metadata: {
@@ -3237,6 +3287,10 @@ function InfiniteCanvasPage() {
                             size: generationConfig.size,
                             seconds: generationConfig.videoSeconds,
                             yfaiParams: generationConfig.yfaiParams,
+                    // 镜头预演 video presets (运镜, 动态分镜, 循环动作) stack each new clip under the ones they already made, like the image presets.
+                    const presetVideos = composePrompt && sourceNode
+                        ? nodesRef.current.filter((node) => node.type === CanvasNodeType.Video && connectionsRef.current.some((connection) => connection.fromNodeId === nodeId && connection.toNodeId === node.id))
+                        : [];
                             vquality: generationConfig.vquality,
                             generateAudio: generationConfig.videoGenerateAudio,
                             watermark: generationConfig.videoWatermark,
@@ -3258,6 +3312,7 @@ function InfiniteCanvasPage() {
                         await completeVideoNodeTask(videoId, generationConfig, effectivePrompt, generationContext.referenceImages, controller.signal, {
                             size: generationConfig.size,
                             seconds: generationConfig.videoSeconds,
+                            ...(composePrompt && sourceNode ? { artAssetFrom: sourceNode.type } : {}),
                             yfaiParams: generationConfig.yfaiParams,
                             vquality: generationConfig.vquality,
                             generateAudio: generationConfig.videoGenerateAudio,
@@ -3322,8 +3377,14 @@ function InfiniteCanvasPage() {
                 const rootNode: CanvasNodeData = {
                     id: rootId,
                     type: CanvasNodeType.Text,
-                    title: retargetText?.title || (reuseTextNode ? sourceNode?.title : undefined) || effectivePrompt.slice(0, 32) || "Generated Text",
-                    position: retargetText ? retargetText.position : reuseTextNode ? sourceNode.position : { x: parentPosition.x + parentConfig.width + 96, y: parentPosition.y + parentConfig.height / 2 - textConfig.height / 2 },
+                    title: retargetText?.title || (reuseTextNode ? sourceNode?.title : undefined) || presetTitle || effectivePrompt.slice(0, 32) || "Generated Text",
+                    position: retargetText
+                        ? retargetText.position
+                        : reuseTextNode
+                          ? sourceNode.position
+                          : presetTexts.length
+                            ? { x: presetTexts[0]!.position.x, y: Math.max(...presetTexts.map((node) => node.position.y + node.height)) + 48 }
+                            : { x: parentPosition.x + presetParentWidth + 96, y: parentPosition.y + presetParentHeight / 2 - textConfig.height / 2 },
                     width: retargetText ? retargetText.width : reuseTextNode ? sourceNode.width : textConfig.width,
                     height: retargetText ? retargetText.height : reuseTextNode ? sourceNode.height : textConfig.height,
                     metadata: {
@@ -3341,6 +3402,12 @@ function InfiniteCanvasPage() {
                 };
                 pendingChildIds = [rootId];
                 setNodes((prev) =>
+                // Text presets (动作戏导演) stack each new result under the ones they already made, like the image and video presets.
+                const presetTexts = composePrompt && sourceNode
+                    ? nodesRef.current.filter((node) => node.type === CanvasNodeType.Text && connectionsRef.current.some((connection) => connection.fromNodeId === nodeId && connection.toNodeId === node.id))
+                    : [];
+                const presetParentWidth = composePrompt && sourceNode ? sourceNode.width : parentConfig.width;
+                const presetParentHeight = composePrompt && sourceNode ? sourceNode.height : parentConfig.height;
                     reuseTextNode
                         ? prev.map((node) => (node.id === nodeId ? { ...node, ...rootNode } : node))
                         : retargetText
@@ -3359,6 +3426,7 @@ function InfiniteCanvasPage() {
                         try {
                             const answer = await requestImageQuestion(
                                 generationConfig,
+                        ...(composePrompt && sourceNode ? { artAssetFrom: sourceNode.type, referenceNodeIds: generationContext.referenceImages.map((image) => image.id) } : {}),
                                 buildNodeResponseMessages({ ...generationContext, prompt: effectivePrompt }),
                                 (text) => {
                                     streamed = text;
@@ -3379,7 +3447,8 @@ function InfiniteCanvasPage() {
                                 },
                                 { signal: controller.signal },
                             );
-                            const content = answer || streamed;
+                            // A preset's images are named "图片N" by the model; saved as references they keep pointing at the same images.
+                            const content = composePrompt ? labelsToNodeTokens(answer || streamed, generationContext.referenceImages.map((image) => image.id)) : answer || streamed;
                             setNodes((prev) =>
                                 prev.map((node) =>
                                     node.id === rootId
@@ -3427,6 +3496,7 @@ function InfiniteCanvasPage() {
                 if (failedTexts.length) message.error(firstText ? t("canvas.projectPage.partialTextFailed") : failedTexts[0]?.errorDetails || t("canvas.projectPage.generationFailed"));
                 setNodes((prev) =>
                     prev.map((node) => {
+                    if (composePrompt) setNodes((prev) => prev.map((node) => (node.id === nodeId ? { ...node, metadata: { ...node.metadata, status: NODE_STATUS_IDLE } } : node)));
                         if (node.id === rootId) {
                             const primaryText = completedTexts.find((text) => text.id === node.metadata?.primaryTextId) || firstText;
                             return {
@@ -3441,7 +3511,8 @@ function InfiniteCanvasPage() {
                                 },
                             };
                         }
-                        return node.id === nodeId && isConfigNode ? { ...node, metadata: { ...node.metadata, status: firstText ? NODE_STATUS_SUCCESS : NODE_STATUS_ERROR, errorDetails: firstText ? undefined : t("canvas.projectPage.generationFailed") } } : node;
+                        // Config nodes and text presets (which stay as they are) show how the run ended.
+                        return node.id === nodeId && (isConfigNode || composePrompt) ? { ...node, metadata: { ...node.metadata, status: firstText ? NODE_STATUS_SUCCESS : NODE_STATUS_ERROR, errorDetails: firstText ? undefined : t("canvas.projectPage.generationFailed") } } : node;
                     }),
                 );
             } catch (error) {
@@ -4237,6 +4308,8 @@ function InfiniteCanvasPage() {
                         />
                     ))}
 
+                            citedReferences={citedReferencesByNodeId.get(node.id)}
+                            contextSignature={contextSignatureByNodeId.get(node.id)}
                     {selectionBox ? (
                         <svg
                             className="pointer-events-none absolute z-[100] overflow-visible"

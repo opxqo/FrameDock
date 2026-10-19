@@ -7,7 +7,7 @@ import { CodexLogo } from "@/components/codex-logo";
 import { type CanvasBackgroundMode } from "@/lib/canvas-theme";
 import { getNodePluginId, listNodeDefinitions, useNodeRegistryVersion } from "@/lib/canvas/node-registry";
 import { getNodeSpec } from "@/constant/canvas";
-import { groupDefinitions } from "@/components/canvas/canvas-create-menus";
+import { NodeMenuCascade } from "@/components/canvas/node-menu-cascade";
 import { cn } from "@/lib/utils";
 import { useThemeStore } from "@/stores/use-theme-store";
 import { useTranslation } from "react-i18next";
@@ -130,38 +130,14 @@ export function CanvasToolbar({
             </div>
 
             {panel === "extensions" && extensionDefs.length ? (
-                <RailPanel title={t("canvas.toolbar.extensions")}>
-                    <div className="grid gap-0.5">
-                        {groupDefinitions(extensionDefs).map(([group, subgroups]) => (
-                            <Fragment key={group || "_"}>
-                                {group ? <div className="mt-2 border-t border-border px-2 pb-1 pt-3 text-[11px] font-medium tracking-[0.08em] text-muted-foreground/70 first:mt-0 first:border-t-0 first:pt-1">{group}</div> : null}
-                                {subgroups.map(([subgroup, defs]) => (
-                                    <Fragment key={subgroup || "_"}>
-                                        {subgroup ? (
-                                            <div className="px-2 pb-0.5 pt-2 text-[11px] text-muted-foreground">{subgroup}</div>
-                                        ) : null}
-                                        {defs.map((def) => (
-                                            <button
-                                                key={def.type}
-                                                type="button"
-                                                className="flex min-h-10 w-full items-center gap-2.5 rounded-lg px-2 py-1 text-left text-[13px] transition-colors hover:bg-accent"
-                                                onClick={() => {
-                                                    onAddExtensionNode(def.type);
-                                                    setPanel(null);
-                                                }}
-                                            >
-                                                <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-secondary text-base">{def.icon}</span>
-                                                <span className="min-w-0 flex-1">
-                                                    <span className="block truncate font-medium leading-4">{getNodeSpec(def.type).title}</span>
-                                                    {def.description ? <span className="block truncate text-[11px] text-muted-foreground">{def.description}</span> : null}
-                                                </span>
-                                            </button>
-                                        ))}
-                                    </Fragment>
-                                ))}
-                            </Fragment>
-                        ))}
-                    </div>
+                <RailPanel title={t("canvas.toolbar.extensions")} wide>
+                    <NodeMenuCascade
+                        defs={extensionDefs}
+                        onPick={(type) => {
+                            onAddExtensionNode(type);
+                            setPanel(null);
+                        }}
+                    />
                 </RailPanel>
             ) : null}
 
@@ -234,9 +210,9 @@ function RailDivider() {
     return <div className="my-1 h-px w-6 bg-border" />;
 }
 
-function RailPanel({ title, children }: { title: string; children: ReactNode }) {
+function RailPanel({ title, children, wide }: { title: string; children: ReactNode; wide?: boolean }) {
     return (
-        <div className="glass pointer-events-auto absolute left-[calc(100%+12px)] top-1/2 w-64 -translate-y-1/2 rounded-2xl p-4 text-popover-foreground">
+        <div className={cn("glass pointer-events-auto absolute left-[calc(100%+12px)] top-1/2 -translate-y-1/2 rounded-2xl p-4 text-popover-foreground", wide ? "w-[460px]" : "w-64")}>
             <div className="pb-2 text-sm font-medium">{title}</div>
             {children}
         </div>

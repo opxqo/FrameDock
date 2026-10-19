@@ -12,6 +12,7 @@ import { buildNodeContext } from "@/lib/canvas/plugin-node-context";
 import { useThemeStore } from "@/stores/use-theme-store";
 import { runTallyFor, useWorkflowRunStore, type TallyState } from "@/stores/canvas/use-workflow-run-store";
 import { CanvasResourceMentionTextarea } from "./canvas-resource-mention-textarea";
+import { ReferenceChipText } from "./reference-chip-text";
 import { CanvasNodeType, type CanvasNodeData, type CanvasNodeImage, type CanvasNodeText, type Position } from "@/types/canvas";
 import type { CanvasNodeContext, CanvasPluginHost } from "@/types/canvas-plugin";
 import type { CanvasResourceReference } from "@/lib/canvas/canvas-resource-references";
@@ -46,6 +47,10 @@ type CanvasNodeProps = {
     showPanel: boolean;
     showImageInfo: boolean;
     mentionReferences?: CanvasResourceReference[];
+    /** Images a generated text cites although they are not its inputs (see metadata.referenceNodeIds). */
+    citedReferences?: CanvasResourceReference[];
+    /** Preset nodes read their inputs and outputs from the canvas while rendering; this changes when those change, so the card redraws (memo would otherwise keep a card drawn before the canvas had loaded). */
+    contextSignature?: string;
     pluginHost?: CanvasPluginHost;
     registryVersion?: number;
     renderPanel?: (node: CanvasNodeData) => ReactNode;
@@ -91,6 +96,7 @@ type NodeContentRendererProps = {
     onContentChange: (nodeId: string, content: string) => void;
     onStopEditing: () => void;
     mentionReferences: CanvasResourceReference[];
+    citedReferences?: CanvasResourceReference[];
     onRetry?: (node: CanvasNodeData) => void;
     onToggleBatch?: () => void;
     onSetBatchPrimary?: (itemId: string) => void;
@@ -115,6 +121,8 @@ export const CanvasNode = React.memo(function CanvasNode({
     showPanel,
     showImageInfo,
     mentionReferences = [],
+    citedReferences,
+    contextSignature,
     pluginHost,
     renderPanel,
     renderNodeContent,
@@ -370,7 +378,11 @@ export const CanvasNode = React.memo(function CanvasNode({
                     onPointerDown={(event) => event.stopPropagation()}
                 >
                     {isGroup || tally === "idle" ? null : <span role="img" aria-label={tallyLabel} title={tallyLabel} className={`size-1.5 shrink-0 rounded-full ${TALLY_CLASS[tally]}`} />}
-                    {data.metadata?.skill ? (
+                    {definition?.kind === "skill" ? (
+                        <span role="img" aria-label={t("skills.presetBadge")} title={t("skills.presetBadge")} className="inline-flex shrink-0" style={{ color: theme.node.muted }}>
+                            <SkillBook className="size-3.5" />
+                        </span>
+                    ) : data.metadata?.skill ? (
                         <span role="img" aria-label={t("skills.nodeBadge", { name: data.metadata.skill.title })} title={t("skills.nodeBadge", { name: data.metadata.skill.title })} className="inline-flex shrink-0" style={{ color: theme.node.muted }}>
                             <SkillBook className="size-3.5" />
                         </span>
@@ -479,6 +491,7 @@ export const CanvasNode = React.memo(function CanvasNode({
                         renderNodeContent={renderNodeContent}
                         pluginContext={pluginContext}
                         mentionReferences={mentionReferences}
+                        citedReferences={citedReferences}
                         onContentChange={onContentChange}
                         onStopEditing={() => setIsEditingContent(false)}
                         onRetry={onRetry}
@@ -669,7 +682,7 @@ function MissingPluginContent({ theme, type }: Pick<NodeContentRendererProps, "t
     );
 }
 
-function TextContent({ node, theme, isEditingContent, textareaRef, mentionReferences, batchExpanded, onContentChange, onStopEditing, onToggleBatch, onSetBatchPrimary }: NodeContentRendererProps) {
+function TextContent({ node, theme, isEditingContent, textareaRef, mentionReferences, citedReferences, batchExpanded, onContentChange, onStopEditing, onToggleBatch, onSetBatchPrimary }: NodeContentRendererProps) {
     const { t } = useTranslation();
     const fontSize = node.metadata?.fontSize || 14;
     const textStyle = { fontSize: `${fontSize}px`, lineHeight: `${Math.round(fontSize * 1.65)}px`, color: theme.node.text, boxSizing: "border-box" } as React.CSSProperties;
@@ -680,13 +693,15 @@ function TextContent({ node, theme, isEditingContent, textareaRef, mentionRefere
     const primaryText = texts.find((text) => text.id === primaryTextId);
     const content = primaryText?.content || node.metadata?.content || "";
     const paddingClass = isBatchRoot ? "px-4 pb-4 pt-14" : "p-4";
+    // What the text refers to: its own inputs, then the images it was written from.
+    const readingReferences = citedReferences?.length ? [...mentionReferences, ...citedReferences.filter((item) => !mentionReferences.some((own) => own.nodeId === item.nodeId))] : mentionReferences;
 
     return (
         <BatchFrame batchCount={batchCount} batchExpanded={batchExpanded}>
             {batchExpanded
                 ? texts
                       .filter((text) => text.id !== primaryTextId)
-                      .map((text, index) => <ExpandedTextCard key={text.id} node={node} text={text} index={index} onSetPrimary={() => onSetBatchPrimary?.(text.id)} />)
+                      .map((text, index) => <ExpandedTextCard key={text.id} node={node} text={text} index={index} references={readingReferences} onSetPrimary={() => onSetBatchPrimary?.(text.id)} />)
                 : null}
             <div className="flex h-full w-full flex-col overflow-hidden rounded-xl">
                 {isEditingContent ? (
@@ -708,7 +723,7 @@ function TextContent({ node, theme, isEditingContent, textareaRef, mentionRefere
                     />
                 ) : content ? (
                     <div className={`thin-scrollbar block h-full w-full overflow-y-auto whitespace-pre-wrap break-words bg-transparent font-mono ${paddingClass}`} style={textStyle} onWheel={(event) => event.stopPropagation()}>
-                        {content}
+                        <ReferenceChipText value={content} references={readingReferences} />
                     </div>
                 ) : primaryText ? (
                     <TextSlotStatus text={primaryText} />
@@ -739,7 +754,7 @@ function TextContent({ node, theme, isEditingContent, textareaRef, mentionRefere
     );
 }
 
-function ExpandedTextCard({ node, text, index, onSetPrimary }: { node: CanvasNodeData; text: CanvasNodeText; index: number; onSetPrimary: () => void }) {
+function ExpandedTextCard({ node, text, index, references, onSetPrimary }: { node: CanvasNodeData; text: CanvasNodeText; index: number; references: CanvasResourceReference[]; onSetPrimary: () => void }) {
     const theme = canvasThemes[useThemeStore((state) => state.theme)];
     const { t } = useTranslation();
     const count = node.metadata?.texts?.length || 0;
@@ -773,7 +788,7 @@ function ExpandedTextCard({ node, text, index, onSetPrimary }: { node: CanvasNod
             {text.content ? (
                 <>
                     <div className="thin-scrollbar h-full overflow-y-auto whitespace-pre-wrap break-words px-4 pb-4 pt-14 font-mono text-sm leading-6" style={{ color: theme.node.text }} onWheel={(event) => event.stopPropagation()}>
-                        {text.content}
+                        <ReferenceChipText value={text.content} references={references} />
                     </div>
                     <button type="button" className="pointer-events-none absolute right-2.5 top-2.5 flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-xs font-medium opacity-0 transition duration-150 hover:bg-black/5 group-hover/node:pointer-events-auto group-hover/node:opacity-100 dark:hover:bg-white/10" style={{ color: theme.node.text }} onClick={(event) => (event.stopPropagation(), onSetPrimary())}>
                         <Star className="size-3.5" style={{ color: selectionBlue }} />

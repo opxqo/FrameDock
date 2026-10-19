@@ -67,7 +67,7 @@ YFAI model coverage additionally uses `pixverse-color.svg`, `happyhorse.svg` and
 
 ## MOKE AIGC（在线资料，不随仓库分发）
 
-FrameDock 可以通过服务端只读代理（`apps/server/src/moke.ts`）匿名检索 [MOKE AIGC](https://www.mokeaigc.ai/) 的 Skill。资料只在用户选用时实时读取，并缓存在本机数据目录，仓库里不包含任何 MOKE 的 Skill 正文或代码，也不会执行其中的脚本。每个 Skill 的使用都以其包内许可和作者授权为准，界面上会标注作者和原页链接。内置的提示词配方和内置 Skill 是 FrameDock 自己编写的，参考了公开的摄影与编剧方法，没有复制 MOKE 的内容。
+FrameDock 可以通过服务端只读代理（`apps/server/src/moke.ts`）匿名检索 [MOKE AIGC](https://www.mokeaigc.ai/) 的 Skill。资料只在用户选用时实时读取，并缓存在本机数据目录，仓库里不包含任何 MOKE 的 Skill 正文或代码，也不会执行其中的脚本。“镜头预演 › 动作戏导演”节点基于 MOKE 的两个 Skill——[seedance-fight-director](https://www.mokeaigc.ai/skills/honghouzi/honghouzi--video/seedance-fight-director)（邪恶红猴子）和 [director-seedance-prompt](https://www.mokeaigc.ai/skills/mariozhaofan/mariozhaofan--personal/director-seedance-prompt)（晚上睡不赵），节点第一次运行时通过同一个只读代理读取它们的 SKILL.md，同样不进入仓库：后者的包内许可证（Private Proprietary License）不允许复制、转存或改编，所以只做运行时读取。节点里自己写的战斗类型、时长和冲击力设定是 FrameDock 的原创，只在文字里引用 fight-director 的“动作基底”和“按力量等级分配反馈”两处的名称与原则。每个 Skill 的使用都以其包内许可和作者授权为准，界面上会标注作者和原页链接。内置的提示词配方和内置 Skill 是 FrameDock 自己编写的，参考了公开的摄影与编剧方法，没有复制 MOKE 的内容。
 
 ## YFAI API metadata
 

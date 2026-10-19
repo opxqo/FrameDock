@@ -163,7 +163,7 @@ export default {
             "prop-turnaround": { title: "道具多视图", summary: "正、侧、背、45° 加细节特写" },
             "prop-extract": { title: "道具提取", summary: "从图中取出道具，补全遮挡，单独展示" },
         },
-        errors: { needsMaster: "派生需要先连一张定稿图", noInput: "请连一张参考图，或写一句描述", needsImage: "这个模板需要先连一张参考图", noTemplate: "请先在节点上选一个模板" },
+        errors: { needsMaster: "派生需要先连一张定稿图", noInput: "请连一张参考图，或写一句描述", needsImage: "这个模板需要先连一张参考图", noTemplate: "请先在节点上选一个模板", skillFailed: "读取 MOKE Skill 失败：{{error}}" },
     },
     yfaiPanel: {
         open: "在 YFAI 面板管理 →",
@@ -176,6 +176,18 @@ export default {
         tabs: { works: "最近作品", usage: "消费明细", logs: "调用日志", adjustments: "参数回执", models: "模型" },
         works: {
             description: "FrameDock 通过 YFAI 生成的任务。结果都保存在本机，看图不走网络；YFAI 只保留约 15 天，本机副本不会过期。本机缺失的结果会自动从 YFAI 重新下载一次。",
+        skillBadge: "Skill",
+        skillInput: "输入",
+        skillInputEmpty: "连人物图和场景图，也可以只写描述。",
+        textTier: "生成提示词",
+        textReferences: "参考图（人物、场景）",
+        textReferencesEmpty: "连人物图和场景图，提示词里会引用它们；也可以只写描述。",
+        textDefaultAsk: "按连入的人物图和场景图，设计一场动作戏。",
+        placeholderText: "写一句：谁和谁在哪里打，谁占上风（可选）。连了图就以图里的人物和场景为准。",
+        videoTier: "生成视频",
+        videoReferences: "参考画面",
+        videoReferencesEmpty: "可以连一张分镜、定稿或场景图作为画面，也可以只写描述。",
+        placeholderVideo: "描述画面里的主体和场景（可选），例如：雨夜街头，穿风衣的侦探。连了图就以那张图为画面。",
             restoring: "正在从 YFAI 下载到本机…",
             fileGone: "本机没有这份结果，YFAI 也已不再提供",
             empty: "还没有 YFAI 任务",
@@ -582,6 +594,7 @@ export default {
         composer: { title: "组装提示词", description: "@ 引用已连接素材，发送前按当前连接重新编号", placeholder: "输入提示词，按 @ 引用连接的图片、文本或组", imagePreview: "引用图片预览", resources: { image: "图片{{index}}", video: "视频{{index}}", audio: "音频{{index}}", text: "文本{{index}}", group: "组{{index}}" } },
         controls: { ratio: "比例", duplicate: "复制", delete: "删除", images: "{{count}} 张", texts: "{{count}} 条", generations: "{{count}} 次", reasoning: "推理" },
         generation: { interrupted: "页面刷新后生成已中断，请重新生成。", front: "正面视角", rotateRight: "向右旋转 {{angle}} 度", rotateLeft: "向左旋转 {{angle}} 度", level: "水平视角", topDown: "俯视 {{angle}} 度", lowAngle: "仰视 {{angle}} 度", angleLabel: "AI 多角度：{{horizontal}}，{{pitch}}，镜头距离 {{distance}}，{{lens}}镜头", anglePrompt: "基于参考图重新生成同一主体的新视角，保持主体、颜色、材质和画面风格一致，不要只做透视变形。{{angle}}。" },
+            kindPrompt: "提示词", kindSkill: "Skill", kindEmpty: "这一页还没有节点",
         agentOps: { add_node: "新增节点", update_node: "更新节点", delete_node: "删除节点", delete_connections: "删除连线", connect_nodes: "连接", set_viewport: "调整视图", select_nodes: "选择节点", run_generation: "触发生成" },
         pluginErrors: { invalidExport: "插件未导出有效对象", missingFields: "插件缺少 id 或 nodes", downloadFailed: "下载失败 (HTTP {{status}})", registryFailed: "获取官方插件列表失败 (HTTP {{status}})" },
         shortcut: {
@@ -1057,3 +1070,4 @@ export default {
         enUS: "English",
     },
 };
+        presetBadge: "Skill 节点：基于 MOKE Skill",

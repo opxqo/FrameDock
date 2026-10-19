@@ -89,6 +89,8 @@ export type CanvasNodeMetadata = {
     yfaiParams?: string;
     references?: string[];
     naturalWidth?: number;
+    /** Text presets (动作戏导演): the images the text was written from, in the order they were sent ("图片1" is the first). Its `@[node:id]` references are shown with these. */
+    referenceNodeIds?: string[];
     naturalHeight?: number;
     freeResize?: boolean;
     /** FrameDock: this picture was re-graded towards another image node ("调色对齐"). */

@@ -141,7 +141,7 @@ export function CanvasNodePromptPanel({ node, nodes, isRunning, onPromptChange, 
                         </>
                     ) : (
                         <>
-                            <CanvasSkillPicker skill={skill} onChange={(next) => onConfigChange(node.id, { skill: next })} />
+                            {preset?.mokeSkills ? null : <CanvasSkillPicker skill={skill} onChange={(next) => onConfigChange(node.id, { skill: next })} />}
                             <ModelPicker config={config} value={config.model} onChange={(model) => onConfigChange(node.id, { model })} capability="text" onMissingConfig={() => openConfigDialog(true)} className="max-w-[140px]" />
                             <CanvasTextSettingsPopover config={config} onYfaiParamsChange={(yfaiParams) => onConfigChange(node.id, { yfaiParams })} buttonClassName="!h-8 !max-w-[124px] !justify-start !rounded-full !px-2.5" count={node.metadata?.textCount || 1} onConfigChange={(_, value) => onConfigChange(node.id, { reasoningEffort: value })} onCountChange={(textCount) => onConfigChange(node.id, { textCount })} />
                         </>
