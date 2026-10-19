@@ -210,7 +210,7 @@ export function InfiniteCanvas({ containerRef, viewport, tool, backgroundMode = 
     return (
         <div
             ref={containerRef}
-            className="relative h-full w-full select-none overflow-hidden"
+            className="relative h-full w-full select-none overflow-clip"
             style={{ background: theme.canvas.background, cursor }}
             onPointerDown={handlePointerDown}
             onDoubleClick={handleDoubleClick}

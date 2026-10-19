@@ -7,6 +7,7 @@ import { CHARACTER_PACK } from "@/lib/art-assets/packs/character";
 import { SCENE_PACK } from "@/lib/art-assets/packs/scene";
 import { COSTUME_PACK } from "@/lib/art-assets/packs/costume";
 import { PROP_PACK } from "@/lib/art-assets/packs/prop";
+import { STORYBOARD_PACK } from "@/lib/art-assets/packs/storyboard";
 import { TOOL_PACK } from "@/lib/art-assets/packs/tool";
 
 export type ArtAssetNodeSpec = {
@@ -18,6 +19,8 @@ export type ArtAssetNodeSpec = {
 
 export type ArtAssetPack = {
     category: ArtAssetCategory;
+    /** Top-level menu group the pack's nodes are listed under: 美术资产 for assets, 镜头预演 for shot planning. */
+    group: LocalText;
     /** Category name, used in result titles ("人物 · 角色三视图"). */
     label: LocalText;
     master?: ArtAssetNodeSpec;
@@ -25,7 +28,7 @@ export type ArtAssetPack = {
     tool?: ArtAssetNodeSpec;
 };
 
-export const ART_ASSET_PACKS: ArtAssetPack[] = [CHARACTER_PACK, SCENE_PACK, COSTUME_PACK, PROP_PACK, TOOL_PACK];
+export const ART_ASSET_PACKS: ArtAssetPack[] = [CHARACTER_PACK, SCENE_PACK, COSTUME_PACK, PROP_PACK, STORYBOARD_PACK, TOOL_PACK];
 
 export const ART_ASSET_TIERS: ArtAssetTier[] = ["master", "derive", "tool"];
 

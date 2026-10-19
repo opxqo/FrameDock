@@ -5,6 +5,7 @@
 //
 // Tiers: 定稿 makes the outfit's master image; 派生 works from it.
 
+import { GROUP_ASSETS } from "@/lib/art-assets/groups";
 import type { ArtAssetPack } from "@/lib/art-assets/packs";
 import type { ArtAssetTemplate } from "@/lib/art-assets/templates";
 
@@ -82,6 +83,7 @@ const DERIVE: ArtAssetTemplate[] = [
 
 export const COSTUME_PACK: ArtAssetPack = {
     category: "costume",
+    group: GROUP_ASSETS,
     label: { zh: "服装", en: "Costume" },
     master: { title: { zh: "服装定稿", en: "Costume master" }, description: { zh: "服装设计、三视图、四视图", en: "Design, views, four views" }, templates: MASTER },
     derive: { title: { zh: "服装派生", en: "Costume derive" }, description: { zh: "拆解、同风格、上身", en: "Breakdown, style, fitting" }, templates: DERIVE },

@@ -6,6 +6,7 @@
 // Tiers: 定稿 makes the scene's master image (designed from a description, or cleaned out of an existing shot);
 // 派生 works from that master.
 
+import { GROUP_ASSETS } from "@/lib/art-assets/groups";
 import type { ArtAssetPack } from "@/lib/art-assets/packs";
 import type { ArtAssetTemplate } from "@/lib/art-assets/templates";
 
@@ -136,6 +137,7 @@ const DERIVE: ArtAssetTemplate[] = [
 
 export const SCENE_PACK: ArtAssetPack = {
     category: "scene",
+    group: GROUP_ASSETS,
     label: { zh: "场景", en: "Scene" },
     master: { title: { zh: "场景定稿", en: "Scene master" }, description: { zh: "概念图、背景提取、重组", en: "Concept, clean plate, recompose" }, templates: MASTER },
     derive: { title: { zh: "场景派生", en: "Scene derive" }, description: { zh: "多机位、拆分、等距、建筑", en: "Angles, split, isometric" }, templates: DERIVE },

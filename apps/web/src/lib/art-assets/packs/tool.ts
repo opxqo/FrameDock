@@ -2,6 +2,7 @@
 // default option values become `{{id}}` (翻译 #41, 细节强化 #42, 特效/普通视频抠图 #44/#45, 技能特效分镜 #46). All need an
 // image. MOKE's wording of #44/#45 ("视频抠图") is kept as is; the result is a sequence reference sheet, not a video.
 
+import { GROUP_ASSETS } from "@/lib/art-assets/groups";
 import type { ArtAssetPack } from "@/lib/art-assets/packs";
 import type { ArtAssetTemplate } from "@/lib/art-assets/templates";
 
@@ -103,6 +104,7 @@ const TOOLS: ArtAssetTemplate[] = [
 
 export const TOOL_PACK: ArtAssetPack = {
     category: "tool",
+    group: GROUP_ASSETS,
     label: { zh: "图像处理", en: "Image tools" },
     tool: { title: { zh: "图像处理", en: "Image tools" }, description: { zh: "细节强化、文字消除、翻译", en: "Detail, text removal, translate" }, templates: TOOLS },
 };

@@ -5,6 +5,7 @@
 //
 // Tiers: 定稿 makes the prop's master image (or a growth sheet); 派生 works from it.
 
+import { GROUP_ASSETS } from "@/lib/art-assets/groups";
 import type { ArtAssetPack } from "@/lib/art-assets/packs";
 import type { ArtAssetTemplate } from "@/lib/art-assets/templates";
 
@@ -105,6 +106,7 @@ const DERIVE: ArtAssetTemplate[] = [
 
 export const PROP_PACK: ArtAssetPack = {
     category: "prop",
+    group: GROUP_ASSETS,
     label: { zh: "道具", en: "Prop" },
     master: { title: { zh: "道具定稿", en: "Prop master" }, description: { zh: "设计图、三视图、四视图", en: "Design, views, four views" }, templates: MASTER },
     derive: { title: { zh: "道具派生", en: "Prop derive" }, description: { zh: "提取、灰模、白模渲染", en: "Extract, grey model, render" }, templates: DERIVE },

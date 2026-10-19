@@ -134,28 +134,25 @@ export function CanvasToolbar({
                     <div className="grid gap-0.5">
                         {groupDefinitions(extensionDefs).map(([group, subgroups]) => (
                             <Fragment key={group || "_"}>
-                                {group ? <div className="px-2 pb-0.5 pt-1.5 text-xs font-medium text-muted-foreground">{group}</div> : null}
+                                {group ? <div className="mt-2 border-t border-border px-2 pb-1 pt-3 text-[11px] font-medium tracking-[0.08em] text-muted-foreground/70 first:mt-0 first:border-t-0 first:pt-1">{group}</div> : null}
                                 {subgroups.map(([subgroup, defs]) => (
                                     <Fragment key={subgroup || "_"}>
                                         {subgroup ? (
-                                            <div className="flex items-center gap-2 px-2 pb-0.5 pt-2 text-[11px] text-muted-foreground">
-                                                {subgroup}
-                                                <span className="h-px flex-1 bg-border" />
-                                            </div>
+                                            <div className="px-2 pb-0.5 pt-2 text-[11px] text-muted-foreground">{subgroup}</div>
                                         ) : null}
                                         {defs.map((def) => (
                                             <button
                                                 key={def.type}
                                                 type="button"
-                                                className="flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left text-sm transition-colors hover:bg-accent"
+                                                className="flex min-h-10 w-full items-center gap-2.5 rounded-lg px-2 py-1 text-left text-[13px] transition-colors hover:bg-accent"
                                                 onClick={() => {
                                                     onAddExtensionNode(def.type);
                                                     setPanel(null);
                                                 }}
                                             >
-                                                <span className="grid size-7 shrink-0 place-items-center rounded-md bg-secondary text-base">{def.icon}</span>
+                                                <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-secondary text-base">{def.icon}</span>
                                                 <span className="min-w-0 flex-1">
-                                                    <span className="block truncate">{getNodeSpec(def.type).title}</span>
+                                                    <span className="block truncate font-medium leading-4">{getNodeSpec(def.type).title}</span>
                                                     {def.description ? <span className="block truncate text-[11px] text-muted-foreground">{def.description}</span> : null}
                                                 </span>
                                             </button>

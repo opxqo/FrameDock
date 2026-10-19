@@ -9,7 +9,8 @@ import { mediaRatioOptions } from "../src/lib/media-size";
 
 const ratios = new Set<string>(mediaRatioOptions.map((item) => item.value));
 const all = ART_ASSET_PACKS.flatMap((pack) => ART_ASSET_TIERS.flatMap((tier) => (pack[tier]?.templates ?? []).map((template) => ({ pack, tier, template }))));
-const moke = (JSON.parse(readFileSync(new URL("../../../docs/research/moke-art-assets.json", import.meta.url), "utf8")) as { items: Array<{ prompt: string }> }).items;
+const readMoke = (name: string) => (JSON.parse(readFileSync(new URL(`../../../docs/research/${name}`, import.meta.url), "utf8")) as { items: Array<{ prompt: string }> }).items;
+const moke = [...readMoke("moke-art-assets.json"), ...readMoke("moke-storyboard.json")];
 const filled = (template: ArtAssetTemplate) => composeArtAssetPrompt(template, { description: "测试主体", referenceCount: 1 });
 
 test("template ids are unique across all packs", () => {
@@ -20,6 +21,7 @@ test("template ids are unique across all packs", () => {
 test("every node has a title, a short menu line and templates; 定稿 and 派生 come in pairs for one-click derive", () => {
     for (const pack of ART_ASSET_PACKS) {
         expect(pack.label.zh && pack.label.en).toBeTruthy();
+        expect(pack.group.zh && pack.group.en).toBeTruthy();
         for (const tier of ART_ASSET_TIERS) {
             const spec = pack[tier];
             if (!spec) continue;

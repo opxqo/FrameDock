@@ -2,7 +2,7 @@
 // into production assets for video (characters, scenes, costumes, props). Written for FrameDock; the category
 // layout follows common art-asset prompt libraries. Pure data and functions, no DOM.
 
-export type ArtAssetCategory = "character" | "scene" | "costume" | "prop" | "tool";
+export type ArtAssetCategory = "character" | "scene" | "costume" | "prop" | "storyboard" | "tool";
 /** Text shown in the UI, in both app languages (pack data carries its own wording; see lib/art-assets/packs). */
 export type LocalText = { zh: string; en: string };
 /** "image": needs a connected reference image. "either": an image or a description is enough. */

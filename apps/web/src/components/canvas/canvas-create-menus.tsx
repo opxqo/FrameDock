@@ -59,19 +59,19 @@ export function ConnectionCreateOption({ theme, icon, title, description, onClic
     return (
         <button
             type="button"
-            className="flex h-12 w-full cursor-pointer items-center gap-2.5 rounded-xl px-2 text-left transition"
+            className="flex min-h-10 w-full cursor-pointer items-center gap-2.5 rounded-xl px-2 py-1 text-left transition"
             style={{ color: theme.node.text }}
             onClick={onClick}
             onMouseEnter={(event) => (event.currentTarget.style.background = theme.node.fill)}
             onMouseLeave={(event) => (event.currentTarget.style.background = "transparent")}
         >
-            <span className="grid size-9 shrink-0 place-items-center rounded-lg" style={{ background: theme.node.fill, color: theme.node.muted }}>
+            <span className="grid size-7 shrink-0 place-items-center rounded-lg" style={{ background: theme.node.fill, color: theme.node.muted }}>
                 {icon}
             </span>
             <span className="min-w-0 flex-1">
-                <span className="flex items-center gap-2 text-sm font-medium leading-5">{title}</span>
+                <span className="block truncate text-[13px] font-medium leading-4">{title}</span>
                 {description ? (
-                    <span className="mt-0.5 block truncate text-xs" style={{ color: theme.node.muted }}>
+                    <span className="mt-0.5 block truncate text-[11px] leading-4" style={{ color: theme.node.muted }}>
                         {description}
                     </span>
                 ) : null}
@@ -114,16 +114,15 @@ export function NodeCreateMenu({ position, scale = 1, onCreate, onClose }: { pos
                 {groupDefinitions(definitions).map(([group, subgroups]) => (
                     <Fragment key={group || "_"}>
                         {group ? (
-                            <div className="mt-2 border-t px-1 pb-0.5 pt-2.5 text-xs font-medium" style={{ color: theme.node.muted, borderColor: theme.node.stroke }}>
+                            <div className="mt-3 border-t px-2 pb-1 pt-3 text-[11px] font-medium tracking-[0.08em]" style={{ color: theme.node.faint, borderColor: theme.node.stroke }}>
                                 {group}
                             </div>
                         ) : null}
                         {subgroups.map(([subgroup, items]) => (
                             <Fragment key={subgroup || "_"}>
                                 {subgroup ? (
-                                    <div className="flex items-center gap-2 px-1 pb-0.5 pt-1.5 text-[11px]" style={{ color: theme.node.muted }}>
+                                    <div className="px-2 pb-0.5 pt-2 text-[11px]" style={{ color: theme.node.muted }}>
                                         {subgroup}
-                                        <span className="h-px flex-1" style={{ background: theme.node.stroke }} />
                                     </div>
                                 ) : null}
                                 {items.map((def) => (

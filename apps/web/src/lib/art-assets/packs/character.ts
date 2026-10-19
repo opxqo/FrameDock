@@ -6,6 +6,7 @@
 // Tiers (FrameDock): 定稿 templates produce the master design of a character; 派生 templates need that master
 // connected as the reference and derive new material from it, so every derived image shows the same character.
 
+import { GROUP_ASSETS } from "@/lib/art-assets/groups";
 import type { ArtAssetPack } from "@/lib/art-assets/packs";
 import type { ArtAssetTemplate } from "@/lib/art-assets/templates";
 
@@ -66,7 +67,7 @@ const DERIVE: ArtAssetTemplate[] = [
         input: "image",
         size: "3:2",
         source: "moke",
-        options: [{ id: "range", label: { zh: "出图范围", en: "Framing" }, choices: ["头像半身特写", "仅头部特写", "含肩装的胸像"] }],
+        options: [{ id: "range", label: { zh: "出图范围", en: "Framing" }, choices: ["头像半身特写", "仅头部特写", "含肩装的胸像"], choiceLabels: ["头像半身","仅头部","含肩胸像"] }],
         prompt: "以参考角色或 [主体] 为主体，制作一张表情设定表。采用{{range}}，分别展示平静、开心、惊讶、愤怒、悲伤、害羞六种清晰可辨的表情，整齐排列，保持同一角色的五官、发型、服装和画风一致。各格尺度一致，纯净背景，避免肢体裁切与面部身份漂移。",
     },
     {
@@ -111,7 +112,7 @@ const DERIVE: ArtAssetTemplate[] = [
         input: "image",
         size: "3:4",
         source: "moke",
-        options: [{ id: "ratio", label: { zh: "Q 版比例", en: "Chibi ratio" }, choices: ["2.5头身", "3头身", "2头身超变形"] }],
+        options: [{ id: "ratio", label: { zh: "Q 版比例", en: "Chibi ratio" }, choices: ["2.5头身", "3头身", "2头身超变形"], choiceLabels: ["2.5 头身","3 头身","2 头身"] }],
         prompt: "将参考角色或 [主体] 转换成{{ratio}}Q版角色。保留可辨识的发型、服装、配色、道具及身份特征，重新调整头身比例与四肢造型；完整全身展示，轮廓清晰，风格与原作一致，背景简洁。",
     },
     {
@@ -123,7 +124,7 @@ const DERIVE: ArtAssetTemplate[] = [
         input: "image",
         size: "3:4",
         source: "moke",
-        options: [{ id: "body", label: { zh: "目标体型", en: "Target build" }, choices: ["7.5头身成人比例", "6.5头身青少年比例", "风格化英雄体型"] }],
+        options: [{ id: "body", label: { zh: "目标体型", en: "Target build" }, choices: ["7.5头身成人比例", "6.5头身青少年比例", "风格化英雄体型"], choiceLabels: ["成人","青少年","英雄体型"] }],
         prompt: "将参考Q版角色或 [主体] 转换为{{body}}。合理重建躯干与四肢结构，保留身份、发型、服装、配色和标志性配件，保持原画风，不直接拉伸原图。完整全身展示。",
     },
     {
@@ -141,6 +142,7 @@ const DERIVE: ArtAssetTemplate[] = [
 
 export const CHARACTER_PACK: ArtAssetPack = {
     category: "character",
+    group: GROUP_ASSETS,
     label: { zh: "人物", en: "Character" },
     master: { title: { zh: "人物定稿", en: "Character master" }, description: { zh: "三视图、四视图、补全", en: "Turnaround, views, completion" }, templates: MASTER },
     derive: { title: { zh: "人物派生", en: "Character derive" }, description: { zh: "表情、姿势、拆解、Q 版", en: "Expressions, poses, chibi" }, templates: DERIVE },
