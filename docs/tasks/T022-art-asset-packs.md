@@ -1,7 +1,7 @@
 # T022 — 美术资产：服装包、道具包、图像处理工具（批量录入 MOKE 模板）
 
-状态：待执行
-执行：Codex（Claude 验收）
+状态：验收通过（Claude 直接实现并验收；Codex 两次没有执行）
+执行：Claude
 
 > 这是数据录入为主的任务，用默认模型和中等推理即可，不需要高推理档位。全程**不要发起任何付费生成请求**。
 
@@ -74,6 +74,41 @@ MOKE 没有专门的服装条目。按下面的思路组织，最终分层以 `p
    测试画布用完删除。
 4. 完成报告附一张表：每条模板的 id、来源（MOKE 编号或自写）、层级、分层理由、对原文的改动（没有就写“无”）。
 
-## 完成报告
+## 完成报告与验收记录（Claude）
 
-（Codex 填写）
+Codex 没有成功执行这张卡，所以由 Claude 直接做完。模板由脚本从 `docs/research/moke-art-assets.json` 生成，避免手抄出错。
+
+### 模板清单
+
+| 包 / 层级 | 模板 id | 来源 | 分层理由 | 对原文的改动 |
+|---|---|---|---|---|
+| 服装 · 定稿 | costume-design | 自写 | 从描述设计整套服装，`either` | — |
+| 服装 · 定稿 | moke-costume-closeup | MOKE #3 | 规范设定图，原文适用于任意主体 | 无 |
+| 服装 · 定稿 | moke-costume-four-views | MOKE #4 | 同上 | 无 |
+| 服装 · 派生 | costume-breakdown | 自写，改自 #10 | 基于已有服装图再加工 | 把角色设定拆解改成只拆服装 |
+| 服装 · 派生 | moke-costume-style-derivative | MOKE #7 | 在已有图基础上衍生 | 无 |
+| 服装 · 派生 | costume-on-character | 自写 | 把服装穿到角色上，需要图 | — |
+| 道具 · 定稿 | prop-design | 自写 | 从描述设计一件道具，`either` | — |
+| 道具 · 定稿 | moke-prop-closeup | MOKE #3 | 同服装 | 无 |
+| 道具 · 定稿 | moke-prop-four-views | MOKE #4 | 同服装 | 无 |
+| 道具 · 定稿 | moke-prop-plant-growth | MOKE #16 | 可以只写植物名，产出系列设定，作为定稿；选项“生长阶段” | 默认阶段换成 `{{stage}}` |
+| 道具 · 派生 | prop-extract | 自写 | 从图里提取道具 | — |
+| 道具 · 派生 | moke-prop-style-derivative | MOKE #7 | 在已有图基础上衍生 | 无 |
+| 道具 · 派生 | moke-prop-gray-model | MOKE #8 | 对已有道具做灰模 | 去掉开头多余的“/” |
+| 道具 · 派生 | moke-prop-white-render | MOKE #11 | 白模渲染成写实 | 无 |
+| 图像处理 | moke-tool-detail-enhance | MOKE #42 | 单步处理，选项“强化方向” | 默认值换成 `{{focus}}` |
+| 图像处理 | moke-tool-text-remove | MOKE #43 | 同上 | 无 |
+| 图像处理 | moke-tool-text-translate | MOKE #41 | 选项“目标语言” | 默认值换成 `{{lang}}` |
+| 图像处理 | moke-tool-layer-split | MOKE #40 | 同上 | 无 |
+| 图像处理 | moke-tool-sprite-split | MOKE #39 | 同上 | 无 |
+| 图像处理 | moke-tool-effect-frames | MOKE #44 | 选项“序列规格” | 默认值换成 `{{grid}}` |
+| 图像处理 | moke-tool-motion-frames | MOKE #45 | 选项“序列规格” | 默认值换成 `{{grid}}` |
+| 图像处理 | moke-tool-skill-storyboard | MOKE #46 | 选项“技能类型” | 默认值换成 `{{kind}}` |
+
+### 验收
+- `bun test` 100 项通过（`tests/art-asset-packs.test.ts` 自动检查了全部新模板，包括与 MOKE 原文逐字一致）；`pnpm typecheck` 通过。
+- 浏览器（测试画布，已删除，请求被拦截，没有产生费用）：
+  - 新建菜单的“美术资产”分组按类别排列：人物、场景、服装、道具、图像处理；各节点图标不同，没有横向滚动条；
+  - 图像处理节点没连图时点生成：弹出“这个模板需要先连一张参考图”，没有发出请求；
+  - 道具定稿选植物生长器，阶段选“发芽到落叶”，描述写“一棵枫树”：请求正文为“为参考植物或 一棵枫树 绘制五阶段生长设定：发芽、抽枝、茂盛、开花、落叶。……”，比例 16:9。
+- 没有逐个节点点过所有模板；服装派生等的“没连图被拦下”走的是同一段代码，已由场景派生验证。

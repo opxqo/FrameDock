@@ -5,6 +5,9 @@
 import type { ArtAssetCategory, ArtAssetTemplate, ArtAssetTier, LocalText } from "@/lib/art-assets/templates";
 import { CHARACTER_PACK } from "@/lib/art-assets/packs/character";
 import { SCENE_PACK } from "@/lib/art-assets/packs/scene";
+import { COSTUME_PACK } from "@/lib/art-assets/packs/costume";
+import { PROP_PACK } from "@/lib/art-assets/packs/prop";
+import { TOOL_PACK } from "@/lib/art-assets/packs/tool";
 
 export type ArtAssetNodeSpec = {
     title: LocalText;
@@ -22,7 +25,7 @@ export type ArtAssetPack = {
     tool?: ArtAssetNodeSpec;
 };
 
-export const ART_ASSET_PACKS: ArtAssetPack[] = [CHARACTER_PACK, SCENE_PACK];
+export const ART_ASSET_PACKS: ArtAssetPack[] = [CHARACTER_PACK, SCENE_PACK, COSTUME_PACK, PROP_PACK, TOOL_PACK];
 
 export const ART_ASSET_TIERS: ArtAssetTier[] = ["master", "derive", "tool"];
 

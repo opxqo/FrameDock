@@ -1,0 +1,108 @@
+// FrameDock: 图像处理 tools — single image operations, no tiers. MOKE 美术资产 entries #39–#46, verbatim except that MOKE's
+// default option values become `{{id}}` (翻译 #41, 细节强化 #42, 特效/普通视频抠图 #44/#45, 技能特效分镜 #46). All need an
+// image. MOKE's wording of #44/#45 ("视频抠图") is kept as is; the result is a sequence reference sheet, not a video.
+
+import type { ArtAssetPack } from "@/lib/art-assets/packs";
+import type { ArtAssetTemplate } from "@/lib/art-assets/templates";
+
+const TOOLS: ArtAssetTemplate[] = [
+    {
+        id: "moke-tool-detail-enhance",
+        title: { zh: "细节强化器", en: "Detail enhancer" },
+        summary: { zh: "保持构图与画风，强化服饰、材质和小道具细节", en: "Keep composition and style, sharpen clothing and material detail" },
+        category: "tool",
+        tier: "tool",
+        input: "image",
+        size: "auto",
+        source: "moke",
+        options: [{ id: "focus", label: { zh: "强化方向", en: "Focus" }, choices: ["服装配件、缝线、材质纹理和小道具", "盔甲镶嵌、磨损、挂件、武器刻纹", "皮肤微观、发型层次、饰品反光（仍保持原画风）"], choiceLabels: ["服饰与材质", "装备与磨损", "角色精修"] }],
+        prompt: "在保持参考图或 [主体] 的构图、轮廓、身份、配色和画风不变的基础上，强化{{focus}}细节。使细节符合原设计和光照，不新增多余装饰，不用锐化光晕替代真实结构。",
+    },
+    {
+        id: "moke-tool-text-remove",
+        title: { zh: "文本消除器", en: "Text remover" },
+        summary: { zh: "移除指定文字，自然重建背景", en: "Remove chosen text and rebuild the background" },
+        category: "tool",
+        tier: "tool",
+        input: "image",
+        size: "auto",
+        source: "moke",
+        prompt: "移除上传原图中指定的文字，并根据周围内容自然重建背景。保持主体、构图、颜色、材质纹理和光照不变，修补边缘连续，不留下字形残影，不新增任何文字。",
+    },
+    {
+        id: "moke-tool-text-translate",
+        title: { zh: "文本翻译器", en: "Text translator" },
+        summary: { zh: "翻译图中文字，保留位置与排版", en: "Translate text in an image, keep layout" },
+        category: "tool",
+        tier: "tool",
+        input: "image",
+        size: "auto",
+        source: "moke",
+        options: [{ id: "lang", label: { zh: "目标语言", en: "Target language" }, choices: ["简体中文", "英语", "日本語", "한국어"], choiceLabels: ["简体中文", "英文", "日文", "韩文"] }],
+        prompt: "将上传原图中可辨识的文字翻译为{{lang}}，保持含义准确。保留文字所在位置、层级、颜色和整体排版，按目标语言合理调整换行与字距；非文字区域、人物与背景保持不变，无法识别的内容不要编造。",
+    },
+    {
+        id: "moke-tool-layer-split",
+        title: { zh: "角色图层拆分", en: "Character layers" },
+        summary: { zh: "前后发、面部、躯干、服装等分层参考表", en: "Layered reference sheet: hair, face, body, clothing" },
+        category: "tool",
+        tier: "tool",
+        input: "image",
+        size: "auto",
+        source: "moke",
+        prompt: "将参考角色或 [主体] 制作为图层拆分参考表，分别展示前后发、面部、躯干、四肢、服装和配件，补全遮挡区域，保留原有比例、画风与配色，标明装配关系。输出为分层设计参考图，不声称生成可编辑PSD文件。",
+    },
+    {
+        id: "moke-tool-sprite-split",
+        title: { zh: "雪碧图拆分预览", en: "Sprite sheet split" },
+        summary: { zh: "把雪碧图的各帧分别展示为预览表", en: "Show each frame of a sprite sheet separately" },
+        category: "tool",
+        tier: "tool",
+        input: "image",
+        size: "auto",
+        source: "moke",
+        prompt: "分析参考雪碧图或 [主体] 中的素材边界，将各帧或元素分别居中展示为拆分预览表。保持原有顺序、比例、色彩和像素风格，各格留出空白、互不重叠，不增加原图没有的动作。输出为预览图，不声称已导出独立文件。",
+    },
+    {
+        id: "moke-tool-effect-frames",
+        title: { zh: "特效视频抠图", en: "Effect frame sequence" },
+        summary: { zh: "特效关键帧转序列参考图，便于抠图", en: "Effect keyframes to a sequence sheet, easy to key out" },
+        category: "tool",
+        tier: "tool",
+        input: "image",
+        size: "auto",
+        source: "moke",
+        options: [{ id: "grid", label: { zh: "序列规格", en: "Sequence" }, choices: ["4×3共12帧", "4×4共16帧", "6×4共24帧"], choiceLabels: ["12 帧", "16 帧", "24 帧"] }],
+        prompt: "根据提供的魔法、能量或粒子特效关键帧，制作{{grid}}的特效序列图。如有参考视频，仅用于理解运动。保持帧间特效尺度、中心和风格一致，体现自然的起势、展开与消散，各格不重叠，背景便于后续抠图。输出是序列参考图。",
+    },
+    {
+        id: "moke-tool-motion-frames",
+        title: { zh: "普通视频抠图", en: "Motion frame sequence" },
+        summary: { zh: "角色或载具关键帧转循环动作序列", en: "Character or vehicle keyframes to a looping motion sheet" },
+        category: "tool",
+        tier: "tool",
+        input: "image",
+        size: "auto",
+        source: "moke",
+        options: [{ id: "grid", label: { zh: "序列规格", en: "Sequence" }, choices: ["6×6共36帧", "4×4共16帧", "4×3共12帧"], choiceLabels: ["36 帧", "16 帧", "12 帧"] }],
+        prompt: "根据提供的角色或载具主体关键帧，制作{{grid}}的循环动作序列参考图。参考视频如有则用于理解动作，保持身份、比例、视角和画风一致，统一每帧中心与基线，动作连续、首尾衔接，背景干净便于后续抠图。",
+    },
+    {
+        id: "moke-tool-skill-storyboard",
+        title: { zh: "技能特效分镜", en: "Skill effect storyboard" },
+        summary: { zh: "按阶段绘制技能特效分镜", en: "Storyboard a skill effect stage by stage" },
+        category: "tool",
+        tier: "tool",
+        input: "image",
+        size: "auto",
+        source: "moke",
+        options: [{ id: "kind", label: { zh: "技能类型", en: "Skill type" }, choices: ["投射物的起手、飞行、命中爆炸", "地面法阵 AOE 的起手、法阵显现、爆发", "近战刀光的蓄力、挥砍、余波", "召唤降临的裂隙、实体凝聚、释放"], choiceLabels: ["投射物", "地面法阵", "近战刀光", "召唤降临"] }],
+        prompt: "为参考特效或 [主体] 绘制技能特效分镜，默认采用{{kind}}三个阶段。统一色彩、材质、尺度与运动方向，清楚表现阶段变化、能量轨迹和作用范围；各分镜独立且顺序明确。",
+    },
+];
+
+export const TOOL_PACK: ArtAssetPack = {
+    category: "tool",
+    label: { zh: "图像处理", en: "Image tools" },
+    tool: { title: { zh: "图像处理", en: "Image tools" }, description: { zh: "细节强化、文字消除、翻译", en: "Detail, text removal, translate" }, templates: TOOLS },
+};

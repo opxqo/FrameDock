@@ -64,6 +64,7 @@ test("MOKE templates are MOKE's text: with the default options filled in, the pr
         "moke-character-turnaround": "added the 以参考角色或 [主体] 为主体 subject line",
         "moke-character-t-pose": "machine-translation slips corrected",
         "moke-character-breakdown": "dropped MOKE's stray leading \"/\"",
+        "moke-prop-gray-model": "dropped MOKE's stray leading \"/\"",
     };
     for (const { template } of all) {
         if (template.source !== "moke" || edited[template.id]) continue;
