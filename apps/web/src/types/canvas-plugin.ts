@@ -104,6 +104,8 @@ export type CanvasBuiltinPanelConfig = {
     composePrompt?: (node: CanvasNodeData, text: string, referenceCount: number) => { prompt: string } | { error: string };
     /** Title of the result node. */
     resultTitle?: (node: CanvasNodeData) => string;
+    /** Images sent as references before the connected ones (美术资产 定稿: the node's own 母版). */
+    ownReferences?: (node: CanvasNodeData, nodes: CanvasNodeData[], connections: CanvasConnection[]) => CanvasNodeData[];
 };
 
 // Shared node definition used by both built-in and plugin nodes.
@@ -112,6 +114,10 @@ export type CanvasNodeDefinition = {
     title: string;
     icon: ReactNode;
     description?: string;
+    /** FrameDock: heading this node is listed under in the create menu and the extensions panel. */
+    group?: string;
+    /** FrameDock: heading inside the group (e.g. 人物 / 场景 under 美术资产). */
+    subgroup?: string;
     defaultSize: { width: number; height: number };
     defaultMetadata?: CanvasNodeMetadata;
     minimapColor?: string;

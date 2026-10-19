@@ -47,3 +47,29 @@ test("a preset's ratio fills a YFAI model's ratio only when left on auto and sup
     expect(withPreferredYfaiRatio("", "yfai::img-x", "auto", [model])).toBe("");
     expect(withPreferredYfaiRatio("", "openai::gpt-image", "16:9", [model])).toBe("");
 });
+
+test("MOKE prompts are sent as written: [主体] takes the description or is dropped, options fill {{id}}", async () => {
+    const { CHARACTER_PACK } = await import("../src/lib/art-assets/packs/character");
+    const CHARACTER_MASTER_TEMPLATES = CHARACTER_PACK.master!.templates;
+    const CHARACTER_DERIVE_TEMPLATES = CHARACTER_PACK.derive!.templates;
+    const turnaround = CHARACTER_MASTER_TEMPLATES[0];
+    const fromText = composeArtAssetPrompt(turnaround, { description: "白色猫族探险家", referenceCount: 0 });
+    expect("prompt" in fromText && fromText.prompt.startsWith("以参考角色或 白色猫族探险家 为主体")).toBe(true);
+    const fromImage = composeArtAssetPrompt(turnaround, { description: "", referenceCount: 1 });
+    expect("prompt" in fromImage && fromImage.prompt.startsWith("以参考角色为主体")).toBe(true);
+    expect("prompt" in fromImage && fromImage.prompt).not.toContain("[主体]");
+
+    const expressions = CHARACTER_DERIVE_TEMPLATES.find((item) => item.id === "moke-character-expressions");
+    const byDefault = composeArtAssetPrompt(expressions, { description: "", referenceCount: 1 });
+    expect("prompt" in byDefault && byDefault.prompt).toContain("采用头像半身特写，");
+    const chosen = composeArtAssetPrompt(expressions, { description: "", referenceCount: 1, options: { range: "仅头部特写" } });
+    expect("prompt" in chosen && chosen.prompt).toContain("采用仅头部特写，");
+    const bogus = composeArtAssetPrompt(expressions, { description: "", referenceCount: 1, options: { range: "x" } });
+    expect("prompt" in bogus && bogus.prompt).toContain("采用头像半身特写，");
+
+    const tPose = CHARACTER_DERIVE_TEMPLATES.find((item) => item.id === "moke-character-t-pose");
+    expect(composeArtAssetPrompt(tPose, { description: "强调护目镜", referenceCount: 0 })).toEqual({ error: "needsImage" });
+    const withNote = composeArtAssetPrompt(tPose, { description: "强调护目镜", referenceCount: 1 });
+    expect("prompt" in withNote && withNote.prompt.endsWith("【补充描述】\n强调护目镜")).toBe(true);
+    expect("prompt" in withNote && withNote.prompt).not.toContain("通用要求");
+});

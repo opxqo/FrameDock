@@ -5,7 +5,7 @@ import { CodexLogo } from "@/components/codex-logo";
 import i18n from "@/i18n";
 
 import { NODE_SPECS } from "@/constant/canvas";
-import { artAssetNodeDefinition } from "@/components/canvas/nodes/art-asset-node";
+import { artAssetNodeDefinitions } from "@/components/canvas/nodes/art-asset-node";
 import { registerNodeDefinitions } from "@/lib/canvas/node-registry";
 import { CanvasNodeType, type CanvasNodeData } from "@/types/canvas";
 import type { CanvasNodeDefinition, CanvasNodeResource } from "@/types/canvas-plugin";
@@ -47,5 +47,5 @@ export function registerBuiltinNodes() {
     registered = true;
     registerNodeDefinitions(BUILTIN_DEFINITIONS, "builtin");
     // FrameDock official preset nodes, listed with the extensions.
-    registerNodeDefinitions([artAssetNodeDefinition], "framedock");
+    registerNodeDefinitions(artAssetNodeDefinitions, "framedock");
 }

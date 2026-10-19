@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { Fragment, useEffect, useRef } from "react";
 import { ImageIcon, List, Music2, Settings2, Video, X } from "@/components/icons";
 import { CodexLogo } from "@/components/codex-logo";
 import { useTranslation } from "react-i18next";
@@ -111,10 +111,40 @@ export function NodeCreateMenu({ position, scale = 1, onCreate, onClose }: { pos
                 </button>
             </div>
             <div className="grid gap-0.5">
-                {definitions.map((def) => (
-                    <ConnectionCreateOption key={def.type} theme={theme} icon={def.icon} title={getNodeSpec(def.type).title} description={def.description} onClick={() => onCreate(def.type)} />
+                {groupDefinitions(definitions).map(([group, subgroups]) => (
+                    <Fragment key={group || "_"}>
+                        {group ? (
+                            <div className="mt-2 border-t px-1 pb-0.5 pt-2.5 text-xs font-medium" style={{ color: theme.node.muted, borderColor: theme.node.stroke }}>
+                                {group}
+                            </div>
+                        ) : null}
+                        {subgroups.map(([subgroup, items]) => (
+                            <Fragment key={subgroup || "_"}>
+                                {subgroup ? (
+                                    <div className="flex items-center gap-2 px-1 pb-0.5 pt-1.5 text-[11px]" style={{ color: theme.node.muted }}>
+                                        {subgroup}
+                                        <span className="h-px flex-1" style={{ background: theme.node.stroke }} />
+                                    </div>
+                                ) : null}
+                                {items.map((def) => (
+                                    <ConnectionCreateOption key={def.type} theme={theme} icon={def.icon} title={getNodeSpec(def.type).title} description={def.description} onClick={() => onCreate(def.type)} />
+                                ))}
+                            </Fragment>
+                        ))}
+                    </Fragment>
                 ))}
             </div>
         </div>
     );
+}
+
+/** FrameDock: ungrouped nodes first, then each group (and each subgroup inside it) under its heading, in registration order. */
+export function groupDefinitions<T extends { group?: string; subgroup?: string }>(definitions: T[]): Array<[string, Array<[string, T[]]>]> {
+    const groups = new Map<string, Map<string, T[]>>();
+    for (const def of definitions) {
+        const group = groups.get(def.group ?? "") ?? new Map<string, T[]>();
+        group.set(def.subgroup ?? "", [...(group.get(def.subgroup ?? "") ?? []), def]);
+        groups.set(def.group ?? "", group);
+    }
+    return [...groups].sort(([a], [b]) => (a ? 1 : 0) - (b ? 1 : 0)).map(([group, subgroups]) => [group, [...subgroups]]);
 }

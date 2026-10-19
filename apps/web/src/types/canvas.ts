@@ -52,7 +52,10 @@ export type CanvasNodeText = {
 
 export type CanvasNodeMetadata = {
     /** FrameDock 美术资产 node: chosen asset category and preset template (lib/art-assets/templates.ts). */
-    artAsset?: { category: string; templateId: string };
+    /** masterId / useMaster: which of the node's own outputs it shares as 母版 with later generations (default: the first). */
+    artAsset?: { category: string; templateId: string; options?: Record<string, string>; masterId?: string; useMaster?: boolean };
+    /** On an image made by a 美术资产 node: that node's type (lets the image offer one-click 派生). */
+    artAssetFrom?: string;
     /** FrameDock: skill snapshot used as the system prompt when this node generates text. */
     skill?: CanvasSkill;
     /** FrameDock: server job producing this node's (single) output; see lib/canvas/resume-jobs.ts. */

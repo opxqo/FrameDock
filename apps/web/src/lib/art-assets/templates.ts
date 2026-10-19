@@ -2,9 +2,23 @@
 // into production assets for video (characters, scenes, costumes, props). Written for FrameDock; the category
 // layout follows common art-asset prompt libraries. Pure data and functions, no DOM.
 
-export type ArtAssetCategory = "character" | "scene" | "costume" | "prop";
+export type ArtAssetCategory = "character" | "scene" | "costume" | "prop" | "tool";
+/** Text shown in the UI, in both app languages (pack data carries its own wording; see lib/art-assets/packs). */
+export type LocalText = { zh: string; en: string };
 /** "image": needs a connected reference image. "either": an image or a description is enough. */
 export type ArtAssetInput = "image" | "either";
+
+/** 定稿 makes the master design; 派生 needs that master as its reference; 工具 is a single image operation. */
+export type ArtAssetTier = "master" | "derive" | "tool";
+/** A template choice that is written into the prompt as `{{id}}` (MOKE's 可选参数); the first choice is the default. */
+export type ArtAssetOption = {
+    id: string;
+    label?: LocalText;
+    /** Values written into the prompt. */
+    choices: string[];
+    /** Short button labels when a value is too long to show (same order as choices). */
+    choiceLabels?: string[];
+};
 
 export type ArtAssetTemplate = {
     id: string;
@@ -13,8 +27,16 @@ export type ArtAssetTemplate = {
     /** Recommended image ratio, written to the node when the template is chosen ("auto" follows the reference). */
     size: string;
     prompt: string;
+    tier?: ArtAssetTier;
+    /** "moke": prompt text from the MOKE AIGC library, used as is; "framedock" (default): FrameDock's own wording. */
+    source?: "moke" | "framedock";
+    options?: ArtAssetOption[];
+    /** Card title and one-line summary. Pack templates carry them; the first combined node's are in the locale files. */
+    title?: LocalText;
+    summary?: LocalText;
 };
 
+/** Category tabs of the first, combined 美术资产 node (T019). */
 export const ART_ASSET_CATEGORIES: ArtAssetCategory[] = ["character", "scene", "costume", "prop"];
 
 // What makes an output usable as a reference in later shots. Scenes keep their own background and light.
@@ -82,8 +104,15 @@ export const ART_ASSET_TEMPLATES: ArtAssetTemplate[] = [
 
 export const ART_ASSET_DEFAULT_TEMPLATE = "character-turnaround";
 
+const registry = new Map<string, ArtAssetTemplate>(ART_ASSET_TEMPLATES.map((template) => [template.id, template]));
+
+/** Makes templates from other files (e.g. character-templates.ts) findable by id. */
+export function registerArtAssetTemplates(templates: ArtAssetTemplate[]) {
+    for (const template of templates) registry.set(template.id, template);
+}
+
 export function findArtAssetTemplate(id: string | undefined) {
-    return ART_ASSET_TEMPLATES.find((template) => template.id === id);
+    return id ? registry.get(id) : undefined;
 }
 
 export function artAssetTemplates(category: ArtAssetCategory) {
@@ -96,15 +125,37 @@ export type ArtAssetComposeError = "noInput" | "needsImage" | "noTemplate";
  * The final prompt: the template, the user's extra description and a consistency rule when references are
  * connected. A template that works from an image refuses to run without one; any template needs an image or text.
  */
-export function composeArtAssetPrompt(template: ArtAssetTemplate | undefined, input: { description: string; referenceCount: number }): { prompt: string } | { error: ArtAssetComposeError } {
+export function composeArtAssetPrompt(template: ArtAssetTemplate | undefined, input: { description: string; referenceCount: number; options?: Record<string, string> }): { prompt: string } | { error: ArtAssetComposeError } {
     if (!template) return { error: "noTemplate" };
     const description = input.description.trim();
     if (template.input === "image" && input.referenceCount < 1) return { error: "needsImage" };
     if (!description && input.referenceCount < 1) return { error: "noInput" };
+    // Pack templates (MOKE's and our own) are complete prompts: fill [主体] and options, add nothing else.
+    if (template.source === "moke" || template.tier) return { prompt: fillMokePrompt(template, description, input.options) };
     const parts = [template.prompt];
     if (input.referenceCount > 0) parts.push(`一致性：严格以参考图为准，保持其中对象的外观、比例、配色和细节特征不变${input.referenceCount > 1 ? "；多张参考图描绘的是同一对象的不同方面，综合使用" : ""}。`);
     if (description) parts.push(`【补充描述】\n${description}`);
     if (template.category !== "scene") parts.push(STUDIO_RULES);
     parts.push(COMMON_RULES);
     return { prompt: parts.join("\n\n") };
+}
+
+/** The value of each option: the node's choice when it is one of the template's, else the first choice. */
+export function artAssetOptionValues(template: ArtAssetTemplate, chosen: Record<string, string> = {}) {
+    return Object.fromEntries((template.options ?? []).map((option) => [option.id, option.choices.includes(chosen[option.id] ?? "") ? chosen[option.id]! : option.choices[0]!]));
+}
+
+/**
+ * MOKE prompts are sent as written: `{{option}}` takes the chosen value, and `[主体]` (MOKE's "参考角色或 [主体]") takes
+ * the description — or is dropped when there is none, leaving "参考角色". A description for a prompt without
+ * `[主体]` is added at the end.
+ */
+function fillMokePrompt(template: ArtAssetTemplate, description: string, chosen?: Record<string, string>) {
+    const values = artAssetOptionValues(template, chosen);
+    let prompt = template.prompt.replace(/\{\{(\w+)\}\}/g, (_, id: string) => values[id] ?? "");
+    if (prompt.includes("[主体]")) {
+        prompt = description ? prompt.replaceAll("[主体]", description) : prompt.replace(/或\s*\[主体\]\s*/g, "").replaceAll("[主体]", "参考图中的角色");
+        return prompt;
+    }
+    return description ? `${prompt}\n\n【补充描述】\n${description}` : prompt;
 }

@@ -1,10 +1,11 @@
 import type { ReactNode } from "react";
-import { Brush, Camera, Copy, FileText, Grid2x2, Lock, LockOpen, Maximize2, Palette, Scissors, Sparkles, Upload, ZoomIn } from "@/components/icons";
+import { ArtAsset, Brush, Camera, Copy, FileText, Grid2x2, Lock, LockOpen, Maximize2, Palette, Scissors, Sparkles, Upload, ZoomIn } from "@/components/icons";
 
 import type { CanvasNodeData } from "@/types/canvas";
 import i18n from "@/i18n";
+import { artAssetDeriveType } from "@/lib/art-assets/node-types";
 
-export type ImageNodeActionToolId = "copyPrompt" | "reversePrompt" | "replace" | "resize" | "maskEdit" | "crop" | "split" | "upscale" | "superResolve" | "angle" | "colorMatch" | "view";
+export type ImageNodeActionToolId = "copyPrompt" | "reversePrompt" | "replace" | "resize" | "maskEdit" | "crop" | "split" | "upscale" | "superResolve" | "angle" | "colorMatch" | "derive" | "view";
 export type ImageQuickToolId = "info" | "delete" | "saveAsset" | "download" | ImageNodeActionToolId;
 
 export type ImageToolHandlers = {
@@ -17,6 +18,7 @@ export type ImageToolHandlers = {
     onSuperResolve: (node: CanvasNodeData) => void;
     onAngle: (node: CanvasNodeData) => void;
     onColorMatch: (node: CanvasNodeData) => void;
+    onDerive: (node: CanvasNodeData) => void;
     onViewImage: (node: CanvasNodeData) => void;
     onCopyPrompt: (node: CanvasNodeData) => void;
     onReversePrompt: (node: CanvasNodeData) => void;
@@ -29,6 +31,8 @@ export type ImageToolDefinition = {
     title: string | ((node: CanvasNodeData) => string);
     icon: (node: CanvasNodeData) => ReactNode;
     active?: (node: CanvasNodeData) => boolean;
+    /** FrameDock: shown only for nodes where this returns true. */
+    available?: (node: CanvasNodeData) => boolean;
     run: (node: CanvasNodeData, handlers: ImageToolHandlers) => void;
 };
 
@@ -40,7 +44,7 @@ export type ImageQuickToolsConfig = {
 };
 
 /** FrameDock: tools added after quick-tool settings were already saved by users. */
-const ADDED_LATER: ImageQuickToolId[] = ["colorMatch"];
+const ADDED_LATER: ImageQuickToolId[] = ["colorMatch", "derive"];
 
 export const IMAGE_QUICK_TOOLS_STORAGE_KEY = "canvas-image-quick-tools-v7";
 
@@ -137,6 +141,15 @@ export const imageToolDefinitions: ImageToolDefinition[] = [
         run: (node, handlers) => handlers.onColorMatch(node),
     },
     {
+        id: "derive",
+        defaultVisible: true,
+        label: () => i18n.t("artAsset.derive"),
+        title: () => i18n.t("artAsset.deriveTitle"),
+        icon: () => <ArtAsset className="size-4" />,
+        available: (node) => Boolean(artAssetDeriveType(node)),
+        run: (node, handlers) => handlers.onDerive(node),
+    },
+    {
         id: "view",
         defaultVisible: true,
         label: () => i18n.t("canvas.imageTools.view"),
@@ -149,7 +162,7 @@ export const imageToolDefinitions: ImageToolDefinition[] = [
 export const defaultImageQuickToolIds: ImageQuickToolId[] = [...defaultBaseToolIds, ...imageToolDefinitions.filter((tool) => tool.defaultVisible).map((tool) => tool.id)];
 
 export function buildImageToolbarTools(node: CanvasNodeData, handlers: ImageToolHandlers) {
-    return imageToolDefinitions.map((tool) => ({
+    return imageToolDefinitions.filter((tool) => !tool.available || tool.available(node)).map((tool) => ({
         id: tool.id,
         label: resolveToolText(tool.label, node),
         title: resolveToolText(tool.title, node),

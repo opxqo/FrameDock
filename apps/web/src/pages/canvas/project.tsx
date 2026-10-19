@@ -96,6 +96,7 @@ import { CanvasEmptyHint } from "@/components/canvas/canvas-empty-hint";
 import { MOD_KEY, useCommandStore } from "@/stores/use-command-store";
 import { getNodeDefinition, isBuiltinNodeType as isBuiltinType, useNodeRegistryVersion } from "@/lib/canvas/node-registry";
 import { registerBuiltinNodes } from "@/components/canvas/nodes/builtin-nodes";
+import { artAssetDeriveType } from "@/lib/art-assets/node-types";
 import { CanvasPluginManagerModal } from "@/components/canvas/canvas-plugin-manager-modal";
 import { CanvasRefreshShell } from "@/components/canvas/canvas-refresh-shell";
 import { CanvasTopBar, useShortcutSheetStore } from "@/components/canvas/canvas-top-bar";
@@ -1152,6 +1153,19 @@ function InfiniteCanvasPage() {
         },
         [effectiveConfig.canvasImageCount, effectiveConfig.count, effectiveConfig.imageModel, effectiveConfig.model, effectiveConfig.size, getCanvasCenter],
     );
+
+    // FrameDock: one-click 派生 — a 美术资产 定稿 result gets the matching 派生 node to its right, already connected.
+    const deriveArtAsset = useCallback((image: CanvasNodeData) => {
+        const type = artAssetDeriveType(image);
+        if (!type) return;
+        const spec = getNodeSpec(type);
+        const newNode = createCanvasNode(type, { x: image.position.x + image.width + 96 + spec.width / 2, y: image.position.y + image.height / 2 });
+        setNodes((prev) => [...prev, newNode]);
+        setConnections((prev) => [...prev, { id: nanoid(), fromNodeId: image.id, toNodeId: newNode.id }]);
+        setSelectedNodeIds(new Set([newNode.id]));
+        setSelectedConnectionId(null);
+        setDialogNodeId(newNode.id);
+    }, []);
 
     const deleteNodes = useCallback(
         (ids: Set<string>) => {
@@ -2965,6 +2979,12 @@ function InfiniteCanvasPage() {
             }
             // FrameDock preset nodes (美术资产) wrap the user's text in their template once the references are known.
             const composePrompt = sourceNode ? getNodeDefinition(sourceNode.type)?.useBuiltinPanel?.composePrompt : undefined;
+            // 美术资产 定稿 nodes share their own 母版 with later generations: it goes first, before connected images.
+            const ownReferences = sourceNode ? getNodeDefinition(sourceNode.type)?.useBuiltinPanel?.ownReferences?.(sourceNode, nodesRef.current, connectionsRef.current) ?? [] : [];
+            if (ownReferences.length) {
+                const own: ReferenceImage[] = ownReferences.map((image) => ({ id: image.id, name: `${image.title || image.id}.png`, type: image.metadata?.mimeType || "image/png", dataUrl: image.metadata?.content || "", storageKey: image.metadata?.storageKey }));
+                generationContext = { ...generationContext, referenceImages: [...own, ...generationContext.referenceImages.filter((image) => !own.some((item) => item.id === image.id))] };
+            }
             if (sourceNode && composePrompt) {
                 const composed = composePrompt(sourceNode, generationContext.prompt, generationContext.referenceImages.length);
                 if ("error" in composed) {
@@ -3024,14 +3044,20 @@ function InfiniteCanvasPage() {
                     const rootId = retargetImage ? retargetImage.id : reuseImageNode ? nodeId : nanoid();
                     const imageIds = Array.from({ length: count }, () => nanoid());
                     pendingChildIds = [rootId];
+                    // 美术资产 nodes keep generating from one place: stack each new result under the ones they already made.
+                    const presetOutputs = composePrompt && sourceNode
+                        ? nodesRef.current.filter((node) => node.type === CanvasNodeType.Image && connectionsRef.current.some((connection) => connection.fromNodeId === nodeId && connection.toNodeId === node.id))
+                        : [];
                     const rootNode: CanvasNodeData = {
                         id: rootId,
                         type: CanvasNodeType.Image,
                         title: retargetImage?.title || (reuseImageNode ? sourceNode?.title : undefined) || presetTitle || effectivePrompt.slice(0, 32) || "Generated Image",
                         position: retargetImage
                             ? retargetImage.position
-                            : {
-                                  x: reuseImageNode ? parentPosition.x : parentPosition.x + parentConfig.width + 96,
+                            : presetOutputs.length
+                              ? { x: presetOutputs[0]!.position.x, y: Math.max(...presetOutputs.map((node) => node.position.y + node.height)) + 48 }
+                              : {
+                                  x: reuseImageNode ? parentPosition.x : parentPosition.x + (composePrompt && sourceNode ? sourceNode.width : parentConfig.width) + 96,
                                   y: parentPosition.y + parentConfig.height / 2 - imageConfig.height / 2,
                               },
                         width: retargetImage ? retargetImage.width : reuseImageNode ? sourceNode?.width || imageConfig.width : imageConfig.width,
@@ -3045,6 +3071,8 @@ function InfiniteCanvasPage() {
                             images: imageIds.map((id) => ({ id, status: NODE_STATUS_LOADING, content: "", naturalWidth: 0, naturalHeight: 0, bytes: 0, mimeType: "" })),
                             primaryImageId: undefined,
                             ...generationMetadata,
+                            // Images from a 美术资产 node remember it, so they can offer one-click 派生.
+                            ...(composePrompt && sourceNode ? { artAssetFrom: sourceNode.type } : {}),
                         },
                     };
 
@@ -4292,6 +4320,7 @@ function InfiniteCanvasPage() {
                     onSuperResolve={(node) => setSuperResolveNodeId(node.id)}
                     onAngle={(node) => setAngleNodeId(node.id)}
                     onColorMatch={(node) => setColorMatchNodeId(node.id)}
+                    onDerive={deriveArtAsset}
                     onViewImage={handleNodeViewImage}
                     onReversePrompt={createImageReversePromptNodes}
                     onRetry={(node) => void handleRetryNode(node)}

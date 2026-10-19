@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { Segmented, Switch, Tooltip } from "antd";
 import { CircleDot, Eraser, Grid2x2, Group, Image as ImageIcon, Info, LocateFixed, Moon, Music2, Palette, Puzzle, Settings2, Square, Sun, Trash2, Type, Upload, Video } from "@/components/icons";
 import { CodexLogo } from "@/components/codex-logo";
@@ -7,6 +7,7 @@ import { CodexLogo } from "@/components/codex-logo";
 import { type CanvasBackgroundMode } from "@/lib/canvas-theme";
 import { getNodePluginId, listNodeDefinitions, useNodeRegistryVersion } from "@/lib/canvas/node-registry";
 import { getNodeSpec } from "@/constant/canvas";
+import { groupDefinitions } from "@/components/canvas/canvas-create-menus";
 import { cn } from "@/lib/utils";
 import { useThemeStore } from "@/stores/use-theme-store";
 import { useTranslation } from "react-i18next";
@@ -131,19 +132,37 @@ export function CanvasToolbar({
             {panel === "extensions" && extensionDefs.length ? (
                 <RailPanel title={t("canvas.toolbar.extensions")}>
                     <div className="grid gap-0.5">
-                        {extensionDefs.map((def) => (
-                            <button
-                                key={def.type}
-                                type="button"
-                                className="flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left text-sm transition-colors hover:bg-accent"
-                                onClick={() => {
-                                    onAddExtensionNode(def.type);
-                                    setPanel(null);
-                                }}
-                            >
-                                <span className="grid size-7 shrink-0 place-items-center rounded-md bg-secondary text-base">{def.icon}</span>
-                                <span className="min-w-0 flex-1 truncate">{getNodeSpec(def.type).title}</span>
-                            </button>
+                        {groupDefinitions(extensionDefs).map(([group, subgroups]) => (
+                            <Fragment key={group || "_"}>
+                                {group ? <div className="px-2 pb-0.5 pt-1.5 text-xs font-medium text-muted-foreground">{group}</div> : null}
+                                {subgroups.map(([subgroup, defs]) => (
+                                    <Fragment key={subgroup || "_"}>
+                                        {subgroup ? (
+                                            <div className="flex items-center gap-2 px-2 pb-0.5 pt-2 text-[11px] text-muted-foreground">
+                                                {subgroup}
+                                                <span className="h-px flex-1 bg-border" />
+                                            </div>
+                                        ) : null}
+                                        {defs.map((def) => (
+                                            <button
+                                                key={def.type}
+                                                type="button"
+                                                className="flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left text-sm transition-colors hover:bg-accent"
+                                                onClick={() => {
+                                                    onAddExtensionNode(def.type);
+                                                    setPanel(null);
+                                                }}
+                                            >
+                                                <span className="grid size-7 shrink-0 place-items-center rounded-md bg-secondary text-base">{def.icon}</span>
+                                                <span className="min-w-0 flex-1">
+                                                    <span className="block truncate">{getNodeSpec(def.type).title}</span>
+                                                    {def.description ? <span className="block truncate text-[11px] text-muted-foreground">{def.description}</span> : null}
+                                                </span>
+                                            </button>
+                                        ))}
+                                    </Fragment>
+                                ))}
+                            </Fragment>
                         ))}
                     </div>
                 </RailPanel>
