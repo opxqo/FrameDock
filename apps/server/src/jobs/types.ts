@@ -39,6 +39,25 @@ export type JobInput = {
   runId?: string;
 };
 
+/** One gateway change to a requested parameter (YFAI `param_adjustments`): `requested` was replaced by `applied`. */
+export type ParamAdjustment = {
+  param: string;
+  requested: unknown;
+  applied: unknown;
+  reason: string;
+};
+
+/** Provider remarks kept with a job; each field is filled in by the adapter that knows it. */
+export type JobNotes = {
+  paramAdjustments?: ParamAdjustment[];
+  /** The id the provider's account ledger uses for this call (YFAI: delivery_provenance.request_id). */
+  ledgerId?: string;
+  /** What the call actually cost, in the provider's display unit (YFAI ⚡). */
+  cost?: number;
+  /** Which provider lane served it (YFAI channel_id). */
+  lane?: string;
+};
+
 /** What clients see: never includes credentials. The (possibly large) request is only sent on demand. */
 export type PublicJob = {
   id: string;
@@ -58,6 +77,9 @@ export type PublicJob = {
   updatedAt: number;
   finishedAt: number | null;
   deliveredAt: number | null;
+  notes: JobNotes | null;
+  /** The start of the prompt, when the request has one. */
+  prompt: string | null;
   request?: unknown;
 };
 
@@ -88,8 +110,8 @@ export type AdapterContext = {
 
 export type PollOutcome =
   | { status: "running" }
-  | { status: "succeeded"; payload?: unknown }
-  | { status: "failed"; error: string };
+  | { status: "succeeded"; payload?: unknown; notes?: JobNotes }
+  | { status: "failed"; error: string; notes?: JobNotes };
 
 export type FetchedResult = {
   bytes: Buffer;
@@ -113,7 +135,7 @@ export interface JobAdapter {
   maxPolls: number;
   submit(
     context: AdapterContext,
-  ): Promise<{ remoteTaskId: string; requestId?: string }>;
+  ): Promise<{ remoteTaskId: string; requestId?: string; notes?: JobNotes }>;
   poll(context: AdapterContext, remoteTaskId: string): Promise<PollOutcome>;
   fetchResult(
     context: AdapterContext,

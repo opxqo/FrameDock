@@ -2,8 +2,9 @@ import { Alert, Button, Empty, Select, Table, Tag } from "antd";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { type AuditReport, fetchJobAudit, listJobs, resubmitJob } from "@/services/api/jobs";
-import { fetchYfaiLedger } from "@/services/api/yfai";
+import { type AuditReport, fetchJobAudit, resubmitJob } from "@/services/api/jobs";
+import { matchYfaiLedger, type YfaiUsageRow } from "@/lib/yfai-account";
+import { fetchYfaiUsage, listYfaiJobs } from "@/services/api/yfai";
 import { useConfigStore } from "@/stores/use-config-store";
 
 // FrameDock: "did everything we paid for end up on the canvas?" Server tasks are cross-checked with their stored
@@ -27,12 +28,21 @@ export function ConfigJobAudit() {
         try {
             setReport(await fetchJobAudit(days));
             const key = config.apiKey;
-            const yfaiKey = config.channels?.find((channel) => /token6688/.test(channel.baseUrl))?.apiKey || (/token6688/.test(config.baseUrl) ? key : "");
+            const yfaiKey = config.channels?.find((channel) => channel.id === "yfai" || /token6688/.test(channel.baseUrl))?.apiKey || (/token6688/.test(config.baseUrl) ? key : "");
             if (yfaiKey) {
                 try {
-                    const [rows, jobs] = await Promise.all([fetchYfaiLedger(yfaiKey, days), listJobs({ limit: 500 })]);
-                    const known = new Set(jobs.map((job) => job.requestId).filter(Boolean));
-                    const unmatched = rows.filter((row) => !known.has(row.requestId));
+                    // The ledger names a call by delivery_provenance.request_id (notes.ledgerId); older tasks match by model and time.
+                    const usage: YfaiUsageRow[] = [];
+                    let cursor = "";
+                    for (let page = 0; page < 5; page++) {
+                        const result = await fetchYfaiUsage(yfaiKey, { days, cursor, type: "usage" });
+                        usage.push(...result.rows.filter((row) => row.requestId));
+                        cursor = result.nextCursor;
+                        if (!cursor) break;
+                    }
+                    const matches = matchYfaiLedger(usage, await listYfaiJobs(yfaiKey, 500));
+                    const rows = usage.map((row) => ({ requestId: row.requestId, model: row.model, credits: Math.abs(row.credits), at: row.at }));
+                    const unmatched = rows.filter((row) => !matches.has(row.requestId));
                     setLedger({ paidCalls: rows.length, paidCredits: rows.reduce((sum, row) => sum + row.credits, 0), matched: rows.length - unmatched.length, unmatched, unmatchedCredits: unmatched.reduce((sum, row) => sum + row.credits, 0) });
                 } catch (ledgerError) {
                     setLedger({ error: ledgerError instanceof Error ? ledgerError.message : String(ledgerError) });

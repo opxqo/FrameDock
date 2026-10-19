@@ -23,8 +23,23 @@ export type Job = {
     nodeId: string | null;
     updatedAt: number;
     deliveredAt: number | null;
+    createdAt: number;
+    finishedAt: number | null;
+    /** What the provider reported besides the result, e.g. YFAI's parameter-adjustment receipt. */
+    notes: JobNotes | null;
+    /** The start of the prompt (up to 200 characters). */
+    prompt: string | null;
     /** Only on a single-job read. */
     request?: unknown;
+};
+/** Provider remarks (apps/server/src/jobs/types.ts JobNotes). */
+export type JobNotes = {
+    paramAdjustments?: Array<{ param: string; requested: unknown; applied: unknown; reason: string }>;
+    /** The id the provider's account ledger uses for this call. */
+    ledgerId?: string;
+    /** Actual cost in the provider's display unit (YFAI ⚡). */
+    cost?: number;
+    lane?: string;
 };
 export type JobInput = {
     kind: Job["kind"];
@@ -64,7 +79,7 @@ export async function createJob({ signal, ...input }: JobInput): Promise<Job> {
     });
 }
 
-export async function listJobs(filter: { node?: string; project?: string; state?: JobState; kind?: Job["kind"]; undelivered?: boolean; limit?: number } = {}, signal?: AbortSignal): Promise<Job[]> {
+export async function listJobs(filter: { node?: string; project?: string; state?: JobState; kind?: Job["kind"]; adapter?: string; undelivered?: boolean; limit?: number } = {}, signal?: AbortSignal): Promise<Job[]> {
     const query = new URLSearchParams();
     for (const [key, value] of Object.entries(filter)) if (value !== undefined) query.set(key, value === true ? "1" : String(value));
     const response = await fetch(`/api/jobs?${query}`, { cache: "no-store", signal });
@@ -75,6 +90,15 @@ export async function listJobs(filter: { node?: string; project?: string; state?
 
 /** Tells the server this client has taken the result, so it stops showing up as undelivered. */
 export const ackJob = (id: string) => jobRequest(`/${encodeURIComponent(id)}/ack`, { method: "POST" });
+
+/** Same-origin url of a stored result file (images, videos and audio are served by the kv store). */
+export function jobFileUrl(job: Job, index = 0) {
+    const file = job.result?.files?.[index] ?? (index === 0 ? job.result : undefined);
+    return file ? kvUrl(file.store, file.key) : "";
+}
+
+/** Stores billing facts looked up at the provider after the job finished. */
+export const addJobNotes = (id: string, notes: Pick<JobNotes, "ledgerId" | "cost" | "lane">) => jobRequest(`/${encodeURIComponent(id)}/notes`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(notes) });
 
 export const getJob = (id: string, signal?: AbortSignal) => jobRequest(`/${encodeURIComponent(id)}`, { signal });
 export const cancelJob = (id: string) => jobRequest(`/${encodeURIComponent(id)}/cancel`, { method: "POST" });

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { App, Button, Drawer, Input, Segmented, Switch, Tag } from "antd";
 import { useTranslation } from "react-i18next";
-import { ChevronDown, ChevronRight, ExternalLink, RefreshCw, Search } from "@/components/icons";
+import { ExternalLink, RefreshCw, Search } from "@/components/icons";
 import { ModelIcon, resolveModelVendor } from "@/components/model-picker";
 import { ModelPrice } from "@/components/autodl-price";
 import { YfaiParameters } from "@/components/yfai-parameters";
@@ -9,17 +9,13 @@ import { YFAI_DOCS_URL, YFAI_SNAPSHOT_AT, yfaiCapability, yfaiModels, yfaiToolOn
 import { buildYfaiParams, fetchYfaiPrices, fetchYfaiCatalog, submitYfaiTask, waitYfaiTask, yfaiRouting, yfaiRequest, yfaiTaskUrls, type YfaiTask } from "@/services/api/yfai";
 import { useConfigStore, withYfaiConfig, withLocalProxy, type AiConfig } from "@/stores/use-config-store";
 
-export function ConfigYfai({ config, onConfigChange }: { config: AiConfig; onConfigChange: (config: AiConfig) => void }) {
+export function ConfigYfai({ config, onConfigChange, onOpenPanel }: { config: AiConfig; onConfigChange: (config: AiConfig) => void; /** FrameDock: opens the YFAI settings section, where the model list now lives. */ onOpenPanel?: () => void }) {
     const { t, i18n } = useTranslation();
     const { message } = App.useApp();
     const [syncing, setSyncing] = useState(false);
-    const [category, setCategory] = useState("text");
-    const [keyword, setKeyword] = useState("");
-    const [expanded, setExpanded] = useState(true);
-    const [tool, setTool] = useState<YfaiModel>();
     const apiKey = config.channels.find((channel) => channel.id === "yfai")?.apiKey || "";
     const models = yfaiModels(config.yfaiModels);
-    const visible = models.filter((model) => yfaiCapability(model) === category && `${model.id} ${model.display_name} ${model.display_name_en}`.toLowerCase().includes(keyword.toLowerCase()));
+    const isEnabled = (model: YfaiModel) => model.available !== false && !yfaiToolOnly(model) && config.yfaiEnabledModels.includes(model.id);
     const sync = async () => {
         setSyncing(true);
         try {
@@ -35,18 +31,6 @@ export function ConfigYfai({ config, onConfigChange }: { config: AiConfig; onCon
             message.success(t("yfai.synced", { count: catalog.filter((model) => !model.deprecated).length }));
         } catch (error) { message.error(error instanceof Error ? error.message : t("yfai.requestFailed")); }
         finally { setSyncing(false); }
-    };
-    const groups = new Map<string, YfaiModel[]>();
-    visible.forEach((model) => {
-        const vendor = resolveModelVendor(model.id);
-        groups.set(vendor, [...(groups.get(vendor) || []), model]);
-    });
-    const isEnabled = (model: YfaiModel) => model.available !== false && !yfaiToolOnly(model) && config.yfaiEnabledModels.includes(model.id);
-    const canEnable = (model: YfaiModel) => model.available !== false && !yfaiToolOnly(model);
-    const modelKey = { text: "textModel", image: "imageModel", video: "videoModel", audio: "audioModel" }[category] as "textModel" | "imageModel" | "videoModel" | "audioModel";
-    const setEnabled = (items: YfaiModel[], on: boolean) => {
-        const names = items.filter(canEnable).map((model) => model.id);
-        onConfigChange(withYfaiConfig(config, { enabled: on ? [...new Set([...config.yfaiEnabledModels, ...names])] : config.yfaiEnabledModels.filter((name) => !names.includes(name)) }));
     };
     const formatTime = (value: string) => new Date(value).toLocaleString(i18n.resolvedLanguage, { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
 
@@ -73,60 +57,84 @@ export function ConfigYfai({ config, onConfigChange }: { config: AiConfig; onCon
                     </Button>
                 </div>
             </div>
-            <div className="border-t border-stone-200 dark:border-stone-800">
-                <button type="button" className="flex w-full items-center gap-1.5 px-4 py-2.5 text-left text-sm font-medium" aria-expanded={expanded} onClick={() => setExpanded((value) => !value)}>
-                    {expanded ? <ChevronDown className="size-4" /> : <ChevronRight className="size-4" />}
-                    {t("yfai.modelList")}
-                    <span className="text-xs font-normal text-stone-500">{t("yfai.enabledCount", { count: models.filter(isEnabled).length, total: models.length })}</span>
-                </button>
-                {expanded ? (
-                    <div className="px-4 pb-4">
-                        <div className="mb-3 flex items-center gap-2">
-                            <Segmented size="small" value={category} onChange={setCategory} options={["text", "image", "video", "audio"].map((value) => {
-                                const all = models.filter((model) => yfaiCapability(model) === value);
-                                return { value, label: `${t(`yfai.categories.${value}`)} ${all.filter(isEnabled).length}/${all.length}` };
-                            })} />
-                            <Input size="small" allowClear prefix={<Search className="size-3.5 opacity-50" />} aria-label={t("yfai.search")} placeholder={t("yfai.searchShort")} value={keyword} onChange={(event) => setKeyword(event.target.value)} className="!min-w-24 !w-32 !flex-1" />
-                            <div className="ml-auto flex shrink-0 gap-1">
-                                <Button size="small" disabled={!visible.some(canEnable)} onClick={() => setEnabled(visible, true)}>{t("yfai.enableAll")}</Button>
-                                <Button size="small" disabled={!visible.some(canEnable)} onClick={() => setEnabled(visible, false)}>{t("yfai.disableAll")}</Button>
-                            </div>
-                        </div>
-                        {groups.size ? (
-                            <div className="max-h-80 overflow-y-auto rounded-md border border-stone-200 dark:border-stone-800">
-                                {Array.from(groups, ([vendor, items]) => (
-                                    <div key={vendor}>
-                                        <div className="sticky top-0 z-10 bg-stone-50 px-3 py-1 text-xs text-stone-500 dark:bg-stone-900">{vendor}</div>
-                                        {items.map((model) => {
-                                            const on = isEnabled(model);
-                                            const optionValue = `yfai::${model.id}`;
-                                            const isDefault = on && config[modelKey] === optionValue;
-                                            const label = i18n.resolvedLanguage?.startsWith("en") ? model.display_name_en || model.display_name : model.display_name;
-                                            return (
-                                                <div key={model.id} className="flex items-center gap-2 border-t border-stone-100 px-3 py-1.5 first:border-t-0 dark:border-stone-800/60">
-                                                    <ModelIcon model={optionValue} />
-                                                    <button type="button" className={`min-w-0 flex-1 truncate text-left text-sm ${on || yfaiToolOnly(model) ? "" : "opacity-50"}`} title={`${model.id} · ${t("yfai.openTool")}`} disabled={model.available === false} onClick={() => setTool(model)}>{label}</button>
-                                                    <ModelPrice model={optionValue} className="text-xs text-stone-500" />
-                                                    {model.available === false ? <Tag color="orange" className="!m-0 shrink-0">{t("yfai.unavailable")}</Tag> : yfaiToolOnly(model) ? (
-                                                        <Button size="small" type="link" className="!px-1" onClick={() => setTool(model)}>{t("yfai.openTool")}</Button>
-                                                    ) : isDefault ? (
-                                                        <Tag color="green" className="!m-0 shrink-0">{t("yfai.default")}</Tag>
-                                                    ) : on ? (
-                                                        <Button size="small" type="link" className="!px-1" onClick={() => onConfigChange({ ...config, [modelKey]: optionValue, ...(category === "image" ? { model: optionValue } : {}) })}>{t("yfai.setDefault")}</Button>
-                                                    ) : null}
-                                                    <Switch size="small" aria-label={`${t("yfai.enable")} ${model.id}`} disabled={!canEnable(model)} checked={on} onChange={(checked) => setEnabled([model], checked)} />
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="rounded-md border border-dashed border-stone-200 px-3 py-6 text-center text-xs text-stone-500 dark:border-stone-800">{t("yfai.noMatch")}</div>
-                        )}
-                    </div>
+            <div className="flex items-center gap-1.5 border-t border-stone-200 px-4 py-2.5 text-sm dark:border-stone-800">
+                <span className="font-medium">{t("yfai.modelList")}</span>
+                <span className="text-xs text-stone-500">{t("yfai.enabledCount", { count: models.filter(isEnabled).length, total: models.length })}</span>
+                {onOpenPanel ? (
+                    <Button size="small" type="link" className="!ml-auto" onClick={onOpenPanel}>
+                        {t("yfaiPanel.open")}
+                    </Button>
                 ) : null}
             </div>
+        </div>
+    );
+}
+
+/** FrameDock: the YFAI model list (enable, default, price, try-out tool), shown in the YFAI settings section. */
+export function YfaiModelList({ config, onConfigChange }: { config: AiConfig; onConfigChange: (config: AiConfig) => void }) {
+    const { t, i18n } = useTranslation();
+    const [category, setCategory] = useState("text");
+    const [keyword, setKeyword] = useState("");
+    const [tool, setTool] = useState<YfaiModel>();
+    const models = yfaiModels(config.yfaiModels);
+    const visible = models.filter((model) => yfaiCapability(model) === category && `${model.id} ${model.display_name} ${model.display_name_en}`.toLowerCase().includes(keyword.toLowerCase()));
+    const groups = new Map<string, YfaiModel[]>();
+    visible.forEach((model) => {
+        const vendor = resolveModelVendor(model.id);
+        groups.set(vendor, [...(groups.get(vendor) || []), model]);
+    });
+    const isEnabled = (model: YfaiModel) => model.available !== false && !yfaiToolOnly(model) && config.yfaiEnabledModels.includes(model.id);
+    const canEnable = (model: YfaiModel) => model.available !== false && !yfaiToolOnly(model);
+    const modelKey = { text: "textModel", image: "imageModel", video: "videoModel", audio: "audioModel" }[category] as "textModel" | "imageModel" | "videoModel" | "audioModel";
+    const setEnabled = (items: YfaiModel[], on: boolean) => {
+        const names = items.filter(canEnable).map((model) => model.id);
+        onConfigChange(withYfaiConfig(config, { enabled: on ? [...new Set([...config.yfaiEnabledModels, ...names])] : config.yfaiEnabledModels.filter((name) => !names.includes(name)) }));
+    };
+    return (
+        <div>
+            <div className="mb-3 flex items-center gap-2">
+                <Segmented size="small" value={category} onChange={setCategory} options={["text", "image", "video", "audio"].map((value) => {
+                    const all = models.filter((model) => yfaiCapability(model) === value);
+                    return { value, label: `${t(`yfai.categories.${value}`)} ${all.filter(isEnabled).length}/${all.length}` };
+                })} />
+                <Input size="small" allowClear prefix={<Search className="size-3.5 opacity-50" />} aria-label={t("yfai.search")} placeholder={t("yfai.searchShort")} value={keyword} onChange={(event) => setKeyword(event.target.value)} className="!min-w-24 !w-32 !flex-1" />
+                <div className="ml-auto flex shrink-0 gap-1">
+                    <Button size="small" disabled={!visible.some(canEnable)} onClick={() => setEnabled(visible, true)}>{t("yfai.enableAll")}</Button>
+                    <Button size="small" disabled={!visible.some(canEnable)} onClick={() => setEnabled(visible, false)}>{t("yfai.disableAll")}</Button>
+                </div>
+            </div>
+            {groups.size ? (
+                <div className="max-h-[52vh] overflow-y-auto rounded-md border border-stone-200 dark:border-stone-800">
+                    {Array.from(groups, ([vendor, items]) => (
+                        <div key={vendor}>
+                            <div className="sticky top-0 z-10 bg-stone-50 px-3 py-1 text-xs text-stone-500 dark:bg-stone-900">{vendor}</div>
+                            {items.map((model) => {
+                                const on = isEnabled(model);
+                                const optionValue = `yfai::${model.id}`;
+                                const isDefault = on && config[modelKey] === optionValue;
+                                const label = i18n.resolvedLanguage?.startsWith("en") ? model.display_name_en || model.display_name : model.display_name;
+                                return (
+                                    <div key={model.id} className="flex items-center gap-2 border-t border-stone-100 px-3 py-1.5 first:border-t-0 dark:border-stone-800/60">
+                                        <ModelIcon model={optionValue} />
+                                        <button type="button" className={`min-w-0 flex-1 truncate text-left text-sm ${on || yfaiToolOnly(model) ? "" : "opacity-50"}`} title={`${model.id} · ${t("yfai.openTool")}`} disabled={model.available === false} onClick={() => setTool(model)}>{label}</button>
+                                        <ModelPrice model={optionValue} className="text-xs text-stone-500" />
+                                        {model.available === false ? <Tag color="orange" className="!m-0 shrink-0">{t("yfai.unavailable")}</Tag> : yfaiToolOnly(model) ? (
+                                            <Button size="small" type="link" className="!px-1" onClick={() => setTool(model)}>{t("yfai.openTool")}</Button>
+                                        ) : isDefault ? (
+                                            <Tag color="green" className="!m-0 shrink-0">{t("yfai.default")}</Tag>
+                                        ) : on ? (
+                                            <Button size="small" type="link" className="!px-1" onClick={() => onConfigChange({ ...config, [modelKey]: optionValue, ...(category === "image" ? { model: optionValue } : {}) })}>{t("yfai.setDefault")}</Button>
+                                        ) : null}
+                                        <Switch size="small" aria-label={`${t("yfai.enable")} ${model.id}`} disabled={!canEnable(model)} checked={on} onChange={(checked) => setEnabled([model], checked)} />
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <div className="rounded-md border border-dashed border-stone-200 px-3 py-6 text-center text-xs text-stone-500 dark:border-stone-800">{t("yfai.noMatch")}</div>
+            )}
             <Drawer title={tool?.display_name} open={Boolean(tool)} width={540} onClose={() => setTool(undefined)} destroyOnHidden>{tool ? <YfaiTool key={tool.id} model={tool} config={config} /> : null}</Drawer>
         </div>
     );

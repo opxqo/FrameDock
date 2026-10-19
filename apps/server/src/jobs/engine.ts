@@ -12,6 +12,7 @@ import {
   type JobAdapter,
   type JobInput,
   type JobKind,
+  type JobNotes,
   type JobResult,
   type JobRow,
   type JobState,
@@ -25,6 +26,7 @@ export type JobFilter = {
   project?: string;
   state?: JobState;
   kind?: JobKind;
+  adapter?: string;
   /** Only succeeded jobs whose result no client has taken yet. */
   undelivered?: boolean;
   limit?: number;
@@ -89,8 +91,50 @@ export function toPublicJob(row: JobRow, withRequest = false): PublicJob {
     updatedAt: row.updated_at,
     finishedAt: row.finished_at,
     deliveredAt: row.delivered_at,
+    notes: (row.notes as JobNotes | null) ?? null,
+    prompt: promptExcerpt(row.request),
     ...(withRequest ? { request: row.request } : {}),
   };
+}
+
+const PROMPT_EXCERPT = 200;
+
+/** The prompt wherever the adapters put it (YFAI: invoke.params.prompt; others: prompt at the top or in params). */
+function promptExcerpt(request: unknown): string | null {
+  const record = (value: unknown) =>
+    value && typeof value === "object"
+      ? (value as Record<string, unknown>)
+      : undefined;
+  const root = record(request);
+  const invoke = record(root?.invoke);
+  const candidates = [
+    record(invoke?.params)?.prompt,
+    record(invoke?.params)?.input,
+    root?.prompt,
+    record(root?.params)?.prompt,
+    record(root?.body)?.prompt,
+  ];
+  const prompt = candidates.find(
+    (value): value is string => typeof value === "string" && value.trim() !== "",
+  );
+  return prompt ? prompt.slice(0, PROMPT_EXCERPT) : null;
+}
+
+/** Adds newly reported remarks to the stored ones; a parameter reported twice keeps its latest entry. */
+export function mergeNotes(
+  current: unknown,
+  next: JobNotes | undefined,
+): JobNotes | null {
+  const base = (current as JobNotes | null) ?? null;
+  if (!next || !Object.keys(next).length) return base;
+  const byParam = new Map(
+    (base?.paramAdjustments ?? []).map((item) => [item.param, item]),
+  );
+  for (const item of next.paramAdjustments ?? []) byParam.set(item.param, item);
+  const merged: JobNotes = { ...base, ...next };
+  if (byParam.size) merged.paramAdjustments = [...byParam.values()];
+  else delete merged.paramAdjustments;
+  return merged;
 }
 
 function describe(error: unknown) {
@@ -206,12 +250,25 @@ export class JobEngine {
     return this.db.select().from(jobs).where(eq(jobs.id, id)).get();
   }
 
+  /** Records provider remarks found after the fact (e.g. the ledger id of an older task). */
+  addNotes(id: string, notes: JobNotes) {
+    const row = this.get(id);
+    if (!row) return undefined;
+    this.db
+      .update(jobs)
+      .set({ notes: mergeNotes(row.notes, notes) })
+      .where(eq(jobs.id, id))
+      .run();
+    return this.get(id);
+  }
+
   list(filter: JobFilter = {}) {
     const conditions = [
       filter.node ? eq(jobs.node_id, filter.node) : undefined,
       filter.project ? eq(jobs.project_id, filter.project) : undefined,
       filter.state ? eq(jobs.state, filter.state) : undefined,
       filter.kind ? eq(jobs.kind, filter.kind) : undefined,
+      filter.adapter ? eq(jobs.adapter, filter.adapter) : undefined,
       filter.undelivered
         ? and(eq(jobs.state, "succeeded"), isNull(jobs.delivered_at))
         : undefined,
@@ -445,10 +502,11 @@ export class JobEngine {
 
     let remoteTaskId: string;
     let requestId: string | undefined;
+    let notes: JobNotes | undefined;
     const tries = adapter.idempotentSubmit ? IDEMPOTENT_SUBMIT_TRIES : 1;
     for (let attempt = 1; ; attempt += 1) {
       try {
-        ({ remoteTaskId, requestId } = await adapter.submit(
+        ({ remoteTaskId, requestId, notes } = await adapter.submit(
           this.context(claimed, controller.signal),
         ));
         break;
@@ -500,6 +558,7 @@ export class JobEngine {
       state: "running",
       remote_task_id: remoteTaskId,
       request_id: requestId ?? null,
+      notes: mergeNotes(claimed.notes, notes),
       next_poll_at: Date.now() + adapter.pollIntervalMs,
     });
     this.schedulePoll(id, adapter.pollIntervalMs);
@@ -534,7 +593,10 @@ export class JobEngine {
       if (this.get(id)?.state !== "running" || this.closed) return;
 
       if (outcome.status === "failed") {
-        this.finish(id, ["running"], "failed", { error: outcome.error });
+        this.finish(id, ["running"], "failed", {
+          error: outcome.error,
+          notes: mergeNotes(row.notes, outcome.notes),
+        });
       } else if (outcome.status === "running") {
         this.pollErrors.delete(id);
         const attempts = row.attempts + 1;
@@ -563,7 +625,11 @@ export class JobEngine {
           id,
           Array.isArray(fetched) ? fetched : [fetched],
         );
-        this.finish(id, ["running"], "succeeded", { result, error: null });
+        this.finish(id, ["running"], "succeeded", {
+          result,
+          error: null,
+          notes: mergeNotes(row.notes, outcome.notes),
+        });
       }
     } catch (error) {
       if (this.closed || this.get(id)?.state !== "running") return;

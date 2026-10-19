@@ -1,4 +1,5 @@
 import { ConfigYfai } from "@/components/layout/config-yfai";
+import { ConfigYfaiPanel } from "@/components/layout/config-yfai-panel";
 import { App, Button, Form, Input, Modal, Progress, Radio, Segmented, Select, Switch } from "antd";
 import type { TFunction } from "i18next";
 import { Cloud, Download, Pencil, Plus, RefreshCw, Trash2, Upload, Wifi } from "@/components/icons";
@@ -198,7 +199,7 @@ export function AppConfigPanel({ showDoneButton = false, initialTab = "channels"
                         label: t("config.tabs.channels"),
                         children: (
                             <div>
-                                <ConfigYfai config={config} onConfigChange={(next) => saveConfig(withChannels(next, next.channels))} />
+                                <ConfigYfai config={config} onConfigChange={(next) => saveConfig(withChannels(next, next.channels))} onOpenPanel={() => setActiveTab("yfai")} />
                                 <ConfigAutodl config={config} onConfigChange={(next) => saveConfig(withChannels(next, next.channels))} />
                                 <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                                     <div className="text-xs text-stone-500">{t("config.channels.description")}</div>
@@ -226,6 +227,11 @@ export function AppConfigPanel({ showDoneButton = false, initialTab = "channels"
                                 </div>
                             </div>
                         ),
+                    },
+                    {
+                        key: "yfai",
+                        label: "YFAI",
+                        children: <ConfigYfaiPanel config={config} onConfigChange={(next) => saveConfig(withChannels(next, next.channels))} onNavigate={setActiveTab} />,
                     },
                     {
                         key: "local-proxy",

@@ -5,8 +5,9 @@ import i18n from "@/i18n";
 import { findYfaiModel, isYfaiUrl, parseYfaiParams, validateYfaiParams, yfaiDefaults, yfaiParamVisible, YFAI_BASE_URL, type YfaiModel, type YfaiValue, resolveYfaiAutoParams } from "@/lib/yfai-catalog";
 import { withLocalProxy, type AiConfig } from "@/stores/use-config-store";
 import { parseYfaiAvailableCredits } from "@/lib/yfai-balance";
+import { parseYfaiBalance, parseYfaiUsagePage, yfaiTaskBilling, type YfaiBalance } from "@/lib/yfai-account";
 import { compileReferenceSyntax } from "@/lib/reference-syntax";
-import { ackJob, createJob, fetchJobBlob, type Job, watchJob } from "@/services/api/jobs";
+import { ackJob, addJobNotes, createJob, fetchJobBlob, type Job, listJobs, watchJob } from "@/services/api/jobs";
 import { imageToDataUrl } from "@/services/image-storage";
 import { getMediaBlob, resolveMediaUrl } from "@/services/file-storage";
 import type { ReferenceImage } from "@/types/image";
@@ -248,24 +249,42 @@ async function requestYfaiImagesViaJob(config: AiConfig, model: YfaiModel, promp
     const detail = [job.error || i18n.t("yfai.taskFailed"), job.remoteTaskId ? i18n.t("yfai.taskId", { id: job.remoteTaskId }) : "", job.requestId ? `Request id: ${job.requestId}` : ""].filter(Boolean).join("\n");
     throw new Error(job.state === "unknown" ? `${i18n.t("apiErrors.videoTaskUnknown")}\n${detail}` : detail);
 }
-export type YfaiLedgerRow = { requestId: string; model: string; credits: number; at: string };
+/** Calendar day (Beijing time, as the ledger filters by) `days` days back. */
+const ledgerStart = (days: number) => new Date(Date.now() - days * 86_400_000 + 8 * 3_600_000).toISOString().slice(0, 10);
+/** One page of the account ledger (GET /v1/skills/usage), newest first, amounts signed. Free. */
+export async function fetchYfaiUsage(apiKey: string, query: { days: number; cursor?: string; type?: string; size?: number }, options?: Options) {
+    const params = new URLSearchParams({ size: String(query.size ?? 100), start: ledgerStart(query.days) });
+    if (query.type) params.set("type", query.type);
+    if (query.cursor) params.set("cursor", query.cursor);
+    return parseYfaiUsagePage(await yfaiRequest(`/v1/skills/usage?${params}`, apiKey, undefined, options));
+}
 /**
- * The account's paid model calls for the last `days` days (the same ledger as the console's usage page), newest first.
- * Costs are positive ⚡ here. Free; reads at most `pages` pages of 100.
+ * The server's YFAI jobs, newest first. Finished jobs from before the ledger id was recorded are looked up once at
+ * YFAI (a free GET /v1/tasks/{id} each, at most `backfill` per call) and the result is stored on the job. Older
+ * tasks are returned without billing, so for those the ledger is matched by model and time (matchYfaiLedger).
  */
-export async function fetchYfaiLedger(apiKey: string, days: number, pages = 5, options?: Options): Promise<YfaiLedgerRow[]> {
-    const start = new Date(Date.now() - days * 86_400_000 + 8 * 3_600_000).toISOString().slice(0, 10);
-    const rows: YfaiLedgerRow[] = [];
-    let cursor = "";
-    for (let page = 0; page < pages; page++) {
-        const payload = await yfaiRequest(`/v1/skills/usage?type=usage&size=100&start=${start}${cursor ? `&cursor=${encodeURIComponent(cursor)}` : ""}`, apiKey, undefined, options);
-        for (const row of (Array.isArray(payload.data) ? payload.data : []) as Array<{ request_id?: string; model?: string; created_at?: string; cost?: { credits?: number } }>) {
-            if (row.request_id) rows.push({ requestId: row.request_id, model: row.model || "", credits: Math.abs(Number(row.cost?.credits) || 0), at: row.created_at || "" });
-        }
-        cursor = String((payload as { next_cursor?: string }).next_cursor || "");
-        if (!cursor) break;
+export async function listYfaiJobs(apiKey: string, limit = 120, backfill = 40, options?: Options): Promise<Job[]> {
+    const jobs = await listJobs({ adapter: "yfai", limit }, options?.signal);
+    const missing = jobs.filter((job) => job.remoteTaskId && job.notes?.ledgerId === undefined && ["succeeded", "failed"].includes(job.state)).slice(0, apiKey ? backfill : 0);
+    const updated = new Map<string, Job>();
+    for (let index = 0; index < missing.length; index += 4) {
+        await Promise.all(
+            missing.slice(index, index + 4).map(async (job) => {
+                try {
+                    const notes = yfaiTaskBilling(await yfaiRequest(`/v1/tasks/${encodeURIComponent(job.remoteTaskId!)}`, apiKey, undefined, options));
+                    // Older tasks come back in a slim form without billing; "" records that, so they are not asked again.
+                    updated.set(job.id, await addJobNotes(job.id, { ...notes, ledgerId: notes.ledgerId ?? "" }));
+                } catch (error) {
+                    if (options?.signal?.aborted) throw error;
+                }
+            }),
+        );
     }
-    return rows;
+    return jobs.map((job) => updated.get(job.id) ?? job);
+}
+/** Total, frozen and spendable ⚡ (GET /v1/skills/balance). Free; throws when the key is rejected. */
+export async function fetchYfaiBalance(apiKey: string, options?: Options): Promise<YfaiBalance> {
+    return parseYfaiBalance(await yfaiRequest("/v1/skills/balance", apiKey, undefined, options));
 }
 /** Spendable ⚡ credits right now (balance minus what running tasks hold back). Free; undefined when it cannot be read. */
 export async function fetchYfaiAvailableCredits(apiKey: string, options?: Options): Promise<number | undefined> {

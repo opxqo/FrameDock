@@ -4,6 +4,8 @@ import {
   type FetchedResult,
   type JobAdapter,
   type JobKind,
+  type JobNotes,
+  type ParamAdjustment,
 } from "../types";
 import { bodyMessage, download, errorMessage, readBody, send } from "./http";
 
@@ -96,6 +98,59 @@ export function yfaiTaskUrls(
   return [...new Set(urls)].filter((url) => /^https?:\/\//.test(url));
 }
 
+/**
+ * The gateway's `param_adjustments` receipt: which requested values it rewrote, defaulted or ignored. It is on the
+ * invoke response (top level, or inside a `{code, data}` envelope) and may be repeated on the task.
+ */
+export function yfaiParamAdjustments(...payloads: unknown[]): JobNotes | undefined {
+  const items: ParamAdjustment[] = [];
+  for (const payload of payloads) {
+    if (!payload || typeof payload !== "object") continue;
+    const record = payload as Record<string, unknown>;
+    const nested =
+      record.data && typeof record.data === "object" && !Array.isArray(record.data)
+        ? (record.data as Record<string, unknown>).param_adjustments
+        : undefined;
+    for (const list of [record.param_adjustments, nested]) {
+      if (!Array.isArray(list)) continue;
+      for (const item of list) {
+        if (!item || typeof item !== "object") continue;
+        const entry = item as Record<string, unknown>;
+        if (typeof entry.param !== "string") continue;
+        items.push({
+          param: entry.param,
+          requested: entry.requested ?? null,
+          applied: entry.applied ?? null,
+          reason: typeof entry.reason === "string" ? entry.reason : "",
+        });
+      }
+    }
+  }
+  return items.length ? { paramAdjustments: items } : undefined;
+}
+
+/**
+ * Billing facts of a finished task: the ledger's id for it (`delivery_provenance.request_id` — not the
+ * X-Request-Id header), the actual ⚡ cost and the serving lane. Observed on the live service; not in the docs.
+ */
+export function yfaiTaskBilling(task: unknown): JobNotes {
+  if (!task || typeof task !== "object") return {};
+  const record = task as {
+    delivery_provenance?: { request_id?: unknown };
+    billing?: { actual_cost_credits?: unknown };
+    channel_id?: unknown;
+  };
+  const notes: JobNotes = {};
+  const ledgerId = record.delivery_provenance?.request_id;
+  if (typeof ledgerId === "string" && ledgerId) notes.ledgerId = ledgerId;
+  const cost = Number(record.billing?.actual_cost_credits);
+  if (record.billing?.actual_cost_credits !== undefined && Number.isFinite(cost))
+    notes.cost = cost;
+  if (typeof record.channel_id === "string" && record.channel_id)
+    notes.lane = record.channel_id;
+  return notes;
+}
+
 const auth = (apiKey: string) => ({ Authorization: `Bearer ${apiKey}` });
 
 // Images take 1–3 minutes (up to an hour at peak) and videos up to ~75 minutes, so a job keeps asking for
@@ -156,6 +211,7 @@ export const yfaiAdapter: JobAdapter = {
     return {
       remoteTaskId: id,
       requestId: response.headers.get("x-request-id") ?? undefined,
+      notes: yfaiParamAdjustments(body.json),
     };
   },
 
@@ -186,9 +242,17 @@ export const yfaiAdapter: JobAdapter = {
     if (!task.is_final) return { status: "running" };
     if (task.status !== "completed" || task.error) {
       const reason = errorMessage(task) || "Task failed";
-      return { status: "failed", error: `${reason}\nTask id: ${remoteTaskId}` };
+      return {
+        status: "failed",
+        error: `${reason}\nTask id: ${remoteTaskId}`,
+        notes: { ...yfaiTaskBilling(task), ...yfaiParamAdjustments(body.json) },
+      };
     }
-    return { status: "succeeded", payload: task };
+    return {
+      status: "succeeded",
+      payload: task,
+      notes: { ...yfaiTaskBilling(task), ...yfaiParamAdjustments(body.json) },
+    };
   },
 
   async fetchResult({ kind, signal }, _remoteTaskId, payload) {

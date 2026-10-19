@@ -43,6 +43,13 @@
       "when": 1792325069251,
       "tag": "0005_cheerful_nuke",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1792368186637,
+      "tag": "0006_clean_talon",
+      "breakpoints": true
     }
   ]
 }

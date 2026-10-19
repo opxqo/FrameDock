@@ -8,6 +8,7 @@ import {
 import type { AddressInfo } from "node:net";
 import { after, afterEach, before, describe, it } from "node:test";
 import sharp from "sharp";
+import { toPublicJob } from "../engine";
 import { closeAll, makeEngine, openDb, track, untilState } from "../testing";
 import type { FetchedResult, JobInput } from "../types";
 import { openaiVideoAdapter } from "./openai-video";
@@ -303,6 +304,50 @@ describe("yfai adapter", () => {
       (await untilState(engine, job.id, "failed")).error ?? "",
       /expired/,
     );
+  });
+
+  it("keeps the gateway's param_adjustments from the submit and the finished task", async () => {
+    handler = (request, response) => {
+      if (request.url === "/api/v1/model-runtime/invoke")
+        return json(response, 200, {
+          code: 200,
+          data: {
+            task_id: "t4",
+            param_adjustments: [
+              { param: "duration", requested: "7", applied: 8, reason: "nearest_supported" },
+              { param: "seconds", requested: 5, applied: null, reason: "field_alias" },
+            ],
+          },
+        });
+      if (request.url === "/v1/tasks/t4")
+        return json(response, 200, {
+          task_id: "t4",
+          is_final: true,
+          status: "completed",
+          output_url: `${base}/files/v.mp4`,
+          delivery_provenance: { request_id: "ledger-uuid" },
+          billing: { actual_cost_credits: 1.25 },
+          channel_id: "veo@ZQI:default",
+          param_adjustments: [
+            { param: "duration", requested: "7", applied: 6, reason: "nearest_vendor_supported" },
+          ],
+        });
+      return media(response);
+    };
+    const { engine } = setup(fast(yfaiAdapter));
+    const { job } = engine.create(yfaiJob());
+    const done = toPublicJob(await untilState(engine, job.id, "succeeded"));
+    assert.deepEqual(done.notes?.paramAdjustments, [
+      { param: "duration", requested: "7", applied: 6, reason: "nearest_vendor_supported" },
+      { param: "seconds", requested: 5, applied: null, reason: "field_alias" },
+    ]);
+    assert.equal(done.notes?.ledgerId, "ledger-uuid");
+    assert.equal(done.notes?.cost, 1.25);
+    assert.equal(done.notes?.lane, "veo@ZQI:default");
+    assert.deepEqual(engine.addNotes(job.id, { cost: 2 })?.notes, { ...done.notes, cost: 2 });
+    assert.equal(done.prompt, "a cat");
+    assert.equal(engine.list({ adapter: "yfai" }).length, 1);
+    assert.equal(engine.list({ adapter: "openai-video" }).length, 0);
   });
 
   it("rejects a job without an invoke payload", async () => {

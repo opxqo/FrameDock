@@ -26,12 +26,23 @@ const listQuery = z.object({
   project: z.string().optional(),
   state: z.enum(JOB_STATES).optional(),
   kind: z.enum(JOB_KINDS).optional(),
+  adapter: z.string().optional(),
   undelivered: z
     .enum(["1", "true"])
     .optional()
     .transform((value) => value !== undefined),
   limit: z.coerce.number().int().min(1).max(500).optional(),
 });
+
+// What a client may add to a finished job after looking the task up at the provider (see JobNotes).
+const notesBody = z
+  .object({
+    // "" records that the provider was asked and had no ledger id for the task (so it is not asked again).
+    ledgerId: z.string().max(128).optional(),
+    cost: z.number().finite().optional(),
+    lane: z.string().max(128).optional(),
+  })
+  .strict();
 
 const HEARTBEAT_MS = 25_000;
 
@@ -115,6 +126,16 @@ const jobsApi: FastifyPluginAsync<{ engine: JobEngine; db: Database }> = async (
 
   app.post<{ Params: { id: string } }>("/:id/ack", async (request, reply) => {
     const row = engine.acknowledge(request.params.id);
+    if (!row) return reply.code(404).send({ error: "Job not found" });
+    return { job: toPublicJob(row) };
+  });
+
+  app.post<{ Params: { id: string } }>("/:id/notes", async (request, reply) => {
+    const parsed = notesBody.safeParse(request.body);
+    if (!parsed.success) {
+      return reply.code(400).send({ error: z.prettifyError(parsed.error) });
+    }
+    const row = engine.addNotes(request.params.id, parsed.data);
     if (!row) return reply.code(404).send({ error: "Job not found" });
     return { job: toPublicJob(row) };
   });

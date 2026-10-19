@@ -28,7 +28,10 @@ async function png(label: string) {
 
 const mockYfai: FastifyPluginAsync = async (app) => {
   app.post<{
-    Body: { client_request_id?: string; params?: { prompt?: string } };
+    Body: {
+      client_request_id?: string;
+      params?: { prompt?: string; aspect_ratio?: string };
+    };
   }>("/api/v1/model-runtime/invoke", async (request, reply) => {
     mockYfaiStats.invokes += 1;
     const clientId = request.body?.client_request_id;
@@ -55,7 +58,25 @@ const mockYfai: FastifyPluginAsync = async (app) => {
     tasks.set(task.id, task);
     mockYfaiStats.tasks += 1;
     if (clientId) byClientId.set(clientId, task.id);
-    return { task_id: task.id, status: "pending", is_final: false };
+    // "[adjust]": answer like the gateway does when it replaced a parameter value.
+    const adjustments = prompt.includes("[adjust]")
+      ? {
+          param_adjustments: [
+            {
+              param: "aspect_ratio",
+              requested: request.body?.params?.aspect_ratio ?? null,
+              applied: "16:9",
+              reason: "nearest_supported",
+            },
+          ],
+        }
+      : {};
+    return {
+      task_id: task.id,
+      status: "pending",
+      is_final: false,
+      ...adjustments,
+    };
   });
 
   app.get<{ Params: { id: string } }>(
@@ -81,6 +102,10 @@ const mockYfai: FastifyPluginAsync = async (app) => {
         task_id: task.id,
         status: "completed",
         is_final: true,
+        // The live service names the ledger's id here, not in X-Request-Id.
+        delivery_provenance: { request_id: `ledger_${task.id}` },
+        billing: { actual_cost_credits: 0.08 },
+        channel_id: "mock-image@MOCK:default",
         result: {
           images: Array.from({ length: task.mode.images }, (_, index) => ({
             url: `${base}/${task.id}-${index + 1}.png`,

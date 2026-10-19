@@ -46,6 +46,8 @@ export const jobs = sqliteTable(
     finished_at: integer("finished_at"),
     // Set when a client has taken the result (acknowledged it). A finished job without it is "undelivered".
     delivered_at: integer("delivered_at"),
+    // What the provider reported about the call besides the result (YFAI param_adjustments), see JobNotes.
+    notes: text("notes", { mode: "json" }),
   },
   (table) => [
     uniqueIndex("jobs_idempotency").on(table.idempotency_key),
