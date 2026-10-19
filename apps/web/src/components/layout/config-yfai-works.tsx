@@ -4,11 +4,12 @@ import { useTranslation } from "react-i18next";
 
 import { Music2, Download, RefreshCw } from "@/components/icons";
 import { bareYfaiModel, formatParamAdjustment, type YfaiParamAdjustment } from "@/lib/yfai-account";
-import { type Job, jobFileUrl, resubmitJob } from "@/services/api/jobs";
+import { hasJobFile, type Job, jobFileUrl, restoreJobResult, resubmitJob } from "@/services/api/jobs";
 import { listYfaiJobs } from "@/services/api/yfai";
 
 // FrameDock: what YFAI made for this FrameDock — the server's YFAI tasks with their stored results (YFAI keeps
-// results ~15 days; these copies stay), the cost from the account ledger, and the gateway's parameter receipts.
+// results ~15 days; these local copies stay), the actual cost, and the gateway's parameter receipts. A result
+// whose local file is gone (older storage cleanup removed delivered ones) is downloaded from YFAI again, once.
 
 const STATE_COLOR: Record<Job["state"], string> = { queued: "default", submitting: "blue", running: "blue", succeeded: "green", failed: "red", canceled: "default", unknown: "orange" };
 type Filter = "all" | "image" | "video" | "audio" | "failed";
@@ -31,7 +32,51 @@ function useYfaiJobs(apiKey: string, limit: number) {
     useEffect(() => {
         void load();
     }, [load]);
-    return { jobs, busy, error, load };
+    return { jobs, setJobs, busy, error, load };
+}
+
+/** Local file state of a finished job's result: checking, present, being fetched from YFAI, or no longer available. */
+type FileState = "checking" | "ok" | "restoring" | "gone";
+
+/** Checks every finished job's local file and fetches missing ones from YFAI again (two at a time). */
+function useLocalResults(apiKey: string, jobs: Job[], onRestored: (job: Job) => void) {
+    const [states, setStates] = useState<Record<string, FileState>>({});
+    const [versions, setVersions] = useState<Record<string, number>>({});
+    useEffect(() => {
+        let alive = true;
+        const finished = jobs.filter((job) => job.state === "succeeded" && job.result);
+        setStates(Object.fromEntries(finished.map((job) => [job.id, "checking" as FileState])));
+        void (async () => {
+            const missing: Job[] = [];
+            for (let index = 0; index < finished.length; index += 8) {
+                const batch = finished.slice(index, index + 8);
+                const present = await Promise.all(batch.map(hasJobFile));
+                if (!alive) return;
+                batch.forEach((job, position) => (present[position] ? undefined : missing.push(job)));
+                setStates((current) => ({ ...current, ...Object.fromEntries(batch.map((job, position) => [job.id, present[position] ? "ok" : apiKey ? "restoring" : "gone"])) }));
+            }
+            if (!apiKey) return;
+            for (let index = 0; index < missing.length; index += 2) {
+                await Promise.all(
+                    missing.slice(index, index + 2).map(async (job) => {
+                        const restored = await restoreJobResult(job.id, apiKey).catch(() => undefined);
+                        if (!alive) return;
+                        if (restored) {
+                            onRestored(restored);
+                            setVersions((current) => ({ ...current, [job.id]: (current[job.id] ?? 0) + 1 }));
+                        }
+                        setStates((current) => ({ ...current, [job.id]: restored ? "ok" : "gone" }));
+                    }),
+                );
+            }
+        })();
+        return () => {
+            alive = false;
+        };
+        // Re-check only when the set of jobs changes, not when a restored job replaces its old copy.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [apiKey, jobs.map((job) => job.id).join(",")]);
+    return { states, versions };
 }
 
 function Adjustments({ items }: { items: YfaiParamAdjustment[] }) {
@@ -49,21 +94,24 @@ function Adjustments({ items }: { items: YfaiParamAdjustment[] }) {
     );
 }
 
-function Preview({ job }: { job: Job }) {
+function Preview({ job, state, version }: { job: Job; state: FileState | undefined; version: number }) {
     const { t } = useTranslation();
-    // Once a result is on the canvas the canvas keeps its own copy, and storage cleanup removes the task's file.
-    const [missing, setMissing] = useState(false);
-    const url = jobFileUrl(job);
-    if (!url || missing) return <div className="grid size-full place-items-center p-3 text-center text-xs text-muted-foreground">{job.deliveredAt ? t("yfaiPanel.works.onCanvas") : t("yfaiPanel.works.fileMissing")}</div>;
+    const [broken, setBroken] = useState(false);
+    useEffect(() => setBroken(false), [version]);
+    const fileUrl = (index = 0) => `${jobFileUrl(job, index)}${version ? `?v=${version}` : ""}`;
+    const url = jobFileUrl(job) ? fileUrl() : "";
+    if (!url || state === "checking") return <div className="size-full animate-pulse bg-black/5" />;
+    if (state === "restoring") return <div className="grid size-full place-items-center p-3 text-center text-xs text-muted-foreground">{t("yfaiPanel.works.restoring")}</div>;
+    if (state === "gone" || broken) return <div className="grid size-full place-items-center p-3 text-center text-xs text-muted-foreground">{t("yfaiPanel.works.fileGone")}</div>;
     if (job.kind === "image") {
         const count = job.result?.files?.length ?? 1;
         return (
-            <Image.PreviewGroup items={Array.from({ length: count }, (_, index) => jobFileUrl(job, index))}>
-                <Image src={url} alt="" rootClassName="!block size-full" className="!size-full object-cover" onError={() => setMissing(true)} />
+            <Image.PreviewGroup items={Array.from({ length: count }, (_, index) => fileUrl(index))}>
+                <Image src={url} alt="" rootClassName="!block size-full" className="!size-full object-cover" onError={() => setBroken(true)} />
             </Image.PreviewGroup>
         );
     }
-    if (job.kind === "video") return <video src={url} controls preload="metadata" className="size-full bg-black object-contain" onError={() => setMissing(true)} />;
+    if (job.kind === "video") return <video src={url} controls preload="metadata" className="size-full bg-black object-contain" onError={() => setBroken(true)} />;
     return (
         <div className="flex size-full flex-col items-center justify-center gap-2 p-2">
             <Music2 className="size-6 text-muted-foreground" />
@@ -74,8 +122,9 @@ function Preview({ job }: { job: Job }) {
 
 export function ConfigYfaiWorks({ apiKey }: { apiKey: string }) {
     const { t, i18n } = useTranslation();
-    const { jobs, busy, error, load } = useYfaiJobs(apiKey, 120);
+    const { jobs, setJobs, busy, error, load } = useYfaiJobs(apiKey, 120);
     const [filter, setFilter] = useState<Filter>("all");
+    const { states, versions } = useLocalResults(apiKey, jobs, (restored) => setJobs((current) => current.map((job) => (job.id === restored.id ? restored : job))));
 
     const shown = jobs.filter((job) => (filter === "all" ? true : filter === "failed" ? ["failed", "unknown"].includes(job.state) : job.kind === filter));
     const time = new Intl.DateTimeFormat(i18n.resolvedLanguage, { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
@@ -97,7 +146,7 @@ export function ConfigYfaiWorks({ apiKey }: { apiKey: string }) {
                         const adjustments = job.notes?.paramAdjustments ?? [];
                         return (
                             <div key={job.id} className="flex flex-col overflow-hidden rounded-lg border border-stone-200 dark:border-stone-800">
-                                <div className="aspect-square overflow-hidden bg-black/5">{job.state === "succeeded" ? <Preview job={job} /> : <div className="grid size-full place-items-center p-3 text-center text-xs text-muted-foreground">{job.error ? <span className="line-clamp-6 break-all">{job.error}</span> : t(`yfaiPanel.works.states.${job.state}`)}</div>}</div>
+                                <div className="aspect-square overflow-hidden bg-black/5">{job.state === "succeeded" ? <Preview job={job} state={states[job.id]} version={versions[job.id] ?? 0} /> : <div className="grid size-full place-items-center p-3 text-center text-xs text-muted-foreground">{job.error ? <span className="line-clamp-6 break-all">{job.error}</span> : t(`yfaiPanel.works.states.${job.state}`)}</div>}</div>
                                 <div className="flex flex-1 flex-col gap-1.5 p-2 text-xs">
                                     <div className="flex items-center gap-1">
                                         <span className="min-w-0 flex-1 truncate font-medium" title={job.model}>{bareYfaiModel(job.model)}</span>
@@ -118,7 +167,7 @@ export function ConfigYfaiWorks({ apiKey }: { apiKey: string }) {
                                         ) : (
                                             <span className="flex-1" />
                                         )}
-                                        {job.state === "succeeded" && !job.deliveredAt ? <Button size="small" type="text" icon={<Download className="size-3.5" />} href={jobFileUrl(job)} download aria-label={t("serverJobs.rescue.download")} /> : null}
+                                        {job.state === "succeeded" && states[job.id] === "ok" ? <Button size="small" type="text" icon={<Download className="size-3.5" />} href={jobFileUrl(job)} download aria-label={t("serverJobs.rescue.download")} /> : null}
                                         {job.state === "unknown" ? (
                                             <Button size="small" onClick={() => void resubmitJob(job.id).then(load, load)}>
                                                 {t("jobAudit.resume")}

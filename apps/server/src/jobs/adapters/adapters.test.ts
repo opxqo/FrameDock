@@ -350,6 +350,35 @@ describe("yfai adapter", () => {
     assert.equal(engine.list({ adapter: "openai-video" }).length, 0);
   });
 
+  it("downloads a finished result again on request, with a key given only for that call", async () => {
+    handler = (request, response) => {
+      if (request.url === "/api/v1/model-runtime/invoke")
+        return json(response, 200, { task_id: "t5" });
+      if (request.url === "/v1/tasks/t5")
+        return json(response, 200, {
+          task_id: "t5",
+          is_final: true,
+          status: "completed",
+          output_url: `${base}/files/v.mp4`,
+        });
+      return media(response);
+    };
+    const { engine, saved } = setup(fast(yfaiAdapter));
+    const { job } = engine.create(yfaiJob());
+    await untilState(engine, job.id, "succeeded");
+    seen = [];
+    const restored = await engine.restoreResult(job.id, "fresh-key");
+    assert.ok(restored?.result);
+    assert.equal(saved.length, 2, "the result was saved a second time");
+    assert.equal(seen[0]?.headers.authorization, "Bearer fresh-key");
+    assert.equal(
+      (restored.credentials as { apiKey: string }).apiKey,
+      "",
+      "the key is not stored",
+    );
+    assert.equal(await engine.restoreResult("missing", "k"), undefined);
+  });
+
   it("rejects a job without an invoke payload", async () => {
     const { engine } = setup(fast(yfaiAdapter));
     const { job } = engine.create(yfaiJob({ request: {} }));

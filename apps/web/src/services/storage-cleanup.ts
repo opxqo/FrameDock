@@ -1,6 +1,7 @@
 import { listServerEntries } from "@/lib/server-storage";
 import { cleanupUnusedMedia } from "@/services/file-storage";
 import { cleanupUnusedImages } from "@/services/image-storage";
+import { listJobs } from "@/services/api/jobs";
 
 // FrameDock: unused-media cleanup must only delete what *nothing* references. A tab's in-memory state can be
 // stale (another tab generated images after it loaded), and files are written before the node that uses them is
@@ -18,6 +19,13 @@ function parseMaybeJson(value: unknown) {
     }
 }
 
+// Background task results stay too: they are the local copy of what was paid for (the YFAI panel shows them,
+// and the provider keeps them only ~15 days). They are listed as references so cleanup keeps them.
+async function jobResultReferences() {
+    const jobs = await listJobs({ state: "succeeded", limit: 500 });
+    return jobs.flatMap((job) => (job.result?.files ?? (job.result ? [job.result] : [])).map((file) => ({ storageKey: file.key })));
+}
+
 async function serverReferences() {
     const entries = await Promise.all(REFERENCE_STORES.map((store) => listServerEntries(store)));
     return entries.flat().map((entry) => parseMaybeJson(entry.value));
@@ -30,7 +38,7 @@ export function cleanupUnusedStorage(localData: unknown) {
     if (running) return running;
     running = (async () => {
         try {
-            const used = [localData, await serverReferences()];
+            const used = [localData, await serverReferences(), await jobResultReferences()];
             await cleanupUnusedImages(used, GRACE_MS);
             await cleanupUnusedMedia(used, GRACE_MS);
         } catch (error) {

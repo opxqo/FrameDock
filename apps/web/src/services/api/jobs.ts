@@ -100,6 +100,17 @@ export function jobFileUrl(job: Job, index = 0) {
 /** Stores billing facts looked up at the provider after the job finished. */
 export const addJobNotes = (id: string, notes: Pick<JobNotes, "ledgerId" | "cost" | "lane">) => jobRequest(`/${encodeURIComponent(id)}/notes`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(notes) });
 
+/** Has the server download a finished job's result from the provider again (the key is used for that call only). */
+export const restoreJobResult = (id: string, apiKey: string) => jobRequest(`/${encodeURIComponent(id)}/restore`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ apiKey }) });
+
+/** True when the first stored result file of a finished job is still there. */
+export async function hasJobFile(job: Job) {
+    const url = jobFileUrl(job);
+    if (!url) return false;
+    const response = await fetch(url, { method: "HEAD", cache: "no-store" }).catch(() => undefined);
+    return Boolean(response?.ok);
+}
+
 export const getJob = (id: string, signal?: AbortSignal) => jobRequest(`/${encodeURIComponent(id)}`, { signal });
 export const cancelJob = (id: string) => jobRequest(`/${encodeURIComponent(id)}/cancel`, { method: "POST" });
 export const resubmitJob = (id: string) => jobRequest(`/${encodeURIComponent(id)}/resubmit`, { method: "POST" });

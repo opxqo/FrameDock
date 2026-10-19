@@ -135,9 +135,9 @@ export default {
         balance: { available: "Available", frozen: "Frozen", total: "Total", failed: "Could not read the balance: {{error}}" },
         tabs: { works: "Recent works", usage: "Ledger", logs: "Call log", adjustments: "Parameter receipts", models: "Models" },
         works: {
-            description: "Tasks FrameDock ran on YFAI. YFAI keeps results for about 15 days; once downloaded, results placed on a canvas are kept by the canvas, and ones not placed yet can be previewed and downloaded here. Costs come from the last 7 days of the ledger.",
-            onCanvas: "On the canvas (kept by the canvas)",
-            fileMissing: "Result file is no longer stored",
+            description: "Tasks FrameDock ran on YFAI. Results are stored on this machine, so viewing them needs no network; YFAI keeps them only ~15 days, the local copies do not expire. A result missing locally is downloaded from YFAI again once.",
+            restoring: "Downloading from YFAI…",
+            fileGone: "Not stored locally, and YFAI no longer has it",
             empty: "No YFAI tasks yet",
             undelivered: "Not on canvas",
             copyIds: "Copy task and request ids",

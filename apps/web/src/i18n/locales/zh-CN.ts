@@ -135,9 +135,9 @@ export default {
         balance: { available: "可用", frozen: "冻结中", total: "总额", failed: "读取余额失败：{{error}}" },
         tabs: { works: "最近作品", usage: "消费明细", logs: "调用日志", adjustments: "参数回执", models: "模型" },
         works: {
-            description: "FrameDock 通过 YFAI 生成的任务。YFAI 只保留结果约 15 天；结果下载到本机后，放到画布的由画布保存，还没放到画布的在这里可以预览和下载。花费取自最近 7 天的账户流水。",
-            onCanvas: "已放到画布（文件由画布保存）",
-            fileMissing: "结果文件已不在本机",
+            description: "FrameDock 通过 YFAI 生成的任务。结果都保存在本机，看图不走网络；YFAI 只保留约 15 天，本机副本不会过期。本机缺失的结果会自动从 YFAI 重新下载一次。",
+            restoring: "正在从 YFAI 下载到本机…",
+            fileGone: "本机没有这份结果，YFAI 也已不再提供",
             empty: "还没有 YFAI 任务",
             undelivered: "未放到画布",
             copyIds: "复制任务号和请求号",

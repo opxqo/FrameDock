@@ -250,6 +250,46 @@ export class JobEngine {
     return this.db.select().from(jobs).where(eq(jobs.id, id)).get();
   }
 
+  /**
+   * Downloads a finished job's result again (the local file was removed, e.g. by storage cleanup) from the
+   * provider, which keeps results for a while (YFAI: ~15 days). The api key is used for this call only.
+   */
+  async restoreResult(id: string, apiKey: string) {
+    const row = this.get(id);
+    const adapter = row && this.adapters.get(row.adapter);
+    if (!row || !adapter || row.state !== "succeeded" || !row.remote_task_id)
+      return undefined;
+    const base = this.context(row, AbortSignal.timeout(180_000));
+    const context = {
+      ...base,
+      credentials: { ...base.credentials, apiKey },
+    };
+    const outcome = await adapter.poll(context, row.remote_task_id);
+    if (outcome.status !== "succeeded") {
+      throw new AdapterError(
+        outcome.status === "failed"
+          ? outcome.error
+          : "The provider no longer reports this task as finished",
+        "fatal",
+      );
+    }
+    const fetched = await this.downloads.add(() =>
+      adapter.fetchResult(context, row.remote_task_id!, outcome.payload),
+    );
+    if (!fetched) return undefined;
+    const result = await this.options.saveResult(
+      row.kind,
+      id,
+      Array.isArray(fetched) ? fetched : [fetched],
+    );
+    this.db
+      .update(jobs)
+      .set({ result, notes: mergeNotes(row.notes, outcome.notes) })
+      .where(eq(jobs.id, id))
+      .run();
+    return this.get(id);
+  }
+
   /** Records provider remarks found after the fact (e.g. the ledger id of an older task). */
   addNotes(id: string, notes: JobNotes) {
     const row = this.get(id);

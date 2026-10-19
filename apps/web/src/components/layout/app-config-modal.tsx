@@ -195,6 +195,11 @@ export function AppConfigPanel({ showDoneButton = false, initialTab = "channels"
                 }
                 items={[
                     {
+                        key: "yfai",
+                        label: "YFAI",
+                        children: <ConfigYfaiPanel config={config} onConfigChange={(next) => saveConfig(withChannels(next, next.channels))} onNavigate={setActiveTab} />,
+                    },
+                    {
                         key: "channels",
                         label: t("config.tabs.channels"),
                         children: (
@@ -227,11 +232,6 @@ export function AppConfigPanel({ showDoneButton = false, initialTab = "channels"
                                 </div>
                             </div>
                         ),
-                    },
-                    {
-                        key: "yfai",
-                        label: "YFAI",
-                        children: <ConfigYfaiPanel config={config} onConfigChange={(next) => saveConfig(withChannels(next, next.channels))} onNavigate={setActiveTab} />,
                     },
                     {
                         key: "local-proxy",

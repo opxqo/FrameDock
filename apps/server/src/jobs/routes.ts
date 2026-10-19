@@ -140,6 +140,32 @@ const jobsApi: FastifyPluginAsync<{ engine: JobEngine; db: Database }> = async (
     return { job: toPublicJob(row) };
   });
 
+  // Fetches a finished job's result from the provider again; the key comes with the request and is not stored.
+  app.post<{ Params: { id: string } }>("/:id/restore", async (request, reply) => {
+    const parsed = z
+      .object({ apiKey: z.string().min(1) })
+      .safeParse(request.body);
+    if (!parsed.success) {
+      return reply.code(400).send({ error: z.prettifyError(parsed.error) });
+    }
+    try {
+      const row = await engine.restoreResult(
+        request.params.id,
+        parsed.data.apiKey,
+      );
+      if (!row) {
+        return reply
+          .code(409)
+          .send({ error: "Job is not a finished task that can be fetched again" });
+      }
+      return { job: toPublicJob(row) };
+    } catch (error) {
+      return reply
+        .code(502)
+        .send({ error: error instanceof Error ? error.message : String(error) });
+    }
+  });
+
   app.post<{ Params: { id: string } }>(
     "/:id/cancel",
     async (request, reply) => {
