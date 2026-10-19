@@ -95,6 +95,15 @@ export type CanvasBuiltinPanelConfig = {
     mode: "image" | "video" | "text" | "audio";
     promptPrefix?: string;
     writeBackToSelf?: boolean;
+    // FrameDock preset nodes (e.g. 美术资产): the node's own settings supply the prompt, so the input box is an
+    // optional extra description, and the final prompt and result title are built from the node.
+    allowEmptyPrompt?: boolean;
+    /** Placeholder for the prompt box while this node is selected. */
+    promptPlaceholder?: (node: CanvasNodeData) => string;
+    /** Builds the prompt sent to the model from the user's text (with upstream text) and the number of reference images. */
+    composePrompt?: (node: CanvasNodeData, text: string, referenceCount: number) => { prompt: string } | { error: string };
+    /** Title of the result node. */
+    resultTitle?: (node: CanvasNodeData) => string;
 };
 
 // Shared node definition used by both built-in and plugin nodes.

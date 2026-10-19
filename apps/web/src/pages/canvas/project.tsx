@@ -13,7 +13,7 @@ import { requestEdit, requestGeneration, requestImageQuestion } from "@/services
 import { requestAudioGeneration, storeGeneratedAudio } from "@/services/api/audio";
 import { readablePrompt } from "@/lib/canvas/prompt-reference-tokens";
 import { referenceOverflowIssue, yfaiBalanceIssue, yfaiPromptIssue, type PreflightIssue } from "@/lib/yfai-preflight";
-import { findYfaiModel, isYfaiUrl } from "@/lib/yfai-catalog";
+import { findYfaiModel, isYfaiUrl, withPreferredYfaiRatio } from "@/lib/yfai-catalog";
 import { getYfaiQuote } from "@/lib/yfai-pricing";
 import { fetchYfaiAvailableCredits } from "@/services/api/yfai";
 import { UndeliveredJobs } from "@/components/canvas/undelivered-jobs";
@@ -2892,7 +2892,12 @@ function InfiniteCanvasPage() {
             // "generate" clicks look it up the same way), so results keep flowing downstream.
             const targetNodeId = options.targetNodeId ?? (sourceNode?.type === CanvasNodeType.Config ? configResultTarget(sourceNode, mode, nodesRef.current, connectionsRef.current)?.id : undefined);
             const retargetNode = targetNodeId ? nodesRef.current.find((node) => node.id === targetNodeId) : undefined;
-            const generationConfig = buildGenerationConfig(effectiveConfig, sourceNode, mode);
+            const baseGenerationConfig = buildGenerationConfig(effectiveConfig, sourceNode, mode);
+            // FrameDock preset nodes (美术资产) recommend a ratio; YFAI models keep theirs in yfaiParams, so it is filled in
+            // there unless the user picked one for this model.
+            const generationConfig = sourceNode && getNodeDefinition(sourceNode.type)?.useBuiltinPanel?.composePrompt
+                ? { ...baseGenerationConfig, yfaiParams: withPreferredYfaiRatio(baseGenerationConfig.yfaiParams || "", baseGenerationConfig.model, sourceNode.metadata?.size, effectiveConfig.yfaiModels) }
+                : baseGenerationConfig;
             if (!isAiConfigReady(generationConfig, generationConfig.model)) {
                 openConfigDialog(true);
                 return;
@@ -2958,6 +2963,20 @@ function InfiniteCanvasPage() {
                 failBeforeStart(t("canvas.projectPage.inputReadFailed", { error: error instanceof Error ? error.message : String(error) }));
                 return;
             }
+            // FrameDock preset nodes (美术资产) wrap the user's text in their template once the references are known.
+            const composePrompt = sourceNode ? getNodeDefinition(sourceNode.type)?.useBuiltinPanel?.composePrompt : undefined;
+            if (sourceNode && composePrompt) {
+                const composed = composePrompt(sourceNode, generationContext.prompt, generationContext.referenceImages.length);
+                if ("error" in composed) {
+                    // Missing input, not a failure: say what to add and leave the node (and its template picker) as it was.
+                    finishGenerationRequest(nodeId, runController);
+                    setRunningNodeId((current) => (current === nodeId ? null : current));
+                    message.warning(composed.error);
+                    return;
+                }
+                generationContext = { ...generationContext, prompt: composed.prompt };
+            }
+            const presetTitle = sourceNode ? getNodeDefinition(sourceNode.type)?.useBuiltinPanel?.resultTitle?.(sourceNode) : undefined;
             const effectivePrompt = generationContext.prompt.trim();
             if (runController.signal.aborted) {
                 finishGenerationRequest(nodeId, runController);
@@ -3008,7 +3027,7 @@ function InfiniteCanvasPage() {
                     const rootNode: CanvasNodeData = {
                         id: rootId,
                         type: CanvasNodeType.Image,
-                        title: retargetImage?.title || (reuseImageNode ? sourceNode?.title : undefined) || effectivePrompt.slice(0, 32) || "Generated Image",
+                        title: retargetImage?.title || (reuseImageNode ? sourceNode?.title : undefined) || presetTitle || effectivePrompt.slice(0, 32) || "Generated Image",
                         position: retargetImage
                             ? retargetImage.position
                             : {
@@ -3046,8 +3065,9 @@ function InfiniteCanvasPage() {
                                             title: rootNode.title,
                                             metadata: { ...node.metadata, ...rootNode.metadata, errorDetails: undefined },
                                         }
-                                      : isImageNode
+                                      : isImageNode || composePrompt
                                         ? {
+                                              // Preset nodes (美术资产) stay as they are; their prompt lives in the template.
                                               ...node,
                                               metadata: { ...node.metadata, status: NODE_STATUS_SUCCESS, errorDetails: undefined },
                                           }

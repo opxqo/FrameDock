@@ -56,6 +56,26 @@ export function resolveYfaiAutoParams(model: YfaiModel, params: Record<string, Y
     }
     return next;
 }
+/**
+ * FrameDock preset nodes: use `ratio` for the model's ratio parameter when the user left it on "自动" and the model
+ * offers that ratio. Returns the serialized params unchanged otherwise (non-YFAI model, unsupported ratio, explicit choice).
+ */
+export function withPreferredYfaiRatio(serialized: string, modelValue: string, ratio: string | undefined, models?: YfaiModel[]) {
+    const model = ratio && ratio !== "auto" ? findYfaiModel(modelValue, models) : undefined;
+    if (!model || !ratio) return serialized;
+    const values = parseYfaiParams(serialized, model.id);
+    for (const key of AUTO_DEFAULT_PARAMS) {
+        const spec = model.param_schema[key];
+        if (!spec) continue;
+        if (values[key] !== undefined && values[key] !== "" && values[key] !== "auto") return serialized;
+        const allowed = spec.options?.map((option) => String(option.value)) || spec.enum?.map(String) || [];
+        if (!allowed.includes(ratio)) return serialized;
+        let all: Record<string, unknown> = {};
+        try { const parsed = JSON.parse(serialized || "{}"); if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) all = parsed; } catch { /* start fresh */ }
+        return JSON.stringify({ ...all, [model.id]: { ...values, [key]: ratio } });
+    }
+    return serialized;
+}
 export function yfaiParamVisible(spec: YfaiParam, params: Record<string, YfaiValue>) {
     return !spec.available_when || Object.entries(spec.available_when).every(([key, values]) => values.some((value) => String(value) === String(params[key])));
 }

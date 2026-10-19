@@ -20,6 +20,7 @@ import { CanvasVideoSettingsPopover } from "./canvas-video-settings-popover";
 import { CanvasTextSettingsPopover } from "./canvas-text-settings-popover";
 import { CanvasNodeType, type CanvasGenerationMode, type CanvasNodeData } from "@/types/canvas";
 import type { CanvasResourceReference } from "@/lib/canvas/canvas-resource-references";
+import { getNodeDefinition } from "@/lib/canvas/node-registry";
 import { CanvasNodeReferenceBar } from "./canvas-node-reference-bar";
 
 export type CanvasNodeGenerationMode = CanvasGenerationMode;
@@ -46,6 +47,9 @@ export function CanvasNodePromptPanel({ node, nodes, isRunning, onPromptChange, 
     const openConfigDialog = useConfigStore((state) => state.openConfigDialog);
     const theme = canvasThemes[useThemeStore((state) => state.theme)];
     const mode = modeOverride ?? defaultMode(node.type);
+    // FrameDock preset nodes (美术资产) carry their own prompt; the box is an optional extra description.
+    const preset = getNodeDefinition(node.type)?.useBuiltinPanel;
+    const allowEmpty = Boolean(preset?.allowEmptyPrompt);
     const config = buildNodeConfig(globalConfig, node, mode);
     const hasTextContent = node.type === CanvasNodeType.Text && Boolean(node.metadata?.content?.trim());
     const hasImageContent = node.type === CanvasNodeType.Image && Boolean(node.metadata?.content);
@@ -71,7 +75,7 @@ export function CanvasNodePromptPanel({ node, nodes, isRunning, onPromptChange, 
 
     const submit = () => {
         const text = prompt.trim();
-        if (!text || isRunning) return;
+        if ((!text && !allowEmpty) || isRunning) return;
         onGenerate(node.id, mode, text, isRegeneratingText
             ? { overwrite: true }
             : isRegeneratingImage
@@ -102,7 +106,7 @@ export function CanvasNodePromptPanel({ node, nodes, isRunning, onPromptChange, 
                 onSubmit={submit}
                 className="thin-scrollbar h-28 w-full cursor-text resize-none rounded-xl px-1 py-2 text-sm leading-6 outline-none"
                 style={{ background: "transparent", color: theme.node.text }}
-                placeholder={mode === "text" && skill ? t("skills.promptPlaceholder", { name: skill.title }) : t(`canvas.promptPanel.${mode === "image" && hasImageContent ? "editImage" : mode === "text" && hasTextContent ? "editText" : mode}`)}
+                placeholder={preset?.promptPlaceholder?.(node) ?? (mode === "text" && skill ? t("skills.promptPlaceholder", { name: skill.title }) : t(`canvas.promptPanel.${mode === "image" && hasImageContent ? "editImage" : mode === "text" && hasTextContent ? "editText" : mode}`))}
             />
 
             {/* Parameter capsules on the left can shrink; the round primary button keeps its own column. */}
@@ -145,7 +149,7 @@ export function CanvasNodePromptPanel({ node, nodes, isRunning, onPromptChange, 
                 </div>
                 <CanvasRunButton
                     state={isRunning ? "running" : isRegeneratingContent ? "regenerate" : "idle"}
-                    disabled={!prompt.trim()}
+                    disabled={!prompt.trim() && !allowEmpty}
                     onRun={submit}
                     onStop={() => onStop(node.id)}
                     label={t(isRunning ? "canvas.promptPanel.stopGeneration" : isRegeneratingContent ? "canvas.promptPanel.regenerate" : "canvas.promptPanel.generate")}
@@ -161,7 +165,7 @@ export function CanvasNodePromptPanel({ node, nodes, isRunning, onPromptChange, 
                         onChange={updatePrompt}
                         className="thin-scrollbar h-[52dvh] min-h-80 w-full cursor-text overflow-y-auto rounded-xl border p-4 text-[15px] leading-6 outline-none"
                         style={{ background: "transparent", borderColor: theme.toolbar.border, color: theme.node.text }}
-                        placeholder={mode === "text" && skill ? t("skills.promptPlaceholder", { name: skill.title }) : t(`canvas.promptPanel.${mode === "image" && hasImageContent ? "editImage" : mode === "text" && hasTextContent ? "editText" : mode}`)}
+                        placeholder={preset?.promptPlaceholder?.(node) ?? (mode === "text" && skill ? t("skills.promptPlaceholder", { name: skill.title }) : t(`canvas.promptPanel.${mode === "image" && hasImageContent ? "editImage" : mode === "text" && hasTextContent ? "editText" : mode}`))}
                     />
                 </div>
             </Modal>

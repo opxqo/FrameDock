@@ -532,6 +532,12 @@ function NodeContent(props: NodeContentRendererProps) {
     if (props.isBatchRoot && props.node.type === CanvasNodeType.Image) return <ImageNodeContent {...props} />;
     if (props.node.type === CanvasNodeType.Text && props.node.metadata?.texts?.length && (props.node.metadata.status !== "error" || props.node.metadata.texts.some((text) => text.content))) return <TextContent {...props} />;
     if (props.node.type === CanvasNodeType.Codex) return <CodexContent {...props} />;
+    // FrameDock preset nodes (美术资产) keep their picker visible and show progress and errors themselves.
+    const presetDefinition = getNodeDefinition(props.node.type);
+    if (presetDefinition?.useBuiltinPanel?.composePrompt && presetDefinition.Content && props.pluginContext) {
+        const PresetContent = presetDefinition.Content;
+        return <PresetContent ctx={props.pluginContext} />;
+    }
     if (props.node.metadata?.status === "loading") return <LoadingContent theme={props.theme} />;
     if (props.node.metadata?.status === "error") return <ErrorContent node={props.node} theme={props.theme} onRetry={props.onRetry} />;
 

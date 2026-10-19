@@ -51,6 +51,8 @@ export type CanvasNodeText = {
 };
 
 export type CanvasNodeMetadata = {
+    /** FrameDock 美术资产 node: chosen asset category and preset template (lib/art-assets/templates.ts). */
+    artAsset?: { category: string; templateId: string };
     /** FrameDock: skill snapshot used as the system prompt when this node generates text. */
     skill?: CanvasSkill;
     /** FrameDock: server job producing this node's (single) output; see lib/canvas/resume-jobs.ts. */
